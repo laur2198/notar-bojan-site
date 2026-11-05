@@ -1,0 +1,23 @@
+# Întrebări frecvente. Primele „numarAfisat” (vezi pagini/ro/acasa.yaml) apar și pe Acasă.
+intrebari:
+  - intrebare: "Trebuie să fac programare?"
+    raspuns: "Pentru majoritatea actelor, da. Programarea ne permite să verificăm dosarul înainte și să vă rezervăm timpul necesar. Solicitarea o trimiteți din pagina Programare sau telefonic, iar biroul o confirmă. «DE COMPLETAT: excepții, ex. legalizări fără programare.»"
+  - intrebare: "Pot trimite actele înainte de programare?"
+    raspuns: "Da. Din pagina fiecărui serviciu puteți trimite actele pe email, ca fotografii clare sau scanări. Le verificăm și vă spunem dacă mai lipsește ceva. La semnare veniți cu documentele originale."
+  - intrebare: "Cât costă un act notarial?"
+    raspuns: "Onorariul se stabilește conform normelor în vigoare și depinde de tipul actului și, pentru unele acte, de valoarea bunului. La onorariu se pot adăuga taxe și impozite prevăzute de lege. Vă comunicăm suma exactă după verificarea actelor."
+  - intrebare: "Ce act de identitate trebuie să am la mine?"
+    raspuns: "Cartea de identitate sau pașaportul, în termen de valabilitate. Pentru cetățenii străini, pașaportul sau documentul de ședere."
+  - intrebare: "Cum se plătește?"
+    raspuns: "«DE COMPLETAT: numerar, card, transfer bancar.»"
+  - intrebare: "Pot fi reprezentat de altcineva?"
+    raspuns: "Pentru multe acte, da, prin procură autentică. Există însă acte care se semnează doar personal, cum sunt testamentul și cererea de divorț. Întrebați-ne înainte de programare."
+  - intrebare: "Nu vorbesc limba română. Ce trebuie să fac?"
+    raspuns: "Actele notariale se întocmesc în limba română. Dacă nu cunoașteți limba, la semnare trebuie să fiți asistat de un interpret autorizat. Anunțați-ne din timp."
+  - intrebare: "În cât timp primesc actul?"
+    raspuns: "Pentru majoritatea actelor, primiți exemplarul la semnare. Pentru acte care se înscriu în cartea funciară, înscrierea se face ulterior, de către birou."
+  - intrebare: "Unde parchez?"
+    raspuns: "«DE COMPLETAT: informații despre parcare și acces.»"
+  - intrebare: "Biroul este accesibil persoanelor cu dizabilități?"
+    raspuns: "«DE COMPLETAT: acces fără trepte / lift / alte informații.» Dacă aveți nevoie de sprijin, anunțați-ne când faceți programarea."
+validat: false

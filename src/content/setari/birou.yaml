@@ -1,0 +1,42 @@
+# Datele biroului. Se editează din panoul de administrare (Pages CMS) → „Setări birou”.
+denumire: "Birou Individual Notarial Bojan Elena Luminița"
+notar: "Bojan Elena Luminița"
+adresa:
+  strada: "«DE COMPLETAT: strada și numărul»"
+  oras: "Brașov"
+  judet: "Brașov"
+  codPostal: "«DE COMPLETAT: cod poștal»"
+telefon: "+40«DE COMPLETAT»"          # format internațional, fără spații – folosit în link-ul tel:
+telefonAfisat: "«DE COMPLETAT: 0268 xxx xxx»"
+email: "«DE COMPLETAT: contact@domeniu.ro»"
+emailActe: "«DE COMPLETAT: acte@domeniu.ro»"
+program:
+  - { zi: "luni",     deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "marți",    deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "miercuri", deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "joi",      deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "vineri",   deschidere: "09:00", inchidere: "15:00", inchis: false }
+  - { zi: "sâmbătă",  deschidere: "",      inchidere: "",      inchis: true }
+  - { zi: "duminică", deschidere: "",      inchidere: "",      inchis: true }
+programConfirmare: "«DE COMPLETAT: orele de mai sus sunt un exemplu. Confirmați programul real, apoi ștergeți acest text.»"
+zileLibere:
+  # Zilele libere legale până la începutul lui 2027. Biroul confirmă și adaugă zilele în care este închis (ex. 24 sau 31 decembrie).
+  - { data: "2026-11-30", motiv: "Sfântul Andrei" }
+  - { data: "2026-12-01", motiv: "Ziua Națională a României" }
+  - { data: "2026-12-25", motiv: "Crăciunul" }
+  - { data: "2026-12-26", motiv: "A doua zi de Crăciun" }
+  - { data: "2027-01-01", motiv: "Anul Nou" }
+  - { data: "2027-01-02", motiv: "Anul Nou" }
+  - { data: "2027-01-06", motiv: "Boboteaza" }
+  - { data: "2027-01-07", motiv: "Sfântul Ioan Botezătorul" }
+  - { data: "2027-01-24", motiv: "Ziua Unirii Principatelor Române" }
+zileLibereConfirmare: "«DE COMPLETAT: confirmați zilele în care biroul este închis, apoi ștergeți acest text.»"
+googleMapsUrl: "«DE COMPLETAT: link Google Maps al profilului rămas după unificare»"
+googleProfilUrl: "«DE COMPLETAT: link recenzii Google»"
+rating:            # ex. 4.8 – se completează după rezolvarea profilurilor duplicate
+numarRecenzii:     # ex. 37
+programareUrl: "«DE COMPLETAT: link pagină de programări Google Calendar»"
+coordonate:        # coordonatele exacte ale sediului (din Google Maps: click dreapta pe pin)
+  lat:             # ex. 45.6427 – cât timp e gol, JSON-LD nu include „geo”
+  lng:
+validat: false

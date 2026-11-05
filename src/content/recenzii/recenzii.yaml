@@ -1,0 +1,6 @@
+# Recenzii REALE copiate de pe profilul Google al biroului, după rezolvarea profilurilor duplicate.
+# Nu se scriu recenzii inventate, nici ca exemplu.
+# Format:
+#   - { autor: "Prenume N.", data: "2026-10-12", nota: 5, text: "…", sursa: "Google" }
+lista: []
+validat: true
