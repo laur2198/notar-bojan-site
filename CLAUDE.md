@@ -58,7 +58,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
   --c-ochre-500: #B0844A;  /* decorativ pe crem (3.2:1 – NU text); pe --c-brown-900 poate fi text (4.9:1) */
   --c-white:     #FFFFFF;
   --c-focus:     #1F5FBF;  /* contur focus pe fundaluri deschise (5.2–5.7:1) */
-  --c-focus-on-dark: #F4EDE3; /* contur focus pe header/footer/butoane maro (≥13:1); #1F5FBF pică acolo (2.3:1) */
+  --c-focus-on-dark: #F4EDE3; /* contur focus pe header/footer/butoane maro (≥11.9:1); #1F5FBF pică acolo (2.3:1) */
   --c-ok:        #2F6B3A;  /* „Deschis acum” */
   --c-closed:    #8A2E22;  /* „Închis” */
 

@@ -1,0 +1,300 @@
+/*
+ * Stiluri globale (CLAUDE.md §4–5). Se importă o singură dată, din layout.
+ * Ordine: tokens → fonturi → reset → tipografie → focus → utilitare → butoane.
+ */
+@import './tokens.css';
+@import './fonturi.css';
+
+/* ---------------------------------------------------------------------------
+   Reset modern
+   --------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+dd,
+dt,
+figcaption,
+blockquote {
+  overflow-wrap: break-word;
+}
+
+/* ---------------------------------------------------------------------------
+   Tipografie de bază: 18 px, line-height 1.6, rând de max. ~70 caractere
+   --------------------------------------------------------------------------- */
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--c-brown-900);
+  background-color: var(--c-cream-50);
+  /* Variabilele acoperă toate grosimile; doar italicul se poate sintetiza (nu e încărcat). */
+  font-synthesis: style;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--c-brown-900);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+}
+
+h4 {
+  font-size: var(--fs-lg);
+}
+
+p,
+li,
+dd,
+blockquote {
+  max-width: var(--measure);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+strong,
+b {
+  font-weight: 650;
+}
+
+small {
+  font-size: var(--fs-sm);
+}
+
+a {
+  color: var(--c-brown-800);
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  transition: color 150ms ease, text-decoration-thickness 150ms ease;
+}
+
+a:hover {
+  color: var(--c-brown-900);
+  text-decoration-thickness: 0.14em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--c-sand-200);
+}
+
+/* ---------------------------------------------------------------------------
+   Focus: contur de 3 px, nu doar schimbare de culoare (CLAUDE.md §4)
+   --------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/*
+ * Pe fundaluri închise (header, footer, secțiuni maro) #1F5FBF are doar 2.3:1.
+ * Containerul închis primește clasa `.pe-inchis`; focusul devine crem (≥11.9:1).
+ */
+.pe-inchis :focus-visible,
+.pe-inchis:focus-visible {
+  outline-color: var(--c-focus-on-dark);
+}
+
+/* ---------------------------------------------------------------------------
+   Utilitare
+   --------------------------------------------------------------------------- */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-2);
+}
+
+@media (min-width: 48rem) {
+  .container {
+    padding-inline: var(--space-4);
+  }
+}
+
+/*
+ * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-brown-900: 14.6:1.
+ * Conturul punctat îl face vizibil și fără a distinge culoarea.
+ */
+mark.todo {
+  background-color: #fff1b8;
+  color: var(--c-brown-900);
+  padding: 0 0.2em;
+  border-radius: 3px;
+  outline: 1px dashed var(--c-brown-600);
+  outline-offset: 1px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---------------------------------------------------------------------------
+   Butoane (CLAUDE.md §5): min. 52 px înălțime
+   Culorile stau în variabile, ca starea hover să schimbe doar variabilele.
+   --------------------------------------------------------------------------- */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-brown-800);
+  --btn-border: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 52px;
+  min-width: 48px;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--btn-border);
+  border-radius: var(--radius);
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration-line: none;
+  text-underline-offset: 0.18em;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.btn:hover {
+  /* Pe lângă culoare, hover-ul subliniază textul: indiciu care nu depinde de culoare. */
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.08em;
+}
+
+/* Primar: fundal --c-brown-800, text alb (13.8:1); hover --c-brown-900 (16.6:1). */
+.btn--primar {
+  --btn-bg: var(--c-brown-800);
+  --btn-fg: var(--c-white);
+  --btn-border: var(--c-brown-800);
+}
+
+.btn--primar:hover {
+  --btn-bg: var(--c-brown-900);
+  --btn-border: var(--c-brown-900);
+  color: var(--c-white);
+}
+
+/* Secundar: contur --c-brown-800 pe fundal transparent; hover cu fundal --c-cream-100 (11.9:1). */
+.btn--secundar {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-brown-800);
+  --btn-border: var(--c-brown-800);
+}
+
+.btn--secundar:hover {
+  --btn-bg: var(--c-cream-100);
+  color: var(--c-brown-800);
+}
+
+/* ---------------------------------------------------------------------------
+   Mișcare redusă: fără tranziții și fără scroll animat
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

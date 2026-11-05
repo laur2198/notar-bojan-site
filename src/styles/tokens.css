@@ -1,0 +1,34 @@
+/* Design tokens – copiate exact din CLAUDE.md §5. Nu se modifică aici fără a modifica CLAUDE.md. */
+:root {
+  /* Culori */
+  --c-brown-900: #2B1B12;  /* text principal, fundal footer */
+  --c-brown-800: #3D281C;  /* culoarea de brand: butoane primare, header */
+  --c-brown-600: #6B4A36;  /* text secundar pe crem (verificat AA) */
+  --c-cream-50:  #FBF8F3;  /* fundal pagină */
+  --c-cream-100: #F4EDE3;  /* fundal secțiuni alternante */
+  --c-sand-200:  #E6DACA;  /* borduri, separatoare */
+  --c-ochre-500: #B0844A;  /* decorativ pe crem (3.2:1 – NU text); pe --c-brown-900 poate fi text (4.9:1) */
+  --c-white:     #FFFFFF;
+  --c-focus:     #1F5FBF;  /* contur focus pe fundaluri deschise (5.2–5.7:1) */
+  --c-focus-on-dark: #F4EDE3; /* contur focus pe header/footer/butoane maro (≥11.9:1); #1F5FBF pică acolo (2.3:1) */
+  --c-ok:        #2F6B3A;  /* „Deschis acum” */
+  --c-closed:    #8A2E22;  /* „Închis” */
+
+  /* Tipografie */
+  --font-serif: 'Source Serif 4 Variable', Georgia, serif;
+  --font-sans:  'Source Sans 3 Variable', system-ui, sans-serif;
+  --fs-base: 1.125rem;   /* 18px */
+  --fs-sm:   1rem;       /* 16px – minim absolut, doar pentru note */
+  --fs-lg:   1.25rem;
+  --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  --fs-h2:   clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  --fs-h1:   clamp(2.125rem, 1.6rem + 2vw, 3.25rem);
+
+  /* Spațiere, raze, umbre */
+  --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
+  --space-5: 3rem;  --space-6: 4.5rem; --space-7: 6rem;
+  --radius: 6px; --radius-lg: 12px;
+  --shadow: 0 1px 2px rgb(43 27 18 / .06), 0 4px 16px rgb(43 27 18 / .06);
+  --container: 72rem;
+  --measure: 68ch;
+}
