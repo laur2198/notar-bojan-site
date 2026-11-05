@@ -78,8 +78,8 @@ body {
   font-family: var(--font-sans);
   font-size: var(--fs-base);
   line-height: 1.6;
-  color: var(--c-brown-900);
-  background-color: var(--c-cream-50);
+  color: var(--c-gray-900);
+  background-color: var(--c-white);
   /* Variabilele acoperă toate grosimile; doar italicul se poate sintetiza (nu e încărcat). */
   font-synthesis: style;
   -webkit-font-smoothing: antialiased;
@@ -93,7 +93,7 @@ h4 {
   font-family: var(--font-serif);
   font-weight: 600;
   line-height: 1.2;
-  color: var(--c-brown-900);
+  color: var(--c-wood-900);
   text-wrap: balance;
 }
 
@@ -134,22 +134,24 @@ small {
   font-size: var(--fs-sm);
 }
 
+/* Linkuri: text --c-wood-800 (12.35:1), sublinierea și hover-ul în accentul bordo (CLAUDE.md §5). */
 a {
-  color: var(--c-brown-800);
+  color: var(--c-wood-800);
   text-decoration-line: underline;
+  text-decoration-color: var(--c-red-700);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
   transition: color 150ms ease, text-decoration-thickness 150ms ease;
 }
 
 a:hover {
-  color: var(--c-brown-900);
+  color: var(--c-red-700);
   text-decoration-thickness: 0.14em;
 }
 
 hr {
   border: 0;
-  border-top: 1px solid var(--c-sand-200);
+  border-top: 1px solid var(--c-gray-200);
 }
 
 /* ---------------------------------------------------------------------------
@@ -163,18 +165,24 @@ hr {
 }
 
 /*
- * Pe fundaluri închise (header, footer, secțiuni maro) #1F5FBF are doar 2.3:1.
- * Containerul închis primește clasa `.pe-inchis`; focusul devine crem (≥11.9:1).
+ * Pe fundal deschis, focusul e --c-focus (wood-800): 12.35:1 pe alb, 11.32:1 pe gray-50.
+ * Pe fundalurile wood (header, footer, CTA) wood-800 nu se vede, deci containerul închis
+ * primește clasa `.pe-inchis`, iar focusul devine --c-focus-on-dark (wood-300):
+ * 5.86:1 pe wood-800, 7.95:1 pe wood-900.
  */
 .pe-inchis :focus-visible,
 .pe-inchis:focus-visible {
   outline-color: var(--c-focus-on-dark);
 }
 
-/* Pe fundal închis, linkurile (în afară de butoane) preiau culoarea deschisă a textului. */
+/*
+ * Pe fundal închis, linkurile (în afară de butoane) preiau culoarea deschisă a textului.
+ * Bordo pe wood are doar 1.51–2.06:1, deci sublinierea preia și ea culoarea textului.
+ */
 .pe-inchis a:not(.btn),
 .pe-inchis a:not(.btn):hover {
   color: inherit;
+  text-decoration-color: currentColor;
 }
 
 /* ---------------------------------------------------------------------------
@@ -207,15 +215,15 @@ hr {
 }
 
 /*
- * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-brown-900: 14.6:1.
+ * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-gray-900: 14.6:1.
  * Conturul punctat îl face vizibil și fără a distinge culoarea.
  */
 mark.todo {
   background-color: #fff1b8;
-  color: var(--c-brown-900);
+  color: var(--c-gray-900);
   padding: 0 0.2em;
   border-radius: 3px;
-  outline: 1px dashed var(--c-brown-600);
+  outline: 1px dashed var(--c-gray-600);
   outline-offset: 1px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -228,7 +236,7 @@ mark.todo {
 
 .btn {
   --btn-bg: transparent;
-  --btn-fg: var(--c-brown-800);
+  --btn-fg: var(--c-wood-800);
   --btn-border: transparent;
 
   display: inline-flex;
@@ -261,49 +269,49 @@ mark.todo {
   text-decoration-thickness: 0.08em;
 }
 
-/* Primar: fundal --c-brown-800, text alb (13.8:1); hover --c-brown-900 (16.6:1). */
+/* Primar: fundal --c-wood-800, text alb (12.35:1); hover --c-wood-900 (16.75:1). Niciodată roșu. */
 .btn--primar {
-  --btn-bg: var(--c-brown-800);
+  --btn-bg: var(--c-wood-800);
   --btn-fg: var(--c-white);
-  --btn-border: var(--c-brown-800);
+  --btn-border: var(--c-wood-800);
 }
 
 .btn--primar:hover {
-  --btn-bg: var(--c-brown-900);
-  --btn-border: var(--c-brown-900);
+  --btn-bg: var(--c-wood-900);
+  --btn-border: var(--c-wood-900);
   color: var(--c-white);
 }
 
-/* Secundar: contur --c-brown-800 pe fundal transparent; hover cu fundal --c-cream-100 (11.9:1). */
+/* Secundar: contur --c-wood-800 pe fundal transparent; hover cu fundal --c-gray-50 (11.32:1). */
 .btn--secundar {
   --btn-bg: transparent;
-  --btn-fg: var(--c-brown-800);
-  --btn-border: var(--c-brown-800);
+  --btn-fg: var(--c-wood-800);
+  --btn-border: var(--c-wood-800);
 }
 
 .btn--secundar:hover {
-  --btn-bg: var(--c-cream-100);
-  color: var(--c-brown-800);
+  --btn-bg: var(--c-gray-50);
+  color: var(--c-wood-800);
 }
 
-/* Invers, pe fundal maro (header, secțiunea finală): fundal crem, text --c-brown-800 (13.05:1). */
+/* Invers, pe secțiunile wood (header, secțiunea finală): fundal alb, text --c-wood-800 (12.35:1). */
 .btn--invers {
-  --btn-bg: var(--c-cream-50);
-  --btn-fg: var(--c-brown-800);
-  --btn-border: var(--c-cream-50);
+  --btn-bg: var(--c-white);
+  --btn-fg: var(--c-wood-800);
+  --btn-border: var(--c-white);
 }
 
 .btn--invers:hover {
-  --btn-bg: var(--c-white);
-  --btn-border: var(--c-white);
-  color: var(--c-brown-800);
+  --btn-bg: var(--c-gray-50);
+  --btn-border: var(--c-gray-50);
+  color: var(--c-wood-800);
 }
 
 /* Link fără destinație (date încă necompletate, doar în preview): vizibil, dar inactiv. */
 .btn[aria-disabled='true'] {
   --btn-bg: transparent;
-  --btn-fg: var(--c-brown-600);
-  --btn-border: var(--c-brown-600);
+  --btn-fg: var(--c-gray-600);
+  --btn-border: var(--c-gray-600);
   border-style: dashed;
   cursor: not-allowed;
   text-decoration-line: none;

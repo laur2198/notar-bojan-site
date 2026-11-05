@@ -115,7 +115,7 @@ Fonturile sunt self-hosted din pachetele Fontsource `@fontsource-variable/source
 - **Bara de jos** (< 768 px): „Sunați” și „Programare”. `body` primește `padding-bottom` cât bara (`--inaltime-bara` în `global.css`).
 - **Date necompletate:** `linkTelefon()` / `linkEmail()` nu generează `tel:` / `mailto:` din texte `«DE COMPLETAT`. În preview, textul apare marcat, iar „Sunați” din bara de jos rămâne vizibil cu `aria-disabled="true"` și fără `href`.
 - **„Deschis acum”** se calculează în browser pe fusul Europe/Bucharest, din `program` și `zileLibere`, și se actualizează la fiecare minut. Fără JS nu apare; programul complet e oricum în footer.
-- **Pe fundal închis** (`.pe-inchis`: header, footer), linkurile preiau culoarea textului, iar focusul devine crem.
+- **Pe fundal închis** (`.pe-inchis`: header, footer), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
 
 ## Note pentru etapele următoare
 

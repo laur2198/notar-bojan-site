@@ -15,7 +15,7 @@ export const culori: Readonly<Record<string, CuloareToken>> = Object.fromEntries
   ),
 );
 
-/** Valoarea hex a unui token de culoare, ex. `culoare('c-brown-800')` → `#3D281C`. */
+/** Valoarea hex a unui token de culoare, ex. `culoare('c-wood-800')` → `#4A2E1E`. */
 export function culoare(nume: string): string {
   const token = culori[nume];
   if (!token) throw new Error(`Tokenul --${nume} lipsește din src/styles/tokens.css.`);

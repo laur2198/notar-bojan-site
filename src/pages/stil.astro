@@ -27,52 +27,61 @@ interface Pereche {
 }
 
 const perechi: Pereche[] = [
-  { fata: 'c-brown-900', fundal: 'c-cream-50', uz: 'text', folosire: 'Text principal pe fundalul paginii' },
-  { fata: 'c-brown-900', fundal: 'c-cream-100', uz: 'text', folosire: 'Text principal pe secțiunile alternante' },
-  { fata: 'c-brown-900', fundal: 'c-white', uz: 'text', folosire: 'Text pe carduri albe' },
-  { fata: 'c-brown-600', fundal: 'c-cream-50', uz: 'text', folosire: 'Text secundar pe fundalul paginii' },
-  { fata: 'c-brown-600', fundal: 'c-cream-100', uz: 'text', folosire: 'Text secundar pe secțiunile alternante' },
-  { fata: 'c-brown-600', fundal: 'c-white', uz: 'text', folosire: 'Text secundar pe carduri albe' },
-  { fata: 'c-brown-800', fundal: 'c-cream-50', uz: 'text', folosire: 'Linkuri; textul și conturul butonului secundar' },
-  { fata: 'c-brown-800', fundal: 'c-cream-100', uz: 'text', folosire: 'Butonul secundar la hover; linkuri pe secțiunile alternante' },
-  { fata: 'c-white', fundal: 'c-brown-800', uz: 'text', folosire: 'Butonul primar; textul din header' },
-  { fata: 'c-white', fundal: 'c-brown-900', uz: 'text', folosire: 'Butonul primar la hover' },
-  { fata: 'c-cream-50', fundal: 'c-brown-900', uz: 'text', folosire: 'Textul din footer' },
-  { fata: 'c-cream-100', fundal: 'c-brown-800', uz: 'text', folosire: 'Text crem pe secțiunea finală maro' },
-  { fata: 'c-ochre-500', fundal: 'c-brown-900', uz: 'text', folosire: 'Text ocru, permis doar pe footer' },
+  { fata: 'c-gray-900', fundal: 'c-white', uz: 'text', folosire: 'Text principal pe fundalul paginii' },
+  { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Text principal pe secțiunile alternante' },
+  { fata: 'c-wood-900', fundal: 'c-white', uz: 'text', folosire: 'Titluri pe fundalul paginii' },
+  { fata: 'c-wood-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Titluri pe secțiunile alternante' },
+  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Text secundar pe fundalul paginii' },
+  { fata: 'c-gray-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Text secundar pe secțiunile alternante' },
+  { fata: 'c-wood-600', fundal: 'c-white', uz: 'text', folosire: 'Text secundar cald și iconițe' },
+  { fata: 'c-wood-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Text secundar cald și iconițe pe secțiunile alternante' },
+  { fata: 'c-wood-800', fundal: 'c-white', uz: 'text', folosire: 'Linkuri; textul și conturul butonului secundar; textul butonului inversat' },
+  { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'text', folosire: 'Butonul secundar la hover; textul butonului inversat la hover' },
+  { fata: 'c-white', fundal: 'c-wood-800', uz: 'text', folosire: 'Butonul primar; textul din header și din secțiunea finală' },
+  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Butonul primar la hover; textul din footer' },
+  { fata: 'c-gray-200', fundal: 'c-wood-800', uz: 'text', folosire: 'Text secundar din header („Notar public · Brașov”)' },
+  { fata: 'c-gray-200', fundal: 'c-wood-900', uz: 'text', folosire: 'Text secundar din footer' },
+  { fata: 'c-wood-300', fundal: 'c-wood-900', uz: 'text', folosire: 'Titlurile din footer' },
   {
-    fata: 'c-ochre-500',
-    fundal: 'c-cream-50',
+    fata: 'c-red-700',
+    fundal: 'c-white',
+    uz: 'text',
+    folosire: 'Accent bordo: linkuri la hover, sublinieri, numerele pașilor, iconițe, „Închis”',
+    nota: 'Doar accent (max. 5–10% din suprafață): nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.',
+  },
+  { fata: 'c-red-700', fundal: 'c-gray-50', uz: 'text', folosire: 'Accent bordo pe secțiunile alternante' },
+  { fata: 'c-red-800', fundal: 'c-white', uz: 'text', folosire: 'Hover pe elementele bordo' },
+  {
+    fata: 'c-red-700',
+    fundal: 'c-wood-800',
     uz: 'decorativ',
-    folosire: 'Linii și accente decorative',
-    nota: 'Strict decorativ: nicio informație nu depinde de această culoare.',
+    folosire: 'Bordo pe fundal wood',
+    nota: 'Nu se folosește: contrast prea mic. Pe header, footer și CTA, linkurile și sublinierile preiau culoarea textului.',
   },
   {
-    fata: 'c-ochre-500',
-    fundal: 'c-cream-100',
-    uz: 'decorativ',
-    folosire: 'Linii și accente decorative (ex. legătura dintre pași)',
-    nota: 'Strict decorativ: nicio informație nu depinde de această culoare. Sub 3:1, deci nu se folosește nici ca text, nici ca indicator de interfață.',
-  },
-  {
-    fata: 'c-sand-200',
-    fundal: 'c-cream-50',
+    fata: 'c-gray-200',
+    fundal: 'c-white',
     uz: 'decorativ',
     folosire: 'Borduri și separatoare',
     nota: 'Doar separatoare decorative; nu delimitează câmpuri de formular sau butoane.',
   },
-  { fata: 'c-focus', fundal: 'c-cream-50', uz: 'ui', folosire: 'Contur de focus pe fundalul paginii' },
-  { fata: 'c-focus', fundal: 'c-cream-100', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
-  { fata: 'c-focus', fundal: 'c-white', uz: 'ui', folosire: 'Contur de focus pe carduri albe' },
-  { fata: 'c-focus-on-dark', fundal: 'c-brown-800', uz: 'ui', folosire: 'Contur de focus pe header și pe secțiunile maro' },
-  { fata: 'c-focus-on-dark', fundal: 'c-brown-900', uz: 'ui', folosire: 'Contur de focus pe footer' },
-  { fata: 'c-ok', fundal: 'c-cream-50', uz: 'text', folosire: '„Deschis acum” pe fundalul paginii' },
-  { fata: 'c-ok', fundal: 'c-white', uz: 'text', folosire: '„Deschis acum” pe carduri albe' },
-  { fata: 'c-ok', fundal: 'c-cream-100', uz: 'text', folosire: '„Deschis acum” pe secțiunile alternante' },
-  { fata: 'c-closed', fundal: 'c-cream-50', uz: 'text', folosire: '„Închis” pe fundalul paginii' },
-  { fata: 'c-closed', fundal: 'c-white', uz: 'text', folosire: '„Închis” pe carduri albe' },
-  { fata: 'c-closed', fundal: 'c-cream-100', uz: 'text', folosire: '„Închis” pe secțiunile alternante' },
-  { fata: 'c-brown-900', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (mark.todo)' },
+  { fata: 'c-focus', fundal: 'c-white', uz: 'ui', folosire: 'Contur de focus pe fundalul paginii' },
+  { fata: 'c-focus', fundal: 'c-gray-50', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
+  { fata: 'c-focus-on-dark', fundal: 'c-wood-800', uz: 'ui', folosire: 'Contur de focus pe header și pe secțiunea finală' },
+  { fata: 'c-focus-on-dark', fundal: 'c-wood-900', uz: 'ui', folosire: 'Contur de focus pe footer' },
+  {
+    fata: 'c-focus-on-dark',
+    fundal: 'c-white',
+    uz: 'decorativ',
+    folosire: 'wood-300 pe fundal deschis',
+    nota: 'Nu se folosește ca focus sau ca text pe fundal deschis: contrast prea mic. Acolo focusul e --c-focus.',
+  },
+  { fata: 'c-ok', fundal: 'c-white', uz: 'text', folosire: '„Deschis acum” pe fundalul paginii' },
+  { fata: 'c-ok', fundal: 'c-gray-50', uz: 'text', folosire: '„Deschis acum” pe secțiunile alternante' },
+  { fata: 'c-closed', fundal: 'c-white', uz: 'text', folosire: '„Închis” pe fundalul paginii' },
+  { fata: 'c-closed', fundal: 'c-gray-50', uz: 'text', folosire: '„Închis” pe secțiunile alternante' },
+  { fata: 'c-gray-900', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (mark.todo)' },
+  { fata: 'c-gray-600', fundal: 'mark', uz: 'ui', folosire: 'Conturul punctat al marcajului' },
 ];
 
 const ETICHETA_UZ: Record<Uz, string> = {
@@ -249,14 +258,18 @@ const exempluMarcaj =
           <span class="btn btn--primar demo-focus">Solicitați o programare</span>
           <span class="btn btn--secundar demo-focus">Sunați: 0268 000 000</span>
         </div>
-        <h3>Focus pe fundal închis</h3>
+        <h3>Butonul inversat și focusul pe fundal închis</h3>
         <div class="panou-inchis pe-inchis">
           <p>
-            Pe header, footer și secțiunile maro, conturul de focus devine crem
+            Pe header, footer și secțiunile wood, conturul de focus devine wood-300
             (<code>--c-focus-on-dark</code>):
           </p>
+          <div class="butoane">
+            <button type="button" class="btn btn--invers">Solicitați o programare</button>
+          </div>
           <div class="butoane" aria-hidden="true">
             <span class="link-demo demo-focus">Politica de confidențialitate</span>
+            <span class="btn btn--invers demo-focus">Solicitați o programare</span>
           </div>
         </div>
       </section>
@@ -298,7 +311,7 @@ const exempluMarcaj =
 
   section {
     padding-top: var(--space-5);
-    border-top: 1px solid var(--c-sand-200);
+    border-top: 1px solid var(--c-gray-200);
     margin-top: var(--space-5);
   }
 
@@ -312,7 +325,7 @@ const exempluMarcaj =
 
   .lead {
     font-size: var(--fs-lg);
-    color: var(--c-brown-600);
+    color: var(--c-gray-600);
   }
 
   code {
@@ -323,12 +336,12 @@ const exempluMarcaj =
   .nota {
     display: block;
     font-size: var(--fs-sm);
-    color: var(--c-brown-600);
+    color: var(--c-gray-600);
   }
 
   .nota--atentie {
     margin-top: 0.25rem;
-    color: var(--c-brown-800);
+    color: var(--c-wood-800);
     font-weight: 600;
   }
 
@@ -348,7 +361,7 @@ const exempluMarcaj =
     max-width: none;
     padding: var(--space-2);
     background: var(--c-white);
-    border: 1px solid var(--c-sand-200);
+    border: 1px solid var(--c-gray-200);
     border-radius: var(--radius-lg);
   }
 
@@ -384,11 +397,11 @@ const exempluMarcaj =
     padding: 0.6rem 0.75rem;
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid var(--c-sand-200);
+    border-bottom: 1px solid var(--c-gray-200);
   }
 
   thead th {
-    border-bottom: 2px solid var(--c-brown-800);
+    border-bottom: 2px solid var(--c-wood-800);
   }
 
   .numar {
@@ -429,7 +442,7 @@ const exempluMarcaj =
 
   .scara dt {
     font-size: var(--fs-sm);
-    color: var(--c-brown-600);
+    color: var(--c-gray-600);
   }
 
   .scara dd {
@@ -489,14 +502,14 @@ const exempluMarcaj =
   }
 
   .demo-hover-primar {
-    --btn-bg: var(--c-brown-900);
-    --btn-border: var(--c-brown-900);
+    --btn-bg: var(--c-wood-900);
+    --btn-border: var(--c-wood-900);
     text-decoration-line: underline;
     text-decoration-thickness: 0.08em;
   }
 
   .demo-hover-secundar {
-    --btn-bg: var(--c-cream-100);
+    --btn-bg: var(--c-gray-50);
     text-decoration-line: underline;
     text-decoration-thickness: 0.08em;
   }
@@ -508,7 +521,7 @@ const exempluMarcaj =
 
   .panou-inchis {
     padding: var(--space-3);
-    background: var(--c-brown-800);
+    background: var(--c-wood-800);
     color: var(--c-white);
     border-radius: var(--radius-lg);
   }
@@ -518,11 +531,11 @@ const exempluMarcaj =
   }
 
   .panou-inchis code {
-    color: var(--c-cream-100);
+    color: var(--c-gray-50);
   }
 
   .link-demo {
-    color: var(--c-cream-50);
+    color: var(--c-white);
     text-decoration: underline;
     text-underline-offset: 0.18em;
   }
@@ -540,7 +553,7 @@ const exempluMarcaj =
   .exemplu-marcaj {
     padding: var(--space-2);
     background: var(--c-white);
-    border: 1px solid var(--c-sand-200);
+    border: 1px solid var(--c-gray-200);
     border-radius: var(--radius);
   }
 </style>

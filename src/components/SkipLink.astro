@@ -21,8 +21,8 @@ const { locale } = Astro.props;
     align-items: center;
     min-height: 48px;
     padding: 0.5rem 1rem;
-    background: var(--c-cream-50);
-    color: var(--c-brown-900);
+    background: var(--c-white);
+    color: var(--c-gray-900);
     font-weight: 600;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -32,5 +32,10 @@ const { locale } = Astro.props;
   .skip-link:focus-visible,
   .skip-link:focus {
     transform: none;
+  }
+
+  /* Linkul apare peste header-ul wood-800, unde conturul --c-focus (tot wood-800) nu s-ar vedea. */
+  .skip-link:focus-visible {
+    outline-color: var(--c-focus-on-dark);
   }
 </style>
