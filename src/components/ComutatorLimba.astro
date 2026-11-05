@@ -1,0 +1,64 @@
+---
+/**
+ * Comutatorul RO | EN (CLAUDE.md §6): duce la pagina corespondentă din cealaltă
+ * limbă sau, dacă nu există, la pagina principală a acelei limbi.
+ * Varianta `compact` arată doar linkul către cealaltă limbă (ecrane înguste).
+ */
+import { caleInAltaLimba, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+  class?: string;
+}
+
+const { locale, compact = false, class: clasa } = Astro.props;
+const tinta = caleInAltaLimba(Astro.url.pathname);
+const cod = (l: Locale) => l.toUpperCase();
+---
+
+<div class:list={['limba', clasa]} role="group" aria-label={t(locale, 'limba.comutator')}>
+  {
+    !compact && (
+      <>
+        <span class="limba__curenta" aria-current="true">
+          {cod(locale)}
+          <span class="sr-only"> – {t(locale, 'limba.nume')}</span>
+        </span>
+        <span class="limba__separator" aria-hidden="true">
+          |
+        </span>
+      </>
+    )
+  }
+  <a class="limba__link" href={tinta.href} hreflang={tinta.locale} lang={tinta.locale}>
+    {cod(tinta.locale)}
+    <span class="sr-only"> – {t(tinta.locale, 'limba.nume')}</span>
+  </a>
+</div>
+
+<style>
+  .limba {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 600;
+  }
+
+  .limba__curenta {
+    padding-inline: 0.25rem;
+  }
+
+  .limba__separator {
+    opacity: 0.7;
+  }
+
+  .limba__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
+    color: inherit;
+  }
+</style>

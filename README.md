@@ -22,6 +22,7 @@ npm install
 | `npm run build:prod` | Build de **producție**: oprește build-ul dacă există conținut nevalidat (vezi mai jos) |
 | `npm run preview` | Servește local ultimul build din `dist/` |
 | `npm run check` | `astro check`: verifică tipurile TypeScript și schemele de conținut |
+| `npm test` | Testele Vitest pentru logica pură (program, linkuri de contact, marcaje, rute) |
 | `npm run verifica` | Doar verificarea conținutului (preview: rezumat; `SITE_MODE=production`: listă și cod de ieșire 1) |
 
 Ghidul de stil intern e la `/stil/`: paleta cu contrastele calculate, tipografia, butoanele, diacriticele. Pagina e `noindex` și e exclusă din sitemap.
@@ -54,10 +55,23 @@ src/
   assets/media/         imaginile încărcate din CMS (optimizate de Astro)
   content/              conținutul scris de om – NU se modifică din cod
   content.config.ts     schemele Zod ale colecțiilor
+  components/           componentele carcasei (Header, Footer, BaraActiuni, ProgramSaptamana,
+                        StareProgram, DraftBadge, Breadcrumbs, Seo, ComutatorLimba…)
+  i18n/
+    ro.ts, en.ts        textele de interfață (en.ts trebuie să aibă exact cheile din ro.ts)
+    index.ts            t(locale, cheie), RUTE, routeMap RO ↔ EN, comutatorul de limbă
+  layouts/
+    BaseLayout.astro    SkipLink → Header → <main id="continut"> → Footer → BaraActiuni
   lib/
-    continut.ts         getBirou(), esteDraft(), marcheazaPlaceholder(), SITE_MODE
+    continut.ts         getBirou(), SITE_MODE (+ re-exportă funcțiile din marcaj.ts)
+    marcaj.ts           esteDraft(), marcheazaPlaceholder() – pure, testate
+    contact.ts          linkTelefon(), linkEmail() – fără tel:/mailto: din date necompletate
+    program.ts          „Deschis acum / Închis acum”, pe fusul Europe/Bucharest – pur, testat
     contrast.ts         calculul contrastului WCAG
+    tokens.ts           culorile din tokens.css, citite la build
   pages/
+    index.astro         pagina principală RO (temporară până la etapa 3)
+    en/index.astro      pagina principală EN (temporară până la etapa 6)
     stil.astro          ghidul de stil intern (/stil/)
   styles/
     tokens.css          design tokens (copie exactă din CLAUDE.md §5)
@@ -95,7 +109,16 @@ Fonturile sunt self-hosted din pachetele Fontsource `@fontsource-variable/source
 - **Fără italic.** Niciun text din `src/content/` nu conține italic (`*…*` sau `_…_`), așa că fișierele italice nu se încarcă. Dacă apare italic în conținut, se adaugă în `fonturi.css` fișierul `source-sans-3-{latin,latin-ext}-wght-italic.woff2`. Până atunci browserul ar sintetiza italicul.
 - Source Serif 4 se încarcă fără axa de dimensiune optică (`opsz`), ale cărei fișiere sunt de circa 2,4 ori mai mari.
 
+## Carcasa (etapa 2)
+
+- **Header:** desktop (≥ 1024 px) pe două niveluri: telefonul și comutatorul de limbă sus, meniul și butonul „Programare” jos. Sub 1024 px: wordmark, comutator (doar linkul către cealaltă limbă) și „Meniu”, un `<details>` care merge fără JS; JS adaugă închiderea la Escape și la click în afară. Între 768 și 1023 px header-ul are un rând în plus cu telefonul și „Programare”, pentru că bara de jos apare doar sub 768 px.
+- **Bara de jos** (< 768 px): „Sunați” și „Programare”. `body` primește `padding-bottom` cât bara (`--inaltime-bara` în `global.css`).
+- **Date necompletate:** `linkTelefon()` / `linkEmail()` nu generează `tel:` / `mailto:` din texte `«DE COMPLETAT`. În preview, textul apare marcat, iar „Sunați” din bara de jos rămâne vizibil cu `aria-disabled="true"` și fără `href`.
+- **„Deschis acum”** se calculează în browser pe fusul Europe/Bucharest, din `program` și `zileLibere`, și se actualizează la fiecare minut. Fără JS nu apare; programul complet e oricum în footer.
+- **Pe fundal închis** (`.pe-inchis`: header, footer), linkurile preiau culoarea textului, iar focusul devine crem.
+
 ## Note pentru etapele următoare
 
 - **Sitemap (etapa 6):** opțiunea `i18n` din `@astrojs/sitemap` împerechează doar căi identice (`/` ↔ `/en/`). Pentru perechile cu slug diferit (`/servicii/` ↔ `/en/services/`) e nevoie de `serialize()` cu `routeMap`. Locul e marcat cu un TODO în `astro.config.mjs`.
+- **hreflang:** paginile folosesc `ro` / `en` (CLAUDE.md §6), iar sitemap-ul `ro-RO` / `en-US` (promptul etapei 1). Ar fi bine să fie aceleași coduri; de unificat în etapa 6.
 - `compressHTML: true` e setat explicit. Astro 7 folosește implicit `'jsx'`, care șterge spațiile dintre elementele inline.

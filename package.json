@@ -13,7 +13,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "verifica": "node scripts/verifica-continut.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "cross-env": "^10.1.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
   }
 }

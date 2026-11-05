@@ -1,0 +1,68 @@
+---
+/**
+ * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): „Sunați” și „Programare”,
+ * două butoane egale. Respectă `env(safe-area-inset-bottom)`; spațiul de sub
+ * conținut e rezervat în global.css (`--inaltime-bara`).
+ *
+ * Dacă telefonul nu e încă completat (doar în preview), „Sunați” rămâne vizibil,
+ * dar fără `href` și cu `aria-disabled="true"`.
+ */
+import { cale, t, type Locale } from '../i18n';
+import { linkTelefon } from '../lib/contact';
+import type { Birou } from '../lib/continut';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+}
+
+const { locale, birou } = Astro.props;
+const telefon = linkTelefon(birou);
+const hrefProgramare = cale('programare', locale);
+---
+
+<nav class="bara-actiuni" aria-label={t(locale, 'actiune.bara')}>
+  {
+    telefon.valid ? (
+      <a class="btn btn--secundar" href={telefon.href}>
+        <Iconita nume="telefon" />
+        {t(locale, 'actiune.suna')}
+      </a>
+    ) : (
+      <a class="btn btn--secundar" role="link" aria-disabled="true">
+        <Iconita nume="telefon" />
+        {t(locale, 'actiune.suna')}
+        <span class="sr-only"> ({t(locale, 'actiune.indisponibil')})</span>
+      </a>
+    )
+  }
+  <a class="btn btn--primar" href={hrefProgramare}>{t(locale, 'actiune.programareScurt')}</a>
+</nav>
+
+<style>
+  .bara-actiuni {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem max(0.5rem, env(safe-area-inset-right, 0px)) calc(0.5rem + env(safe-area-inset-bottom, 0px))
+      max(0.5rem, env(safe-area-inset-left, 0px));
+    background: var(--c-cream-50);
+    border-top: 1px solid var(--c-sand-200);
+    box-shadow: 0 -4px 16px rgb(43 27 18 / 0.08);
+  }
+
+  .bara-actiuni .btn {
+    width: 100%;
+    padding-inline: 0.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .bara-actiuni {
+      display: none;
+    }
+  }
+</style>

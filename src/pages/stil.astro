@@ -5,15 +5,9 @@
  * sunt calculate din valorile reale, la fiecare build.
  */
 import '../styles/global.css';
-import tokensCss from '../styles/tokens.css?raw';
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
 import { marcheazaPlaceholder } from '../lib/continut';
-
-const culori = Object.fromEntries(
-  [...tokensCss.matchAll(/--(c-[a-z0-9-]+):\s*(#[0-9a-fA-F]{3,6})\s*;\s*(?:\/\*\s*(.*?)\s*\*\/)?/g)].map(
-    ([, nume, hex, comentariu]) => [nume, { hex: hex.toUpperCase(), comentariu: comentariu ?? '' }],
-  ),
-) as Record<string, { hex: string; comentariu: string }>;
+import { culori } from '../lib/tokens';
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
 

@@ -1,0 +1,58 @@
+---
+/**
+ * Eticheta „Text propus – în curs de validare” (CLAUDE.md §7).
+ * Apare doar în preview și doar dacă textul nu e aprobat.
+ *
+ * Folosire: <DraftBadge locale="ro" intrare={entry} /> sau <DraftBadge locale="ro" draft />.
+ * `text` înlocuiește eticheta standard (ex. „Recenziile se adaugă după…”).
+ */
+import { t, type Locale } from '../i18n';
+import { esteDraft, estePreview, type IntrareContinut } from '../lib/continut';
+
+interface Props {
+  locale: Locale;
+  /** Intrarea de conținut verificată cu `esteDraft()`. */
+  intrare?: IntrareContinut;
+  /** Forțează afișarea (când starea e deja calculată). */
+  draft?: boolean;
+  text?: string;
+}
+
+const { locale, intrare, draft, text } = Astro.props;
+const afiseaza = estePreview && (draft ?? (intrare ? esteDraft(intrare) : false));
+---
+
+{
+  afiseaza && (
+    <p class="draft-badge" role="note">
+      {text ?? t(locale, 'draft.eticheta')}
+    </p>
+  )
+}
+
+<style>
+  .draft-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    margin-block: var(--space-2);
+    padding: 0.25rem 0.75rem;
+    background: #fff1b8;
+    color: var(--c-brown-900);
+    border: 1px dashed var(--c-brown-600);
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .draft-badge::before {
+    content: '';
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--c-brown-600);
+  }
+</style>

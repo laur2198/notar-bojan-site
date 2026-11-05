@@ -171,6 +171,12 @@ hr {
   outline-color: var(--c-focus-on-dark);
 }
 
+/* Pe fundal închis, linkurile (în afară de butoane) preiau culoarea deschisă a textului. */
+.pe-inchis a:not(.btn),
+.pe-inchis a:not(.btn):hover {
+  color: inherit;
+}
+
 /* ---------------------------------------------------------------------------
    Utilitare
    --------------------------------------------------------------------------- */
@@ -278,6 +284,54 @@ mark.todo {
 .btn--secundar:hover {
   --btn-bg: var(--c-cream-100);
   color: var(--c-brown-800);
+}
+
+/* Invers, pe fundal maro (header, secțiunea finală): fundal crem, text --c-brown-800 (13.05:1). */
+.btn--invers {
+  --btn-bg: var(--c-cream-50);
+  --btn-fg: var(--c-brown-800);
+  --btn-border: var(--c-cream-50);
+}
+
+.btn--invers:hover {
+  --btn-bg: var(--c-white);
+  --btn-border: var(--c-white);
+  color: var(--c-brown-800);
+}
+
+/* Link fără destinație (date încă necompletate, doar în preview): vizibil, dar inactiv. */
+.btn[aria-disabled='true'] {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-brown-600);
+  --btn-border: var(--c-brown-600);
+  border-style: dashed;
+  cursor: not-allowed;
+  text-decoration-line: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Carcasă: bara de acțiuni de pe mobil (BaraActiuni.astro)
+   Sub 768 px, pagina primește jos spațiu cât bara, ca bara să nu acopere footer-ul.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* buton 52 px + 2 × 8 px spațiere + 1 px bordură */
+  --inaltime-bara: calc(52px + 1rem + 1px);
+}
+
+@media (max-width: 47.99rem) {
+  html {
+    /* Elementele focusate prin Tab nu ajung sub bară. */
+    scroll-padding-bottom: calc(var(--inaltime-bara) + env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+
+  body {
+    padding-bottom: calc(var(--inaltime-bara) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+main:focus {
+  outline: none;
 }
 
 /* ---------------------------------------------------------------------------

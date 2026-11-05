@@ -1,0 +1,175 @@
+---
+/**
+ * Subsolul (CLAUDE.md §4, §8): datele biroului, programul, linkuri utile.
+ * Fundal --c-brown-900; focusul folosește --c-focus-on-dark (clasa .pe-inchis).
+ */
+import { cale, esteInAltaLimba, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
+import { linkEmail, linkTelefon } from '../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import ProgramSaptamana from './ProgramSaptamana.astro';
+import TelefonLink from './TelefonLink.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+}
+
+const { locale, birou } = Astro.props;
+const telefon = linkTelefon(birou);
+const email = linkEmail(birou.email);
+const an = new Date().getFullYear();
+
+/** Recenziile nu au pagină EN (CLAUDE.md §6), deci nu apar în subsolul EN. */
+const LINKURI: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
+  ro: [
+    { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'recenzii', eticheta: 'nav.recenzii' },
+    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'contact', eticheta: 'nav.contact' },
+    { cheie: 'confidentialitate', eticheta: 'nav.confidentialitate' },
+  ],
+  en: [
+    { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'contact', eticheta: 'nav.contact' },
+    { cheie: 'confidentialitate', eticheta: 'nav.confidentialitate' },
+  ],
+};
+
+const linkuri = LINKURI[locale].map(({ cheie, eticheta }) => ({
+  href: cale(cheie, locale),
+  text: t(locale, eticheta),
+  altaLimba: esteInAltaLimba(cheie, locale),
+}));
+
+const { strada, codPostal, oras, judet } = birou.adresa;
+---
+
+<footer class="subsol pe-inchis">
+  <div class="container subsol__grila">
+    <section class="subsol__coloana" aria-labelledby="subsol-contact">
+      <h2 id="subsol-contact" class="subsol__titlu">{t(locale, 'subsol.contact')}</h2>
+      <p class="subsol__denumire">{birou.denumire}</p>
+      <address>
+        <span set:html={marcheazaPlaceholder(strada)} /><br />
+        <span set:html={marcheazaPlaceholder(codPostal)} />
+        {oras}, {t(locale, 'contact.judet', { judet })}
+      </address>
+      <ul class="subsol__contact" role="list">
+        <li>
+          <TelefonLink locale={locale} telefon={telefon} />
+        </li>
+        <li>
+          {
+            email.valid ? (
+              <a class="subsol__email" href={email.href}>
+                <span class="sr-only">{t(locale, 'contact.email')}: </span>
+                {email.text}
+              </a>
+            ) : (
+              <span class="subsol__email">
+                <span class="sr-only">{t(locale, 'contact.email')}: </span>
+                <Fragment set:html={marcheazaPlaceholder(email.text)} />
+              </span>
+            )
+          }
+        </li>
+      </ul>
+    </section>
+
+    <section class="subsol__coloana" aria-labelledby="subsol-program">
+      <h2 id="subsol-program" class="subsol__titlu">{t(locale, 'program.titlu')}</h2>
+      <ProgramSaptamana locale={locale} program={birou.program} ton="inchis" />
+    </section>
+
+    <nav class="subsol__coloana" aria-labelledby="subsol-linkuri">
+      <h2 id="subsol-linkuri" class="subsol__titlu">{t(locale, 'nav.subsol')}</h2>
+      <ul class="subsol__linkuri" role="list">
+        {
+          linkuri.map((l) => (
+            <li>
+              <a href={l.href} hreflang={l.altaLimba ? 'ro' : undefined}>
+                {l.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container">
+    <p class="subsol__final">{t(locale, 'subsol.copyright', { an, denumire: birou.denumire })}</p>
+  </div>
+</footer>
+
+<style>
+  .subsol {
+    background: var(--c-brown-900);
+    color: var(--c-cream-50);
+    padding-top: var(--space-6);
+  }
+
+  .subsol__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 48rem) {
+    .subsol__grila {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .subsol__grila {
+      grid-template-columns: 1.2fr 1fr 1fr;
+    }
+  }
+
+  .subsol__coloana > * + * {
+    margin-top: var(--space-2);
+  }
+
+  .subsol__titlu {
+    font-size: var(--fs-lg);
+    color: var(--c-cream-100);
+  }
+
+  .subsol__denumire {
+    font-weight: 600;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  .subsol__contact,
+  .subsol__linkuri {
+    padding: 0;
+    list-style: none;
+  }
+
+  .subsol__email {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    overflow-wrap: anywhere;
+  }
+
+  .subsol__linkuri a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  .subsol__final {
+    max-width: none;
+    margin-top: var(--space-5);
+    padding-block: var(--space-3);
+    border-top: 1px solid rgb(244 237 227 / 0.2);
+    font-size: var(--fs-sm);
+    color: var(--c-cream-100);
+  }
+</style>
