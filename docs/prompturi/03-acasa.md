@@ -13,7 +13,7 @@ Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de res
 ## Ce construiești: secțiunile, în ordine
 
 1. **Hero:**
-   - pe desktop, două coloane: text (eticheta mică „Birou Individual Notarial”, `h1` „Notar public în Brașov”, subtitlul, butonul primar „Solicitați o programare” și butonul secundar „Sunați: {telefonAfisat}”) și fotografia în format portret 4:5;
+   - pe desktop, două coloane: text (denumirea legală „Birou Individual Notarial” pe un rând mic, în fontul de text, fără majuscule integrale și fără `letter-spacing`, `h1` „Notar public în Brașov”, subtitlul, butonul primar „Solicitați o programare” și butonul secundar „Sunați: {telefonAfisat}”) și fotografia în format portret 4:5;
    - pe mobil: text, butoane pe toată lățimea, apoi fotografia, la o înălțime rezonabilă;
    - fotografia lipsește încă, așa că pune un placeholder cu eticheta „Fotografie – de completat” (`CLAUDE.md` §5). Fără fotografii stock.
 2. **Banda de informații practice** (elementul preluat de la Benavides). Stă lipită sau ușor suprapusă peste baza hero-ului pe desktop, pe fundal alb, cu umbra `--shadow`. Are trei coloane:
@@ -22,7 +22,7 @@ Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de res
    - **Adresă:** strada, orașul și linkul „Deschideți în Google Maps” (tab nou, anunțat).
 
    Pe mobil, cele trei coloane devin trei carduri stivuite.
-3. **Servicii:** `h2`, intro și un grid cu serviciile `evidentiat: true`, ordonate după `ordine`. Grid-ul are 3 coloane pe desktop, 2 pe tabletă și 1 pe mobil. Fiecare card conține titlul (serif), `rezumat`, „Aflați mai multe” și o săgeată decorativă. **Tot cardul e clicabil**, cu un singur link real (tehnica pseudo-element pe `a`), fără linkuri imbricate. Sub grid: „Vedeți toate serviciile și onorariile”.
+3. **Servicii:** `h2`, intro și un grid cu serviciile `evidentiat: true`, ordonate după `ordine`. Grid-ul are 3 coloane pe desktop, 2 pe tabletă și 1 pe mobil. Fiecare card conține titlul (serif), `rezumat` și o săgeată decorativă. Titlul cardului e chiar linkul; fără „Aflați mai multe” repetat pe fiecare card. **Tot cardul e clicabil**, cu un singur link real (tehnica pseudo-element pe `a`), fără linkuri imbricate. Sub grid: „Vedeți toate serviciile și onorariile”.
 4. **Cum lucrăm:** cei 3 pași din `pasi.lista`, ca listă ordonată, cu numere mari în serif și o linie de legătură decorativă `--c-ochre-500` pe desktop. Fundal `--c-cream-100`.
 5. **Recenzii:**
    - dacă `recenzii.lista` are elemente: maximum 3 carduri cu nota, textul (trunchiat elegant la ~5 rânduri, cu „Citiți tot” spre `/recenzii/`), autorul, data și sursa „Google”;
@@ -38,7 +38,7 @@ Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de res
 - Toate textele vin din conținut sau din `src/i18n/`. Nimic hardcodat.
 - Componente reutilizabile: `CardServiciu`, `BandaInfo`, `PasiLucru`, `CardRecenzie`, `ListaFaq`, `SectiuneCta`. Le vor folosi și paginile următoare.
 - Ritm vertical consecvent: secțiunile alternează fundalul crem cu crem închis, cu `--space-6`/`--space-7` între ele.
-- Detaliile care dau calitate: linii subțiri `--c-sand-200`, eticheta mică cu litere spațiate (`letter-spacing`) deasupra `h2`, numerele pașilor în serif, umbre discrete. Fără gradienți stridenți, fără iconițe de tip clipart.
+- Detaliile care dau calitate: linii subțiri `--c-sand-200`, numerele pașilor în serif, umbre discrete. Fără gradienți stridenți, fără iconițe de tip clipart. **Fără eyebrow** (text mic deasupra unui `h2`, care doar anunță titlul) și fără etichete cu MAJUSCULE spațiate: sunt cele mai recognoscibile semne de design generat de AI. Fiecare secțiune începe direct cu `h2`.
 - Lighthouse pe mobil, în preview: Performance ≥ 95, Accessibility 100, Best Practices ≥ 95.
 - Imaginile, când vor exista, trec prin `<Image>` din Astro. Hero-ul are `loading="eager"` și `fetchpriority="high"`.
 
