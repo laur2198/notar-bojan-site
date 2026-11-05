@@ -1,0 +1,35 @@
+# Datele biroului. Se editează din panoul de administrare (Pages CMS) → „Setări birou”.
+denumire: "Birou Individual Notarial Bojan Elena Luminița"
+notar: "Bojan Elena Luminița"
+adresa:
+  strada: "«DE COMPLETAT: strada și numărul»"
+  oras: "Brașov"
+  judet: "Brașov"
+  codPostal: "«DE COMPLETAT: cod poștal»"
+telefon: "+40«DE COMPLETAT»"          # format internațional, fără spații – folosit în link-ul tel:
+telefonAfisat: "«DE COMPLETAT: 0268 xxx xxx»"
+email: "«DE COMPLETAT: contact@domeniu.ro»"
+emailActe: "«DE COMPLETAT: acte@domeniu.ro»"
+program:
+  - { zi: "luni",     deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "marți",    deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "miercuri", deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "joi",      deschidere: "09:00", inchidere: "17:00", inchis: false }
+  - { zi: "vineri",   deschidere: "09:00", inchidere: "15:00", inchis: false }
+  - { zi: "sâmbătă",  deschidere: "",      inchidere: "",      inchis: true }
+  - { zi: "duminică", deschidere: "",      inchidere: "",      inchis: true }
+# Orele de mai sus sunt EXEMPLU și trebuie confirmate de birou.
+zileLibere:
+  - { data: "2026-12-25", motiv: "Crăciunul" }
+  - { data: "2026-12-26", motiv: "A doua zi de Crăciun" }
+  - { data: "2027-01-01", motiv: "Anul Nou" }
+  - { data: "2027-01-02", motiv: "Anul Nou" }
+googleMapsUrl: "«DE COMPLETAT: link Google Maps al profilului rămas după unificare»"
+googleProfilUrl: "«DE COMPLETAT: link recenzii Google»"
+rating:            # ex. 4.8 – se completează după rezolvarea profilurilor duplicate
+numarRecenzii:     # ex. 37
+programareUrl: "«DE COMPLETAT: link pagină de programări Google Calendar»"
+coordonate:
+  lat: 45.6427    # centrul Brașovului – de înlocuit cu coordonatele exacte ale sediului
+  lng: 25.5887
+validat: false

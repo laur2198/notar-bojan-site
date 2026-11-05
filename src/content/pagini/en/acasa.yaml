@@ -1,0 +1,45 @@
+seo:
+  titlu: "Notary Public in Brașov, Romania – Bojan Elena Luminița"
+  descriere: "Notary office in Brașov, Romania: property sales, inheritance, powers of attorney, certified copies and signatures. Book an appointment and send your documents in advance."
+
+hero:
+  eticheta: "Notary Office"
+  titlu: "Notary Public in Brașov"
+  subtitlu: "Bojan Elena Luminița. Send us your documents in advance, so your visit to the office is only for signing."
+  imagine: ""
+  imagineAlt: "Notary public Bojan Elena Luminița in her office in Brașov"
+
+servicii:
+  titlu: "Notarial services"
+  intro: "The services most often requested by foreign clients. Contact us for any other notarial act."
+
+pasi:
+  titlu: "How it works"
+  intro: "We prepare your file before the appointment, to keep your visit short."
+  lista:
+    - titlu: "Send your documents"
+      text: "By email, as clear photos or scans. Tell us which act you need."
+    - titlu: "We check your file"
+      text: "We let you know what else is needed and give you an estimate of the fees and taxes."
+    - titlu: "Sign at the office"
+      text: "We agree on a date. Bring the original documents and your ID or passport."
+
+recenzii:
+  titlu: "Client reviews"
+  intro: "Reviews published by clients on the office's Google profile."
+
+despre:
+  titlu: "About the office"
+  text: "Notarial acts in Romania are drawn up in Romanian. If you do not speak Romanian, an authorised interpreter must assist you when you sign. Contact us beforehand and we will tell you what to arrange."
+  imagine: ""
+  imagineAlt: "The notary office building"
+
+faq:
+  titlu: "Frequently asked questions"
+  numarAfisat: 3
+
+final:
+  titlu: "Need a notarial act?"
+  text: "Call us or request an appointment. We reply during office hours."
+
+validat: false

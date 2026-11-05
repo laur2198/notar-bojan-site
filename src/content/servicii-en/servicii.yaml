@@ -1,0 +1,11 @@
+# Short service list for /en/services/. Links point to the Romanian service pages.
+intro: "We provide all notarial services under Romanian law. These are the ones most often requested by foreign clients."
+lista:
+  - { titlu: "Property sale and purchase", text: "Sale contracts for apartments, houses and land, including registration in the land register.", slugRo: "vanzare-cumparare" }
+  - { titlu: "Inheritance", text: "Inheritance proceedings and the certificate of inheritance for heirs living in Romania or abroad.", slugRo: "succesiune" }
+  - { titlu: "Power of attorney", text: "Powers of attorney for property, banks, inheritance or use abroad.", slugRo: "procuri" }
+  - { titlu: "Certified copies and signatures", text: "Certified copies of documents, signature authentication and specimen signatures.", slugRo: "legalizari" }
+  - { titlu: "Declarations", text: "Sworn declarations, including parental consent for a minor travelling abroad.", slugRo: "declaratii" }
+  - { titlu: "Gift deed", text: "Gift contracts for property and other assets.", slugRo: "donatie" }
+fees: "Notary fees are set according to the regulations in force. We give you the exact amount, including taxes, after checking your documents."
+validat: false

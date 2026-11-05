@@ -1,0 +1,45 @@
+seo:
+  titlu: "Notar public în Brașov – Birou Individual Notarial Bojan Elena Luminița"
+  descriere: "Birou notarial în Brașov: vânzări, succesiuni, donații, procuri, legalizări și divorț pe cale notarială. Programare online și trimiterea actelor înainte de întâlnire."
+
+hero:
+  eticheta: "Birou Individual Notarial"
+  titlu: "Notar public în Brașov"
+  subtitlu: "Bojan Elena Luminița. Vă ajutăm să pregătiți actele din timp, ca la birou să veniți doar pentru semnare."
+  imagine: ""          # fotografie a notarului sau a biroului – de încărcat din panou
+  imagineAlt: "Notar public Bojan Elena Luminița în biroul notarial din Brașov"
+
+servicii:
+  titlu: "Servicii notariale"
+  intro: "Cele mai solicitate operațiuni. Pe pagina fiecărui serviciu găsiți actele de pregătit și cum decurge procedura."
+
+pasi:
+  titlu: "Cum lucrăm"
+  intro: "Pregătim dosarul înainte de programare, ca vizita la birou să fie cât mai scurtă."
+  lista:
+    - titlu: "Trimiteți actele"
+      text: "Pe email, din pagina serviciului de care aveți nevoie. Puteți atașa fotografii clare sau scanări ale documentelor."
+    - titlu: "Verificăm dosarul"
+      text: "Vă spunem ce mai este necesar și vă comunicăm onorariul și taxele estimate."
+    - titlu: "Semnați la birou"
+      text: "Stabilim împreună data. La birou veniți cu actele originale, pentru semnare."
+
+recenzii:
+  titlu: "Ce spun clienții"
+  intro: "Recenzii publicate de clienți pe profilul Google al biroului."
+
+despre:
+  titlu: "Despre birou"
+  text: "Biroul Individual Notarial Bojan Elena Luminița funcționează în Brașov din «DE COMPLETAT: anul». Notarul public Bojan Elena Luminița este membru al Camerei Notarilor Publici Brașov. «DE COMPLETAT: 1–2 propoziții despre activitate, scrise de notar.»"
+  imagine: ""
+  imagineAlt: "Sediul biroului notarial"
+
+faq:
+  titlu: "Întrebări frecvente"
+  numarAfisat: 4
+
+final:
+  titlu: "Aveți nevoie de un act notarial?"
+  text: "Sunați-ne sau trimiteți o solicitare de programare. Vă răspundem în timpul programului de lucru."
+
+validat: false

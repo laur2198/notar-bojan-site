@@ -1,0 +1,15 @@
+# Onorarii orientative afișate pe pagina „Servicii și prețuri”.
+# Cifrele le stabilește EXCLUSIV biroul, conform normelor privind onorariile minimale.
+# Nu se afișează reduceri, promoții sau comparații (cod deontologic).
+intro: "Onorariile notariale se stabilesc conform normelor în vigoare. Valorile de mai jos sunt orientative. Suma exactă, împreună cu taxele și impozitele datorate, v-o comunicăm după verificarea actelor."
+nota: "La onorariul notarial se pot adăuga, după caz, taxele de carte funciară, impozitul pe transferul proprietății și alte taxe prevăzute de lege. «DE COMPLETAT: mențiunea despre TVA, dacă este cazul.»"
+lista:
+  - { serviciu: "vanzare-cumparare", text: "de la «DE COMPLETAT» lei, în funcție de valoarea imobilului" }
+  - { serviciu: "succesiune",        text: "de la «DE COMPLETAT» lei, în funcție de valoarea bunurilor" }
+  - { serviciu: "donatie",           text: "de la «DE COMPLETAT» lei, în funcție de valoarea bunului" }
+  - { serviciu: "procuri",           text: "de la «DE COMPLETAT» lei" }
+  - { serviciu: "legalizari",        text: "de la «DE COMPLETAT» lei / pagină sau semnătură" }
+  - { serviciu: "divort",            text: "de la «DE COMPLETAT» lei" }
+  - { serviciu: "declaratii",        text: "de la «DE COMPLETAT» lei" }
+  - { serviciu: "testament",         text: "de la «DE COMPLETAT» lei" }
+validat: false
