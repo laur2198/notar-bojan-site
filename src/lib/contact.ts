@@ -34,3 +34,20 @@ export function linkEmail(adresa: string): LinkContact {
   const valid = !areMarcaj(curata) && EMAIL.test(curata);
   return { href: valid ? `mailto:${curata}` : undefined, text: curata, valid };
 }
+
+/**
+ * Link extern (Google Maps, profilul Google, pagina de programări): doar dacă e o
+ * adresă `https://` completă, fără marcaj «DE COMPLETAT».
+ */
+export function linkExtern(url: string, text: string): LinkContact {
+  const curat = url.trim();
+  let valid = false;
+  if (!areMarcaj(curat)) {
+    try {
+      valid = new URL(curat).protocol === 'https:';
+    } catch {
+      valid = false;
+    }
+  }
+  return { href: valid ? curat : undefined, text, valid };
+}

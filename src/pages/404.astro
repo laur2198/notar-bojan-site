@@ -1,0 +1,97 @@
+---
+/**
+ * Pagina 404 (CLAUDE.md §6): mesaj în română și în engleză, linkuri spre Acasă, Servicii
+ * și Contact, plus telefonul. Fără canonical și cu `noindex` în orice mod.
+ * Pe GitHub Pages e servită la orice adresă inexistentă de sub calea de bază, deci toate
+ * linkurile și resursele au cale absolută (cu bază, prin `cale()` / `url()`).
+ */
+import Sectiune from '../components/Sectiune.astro';
+import TelefonLink from '../components/TelefonLink.astro';
+import { cale, t, type Locale } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { linkTelefon } from '../lib/contact';
+import { getBirou } from '../lib/continut';
+
+const birou = await getBirou();
+const telefon = linkTelefon(birou);
+
+const variante: { locale: Locale; titluId: string }[] = [
+  { locale: 'ro', titluId: 'titlu-404' },
+  { locale: 'en', titluId: 'titlu-404-en' },
+];
+---
+
+<BaseLayout locale="ro" title={`${t('ro', '404.titlu')} / ${t('en', '404.titlu')}`} description={t('ro', '404.descriere')} noindex>
+  <Sectiune>
+    <div class="pagina-404">
+      {
+        variante.map(({ locale, titluId }) => (
+          <section class="pagina-404__limba" lang={locale} aria-labelledby={titluId}>
+            {locale === 'ro' ? <h1 id={titluId}>{t(locale, '404.titlu')}</h1> : <h2 id={titluId}>{t(locale, '404.titlu')}</h2>}
+            <p>{t(locale, '404.text')}</p>
+            <ul class="pagina-404__linkuri" role="list">
+              <li>
+                <a class="btn btn--primar" href={cale('acasa', locale)}>
+                  {t(locale, '404.acasa')}
+                </a>
+              </li>
+              <li>
+                <a class="btn btn--secundar" href={cale('servicii', locale)}>
+                  {t(locale, 'nav.servicii')}
+                </a>
+              </li>
+              <li>
+                <a class="btn btn--secundar" href={cale('contact', locale)}>
+                  {t(locale, 'nav.contact')}
+                </a>
+              </li>
+            </ul>
+            <p class="pagina-404__telefon">
+              {t(locale, '404.telefon')} <TelefonLink locale={locale} telefon={telefon} />
+            </p>
+          </section>
+        ))
+      }
+    </div>
+  </Sectiune>
+</BaseLayout>
+
+<style>
+  .pagina-404 {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .pagina-404__limba {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .pagina-404__limba + .pagina-404__limba {
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-gray-200);
+  }
+
+  .pagina-404 h2 {
+    font-size: var(--fs-h1);
+  }
+
+  .pagina-404__linkuri {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .pagina-404__linkuri li {
+    max-width: none;
+  }
+
+  .pagina-404__telefon {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+  }
+</style>

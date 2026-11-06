@@ -14,7 +14,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 - **Astro**, ultima versiune stabilă, `output: 'static'`. Content Layer API (`src/content.config.ts`, loader `glob`/`file`). Verifică documentația curentă Astro înainte de API-uri de care nu ești sigur.
 - **CSS propriu** cu custom properties (design tokens) în `src/styles/`. Fără Tailwind, fără framework UI, fără jQuery.
 - **JavaScript minim**, doar ca progressive enhancement (ex.: „Deschis acum / Închis”). Site-ul trebuie să funcționeze complet cu JS dezactivat.
-- **Fonturi self-hosted** prin Fontsource: `@fontsource-variable/source-serif-4` (titluri) și `@fontsource-variable/source-sans-3` (text). Verifică randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ).
+- **Font self-hosted** prin Fontsource: `@fontsource-variable/inter` (un singur font, pentru titluri și text), subseturile latin + latin-ext. Verifică randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ).
 - **Pages CMS** (`.pages.yml` în rădăcină) pentru editarea conținutului. Documentație: https://pagescms.org/llms-full.txt
 - **Găzduire:** Cloudflare (static). Fără funcții server, fără bază de date.
 - **Node:** versiunea LTS curentă. Package manager: npm.
@@ -31,6 +31,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ## 4. Accesibilitate (contractual – WCAG 2.1 AA)
 
 - Text de bază **18 px** (`1.125rem`), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
+- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (13 px). Nicăieri altundeva.
 - Contrast AA: minim 4.5:1 text normal, 3:1 text mare și elemente UI. Verifică fiecare combinație nouă de culori.
 - Ținte de atingere minim **48×48 px**.
 - `:focus-visible` clar pe toate elementele interactive (contur de 3 px, nu doar schimbare de culoare).
@@ -42,15 +43,15 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 ## 5. Design
 
-**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e maro-lemn închis, cu gri, alb și accente bordo, stabilite cu clienta. Nu se discută.
+**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e maro-lemn închis, cu gri, alb și accente bordo, stabilite cu clienta. Nu se discută. Structură și ritm după notariatul Jesús Benavides: un singur font sans, raze mici, spațiere generoasă, header alb fix.
 
 ### Tokens (în `src/styles/tokens.css`)
 
 ```css
 :root {
   /* Culori */
-  --c-wood-900: #2A1A10;  /* fundal footer, titluri */
-  --c-wood-800: #4A2E1E;  /* culoarea de brand: header, butoane primare */
+  --c-wood-900: #2A1A10;  /* titluri, fundalul hero-ului fără fotografie */
+  --c-wood-800: #4A2E1E;  /* culoarea de brand: butoane primare, secțiunea CTA finală */
   --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
   --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
   --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
@@ -66,31 +67,37 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
   --c-closed:   #9B1C1C;  /* „Închis” */
 
   /* Tipografie */
-  --font-serif: 'Source Serif 4 Variable', Georgia, serif;
-  --font-sans:  'Source Sans 3 Variable', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
-  --fs-sm:   1rem;       /* 16px – minim absolut, doar pentru note */
+  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
+  --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
-  --fs-h2:   clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
-  --fs-h1:   clamp(2.125rem, 1.6rem + 2vw, 3.25rem);
+  --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.7rem);
+  --fs-h2:   clamp(1.75rem, 1.3rem + 1.4vw, 2rem);
+  --fs-h1:   clamp(2rem, 1.2rem + 3vw, 3rem);
 
   /* Spațiere, raze, umbre */
   --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
   --space-5: 3rem;  --space-6: 4.5rem; --space-7: 6rem;
-  --radius: 6px; --radius-lg: 12px;
-  --shadow: 0 1px 2px rgb(43 27 18 / .06), 0 4px 16px rgb(43 27 18 / .06);
-  --container: 72rem;
+  --section-y:    clamp(4rem, 2rem + 6vw, 8rem);   /* padding sus/jos al secțiunilor */
+  --section-y-sm: clamp(3rem, 2rem + 3vw, 4rem);   /* banda de informații */
+  --radius: 4px; --radius-lg: 10px; --radius-pill: 999px;
+  --shadow: 0 4px 8px rgb(42 26 16 / .12);
+  --container: 75rem;
+  --gutter: 1.5rem;      /* padding lateral al containerului */
+  --gutter-sm: 1rem;     /* sub 480px */
+  --header-h: 80px;      /* header fix pe desktop */
+  --header-h-sm: 64px;   /* header fix pe mobil */
   --measure: 68ch;
 }
 ```
 
 Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
 
-- Titluri în serif, text în sans. Fără text justify. Fără majuscule integrale pe paragrafe.
+- Un singur font, Inter; titluri 700. Fără text justify. Fără majuscule integrale pe paragrafe (wordmark-ul și h1-ul din hero pot fi cu majuscule, prin CSS).
 - Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
-- Butonul primar: fundal `--c-wood-800`, text alb, înălțime min. 52 px. Butonul secundar: contur `--c-wood-800`, fundal transparent. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
-- Fundaluri: alb pentru pagină, `--c-gray-50` pentru secțiunile alternante, `--c-wood-800`/`--c-wood-900` pentru header, footer și secțiunea CTA finală.
+- Butonul primar: fundal `--c-wood-800`, text alb, înălțime min. 52 px. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
+- Fundaluri: alb pentru pagină și header (fix sus), `--c-gray-50` pentru secțiunile alternante și footer, `--c-wood-800` pentru secțiunea CTA finală, `--c-wood-900` sub fotografia din hero.
 - Fără texturi sau imagini de lemn; „lemnul” e doar culoarea.
 - `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-gray-900`).
 - `theme-color` devine `--c-wood-800`.

@@ -4,7 +4,7 @@
  * Contur simplu, 24×24, culoarea textului (currentColor).
  */
 interface Props {
-  nume: 'telefon' | 'meniu' | 'inchide';
+  nume: 'telefon' | 'meniu' | 'inchide' | 'email' | 'calendar' | 'ceas' | 'pin' | 'plus' | 'sageata';
   class?: string;
 }
 
@@ -15,6 +15,12 @@ const trasee: Record<Props['nume'], string> = {
     'M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
   meniu: 'M4 6h16M4 12h16M4 18h16',
   inchide: 'M6 6l12 12M18 6L6 18',
+  email: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM3 7l9 6 9-6',
+  calendar: 'M5 5h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM16 3v4M8 3v4M4 10h16M8 14h2M14 14h2M8 17h2',
+  ceas: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  pin: 'M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+  plus: 'M12 7v10M7 12h10',
+  sageata: 'M5 12h14M13 6l6 6-6 6',
 };
 ---
 

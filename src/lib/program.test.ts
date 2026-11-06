@@ -10,6 +10,8 @@ import {
   momentLocal,
   type ZiLibera,
   type ZiProgram,
+  zileLibereApropiate,
+  zileLibereViitoare,
 } from './program';
 
 // Programul din exemplu: luni–joi 09–17, vineri 09–15, weekend închis.
@@ -160,5 +162,42 @@ describe('mesajStare (EN)', () => {
     expect(mesaj('2026-12-01T08:00:00Z', LIBERE, PROGRAM, EN)).toBe(
       'Closed today – Ziua Națională a României · we open tomorrow at 09:00',
     );
+  });
+});
+
+describe('zileLibereApropiate / zileLibereViitoare', () => {
+  const lista: ZiLibera[] = [
+    { data: '2027-01-01', motiv: 'Anul Nou' },
+    { data: '2026-12-25', motiv: 'Crăciunul' },
+    { data: '2026-11-30', motiv: 'Sfântul Andrei' },
+    { data: '2026-12-26', motiv: 'A doua zi de Crăciun' },
+  ];
+
+  it('fereastra de 14 zile, sortată, inclusiv azi și ziua a 14-a', () => {
+    // 17 dec. 2026, 10:00 în București: limita e 31 dec., deci 1 ian. nu intră
+    expect(zileLibereApropiate(new Date('2026-12-17T08:00:00Z'), lista).map((z) => z.data)).toEqual([
+      '2026-12-25',
+      '2026-12-26',
+    ]);
+    // 18 dec.: 1 ian. e la exact 14 zile
+    expect(zileLibereApropiate(new Date('2026-12-18T08:00:00Z'), lista).map((z) => z.data)).toEqual([
+      '2026-12-25',
+      '2026-12-26',
+      '2027-01-01',
+    ]);
+    // ziua liberă de azi apare
+    expect(zileLibereApropiate(new Date('2026-11-30T08:00:00Z'), lista)[0]?.motiv).toBe('Sfântul Andrei');
+  });
+
+  it('nimic în fereastră', () => {
+    expect(zileLibereApropiate(new Date('2026-11-06T08:00:00Z'), lista)).toEqual([]);
+  });
+
+  it('folosește data din București, nu UTC (23:30 UTC pe 29 nov. e deja 30 nov.)', () => {
+    expect(zileLibereApropiate(new Date('2026-11-29T23:30:00Z'), lista, 0).map((z) => z.motiv)).toEqual(['Sfântul Andrei']);
+  });
+
+  it('zileLibereViitoare exclude zilele trecute', () => {
+    expect(zileLibereViitoare(new Date('2026-12-26T12:00:00Z'), lista).map((z) => z.data)).toEqual(['2026-12-26', '2027-01-01']);
   });
 });

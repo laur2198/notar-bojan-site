@@ -7,8 +7,8 @@
 
 # Imaginile încărcate din panou ajung în src/assets/media/, ca Astro să le optimizeze
 # (AVIF/WebP, dimensiuni explicite). În conținut se scrie calea relativă față de fișierele
-# din src/content/pagini/{ro,en}/, singurul loc care are câmpuri de imagine.
-# Un câmp de imagine într-un fișier de altă adâncime ar avea nevoie de altă cale (vezi README).
+# din src/content/pagini/{ro,en}/ și src/content/servicii/ro/ (aceeași adâncime), singurele locuri
+# cu câmpuri de imagine. Un câmp de imagine într-un fișier de altă adâncime ar avea nevoie de altă cale (vezi README).
 media:
   input: src/assets/media
   output: ../../../assets/media
@@ -237,11 +237,6 @@ content:
         label: Prima secțiune
         type: object
         fields:
-          - name: eticheta
-            label: Rândul mic de deasupra titlului
-            type: string
-            required: true
-            description: Denumirea legală, scrisă normal (fără majuscule).
           - name: titlu
             label: Titlul principal
             type: string
@@ -422,6 +417,12 @@ content:
         type: string
         required: true
         description: "ATENȚIE: nu modificați fără să anunțați biroul. Biroul poate filtra emailurile primite după acest subiect."
+      - name: imagine
+        component: imagine
+        label: Fotografie pe card (opțional)
+        description: Apare sus pe cardul serviciului, în format lat (16:10). Fără fotografii de stoc. Dacă lipsește, cardul are doar o linie de accent.
+      - name: imagineAlt
+        component: imagineAlt
       - name: validat
         component: validat
       - name: body

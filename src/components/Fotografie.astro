@@ -1,0 +1,104 @@
+---
+/**
+ * Fotografie de conținut (CLAUDE.md §5): componenta <Image> din Astro (AVIF/WebP,
+ * dimensiuni explicite, `object-fit: cover`) sau, până vin fotografiile reale, un
+ * bloc placeholder cu eticheta „Fotografie – de completat”. Fără fotografii stock.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  imagine?: ImageMetadata;
+  alt?: string;
+  /** Raportul de aspect, ex. „4 / 5”, „16 / 10”. */
+  raport: string;
+  /** Raport diferit pe ecrane înguste (< 768 px), ex. „4 / 3”. */
+  raportMobil?: string;
+  /** Lățimile generate și `sizes` (vezi documentația <Image>). */
+  latimi?: number[];
+  sizes?: string;
+  /** Imaginea principală a paginii: încărcare imediată, prioritate mare. */
+  prioritar?: boolean;
+  /** Placeholder pe fundal închis (wood-900), ex. în hero. */
+  inchis?: boolean;
+  eticheta?: string;
+  class?: string;
+}
+
+const {
+  locale,
+  imagine,
+  alt = '',
+  raport,
+  raportMobil = raport,
+  latimi = [480, 800, 1200],
+  sizes = '(min-width: 64rem) 50vw, 100vw',
+  prioritar = false,
+  inchis = false,
+  eticheta = t(locale, 'foto.deCompletat'),
+  class: clasa,
+} = Astro.props;
+---
+
+{
+  imagine ? (
+    <Image
+      class:list={['fotografie', clasa]}
+      src={imagine}
+      alt={alt}
+      widths={latimi.filter((w) => w <= imagine.width)}
+      sizes={sizes}
+      loading={prioritar ? 'eager' : 'lazy'}
+      fetchpriority={prioritar ? 'high' : 'auto'}
+      style={`--raport: ${raport}; --raport-mobil: ${raportMobil}`}
+    />
+  ) : (
+    <div
+      class:list={['fotografie', 'fotografie--placeholder', { 'fotografie--inchis': inchis }, clasa]}
+      style={`--raport: ${raport}; --raport-mobil: ${raportMobil}`}
+    >
+      <span class="fotografie__eticheta">{eticheta}</span>
+    </div>
+  )
+}
+
+<style>
+  .fotografie {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--raport-mobil);
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  @media (min-width: 48rem) {
+    .fotografie {
+      aspect-ratio: var(--raport);
+    }
+  }
+
+  .fotografie--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3);
+    background: var(--c-gray-50);
+    border: 1px dashed var(--c-gray-600);
+    color: var(--c-gray-600);
+    text-align: center;
+  }
+
+  .fotografie--inchis {
+    background: var(--c-wood-900);
+    border-color: var(--c-wood-300);
+    color: var(--c-gray-200);
+  }
+
+  .fotografie__eticheta {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+</style>

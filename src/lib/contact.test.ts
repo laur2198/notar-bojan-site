@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { linkEmail, linkTelefon } from './contact';
+import { linkEmail, linkExtern, linkTelefon } from './contact';
 
 describe('linkTelefon', () => {
   it('număr valid: link tel: în format internațional', () => {
@@ -40,5 +40,16 @@ describe('linkEmail', () => {
       valid: false,
     });
     expect(linkEmail('contact@').valid).toBe(false);
+  });
+});
+
+describe('linkExtern', () => {
+  it('https valid', () => {
+    expect(linkExtern('https://maps.app.goo.gl/abc', 'Hartă')).toEqual({ href: 'https://maps.app.goo.gl/abc', text: 'Hartă', valid: true });
+  });
+  it('marcaj, http sau text: fără href', () => {
+    expect(linkExtern('«DE COMPLETAT: link Google Maps»', 'Hartă').valid).toBe(false);
+    expect(linkExtern('http://exemplu.ro', 'x').href).toBeUndefined();
+    expect(linkExtern('nu e link', 'x').valid).toBe(false);
   });
 });

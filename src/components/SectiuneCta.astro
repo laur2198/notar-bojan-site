@@ -1,0 +1,40 @@
+---
+/**
+ * Secțiunea finală (CLAUDE.md §5): fundal wood-800, text alb, butonul inversat
+ * (fundal alb, text wood-800) și telefonul mare, clicabil. Fără roșu pe wood.
+ */
+import { cale, t, type Locale } from '../i18n';
+import { linkTelefon } from '../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Sectiune from './Sectiune.astro';
+import TelefonLink from './TelefonLink.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  titlu: string;
+  text: string;
+}
+
+const { locale, birou, titlu, text } = Astro.props;
+---
+
+<Sectiune id="final" ton="wood" centrat titlu={titlu} introHtml={marcheazaPlaceholder(text)}>
+  <div class="cta">
+    <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
+    <TelefonLink locale={locale} telefon={linkTelefon(birou)} class="cta__telefon" />
+  </div>
+</Sectiune>
+
+<style>
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .cta :global(.cta__telefon) {
+    font-size: var(--fs-h3);
+  }
+</style>

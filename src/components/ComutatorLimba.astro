@@ -41,12 +41,12 @@ const cod = (l: Locale) => l.toUpperCase();
   .limba {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: calc(var(--space-1) / 2);
     font-weight: 600;
   }
 
   .limba__curenta {
-    padding-inline: 0.25rem;
+    padding-inline: calc(var(--space-1) / 2);
   }
 
   .limba__separator {

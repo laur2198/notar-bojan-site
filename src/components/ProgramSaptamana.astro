@@ -14,9 +14,13 @@ interface Props {
   ton?: 'deschis' | 'inchis';
   /** Titlul tabelului vizibil (implicit doar pentru cititoare de ecran). */
   captionVizibil?: boolean;
+  /** Fără borduri, ziua bold, „Închis” în accentul bordo (banda de pe Acasă). */
+  simplu?: boolean;
+  /** Text de 16 px și rânduri mai strânse (footer). */
+  compact?: boolean;
 }
 
-const { locale, program, ton = 'deschis', captionVizibil = false } = Astro.props;
+const { locale, program, ton = 'deschis', captionVizibil = false, simplu = false, compact = false } = Astro.props;
 const zile = zileSaptamana(locale);
 
 const ore = (zi: ZiProgram) =>
@@ -25,7 +29,7 @@ const ore = (zi: ZiProgram) =>
     : t(locale, 'program.interval', { deschidere: zi.deschidere, inchidere: zi.inchidere });
 ---
 
-<table class:list={['program', `program--${ton}`]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
+<table class:list={['program', `program--${ton}`, { 'program--simplu': simplu, 'program--compact': compact }]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
   <caption class:list={{ 'sr-only': !captionVizibil }}>{t(locale, 'program.caption')}</caption>
   <thead class="sr-only">
     <tr>
@@ -38,7 +42,7 @@ const ore = (zi: ZiProgram) =>
       program.map((zi, i) => (
         <tr data-zi={i}>
           <th scope="row">{majusculaInitiala(zile[i] ?? zi.zi, locale)}</th>
-          <td>{ore(zi)}</td>
+          <td class:list={{ program__inchis: zi.inchis }}>{ore(zi)}</td>
         </tr>
       ))
     }
@@ -72,12 +76,12 @@ const ore = (zi: ZiProgram) =>
   caption {
     text-align: left;
     font-weight: 600;
-    padding-bottom: 0.5rem;
+    padding-bottom: var(--space-1);
   }
 
   th,
   td {
-    padding: 0.35rem 0;
+    padding: calc(var(--space-1) * 0.7) 0;
     text-align: left;
     font-weight: 400;
     border-bottom: 1px solid var(--c-gray-200);
@@ -99,8 +103,36 @@ const ore = (zi: ZiProgram) =>
     font-weight: 700;
   }
 
+  /* Varianta simplă: fără borduri, ziua bold stânga, orele dreapta, „Închis” bordo (7.47:1 pe gray-50). */
+  .program--simplu {
+    max-width: none;
+  }
+
+  .program--simplu th,
+  .program--simplu td {
+    border-bottom: 0;
+  }
+
+  .program--simplu th {
+    font-weight: 700;
+  }
+
+  .program--simplu .program__inchis {
+    color: var(--c-red-700);
+    font-weight: 600;
+  }
+
   tr[aria-current='date'] th {
     box-shadow: inset 4px 0 0 currentColor;
-    padding-left: 0.75rem;
+    padding-left: calc(var(--space-1) * 1.5);
+  }
+
+  .program--compact {
+    font-size: var(--fs-sm);
+  }
+
+  .program--compact th,
+  .program--compact td {
+    padding-block: calc(var(--space-1) / 4);
   }
 </style>

@@ -1,0 +1,86 @@
+---
+/**
+ * Card cu o recenzie reală de pe Google (CLAUDE.md §3.4, §7): nota, textul trunchiat la
+ * ~5 rânduri (cu „Citiți tot” spre /recenzii/), autorul, data și sursa. Nu se folosește
+ * niciodată cu recenzii generate.
+ */
+import { formateazaNumar, LOCALE_INTL, t, type Locale } from '../i18n';
+import LogoGoogle from './LogoGoogle.astro';
+import Stele from './Stele.astro';
+
+interface Props {
+  locale: Locale;
+  autor: string;
+  data: string;
+  nota: number;
+  text: string;
+  hrefToate: string;
+}
+
+const { locale, autor, data, nota, text, hrefToate } = Astro.props;
+const dataAfisata = new Intl.DateTimeFormat(LOCALE_INTL[locale], { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+  new Date(`${data}T00:00:00Z`),
+);
+const notaText = formateazaNumar(locale, nota, 0);
+---
+
+<article class="card-recenzie">
+  <p class="card-recenzie__nota">
+    <Stele nota={nota} />
+    <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota: notaText })}</span>
+  </p>
+  <blockquote class="card-recenzie__text">
+    <p>{text}</p>
+  </blockquote>
+  <a class="card-recenzie__tot" href={hrefToate}>{t(locale, 'recenzii.citestiTot')}</a>
+  <footer class="card-recenzie__subsol">
+    <LogoGoogle />
+    <span>
+      <strong>{autor}</strong>
+      <span class="card-recenzie__meta"><time datetime={data}>{dataAfisata}</time> · {t(locale, 'recenzii.sursa')}</span>
+    </span>
+  </footer>
+</article>
+
+<style>
+  .card-recenzie {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--c-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .card-recenzie__text p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    overflow: hidden;
+  }
+
+  .card-recenzie__tot {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-weight: 700;
+  }
+
+  .card-recenzie__subsol {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: auto;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--c-gray-200);
+  }
+
+  .card-recenzie__meta {
+    display: block;
+    color: var(--c-gray-600);
+    font-size: var(--fs-sm);
+  }
+</style>

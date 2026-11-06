@@ -1,0 +1,31 @@
+---
+/**
+ * Link către un site extern (Google Maps, profilul Google), deschis într-o filă nouă,
+ * anunțată pentru cititoarele de ecran (CLAUDE.md §4). Dacă adresa nu e gata
+ * (marcaj «DE COMPLETAT», doar în preview), rămâne vizibil, fără `href`, cu `aria-disabled`.
+ */
+import { t, type Locale } from '../i18n';
+import type { LinkContact } from '../lib/contact';
+
+interface Props {
+  locale: Locale;
+  link: LinkContact;
+  class?: string;
+}
+
+const { locale, link, class: clasa } = Astro.props;
+---
+
+{
+  link.valid ? (
+    <a class={clasa} href={link.href} target="_blank" rel="noopener noreferrer">
+      <slot />
+      <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>
+    </a>
+  ) : (
+    <a class={clasa} role="link" aria-disabled="true">
+      <slot />
+      <span class="sr-only"> ({t(locale, 'link.indisponibil')})</span>
+    </a>
+  )
+}

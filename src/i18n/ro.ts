@@ -66,7 +66,55 @@ export const ro = {
 
   // Subsol
   'subsol.contact': 'Contact',
+  'subsol.linkuri': 'Linkuri',
   'subsol.copyright': '© {an} {denumire}',
+
+  // Pagina Acasă
+  'acasa.programare': 'Solicitați o programare',
+  'acasa.suna': 'Sunați: {telefon}',
+  'acasa.toateServiciile': 'Vedeți toate serviciile și onorariile',
+  'acasa.despreLink': 'Despre birou',
+  'acasa.toateIntrebarile': 'Toate întrebările',
+  'foto.deCompletat': 'Fotografie – de completat',
+
+  // Banda de informații practice
+  'banda.eticheta': 'Informații practice',
+  'banda.adresa': 'Adresa',
+  'program.inchisPe': 'Biroul este închis pe {data} – {motiv}',
+  'harta.deschide': 'Deschideți în Google Maps',
+
+  // Recenzii
+  'recenzii.numar.one': '{n} recenzie pe Google',
+  'recenzii.numar.few': '{n} recenzii pe Google',
+  'recenzii.numar.other': '{n} de recenzii pe Google',
+  'recenzii.vedetiNoastre': 'Vedeți recenziile noastre pe Google',
+  'recenzii.vedeti': 'Vedeți recenziile pe Google',
+  'recenzii.inAsteptare': 'Recenziile se adaugă după rezolvarea profilurilor Google',
+  'recenzii.citestiTot': 'Citiți tot',
+  'recenzii.sursa': 'Recenzie de pe Google',
+  'recenzii.notaStele': 'Nota: {nota} din 5 stele',
+
+  // Antet, bara de jos, banda, servicii (calibrare după referință)
+  'antet.email': 'Trimiteți un email: {email}',
+  'bara.program': 'Program',
+  'bara.locatie': 'Locație',
+  'banda.birou': 'Biroul notarial',
+  'banda.programul': 'Programul nostru',
+  'banda.recenziiClienti': 'Recenziile clienților',
+  'banda.cumAjungeti': 'Cum ajungeți',
+  'banda.vedetiRecenziile': 'Vedeți recenziile',
+  'hero.fotoDeCompletat': 'Fotografie clădire/birou – de completat',
+  'servicii.vedeti': 'Vedeți serviciul',
+
+  // Pagina 404
+  '404.titlu': 'Pagina nu a fost găsită',
+  '404.descriere': 'Pagina căutată nu există sau a fost mutată.',
+  '404.text': 'Pagina pe care o căutați nu există sau a fost mutată. Puteți continua de aici:',
+  '404.acasa': 'Pagina principală',
+  '404.telefon': 'Sau sunați-ne:',
+
+  // Linkuri
+  'link.indisponibil': 'linkul nu este încă disponibil',
 
   // Diverse
   'draft.eticheta': 'Text propus – în curs de validare',

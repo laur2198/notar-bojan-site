@@ -5,21 +5,25 @@
  */
 import { localeDinCale, normalizeazaCale, perecheLimbi, type Locale } from '../i18n';
 import { estePreview } from '../lib/continut';
+import { url } from '../lib/url';
 
 interface Props {
   locale: Locale;
   title: string;
   description: string;
   numeSite: string;
+  /** Pagini care nu se indexează în niciun mod (ex. 404): `noindex`, fără canonical. */
+  noindex?: boolean;
 }
 
-const { locale, title, description, numeSite } = Astro.props;
+const { locale, title, description, numeSite, noindex = false } = Astro.props;
 
 const site = Astro.site ?? new URL(Astro.url.origin);
+/** Calea logică (fără bază); adresele absolute o primesc înapoi prin `url()`. */
 const caleCurenta = normalizeazaCale(Astro.url.pathname);
-const canonical = new URL(caleCurenta, site).href;
+const absolut = (cale: string) => new URL(url(cale), site).href;
+const canonical = absolut(caleCurenta);
 const pereche = perecheLimbi(caleCurenta);
-const absolut = (cale: string) => new URL(cale, site).href;
 
 const OG_LOCALE: Record<Locale, string> = { ro: 'ro_RO', en: 'en_US' };
 const alternativ: Locale = locale === 'ro' ? 'en' : 'ro';
@@ -31,11 +35,11 @@ if (localeDinCale(caleCurenta) !== locale) {
 
 <title>{title}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
-{estePreview && <meta name="robots" content="noindex, nofollow" />}
+{!noindex && <link rel="canonical" href={canonical} />}
+{(estePreview || noindex) && <meta name="robots" content="noindex, nofollow" />}
 
 {
-  pereche && (
+  pereche && !noindex && (
     <>
       <link rel="alternate" hreflang="ro" href={absolut(pereche.ro)} />
       <link rel="alternate" hreflang="en" href={absolut(pereche.en)} />
@@ -48,6 +52,6 @@ if (localeDinCale(caleCurenta) !== locale) {
 <meta property="og:site_name" content={numeSite} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={canonical} />
+{!noindex && <meta property="og:url" content={canonical} />}
 <meta property="og:locale" content={OG_LOCALE[locale]} />
 {pereche && <meta property="og:locale:alternate" content={OG_LOCALE[alternativ]} />}

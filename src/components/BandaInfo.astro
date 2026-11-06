@@ -1,0 +1,225 @@
+---
+/**
+ * Banda de informații practice (CLAUDE.md §5, elementul preluat de la referință):
+ * pe gray-50, trei coloane egale (stivuite pe mobil). Fiecare coloană: titlu (h2 cu
+ * mărime de h3), conținut, iar dedesubt un buton secundar centrat.
+ *
+ * 1. Biroul notarial: textul despre locație, adresa, „Cum ajungeți” (Google Maps).
+ * 2. Programul nostru: „Deschis acum”, programul săptămânal, zilele libere apropiate (JS).
+ * 3. Recenziile clienților: ratingul Google, doar dacă e completat (niciodată inventat).
+ *
+ * Secțiunea are id-ul `program`, ținta „Program” din bara de jos de pe mobil.
+ */
+import { cale, formateazaNumar, t, tPlural, type Locale } from '../i18n';
+import { linkExtern } from '../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Iconita from './Iconita.astro';
+import LinkExtern from './LinkExtern.astro';
+import LogoGoogle from './LogoGoogle.astro';
+import ProgramSaptamana from './ProgramSaptamana.astro';
+import StareProgram from './StareProgram.astro';
+import Stele from './Stele.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  /** Câteva rânduri despre locație (ex. secțiunea „Cum ajungeți” din contact.md). */
+  textLocatie?: string;
+}
+
+const { locale, birou, textLocatie } = Astro.props;
+const harta = linkExtern(birou.googleMapsUrl, '');
+const profilGoogle = linkExtern(birou.googleProfilUrl, '');
+const areRating = birou.rating !== null && birou.numarRecenzii !== null;
+const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
+
+const dateZileLibere = JSON.stringify({
+  zileLibere: birou.zileLibere.map(({ data, motiv }) => ({ data, motiv })),
+  sablon: t(locale, 'program.inchisPe'),
+  locale,
+});
+---
+
+<section id="program" class="banda" aria-label={t(locale, 'banda.eticheta')}>
+  <div class="container">
+    <slot />
+    <div class="banda__grila">
+      <div class="banda__coloana">
+        <h2 id="banda-birou" class="banda__titlu">{t(locale, 'banda.birou')}</h2>
+        <div class="banda__continut">
+          {textLocatie && textLocatie.split('\n\n').map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
+          <p class="banda__adresa">
+            <Iconita nume="pin" class="banda__iconita" />
+            <span>
+              <span class="sr-only">{t(locale, 'banda.adresa')}: </span>
+              <span set:html={marcheazaPlaceholder(birou.adresa.strada)} />, {birou.adresa.oras}
+            </span>
+          </p>
+        </div>
+        <LinkExtern locale={locale} link={harta} class="btn btn--secundar banda__buton">
+          {t(locale, 'banda.cumAjungeti')}
+        </LinkExtern>
+      </div>
+
+      <div class="banda__coloana">
+        <h2 id="banda-program" class="banda__titlu">{t(locale, 'banda.programul')}</h2>
+        <div class="banda__continut">
+          <StareProgram locale={locale} program={birou.program} zileLibere={birou.zileLibere} class="banda__stare" />
+          <ProgramSaptamana locale={locale} program={birou.program} simplu />
+          <div class="banda__zile-libere" data-zile-libere-apropiate={dateZileLibere} hidden></div>
+        </div>
+        <a class="btn btn--secundar banda__buton" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
+      </div>
+
+      <div class="banda__coloana">
+        <h2 id="banda-recenzii" class="banda__titlu">{t(locale, 'banda.recenziiClienti')}</h2>
+        <div class="banda__continut">
+          <div class="banda__card">
+            <LogoGoogle class="banda__google" />
+            {
+              areRating ? (
+                <>
+                  <p class="banda__nota">
+                    <span>{nota}</span>
+                    <Stele nota={birou.rating!} />
+                    <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota })}</span>
+                  </p>
+                  <p>{tPlural(locale, 'recenzii.numar', birou.numarRecenzii!)}</p>
+                </>
+              ) : (
+                <p>{t(locale, 'recenzii.vedetiNoastre')}</p>
+              )
+            }
+          </div>
+        </div>
+        <LinkExtern locale={locale} link={profilGoogle} class="btn btn--secundar banda__buton">
+          {t(locale, 'banda.vedetiRecenziile')}
+        </LinkExtern>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { formateazaZiLuna, type Locale } from '../i18n';
+  import { zileLibereApropiate, type ZiLibera } from '../lib/program';
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-zile-libere-apropiate]')) {
+    const { zileLibere, sablon, locale } = JSON.parse(el.dataset.zileLibereApropiate ?? '{}') as {
+      zileLibere: ZiLibera[];
+      sablon: string;
+      locale: Locale;
+    };
+    const apropiate = zileLibereApropiate(new Date(), zileLibere);
+    if (apropiate.length === 0) continue;
+    for (const zi of apropiate) {
+      const p = document.createElement('p');
+      p.textContent = sablon.replace('{data}', formateazaZiLuna(locale, zi.data)).replace('{motiv}', zi.motiv);
+      el.append(p);
+    }
+    el.hidden = false;
+  }
+</script>
+
+<style>
+  .banda {
+    padding-block: var(--section-y-sm);
+    background: var(--c-gray-50);
+  }
+
+  .banda__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64rem) {
+    .banda__grila {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  .banda__coloana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .banda__titlu {
+    font-size: var(--fs-h3);
+    text-align: center;
+  }
+
+  .banda__continut {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 26rem;
+    flex: 1;
+    align-content: start;
+  }
+
+  .banda__continut > :global(p) {
+    max-width: none;
+  }
+
+  .banda__adresa {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+    font-weight: 600;
+  }
+
+  .banda__adresa :global(.banda__iconita) {
+    margin-top: calc(var(--space-1) / 4);
+    color: var(--c-red-700);
+  }
+
+  .banda__continut :global(.banda__stare) {
+    justify-self: center;
+  }
+
+  .banda__zile-libere {
+    display: grid;
+    gap: calc(var(--space-1) / 2);
+    padding: var(--space-1) var(--space-2);
+    border-left: 3px solid var(--c-red-700);
+    background: var(--c-white);
+    border-radius: var(--radius);
+    font-weight: 600;
+  }
+
+  .banda__zile-libere[hidden] {
+    display: none;
+  }
+
+  .banda__card {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    background: var(--c-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .banda__card :global(.banda__google) {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .banda__nota {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--c-wood-900);
+  }
+
+  .banda__coloana :global(.banda__buton) {
+    align-self: center;
+  }
+</style>

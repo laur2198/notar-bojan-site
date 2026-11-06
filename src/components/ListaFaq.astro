@@ -1,0 +1,104 @@
+---
+/**
+ * Întrebări frecvente cu `<details>/<summary>` nativ (CLAUDE.md §4): fiecare item alb,
+ * contur subțire, radius-lg; în summary, „+” într-un cerc subțire, care se rotește în „×”
+ * la deschidere (150 ms, oprit de `prefers-reduced-motion`). Răspunsurile trec prin
+ * `marcheazaPlaceholder`.
+ */
+import { marcheazaPlaceholder } from '../lib/continut';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  intrebari: { intrebare: string; raspuns: string }[];
+}
+
+const { intrebari } = Astro.props;
+---
+
+<div class="lista-faq">
+  {
+    intrebari.map((q) => (
+      <details class="faq">
+        <summary class="faq__intrebare">
+          <span class="faq__cerc" aria-hidden="true">
+            <Iconita nume="plus" />
+          </span>
+          <span>{q.intrebare}</span>
+        </summary>
+        <div class="faq__raspuns">
+          <p set:html={marcheazaPlaceholder(q.raspuns)} />
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .lista-faq {
+    display: grid;
+    gap: calc(var(--space-1) * 1.5);
+    max-width: 61.25rem;
+    margin-inline: auto;
+  }
+
+  .faq {
+    background: var(--c-white);
+    border: 1px solid rgb(0 0 0 / 0.1);
+    border-radius: var(--radius-lg);
+  }
+
+  .faq__intrebare {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 48px;
+    padding: var(--space-2) calc(var(--space-2) * 1.75);
+    color: var(--c-wood-900);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    border-radius: var(--radius-lg);
+  }
+
+  .faq__intrebare::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__intrebare:hover {
+    color: var(--c-red-700);
+  }
+
+  .faq__cerc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    color: var(--c-red-700);
+    border: 1px solid currentColor;
+    border-radius: var(--radius-pill);
+    transition: transform 150ms ease;
+  }
+
+  .faq[open] .faq__cerc {
+    transform: rotate(45deg);
+  }
+
+  .faq__raspuns {
+    padding: 0 calc(var(--space-2) * 1.75) var(--space-3);
+    padding-left: calc(var(--space-2) * 1.75 + var(--space-4) + var(--space-2));
+    color: var(--c-gray-600);
+  }
+
+  @media (max-width: 29.99rem) {
+    .faq__intrebare {
+      padding: var(--space-2);
+    }
+
+    .faq__raspuns {
+      padding: 0 var(--space-2) var(--space-3);
+    }
+  }
+</style>

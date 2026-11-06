@@ -1,0 +1,63 @@
+# Preview pe GitHub Pages: publică doar build-ul Astro din dist/ (nu repo-ul cu Jekyll).
+# Adresa: https://laur2198.github.io/notar-bojan-site/
+# Build de PREVIEW (npm run build): conținutul nevalidat e marcat, paginile au noindex.
+# Producția (npm run build:prod) se face separat, pe Cloudflare, după validarea conținutului.
+
+name: Preview pe GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permisiuni minime: citirea codului (checkout) și publicarea pe Pages (OIDC).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# O singură publicare odată; cea în curs nu se anulează (recomandarea GitHub pentru Pages).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Node (≥ 22.23.4, cerut de Astro 7)
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Versiunea Node
+        run: node --version
+
+      - name: Dependențe
+        run: npm ci
+
+      - name: Build de preview
+        run: npm run build
+        env:
+          SITE_URL: https://laur2198.github.io
+          BASE_PATH: /notar-bojan-site/
+
+      - name: Încarcă dist/ pentru Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicare.outputs.page_url }}
+    steps:
+      - name: Publică pe GitHub Pages
+        id: publicare
+        uses: actions/deploy-pages@v5

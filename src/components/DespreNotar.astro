@@ -1,0 +1,94 @@
+---
+/**
+ * „Despre notar” pe Acasă: continuă vizual banda de informații (tot gray-50).
+ * Stânga portretul 2:3 (pe mobil, deasupra, lat: 4:3), dreapta titlul, textul și linkul.
+ * Fără etichetă cu majuscule deasupra titlului.
+ */
+import type { ImageMetadata } from 'astro';
+import { cale, t, type Locale } from '../i18n';
+import { marcheazaPlaceholder } from '../lib/continut';
+import Fotografie from './Fotografie.astro';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  locale: Locale;
+  titlu: string;
+  text: string;
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+}
+
+const { locale, titlu, text, imagine, imagineAlt } = Astro.props;
+---
+
+<section class="despre" aria-labelledby="despre-titlu">
+  <div class="container despre__interior">
+    <div class="despre__foto">
+      <Fotografie
+        locale={locale}
+        imagine={imagine}
+        alt={imagineAlt}
+        raport="2 / 3"
+        raportMobil="4 / 3"
+        latimi={[400, 700, 1000]}
+        sizes="(min-width: 48rem) 21rem, 100vw"
+      />
+    </div>
+    <div class="despre__text">
+      <h2 id="despre-titlu">{titlu}</h2>
+      {text.split('\n\n').map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
+      <p>
+        <a class="despre__link" href={cale('despre', locale)}>
+          {t(locale, 'acasa.despreLink')}
+          <Iconita nume="sageata" />
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .despre {
+    padding-bottom: var(--section-y);
+    background: var(--c-gray-50);
+  }
+
+  .despre__interior {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 48rem) {
+    .despre__interior {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .despre__foto {
+      flex: 0 0 21rem;
+    }
+  }
+
+  .despre__text {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .despre__text h2 {
+    margin-bottom: calc(var(--space-1) / 2);
+  }
+
+  .despre__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 48px;
+    font-weight: 700;
+  }
+
+  .despre__link :global(.iconita) {
+    color: var(--c-red-700);
+  }
+</style>

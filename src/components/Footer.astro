@@ -1,13 +1,17 @@
 ---
 /**
- * Subsolul (CLAUDE.md §4, §8): datele biroului, programul, linkuri utile.
- * Fundal --c-wood-900; focusul folosește --c-focus-on-dark (clasa .pe-inchis).
+ * Subsolul (structură după referința aleasă de clientă): deschis la culoare, aerisit.
+ * Fundal gray-50, linie gray-200 sus. Patru coloane pe desktop (2 pe tabletă, 1 pe mobil):
+ * wordmark + denumirea completă | Contact | Program | Linkuri. Dedesubt, după o linie,
+ * „© an denumire” și „Politica de confidențialitate”.
+ * Fundalul e deschis, deci focusul e --c-focus (fără `.pe-inchis`).
  */
 import { cale, esteInAltaLimba, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
 import { linkEmail, linkTelefon } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Iconita from './Iconita.astro';
 import ProgramSaptamana from './ProgramSaptamana.astro';
-import TelefonLink from './TelefonLink.astro';
+import Wordmark from './Wordmark.astro';
 
 interface Props {
   locale: Locale;
@@ -23,96 +27,127 @@ const an = new Date().getFullYear();
 const LINKURI: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ro: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'programare', eticheta: 'nav.programare' },
     { cheie: 'recenzii', eticheta: 'nav.recenzii' },
     { cheie: 'faq', eticheta: 'nav.faq' },
     { cheie: 'contact', eticheta: 'nav.contact' },
-    { cheie: 'confidentialitate', eticheta: 'nav.confidentialitate' },
   ],
   en: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'programare', eticheta: 'nav.programare' },
     { cheie: 'faq', eticheta: 'nav.faq' },
     { cheie: 'contact', eticheta: 'nav.contact' },
-    { cheie: 'confidentialitate', eticheta: 'nav.confidentialitate' },
   ],
 };
 
-const linkuri = LINKURI[locale].map(({ cheie, eticheta }) => ({
-  href: cale(cheie, locale),
-  text: t(locale, eticheta),
-  altaLimba: esteInAltaLimba(cheie, locale),
-}));
-
+const linkuri = LINKURI[locale].map(({ cheie, eticheta }) => ({ href: cale(cheie, locale), text: t(locale, eticheta) }));
+const confidentialitate = {
+  href: cale('confidentialitate', locale),
+  text: t(locale, 'nav.confidentialitate'),
+  altaLimba: esteInAltaLimba('confidentialitate', locale),
+};
 const { strada, codPostal, oras, judet } = birou.adresa;
 ---
 
-<footer class="subsol pe-inchis">
-  <div class="container subsol__grila">
-    <section class="subsol__coloana" aria-labelledby="subsol-contact">
-      <h2 id="subsol-contact" class="subsol__titlu">{t(locale, 'subsol.contact')}</h2>
-      <p class="subsol__denumire">{birou.denumire}</p>
-      <address>
-        <span set:html={marcheazaPlaceholder(strada)} /><br />
-        <span set:html={marcheazaPlaceholder(codPostal)} />
-        {oras}, {t(locale, 'contact.judet', { judet })}
-      </address>
-      <ul class="subsol__contact" role="list">
-        <li>
-          <TelefonLink locale={locale} telefon={telefon} />
-        </li>
-        <li>
-          {
-            email.valid ? (
-              <a class="subsol__email" href={email.href}>
-                <span class="sr-only">{t(locale, 'contact.email')}: </span>
-                {email.text}
-              </a>
-            ) : (
-              <span class="subsol__email">
-                <span class="sr-only">{t(locale, 'contact.email')}: </span>
-                <Fragment set:html={marcheazaPlaceholder(email.text)} />
-              </span>
-            )
-          }
-        </li>
-      </ul>
-    </section>
-
-    <section class="subsol__coloana" aria-labelledby="subsol-program">
-      <h2 id="subsol-program" class="subsol__titlu">{t(locale, 'program.titlu')}</h2>
-      <ProgramSaptamana locale={locale} program={birou.program} ton="inchis" />
-    </section>
-
-    <nav class="subsol__coloana" aria-labelledby="subsol-linkuri">
-      <h2 id="subsol-linkuri" class="subsol__titlu">{t(locale, 'nav.subsol')}</h2>
-      <ul class="subsol__linkuri" role="list">
-        {
-          linkuri.map((l) => (
-            <li>
-              <a href={l.href} hreflang={l.altaLimba ? 'ro' : undefined}>
-                {l.text}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </div>
-
+<footer class="subsol">
   <div class="container">
-    <p class="subsol__final">{t(locale, 'subsol.copyright', { an, denumire: birou.denumire })}</p>
+    <div class="subsol__grila">
+      <div class="subsol__coloana">
+        <Wordmark locale={locale} birou={birou} />
+        <p class="subsol__denumire">{birou.denumire}</p>
+      </div>
+
+      <section class="subsol__coloana" aria-labelledby="subsol-contact">
+        <h2 id="subsol-contact" class="subsol__titlu">{t(locale, 'subsol.contact')}</h2>
+        <ul class="subsol__lista" role="list">
+          <li class="subsol__rand">
+            <Iconita nume="pin" class="subsol__iconita" />
+            <address>
+              <span class="sr-only">{t(locale, 'contact.adresa')}: </span>
+              <span set:html={marcheazaPlaceholder(strada)} /><br />
+              <span set:html={marcheazaPlaceholder(codPostal)} />
+              {oras}, {t(locale, 'contact.judet', { judet })}
+            </address>
+          </li>
+          <li class="subsol__rand">
+            <Iconita nume="telefon" class="subsol__iconita" />
+            {
+              telefon.valid ? (
+                <a class="subsol__link" href={telefon.href}>
+                  <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
+                  {telefon.text}
+                </a>
+              ) : (
+                <span>
+                  <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
+                  <Fragment set:html={marcheazaPlaceholder(telefon.text)} />
+                </span>
+              )
+            }
+          </li>
+          <li class="subsol__rand">
+            <Iconita nume="email" class="subsol__iconita" />
+            {
+              email.valid ? (
+                <a class="subsol__link subsol__email" href={email.href}>
+                  <span class="sr-only">{t(locale, 'contact.email')}: </span>
+                  {email.text}
+                </a>
+              ) : (
+                <span class="subsol__email">
+                  <span class="sr-only">{t(locale, 'contact.email')}: </span>
+                  <Fragment set:html={marcheazaPlaceholder(email.text)} />
+                </span>
+              )
+            }
+          </li>
+        </ul>
+      </section>
+
+      <section class="subsol__coloana" aria-labelledby="subsol-program">
+        <h2 id="subsol-program" class="subsol__titlu">{t(locale, 'program.titlu')}</h2>
+        <ProgramSaptamana locale={locale} program={birou.program} simplu compact />
+      </section>
+
+      <nav class="subsol__coloana" aria-labelledby="subsol-linkuri">
+        <h2 id="subsol-linkuri" class="subsol__titlu">{t(locale, 'subsol.linkuri')}</h2>
+        <ul class="subsol__lista" role="list">
+          {
+            linkuri.map((l) => (
+              <li>
+                <a class="subsol__link" href={l.href}>
+                  {l.text}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <div class="subsol__final">
+      <p>{t(locale, 'subsol.copyright', { an, denumire: birou.denumire })}</p>
+      <p>
+        <a class="subsol__link" href={confidentialitate.href} hreflang={confidentialitate.altaLimba ? 'ro' : undefined}>
+          {confidentialitate.text}
+        </a>
+      </p>
+    </div>
   </div>
 </footer>
 
 <style>
   .subsol {
-    background: var(--c-wood-900);
-    color: var(--c-white);
-    padding-top: var(--space-6);
+    padding-block: var(--section-y-sm);
+    background: var(--c-gray-50);
+    border-top: 1px solid var(--c-gray-200);
+    color: var(--c-gray-900);
+    font-size: var(--fs-sm);
   }
 
   .subsol__grila {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
   @media (min-width: 48rem) {
@@ -123,53 +158,100 @@ const { strada, codPostal, oras, judet } = birou.adresa;
 
   @media (min-width: 64rem) {
     .subsol__grila {
-      grid-template-columns: 1.2fr 1fr 1fr;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
-  .subsol__coloana > * + * {
-    margin-top: var(--space-2);
+  .subsol__coloana {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
   }
 
   .subsol__titlu {
-    font-size: var(--fs-lg);
-    color: var(--c-wood-300);
+    color: var(--c-gray-900);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1.4;
   }
 
   .subsol__denumire {
-    font-weight: 600;
+    color: var(--c-gray-600);
   }
 
-  address {
-    font-style: normal;
-  }
-
-  .subsol__contact,
-  .subsol__linkuri {
+  .subsol__lista {
+    display: grid;
+    gap: calc(var(--space-1) / 2);
     padding: 0;
     list-style: none;
   }
 
-  .subsol__email {
+  .subsol__lista li {
+    max-width: none;
+  }
+
+  .subsol__rand {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .subsol__rand :global(.subsol__iconita) {
+    flex: none;
+    margin-top: calc(var(--space-1) * 0.75);
+    color: var(--c-wood-800);
+  }
+
+  address {
+    font-style: normal;
+    padding-block: calc(var(--space-1) / 2);
+  }
+
+  .subsol__rand > span {
     display: inline-flex;
     align-items: center;
     min-height: 48px;
-    overflow-wrap: anywhere;
   }
 
-  .subsol__linkuri a {
+  /* Linkuri: 16 px, gray-900, subliniere bordo la hover. */
+  .subsol__link {
     display: inline-flex;
     align-items: center;
     min-width: 48px;
     min-height: 48px;
+    color: var(--c-gray-900);
+    text-decoration: none;
+  }
+
+  .subsol__link:hover {
+    color: var(--c-gray-900);
+    text-decoration: underline;
+    text-decoration-color: var(--c-red-700);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+  }
+
+  .subsol__email {
+    overflow-wrap: anywhere;
   }
 
   .subsol__final {
-    max-width: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 var(--space-3);
     margin-top: var(--space-5);
-    padding-block: var(--space-3);
-    border-top: 1px solid rgb(255 255 255 / 0.2);
-    font-size: var(--fs-sm);
-    color: var(--c-gray-200);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--c-gray-200);
+    color: var(--c-gray-600);
+  }
+
+  .subsol__final p {
+    max-width: none;
+  }
+
+  .subsol__final .subsol__link {
+    color: var(--c-gray-600);
   }
 </style>

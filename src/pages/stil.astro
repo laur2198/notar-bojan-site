@@ -7,15 +7,27 @@
 import '../styles/global.css';
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
 import { marcheazaPlaceholder } from '../lib/continut';
-import { culori } from '../lib/tokens';
+import { culoare, culori } from '../lib/tokens';
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
 
+/** Amestec sRGB, ca `color-mix(in srgb, a, b p%)` din CSS (hover-ul butonului secundar). */
+const amesteca = (a: string, b: string, p: number) =>
+  '#' +
+  [1, 3, 5]
+    .map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - p) + parseInt(b.slice(i, i + 2), 16) * p))
+    .map((v) => v.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
+
 const hex = (token: string) => {
   if (token === 'mark') return MARK_FUNDAL;
-  const culoare = culori[token];
-  if (!culoare) throw new Error(`Tokenul --${token} lipsește din tokens.css.`);
-  return culoare.hex;
+  if (token === 'hover-secundar') return amesteca(culoare('c-gray-200'), culoare('c-gray-900'), 0.1);
+  // Alb 90% peste fundalul hero-ului (wood-900).
+  if (token === 'hero-subtitlu') return amesteca(culoare('c-wood-900'), culoare('c-white'), 0.9);
+  const tokenCuloare = culori[token];
+  if (!tokenCuloare) throw new Error(`Tokenul --${token} lipsește din tokens.css.`);
+  return tokenCuloare.hex;
 };
 
 interface Pereche {
@@ -38,10 +50,10 @@ const perechi: Pereche[] = [
   { fata: 'c-wood-800', fundal: 'c-white', uz: 'text', folosire: 'Linkuri; textul și conturul butonului secundar; textul butonului inversat' },
   { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'text', folosire: 'Butonul secundar la hover; textul butonului inversat la hover' },
   { fata: 'c-white', fundal: 'c-wood-800', uz: 'text', folosire: 'Butonul primar; textul din header și din secțiunea finală' },
-  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Butonul primar la hover; textul din footer' },
+  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Butonul primar la hover; titlul și textul din hero (fără fotografie)' },
   { fata: 'c-gray-200', fundal: 'c-wood-800', uz: 'text', folosire: 'Text secundar din header („Notar public · Brașov”)' },
-  { fata: 'c-gray-200', fundal: 'c-wood-900', uz: 'text', folosire: 'Text secundar din footer' },
-  { fata: 'c-wood-300', fundal: 'c-wood-900', uz: 'text', folosire: 'Titlurile din footer' },
+  { fata: 'c-gray-200', fundal: 'c-wood-900', uz: 'text', folosire: 'Eticheta „Fotografie clădire/birou – de completat” din hero' },
+  { fata: 'hero-subtitlu', fundal: 'c-wood-900', uz: 'text', folosire: 'Subtitlul din hero (alb 90%)' },
   {
     fata: 'c-red-700',
     fundal: 'c-white',
@@ -56,7 +68,7 @@ const perechi: Pereche[] = [
     fundal: 'c-wood-800',
     uz: 'decorativ',
     folosire: 'Bordo pe fundal wood',
-    nota: 'Nu se folosește: contrast prea mic. Pe header, footer și CTA, linkurile și sublinierile preiau culoarea textului.',
+    nota: 'Nu se folosește: contrast prea mic. Pe hero și CTA, linkurile și sublinierile preiau culoarea textului.',
   },
   {
     fata: 'c-gray-200',
@@ -68,7 +80,7 @@ const perechi: Pereche[] = [
   { fata: 'c-focus', fundal: 'c-white', uz: 'ui', folosire: 'Contur de focus pe fundalul paginii' },
   { fata: 'c-focus', fundal: 'c-gray-50', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
   { fata: 'c-focus-on-dark', fundal: 'c-wood-800', uz: 'ui', folosire: 'Contur de focus pe header și pe secțiunea finală' },
-  { fata: 'c-focus-on-dark', fundal: 'c-wood-900', uz: 'ui', folosire: 'Contur de focus pe footer' },
+  { fata: 'c-focus-on-dark', fundal: 'c-wood-900', uz: 'ui', folosire: 'Contur de focus în hero (fără fotografie)' },
   {
     fata: 'c-focus-on-dark',
     fundal: 'c-white',
@@ -81,6 +93,18 @@ const perechi: Pereche[] = [
   { fata: 'c-closed', fundal: 'c-white', uz: 'text', folosire: '„Închis” pe fundalul paginii' },
   { fata: 'c-closed', fundal: 'c-gray-50', uz: 'text', folosire: '„Închis” pe secțiunile alternante' },
   { fata: 'c-gray-900', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (mark.todo)' },
+  { fata: 'c-gray-900', fundal: 'c-gray-200', uz: 'text', folosire: 'Butonul secundar (fundal gray-200, fără contur)' },
+  { fata: 'c-gray-900', fundal: 'hover-secundar', uz: 'text', folosire: 'Butonul secundar la hover (gray-200 cu 10% gray-900)' },
+  { fata: 'c-gray-900', fundal: 'c-white', uz: 'text', folosire: 'Header-ul alb: meniul, wordmark-ul, telefonul; etichetele barei de jos (14 px, 600)' },
+  { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: titlurile coloanelor și linkurile (16 px)' },
+  { fata: 'c-gray-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: denumirea completă, © și confidențialitatea (16 px)' },
+  { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'ui', folosire: 'Iconițele din footer (pin, telefon, email)' },
+  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Rândul 2 al wordmark-ului (13 px, majuscule); rezumatul cardurilor de serviciu' },
+  { fata: 'c-wood-800', fundal: 'c-white', uz: 'ui', folosire: 'Iconițele line din header și din bara de jos' },
+  { fata: 'c-red-700', fundal: 'c-white', uz: 'ui', folosire: 'Stelele ratingului, cercul „+” din întrebări, linia de accent a cardurilor' },
+  { fata: 'c-red-700', fundal: 'c-gray-50', uz: 'ui', folosire: 'Cercurile și linia dintre pași; iconița adresei din bandă' },
+  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Textul din hero (fără fotografie, pe wood-900; cu fotografie, peste overlay-ul wood-900 55%)' },
+  { fata: 'c-wood-300', fundal: 'c-wood-900', uz: 'ui', folosire: 'Conturul butonului primar din hero (ca forma să se vadă pe fundal închis)' },
   { fata: 'c-gray-600', fundal: 'mark', uz: 'ui', folosire: 'Conturul punctat al marcajului' },
 ];
 
@@ -109,12 +133,13 @@ const fraSedila = !/[şţŞŢ]/.test(DIACRITICE);
 const coduri = [...'șȘțȚ'].map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`);
 
 const scara = [
-  { nume: 'Titlu h1', variabila: '--fs-h1', clasa: 'scara-h1', font: 'serif' },
-  { nume: 'Titlu h2', variabila: '--fs-h2', clasa: 'scara-h2', font: 'serif' },
-  { nume: 'Titlu h3', variabila: '--fs-h3', clasa: 'scara-h3', font: 'serif' },
-  { nume: 'Text mare', variabila: '--fs-lg', clasa: 'scara-lg', font: 'sans' },
-  { nume: 'Text de bază (18 px)', variabila: '--fs-base', clasa: 'scara-base', font: 'sans' },
-  { nume: 'Note (minim 16 px)', variabila: '--fs-sm', clasa: 'scara-sm', font: 'sans' },
+  { nume: 'Titlu h1 (hero, majuscule)', variabila: '--fs-h1', clasa: 'scara-h1 scara-majuscule' },
+  { nume: 'Titlu h2', variabila: '--fs-h2', clasa: 'scara-h2' },
+  { nume: 'Titlu h3 / titluri de coloană', variabila: '--fs-h3', clasa: 'scara-h3' },
+  { nume: 'Text mare', variabila: '--fs-lg', clasa: 'scara-lg' },
+  { nume: 'Text de bază (18 px)', variabila: '--fs-base', clasa: 'scara-base' },
+  { nume: 'Note, meniu, rezumate (16 px)', variabila: '--fs-sm', clasa: 'scara-sm' },
+  { nume: 'Etichetele barei de jos (14 px)', variabila: '--fs-xs', clasa: 'scara-xs' },
 ];
 
 const exempluMarcaj =
@@ -195,8 +220,8 @@ const exempluMarcaj =
                       </span>
                     </td>
                     <td>
-                      <code>--{r.fata === 'mark' ? 'mark' : r.fata}</code> pe{' '}
-                      <code>{r.fundal === 'mark' ? 'mark.todo' : `--${r.fundal}`}</code>
+                      <code>{r.fata === 'hero-subtitlu' ? 'alb 90%' : `--${r.fata}`}</code> pe{' '}
+                      <code>{r.fundal === 'mark' ? 'mark.todo' : r.fundal === 'hover-secundar' ? 'hover (color-mix)' : `--${r.fundal}`}</code>
                     </td>
                     <td>
                       {r.folosire}
@@ -215,7 +240,7 @@ const exempluMarcaj =
 
       <section aria-labelledby="tipografie">
         <h2 id="tipografie">Scara tipografică</h2>
-        <p>Titluri: Source Serif 4. Text: Source Sans 3. Dimensiunile titlurilor cresc fluid cu lățimea ecranului.</p>
+        <p>Un singur font: Inter (variabil, self-hosted). Titlurile 700. Dimensiunile titlurilor cresc fluid cu lățimea ecranului.</p>
         <dl class="scara">
           {
             scara.map((s) => (
@@ -223,7 +248,7 @@ const exempluMarcaj =
                 <dt>
                   {s.nume} <code>{s.variabila}</code>
                 </dt>
-                <dd class={`${s.clasa} font-${s.font}`}>Notar public în Brașov</dd>
+                <dd class={s.clasa}>Notar public în Brașov</dd>
               </div>
             ))
           }
@@ -233,7 +258,7 @@ const exempluMarcaj =
           <span style="font-weight: 400">Normal 400</span>
           <span style="font-weight: 600">Semibold 600</span>
           <span style="font-weight: 700">Bold 700</span>
-          <span class="font-serif" style="font-weight: 600">Serif 600</span>
+          <span style="font-weight: 500">Medium 500 (rândul 2 din wordmark)</span>
         </p>
       </section>
 
@@ -261,7 +286,7 @@ const exempluMarcaj =
         <h3>Butonul inversat și focusul pe fundal închis</h3>
         <div class="panou-inchis pe-inchis">
           <p>
-            Pe header, footer și secțiunile wood, conturul de focus devine wood-300
+            Pe secțiunea finală și în hero (fundaluri wood), conturul de focus devine wood-300
             (<code>--c-focus-on-dark</code>):
           </p>
           <div class="butoane">
@@ -276,8 +301,9 @@ const exempluMarcaj =
 
       <section aria-labelledby="diacritice">
         <h2 id="diacritice">Diacritice</h2>
-        <p class="diacritice font-serif">{DIACRITICE}</p>
+        <p class="diacritice diacritice--bold">{DIACRITICE}</p>
         <p class="diacritice">{DIACRITICE}</p>
+        <p class="diacritice diacritice--majuscule">bojan elena luminița · brașov</p>
         <p>
           Știința își păstrează însemnătatea: ȘTIINȚĂ, ȚARĂ, ÎNSEMNĂTATE. Ușa biroului din Brașov se deschide la
           nouă; actele se semnează în fața notarului.
@@ -451,10 +477,24 @@ const exempluMarcaj =
     line-height: 1.2;
   }
 
-  .font-serif {
-    font-family: var(--font-serif);
-    font-weight: 600;
+  .diacritice--bold {
+    font-weight: 700;
   }
+
+  .diacritice--majuscule {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .scara-majuscule {
+    text-transform: uppercase;
+  }
+
+  .scara-xs {
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+  }
+
 
   .font-sans {
     font-family: var(--font-sans);
