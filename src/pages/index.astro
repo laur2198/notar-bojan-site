@@ -7,7 +7,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import BandaInfo from '../components/BandaInfo.astro';
 import CardRecenzie from '../components/CardRecenzie.astro';
-import CardServiciu from '../components/CardServiciu.astro';
+import GrilaServicii from '../components/GrilaServicii.astro';
 import DespreNotar from '../components/DespreNotar.astro';
 import DraftBadge from '../components/DraftBadge.astro';
 import Hero from '../components/Hero.astro';
@@ -38,7 +38,6 @@ const birou = birouIntrare.data;
 const a = acasa.data;
 
 const servicii = (await getCollection('servicii', (s) => s.data.evidentiat)).sort((x, y) => x.data.ordine - y.data.ordine);
-const hrefServiciu = (slug: string) => `${cale('servicii', locale)}${slug}/`;
 
 const recenziiAfisate = [...recenzii.data.lista].sort((x, y) => y.data.localeCompare(x.data)).slice(0, 3);
 const intrebari = faq.data.intrebari.slice(0, a.faq.numarAfisat);
@@ -75,22 +74,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     <div class="centrat">
       <DraftBadge locale={locale} draft={servicii.some((s) => esteDraft(s))} />
     </div>
-    <ul class="grila-servicii" role="list">
-      {
-        servicii.map((s) => (
-          <li>
-            <CardServiciu
-              locale={locale}
-              titlu={s.data.titlu}
-              href={hrefServiciu(s.data.slug)}
-              rezumat={s.data.rezumat}
-              imagine={s.data.imagine}
-              imagineAlt={s.data.imagineAlt}
-            />
-          </li>
-        ))
-      }
-    </ul>
+    <GrilaServicii locale={locale} servicii={servicii.map((s) => s.data)} />
     <p class="centrat sub-grila">
       <a class="btn btn--secundar" href={cale('servicii', locale)}>{t(locale, 'acasa.toateServiciile')}</a>
     </p>
@@ -142,7 +126,6 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     text-align: center;
   }
 
-  .grila-servicii,
   .grila-recenzii {
     display: grid;
     gap: var(--space-3);
@@ -151,24 +134,18 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     text-align: left;
   }
 
-  .grila-servicii > li,
   .grila-recenzii > li {
     display: grid;
     max-width: none;
   }
 
   @media (min-width: 48rem) {
-    .grila-servicii,
     .grila-recenzii {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 75rem) {
-    .grila-servicii {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
     .grila-recenzii {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }

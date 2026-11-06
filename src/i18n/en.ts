@@ -108,6 +108,37 @@ export const en: Record<keyof typeof ro, string> = {
   'hero.fotoDeCompletat': 'Photo of the building/office – to be added',
   'servicii.vedeti': 'View service',
 
+  // Services and fees
+  'servicii.titlu': 'Services and fees',
+  'servicii.seoTitlu': 'Services and fees – Notary public Brasov | Bojan Elena Luminita',
+  'servicii.seoDescriere': 'The services of the notary office in Brasov, the documents needed for each and the indicative fees.',
+  'servicii.onorariiTitlu': 'Indicative fees',
+  'servicii.coloanaServiciu': 'Service',
+  'servicii.coloanaOnorariu': 'Indicative fee',
+  'servicii.onorariuCard': 'Fee:',
+  'servicii.altele': 'Other services',
+  'servicii.seoTitluPagina': '{titlu} – Notary public Brasov | Bojan Elena Luminita',
+  'breadcrumbs.acasa': 'Home',
+
+  // "Prepare your file" box
+  'dosar.titlu': 'Prepare your file',
+  'dosar.durata': 'Duration',
+  'dosar.onorariu': 'Fee',
+  'dosar.acte': 'Documents needed',
+  'dosar.nota': 'We confirm the final list after checking your documents.',
+  'dosar.trimite': 'Email us your documents',
+  'dosar.notaEmail': 'Your email app will open. The limit for one message is 25 MB; if your documents are larger, send several emails.',
+  'dosar.adresa': 'Address for documents:',
+  'dosar.sunati': 'Or call us:',
+
+  // Prefilled email for documents
+  'email.salut': 'Hello,',
+  'email.nume': 'Full name:',
+  'email.telefon': 'Phone:',
+  'email.data': 'Preferred date (approximate):',
+  'email.observatii': 'Notes:',
+  'email.atasate': 'I have attached the following documents:',
+
   // 404 page
   '404.titlu': 'Page not found',
   '404.descriere': 'The page you are looking for does not exist or has been moved.',

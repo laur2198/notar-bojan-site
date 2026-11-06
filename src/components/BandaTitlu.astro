@@ -1,0 +1,46 @@
+---
+/**
+ * Banda de titlu a paginilor interioare: pe gray-50, cu breadcrumbs (opțional),
+ * slot pentru DraftBadge, h1 și lead. Conținutul paginii urmează pe alb.
+ * Fără imagine mare în antet.
+ */
+import type { Locale } from '../i18n';
+import Breadcrumbs, { type Firimitura } from './Breadcrumbs.astro';
+
+interface Props {
+  locale: Locale;
+  titlu: string;
+  /** Lead-ul ca HTML sigur (deja trecut prin `marcheazaPlaceholder`). */
+  leadHtml?: string;
+  breadcrumbs?: Firimitura[];
+}
+
+const { locale, titlu, leadHtml, breadcrumbs } = Astro.props;
+---
+
+<div class="banda-titlu">
+  <div class="container">
+    {breadcrumbs && <Breadcrumbs locale={locale} elemente={breadcrumbs} />}
+    <slot />
+    <h1 class="banda-titlu__h1">{titlu}</h1>
+    {leadHtml && <p class="banda-titlu__lead" set:html={leadHtml} />}
+  </div>
+</div>
+
+<style>
+  .banda-titlu {
+    padding-block: var(--space-3) var(--section-y-sm);
+    background: var(--c-gray-50);
+    border-bottom: 1px solid var(--c-gray-200);
+  }
+
+  .banda-titlu__h1 {
+    margin-top: var(--space-2);
+  }
+
+  .banda-titlu__lead {
+    margin-top: var(--space-2);
+    color: var(--c-gray-600);
+    font-size: var(--fs-lg);
+  }
+</style>

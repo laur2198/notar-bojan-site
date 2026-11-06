@@ -51,3 +51,30 @@ export function linkExtern(url: string, text: string): LinkContact {
   }
   return { href: valid ? curat : undefined, text, valid };
 }
+
+/** Rândurile emailului precompletat pentru trimiterea actelor (texte din src/i18n). */
+export interface CorpEmailActe {
+  salut: string;
+  nume: string;
+  telefon: string;
+  data: string;
+  observatii: string;
+  atasate: string;
+}
+
+/**
+ * Linkul „Trimiteți actele pe email” (CLAUDE.md §8): `mailto:` către `emailActe`, cu
+ * `subject` = `subiectEmail` și un corp precompletat, cu rânduri goale de completat.
+ * Codificare cu `encodeURIComponent` (spațiile devin %20, rândurile noi %0D%0A).
+ * Dacă adresa nu e gata (marcaj «DE COMPLETAT» sau invalidă), nu se generează `href`.
+ */
+export function linkActe(emailActe: string, subiect: string, corp: CorpEmailActe): LinkContact {
+  const adresa = linkEmail(emailActe);
+  if (!adresa.valid) return adresa;
+  const rand = '\r\n';
+  const text = [corp.salut, '', `${corp.nume} `, `${corp.telefon} `, `${corp.data} `, `${corp.observatii} `, '', corp.atasate, '- ', ''].join(
+    rand,
+  );
+  const href = `mailto:${emailActe.trim()}?subject=${encodeURIComponent(subiect)}&body=${encodeURIComponent(text)}`;
+  return { href, text: adresa.text, valid: true };
+}

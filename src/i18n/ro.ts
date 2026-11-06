@@ -106,6 +106,37 @@ export const ro = {
   'hero.fotoDeCompletat': 'Fotografie clădire/birou – de completat',
   'servicii.vedeti': 'Vedeți serviciul',
 
+  // Servicii și prețuri
+  'servicii.titlu': 'Servicii și prețuri',
+  'servicii.seoTitlu': 'Servicii și prețuri – Notar public Brașov | Bojan Elena Luminița',
+  'servicii.seoDescriere': 'Serviciile biroului notarial din Brașov, actele necesare pentru fiecare și onorariile orientative.',
+  'servicii.onorariiTitlu': 'Onorarii orientative',
+  'servicii.coloanaServiciu': 'Serviciu',
+  'servicii.coloanaOnorariu': 'Onorariu orientativ',
+  'servicii.onorariuCard': 'Onorariu:',
+  'servicii.altele': 'Alte servicii',
+  'servicii.seoTitluPagina': '{titlu} – Notar public Brașov | Bojan Elena Luminița',
+  'breadcrumbs.acasa': 'Acasă',
+
+  // Caseta „Pregătiți dosarul”
+  'dosar.titlu': 'Pregătiți dosarul',
+  'dosar.durata': 'Durata',
+  'dosar.onorariu': 'Onorariu',
+  'dosar.acte': 'Acte necesare',
+  'dosar.nota': 'Lista finală v-o confirmăm după verificarea actelor.',
+  'dosar.trimite': 'Trimiteți actele pe email',
+  'dosar.notaEmail': 'Se deschide aplicația de email. Limita unui mesaj este de 25 MB; dacă documentele sunt mai mari, trimiteți mai multe emailuri.',
+  'dosar.adresa': 'Adresa pentru acte:',
+  'dosar.sunati': 'Sau sunați:',
+
+  // Emailul precompletat pentru acte
+  'email.salut': 'Bună ziua,',
+  'email.nume': 'Nume și prenume:',
+  'email.telefon': 'Telefon:',
+  'email.data': 'Data aproximativă dorită:',
+  'email.observatii': 'Observații:',
+  'email.atasate': 'Am atașat următoarele documente:',
+
   // Pagina 404
   '404.titlu': 'Pagina nu a fost găsită',
   '404.descriere': 'Pagina căutată nu există sau a fost mutată.',
