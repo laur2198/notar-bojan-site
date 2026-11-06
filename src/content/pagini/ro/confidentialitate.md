@@ -9,7 +9,7 @@ validat: false
 
 ## Cine prelucrează datele
 
-Operatorul datelor este Biroul Individual Notarial Bojan Elena Luminița, cu sediul în «DE COMPLETAT: adresa», CIF «DE COMPLETAT», email «DE COMPLETAT», telefon «DE COMPLETAT».
+Operatorul datelor este Biroul Individual Notarial Bojan Elena Luminița, cu sediul în «DE COMPLETAT: adresa», cod fiscal RO19608590, email «DE COMPLETAT», telefon «DE COMPLETAT».
 
 ## Ce date prelucrăm și de unde
 
