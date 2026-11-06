@@ -4,6 +4,8 @@
  * Numele accesibil vine din `eticheta` (aria-label), ex. „Sunați: 0268 123 456”.
  * Dacă linkul nu e gata (date «DE COMPLETAT», doar în preview), butonul rămâne vizibil,
  * fără `href` și cu `aria-disabled="true"`.
+ * `extern` (WhatsApp): se deschide într-o filă nouă (target="_blank", rel="noopener"), iar
+ * eticheta o anunță.
  */
 import { t, type Locale } from '../i18n';
 import type { LinkContact } from '../lib/contact';
@@ -11,18 +13,25 @@ import Iconita from './Iconita.astro';
 
 interface Props {
   locale: Locale;
-  iconita: 'telefon' | 'email';
+  iconita: 'telefon' | 'email' | 'whatsapp';
   link: LinkContact;
   eticheta: string;
+  extern?: boolean;
 }
 
-const { locale, iconita, link, eticheta } = Astro.props;
+const { locale, iconita, link, eticheta, extern = false } = Astro.props;
+const etichetaActiva = extern ? `${eticheta} ${t(locale, 'link.filaNoua')}` : eticheta;
 const indisponibil = `${eticheta} (${t(locale, 'link.indisponibil')})`;
 ---
 
 {
   link.valid ? (
-    <a class="buton-iconita" href={link.href} aria-label={eticheta}>
+    <a
+      class="buton-iconita"
+      href={link.href}
+      aria-label={etichetaActiva}
+      {...(extern && { target: '_blank', rel: 'noopener' })}
+    >
       <Iconita nume={iconita} />
     </a>
   ) : (

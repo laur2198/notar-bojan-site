@@ -1,7 +1,7 @@
 ---
 /**
  * /programare/ și /en/appointments/ (CLAUDE.md §8): introducerea, cardul „Alegeți data și ora” (link spre
- * pagina de programări Google Calendar, în filă nouă, anunțată), alături telefonul, starea
+ * pagina de programări Google Calendar, în filă nouă, anunțată), alături telefonul, WhatsApp-ul și emailul, starea
  * programului și programul săptămânal, apoi restul textului (Înainte de programare, Anulare).
  * Fără iframe: calendarul nu se încarcă în pagină (vezi EmbedCuConsimtamant, nefolosită).
  */
@@ -13,10 +13,10 @@ import Iconita from './Iconita.astro';
 import LinkExtern from './LinkExtern.astro';
 import ProgramSaptamana from './ProgramSaptamana.astro';
 import StareProgram from './StareProgram.astro';
-import TelefonLink from './TelefonLink.astro';
+import ListaContacte from './ListaContacte.astro';
 import { t, type Locale } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { linkExtern, linkTelefon } from '../lib/contact';
+import { linkExtern } from '../lib/contact';
 import { getBirou, marcheazaPlaceholder } from '../lib/continut';
 import { extrageIntro } from '../lib/markdown';
 
@@ -59,7 +59,7 @@ const calendar = linkExtern(birou.programareUrl, '');
 
       <aside class="programare__alaturi" aria-labelledby="programare-altfel">
         <h2 id="programare-altfel" class="programare__subtitlu">{t(locale, 'programare.altfel')}</h2>
-        <TelefonLink locale={locale} telefon={linkTelefon(birou)} class="programare__telefon" />
+        <ListaContacte locale={locale} birou={birou} />
         <StareProgram locale={locale} program={birou.program} zileLibere={birou.zileLibere} />
         <ProgramSaptamana locale={locale} program={birou.program} captionVizibil />
       </aside>
@@ -137,10 +137,6 @@ const calendar = linkExtern(birou.programareUrl, '');
 
   .programare__subtitlu {
     font-size: var(--fs-h3);
-  }
-
-  .programare__alaturi :global(.programare__telefon) {
-    font-size: var(--fs-lg);
   }
 
   .programare__text {

@@ -101,6 +101,14 @@ content:
         type: string
         required: true
         description: Ex. 0268 123 456.
+      - name: whatsapp
+        label: WhatsApp
+        type: string
+        required: true
+        description: Numărul WhatsApp Business al biroului (nu un număr personal). Format internațional, fără spații, ex. +40722123456.
+        pattern:
+          regex: "^(\\+40\\d{9}|.*«DE COMPLETAT.*)$"
+          message: Scrieți numărul ca +40 urmat de 9 cifre, fără spații.
       - name: email
         label: Email general
         type: string
@@ -550,6 +558,19 @@ content:
             default: Google
             options:
               values: [Google]
+          - name: limba
+            label: Limba recenziei
+            type: select
+            default: ro
+            options:
+              values:
+                - { name: ro, label: Română }
+                - { name: en, label: Engleză }
+                - { name: de, label: Germană }
+                - { name: fr, label: Franceză }
+                - { name: hu, label: Maghiară }
+                - { name: it, label: Italiană }
+                - { name: es, label: Spaniolă }
       - name: validat
         component: validat
 

@@ -96,7 +96,6 @@ export const ro = {
 
   // Antet, bara de jos, banda, servicii (calibrare după referință)
   'antet.email': 'Trimiteți un email: {email}',
-  'bara.program': 'Program',
   'bara.locatie': 'Locație',
   'banda.birou': 'Biroul notarial',
   'banda.programul': 'Programul nostru',
@@ -142,7 +141,7 @@ export const ro = {
   'programare.cardTitlu': 'Programare online',
   'programare.alegeti': 'Alegeți data și ora',
   'programare.nota': 'Programarea se face prin Google Calendar. Biroul vă confirmă programarea.',
-  'programare.altfel': 'Preferați să sunați?',
+  'programare.altfel': 'Preferați să sunați sau să ne scrieți?',
   'embed.afiseaza': 'Afișați calendarul aici',
   'embed.info': 'Calendarul este găzduit de Google. Dacă îl afișați aici, Google poate seta cookie-uri și poate afla că ați vizitat această pagină. Până atunci, pagina nu încarcă nimic de la Google.',
   'embed.deschide': 'Deschideți calendarul într-o filă nouă',
@@ -154,7 +153,7 @@ export const ro = {
   'recenzii.goale': 'Recenziile clienților pot fi citite pe profilul Google al biroului.',
   'contact.emailActe': 'Email pentru acte',
   'banda.adresaTitlu': 'Adresa',
-  'banda.contactTitlu': 'Telefon și email',
+  'banda.contactTitlu': 'Telefon, WhatsApp și email',
   'harta.titlu': 'Harta',
   'doc.cuprins': 'Cuprins',
   'doc.actualizat': 'Ultima actualizare: {data}',
@@ -164,6 +163,12 @@ export const ro = {
   'servicii.detaliiRo': 'Detalii în română',
   'servicii.onorariiScurt': 'Onorarii',
   'despre.nota': 'Bine de știut',
+
+  // WhatsApp
+  'whatsapp.nume': 'WhatsApp',
+  'whatsapp.scrieti': 'Scrieți-ne pe WhatsApp',
+  'whatsapp.mesaj': 'Bună ziua, aș dori informații despre…',
+  'whatsapp.nota': 'Pe WhatsApp răspundem la întrebări și programări. Actele le trimiteți pe email, din pagina serviciului.',
 
   // Pagina 404
   '404.titlu': 'Pagina nu a fost găsită',

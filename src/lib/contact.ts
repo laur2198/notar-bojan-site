@@ -3,6 +3,7 @@
  * necompletate (marcaj «DE COMPLETAT») sau invalide.
  * Funcții pure, testate în contact.test.ts.
  */
+import { t, type Locale } from '../i18n';
 import { areMarcaj } from './marcaj';
 
 export interface LinkContact {
@@ -26,6 +27,22 @@ export function linkTelefon(birou: { telefon: string; telefonAfisat: string }): 
   const valid = !areMarcaj(birou.telefon) && TELEFON_E164_RO.test(birou.telefon);
   const text = birou.telefonAfisat.trim() || birou.telefon;
   return { href: valid ? `tel:${birou.telefon}` : undefined, text, valid };
+}
+
+/**
+ * Linkul WhatsApp al biroului: `https://wa.me/40XXXXXXXXX?text=…` (numărul fără „+”), cu un
+ * mesaj precompletat în limba paginii, codificat cu `encodeURIComponent`. Textul afișat e
+ * numărul în format național (ex. 0722 123 456). Cât timp `whatsapp` e «DE COMPLETAT» sau
+ * invalid, nu se generează `href` (butonul rămâne vizibil, dezactivat, doar în preview).
+ */
+export function linkWhatsapp(birou: { whatsapp: string }, locale: Locale): LinkContact {
+  const numar = birou.whatsapp.trim();
+  const valid = !areMarcaj(numar) && TELEFON_E164_RO.test(numar);
+  if (!valid) return { href: undefined, text: numar, valid: false };
+  const cifre = numar.slice(3); // fără „+40”
+  const text = `0${cifre.slice(0, 3)} ${cifre.slice(3, 6)} ${cifre.slice(6)}`;
+  const href = `https://wa.me/${numar.slice(1)}?text=${encodeURIComponent(t(locale, 'whatsapp.mesaj'))}`;
+  return { href, text, valid: true };
 }
 
 /** Link `mailto:` simplu către o adresă, fără subiect. */

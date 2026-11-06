@@ -3,21 +3,25 @@
  * Antetul site-ului (CLAUDE.md §4, §5, §6): alb, fix sus (sticky), 80 px pe desktop,
  * 64 px pe mobil. Fără scroll: o linie gray-200 jos; după scroll: umbră fină (JS).
  *
- * - Desktop (≥ 80rem): wordmark | meniu | RO | EN | telefon | email | „Programare”.
+ * - Desktop (≥ 80rem): wordmark | meniu | RO | EN | telefon | WhatsApp | email | „Programare”.
  *   (măsurat: ~1.175 px de conținut; containerul are maximum 1.200 px).
  * - 768 px – 80rem: wordmark | telefon | „Programare” | comutator | „Meniu”
  *   (bara de jos apare doar sub 768 px, iar telefonul trebuie să fie vizibil pe orice ecran).
  * - < 768 px: wordmark | comutator | „Meniu”; telefonul și „Programare” stau în bara de jos.
  *
+ * Meniul compact are, după linkuri, contactele directe (telefon, WhatsApp, email) și nota
+ * despre WhatsApp (ListaContacte).
+ *
  * Meniul compact e un `<details>`: se deschide și fără JS. JS adaugă închiderea la
  * Escape (cu focus înapoi pe buton), la click în afara meniului și umbra după scroll.
  */
 import { ariaCurent, cale, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
-import { linkEmail, linkTelefon } from '../lib/contact';
+import { linkEmail, linkTelefon, linkWhatsapp } from '../lib/contact';
 import type { Birou } from '../lib/continut';
 import ButonIconita from './ButonIconita.astro';
 import ComutatorLimba from './ComutatorLimba.astro';
 import Iconita from './Iconita.astro';
+import ListaContacte from './ListaContacte.astro';
 import Wordmark from './Wordmark.astro';
 
 interface Props {
@@ -29,6 +33,7 @@ const { locale, birou } = Astro.props;
 const pathname = Astro.url.pathname;
 const telefon = linkTelefon(birou);
 const email = linkEmail(birou.email);
+const whatsapp = linkWhatsapp(birou, locale);
 
 const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ro: [
@@ -87,6 +92,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
           <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
         )
       }
+      <ButonIconita locale={locale} iconita="whatsapp" link={whatsapp} eticheta={t(locale, 'whatsapp.scrieti')} extern />
       <ButonIconita locale={locale} iconita="email" link={email} eticheta={etichetaEmail} />
       <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
         {t(locale, 'actiune.programare')}
@@ -127,6 +133,9 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
               }
             </ul>
           </nav>
+          <div class="container meniu-compact__contacte">
+            <ListaContacte locale={locale} birou={birou} />
+          </div>
         </div>
       </details>
     </div>
@@ -269,6 +278,30 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     max-width: none;
   }
 
+  .meniu-compact__contacte {
+    padding-block: var(--space-2) var(--space-3);
+    border-top: 1px solid var(--c-gray-200);
+  }
+
+  /* Pe tabletă, contactele stau pe un rând (cât încap); pe telefon, unul sub altul. */
+  @media (min-width: 48rem) {
+    .meniu-compact__contacte :global(.contacte__lista) {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: var(--space-4);
+    }
+
+    .meniu-compact__contacte :global(.contacte__link) {
+      overflow-wrap: normal;
+    }
+  }
+
+  /* Meniul compact derulează dacă nu încape (telefon în poziție orizontală). */
+  .meniu-compact__panou {
+    max-height: calc(100svh - var(--header-h-sm));
+    overflow-y: auto;
+  }
+
   .meniu-compact__lista li + li {
     border-top: 1px solid var(--c-gray-200);
   }
@@ -323,7 +356,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       max-width: none;
     }
 
-    /* Telefonul: iconiță + număr într-un singur link; sub 85rem (1360 px), doar iconița. */
+    /* Telefonul: iconiță + număr într-un singur link; sub 88rem (1408 px), doar iconița. */
     .antet__telefon {
       display: inline-flex;
       align-items: center;
@@ -393,8 +426,9 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     }
   }
 
-  /* Numărul de telefon apare de la 85rem (1360 px): pragul măsurat la care header-ul încape pe un rând. */
-  @media (min-width: 85rem) {
+  /* Numărul de telefon apare de la 88rem (1408 px): pragul măsurat la care header-ul încape pe un rând
+     cu butonul WhatsApp (cu număr valid: 1.396 px necesari). */
+  @media (min-width: 88rem) {
     .antet__telefon-numar {
       display: inline;
     }

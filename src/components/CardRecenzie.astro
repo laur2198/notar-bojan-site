@@ -3,8 +3,11 @@
  * Card cu o recenzie reală de pe Google (CLAUDE.md §3.4, §7): nota, textul trunchiat la
  * ~5 rânduri (cu „Citiți tot” spre /recenzii/), autorul, data și sursa. Nu se folosește
  * niciodată cu recenzii generate.
+ *
+ * `limba` (implicit „ro”): dacă diferă de limba paginii, textul recenziei și autorul primesc
+ * atributul `lang` (cititoarele de ecran pronunță corect; `verifica:en` le ignoră).
  */
-import { formateazaNumar, LOCALE_INTL, t, type Locale } from '../i18n';
+import { esteInAltaLimba, formateazaNumar, LOCALE_INTL, t, type Locale } from '../i18n';
 import LogoGoogle from './LogoGoogle.astro';
 import Stele from './Stele.astro';
 
@@ -18,9 +21,12 @@ interface Props {
   hrefToate?: string;
   /** Textul întreg, fără trunchiere (pe /recenzii/). */
   complet?: boolean;
+  /** Limba în care e scrisă recenzia (recenzii.yaml); lipsă = română. */
+  limba?: 'ro' | 'en' | 'de' | 'fr' | 'hu' | 'it' | 'es';
 }
 
-const { locale, autor, data, nota, text, hrefToate, complet = false } = Astro.props;
+const { locale, autor, data, nota, text, hrefToate, complet = false, limba = 'ro' } = Astro.props;
+const lang = limba !== locale ? limba : undefined;
 const dataAfisata = new Intl.DateTimeFormat(LOCALE_INTL[locale], { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
   new Date(`${data}T00:00:00Z`),
 );
@@ -32,14 +38,20 @@ const notaText = formateazaNumar(locale, nota, 0);
     <Stele nota={nota} />
     <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota: notaText })}</span>
   </p>
-  <blockquote class:list={['card-recenzie__text', { 'card-recenzie__text--complet': complet }]}>
+  <blockquote class:list={['card-recenzie__text', { 'card-recenzie__text--complet': complet }]} lang={lang}>
     <p>{text}</p>
   </blockquote>
-  {!complet && hrefToate && <a class="card-recenzie__tot" href={hrefToate}>{t(locale, 'recenzii.citestiTot')}</a>}
+  {
+    !complet && hrefToate && (
+      <a class="card-recenzie__tot" href={hrefToate} hreflang={esteInAltaLimba('recenzii', locale) ? 'ro' : undefined}>
+        {t(locale, 'recenzii.citestiTot')}
+      </a>
+    )
+  }
   <footer class="card-recenzie__subsol">
     <LogoGoogle />
     <span>
-      <strong>{autor}</strong>
+      <strong lang={lang}>{autor}</strong>
       <span class="card-recenzie__meta"><time datetime={data}>{dataAfisata}</time> · {t(locale, 'recenzii.sursa')}</span>
     </span>
   </footer>

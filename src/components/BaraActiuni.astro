@@ -1,8 +1,8 @@
 ---
 /**
  * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): patru acțiuni egale, cu
- * iconiță line (wood-800) și etichetă dedesubt: Sunați, Programare, Program
- * (ancoră spre banda de informații de pe Acasă) și Locație (Google Maps).
+ * iconiță (wood-800) și etichetă dedesubt: Sunați, WhatsApp (filă nouă), Programare și
+ * Locație (Google Maps). Programul rămâne pe Acasă, la ancora #program.
  * Respectă `env(safe-area-inset-bottom)`; spațiul de sub conținut e rezervat în
  * global.css (`--inaltime-bara`).
  *
@@ -10,7 +10,7 @@
  * cu `aria-disabled="true"`.
  */
 import { cale, t, type Locale } from '../i18n';
-import { linkExtern, linkTelefon, type LinkContact } from '../lib/contact';
+import { linkExtern, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
 import type { Birou } from '../lib/continut';
 import Iconita from './Iconita.astro';
 
@@ -22,7 +22,7 @@ interface Props {
 const { locale, birou } = Astro.props;
 
 interface Actiune {
-  iconita: 'telefon' | 'calendar' | 'ceas' | 'pin';
+  iconita: 'telefon' | 'whatsapp' | 'calendar' | 'pin';
   eticheta: string;
   link: LinkContact;
   extern?: boolean;
@@ -32,12 +32,12 @@ const intern = (href: string, text: string): LinkContact => ({ href, text, valid
 
 const actiuni: Actiune[] = [
   { iconita: 'telefon', eticheta: t(locale, 'actiune.suna'), link: linkTelefon(birou) },
+  { iconita: 'whatsapp', eticheta: t(locale, 'whatsapp.nume'), link: linkWhatsapp(birou, locale), extern: true },
   {
     iconita: 'calendar',
     eticheta: t(locale, 'actiune.programareScurt'),
     link: intern(cale('programare', locale), ''),
   },
-  { iconita: 'ceas', eticheta: t(locale, 'bara.program'), link: intern(`${cale('acasa', locale)}#program`, '') },
   {
     iconita: 'pin',
     eticheta: t(locale, 'bara.locatie'),

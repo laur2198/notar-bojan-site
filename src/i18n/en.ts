@@ -98,7 +98,6 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Header, bottom bar, band, services (calibration after the reference site)
   'antet.email': 'Email us: {email}',
-  'bara.program': 'Hours',
   'bara.locatie': 'Location',
   'banda.birou': 'The notary office',
   'banda.programul': 'Our opening hours',
@@ -144,7 +143,7 @@ export const en: Record<keyof typeof ro, string> = {
   'programare.cardTitlu': 'Online appointment',
   'programare.alegeti': 'Choose a date and time',
   'programare.nota': 'Appointments are made through Google Calendar. The office will confirm your appointment.',
-  'programare.altfel': 'Prefer to call?',
+  'programare.altfel': 'Prefer to call or message us?',
   'embed.afiseaza': 'Show the calendar here',
   'embed.info': 'The calendar is hosted by Google. If you show it here, Google may set cookies and learn that you visited this page. Until then, this page loads nothing from Google.',
   'embed.deschide': 'Open the calendar in a new tab',
@@ -156,7 +155,7 @@ export const en: Record<keyof typeof ro, string> = {
   'recenzii.goale': 'You can read client reviews on the office Google profile.',
   'contact.emailActe': 'Email for documents',
   'banda.adresaTitlu': 'Address',
-  'banda.contactTitlu': 'Phone and email',
+  'banda.contactTitlu': 'Phone, WhatsApp and email',
   'harta.titlu': 'Map',
   'doc.cuprins': 'Contents',
   'doc.actualizat': 'Last updated: {data}',
@@ -166,6 +165,12 @@ export const en: Record<keyof typeof ro, string> = {
   'servicii.detaliiRo': 'Details in Romanian',
   'servicii.onorariiScurt': 'Fees',
   'despre.nota': 'Good to know',
+
+  // WhatsApp
+  'whatsapp.nume': 'WhatsApp',
+  'whatsapp.scrieti': 'Message us on WhatsApp',
+  'whatsapp.mesaj': 'Hello, I would like information about…',
+  'whatsapp.nota': 'On WhatsApp we answer questions and bookings. Please send documents by email, from the service page.',
 
   // 404 page
   '404.titlu': 'Page not found',
