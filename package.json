@@ -15,7 +15,8 @@
     "verifica": "node scripts/verifica-continut.mjs",
     "astro": "astro",
     "test": "vitest run",
-    "linkuri": "node scripts/verifica-linkuri.mjs"
+    "linkuri": "node scripts/verifica-linkuri.mjs",
+    "verifica:en": "node scripts/verifica-engleza.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

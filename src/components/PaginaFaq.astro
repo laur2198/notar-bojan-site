@@ -1,0 +1,40 @@
+---
+/**
+ * /intrebari-frecvente/ și /en/faq/: toate întrebările din faq/{ro,en}.yaml (ListaFaq) și
+ * JSON-LD FAQPage cu `inLanguage` al paginii.
+ * Răspunsurile încă necompletate («DE COMPLETAT») sunt excluse din JSON-LD.
+ */
+import { getEntry } from 'astro:content';
+import BandaTitlu from './BandaTitlu.astro';
+import DraftBadge from './DraftBadge.astro';
+import JsonLd from './JsonLd.astro';
+import ListaFaq from './ListaFaq.astro';
+import SectiuneCta from './SectiuneCta.astro';
+import Sectiune from './Sectiune.astro';
+import { t, type Locale } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getBirou } from '../lib/continut';
+import { faqPage } from '../lib/jsonld';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const [faq, acasa, birou] = await Promise.all([getEntry('faq', locale), getEntry('acasa', `${locale}/acasa`), getBirou()]);
+if (!faq || !acasa) throw new Error(`Lipsesc faq/${locale}.yaml sau pagini/${locale}/acasa.yaml.`);
+const titlu = t(locale, 'faq.titlu');
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu })} description={t(locale, 'faq.seoDescriere')}>
+  <JsonLd date={faqPage(faq.data.intrebari, locale)} slot="head" />
+  <BandaTitlu locale={locale} titlu={titlu}>
+    <DraftBadge locale={locale} intrare={faq} />
+  </BandaTitlu>
+
+  <Sectiune>
+    <ListaFaq intrebari={faq.data.intrebari} />
+  </Sectiune>
+
+  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+</BaseLayout>

@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { loadEnv } from 'vite';
+import { alternateLimbi } from './src/i18n/rute.ts';
 
 // `.env` nu ajunge automat în process.env în fișierul de configurare; loadEnv îl citește explicit.
 const env = { ...loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), ''), ...process.env };
@@ -41,14 +42,18 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) => !new URL(page).pathname.startsWith(`${BASE_PATH}stil/`),
-      // TODO etapa 6: opțiunea `i18n` împerechează doar căi identice (`/` ↔ `/en/`).
-      // Perechile cu slug diferit (`/servicii/` ↔ `/en/services/`) cer `serialize()` cu `routeMap`.
-      i18n: {
-        defaultLocale: 'ro',
-        locales: {
-          ro: 'ro-RO',
-          en: 'en-US',
-        },
+      // Opțiunea `i18n` a integrării împerechează doar căi identice (`/` ↔ `/en/`), deci
+      // alternatele se pun aici, din routeMap (src/i18n/rute.ts): și perechile cu slug diferit
+      // (`/servicii/` ↔ `/en/services/`). Paginile fără pereche nu primesc alternate.
+      // Codurile hreflang sunt aceleași ca în pagini: ro, en, x-default → RO.
+      serialize(item) {
+        const adresa = new URL(item.url);
+        const caleLogica = `/${adresa.pathname.slice(BASE_PATH.length)}`;
+        const alternate = alternateLimbi(caleLogica);
+        return {
+          ...item,
+          links: alternate?.map(({ lang, cale }) => ({ lang, url: new URL(`${BASE_PATH}${cale.slice(1)}`, adresa.origin).href })),
+        };
       },
     }),
   ],

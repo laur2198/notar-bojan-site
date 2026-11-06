@@ -1,35 +1,6 @@
 ---
-/**
- * /intrebari-frecvente/: toate întrebările din faq/ro.yaml (ListaFaq) și JSON-LD FAQPage.
- * Răspunsurile încă necompletate («DE COMPLETAT») sunt excluse din JSON-LD.
- */
-import { getEntry } from 'astro:content';
-import BandaTitlu from '../components/BandaTitlu.astro';
-import DraftBadge from '../components/DraftBadge.astro';
-import JsonLd from '../components/JsonLd.astro';
-import ListaFaq from '../components/ListaFaq.astro';
-import SectiuneCta from '../components/SectiuneCta.astro';
-import Sectiune from '../components/Sectiune.astro';
-import { t } from '../i18n';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getBirou } from '../lib/continut';
-import { faqPage } from '../lib/jsonld';
-
-const locale = 'ro';
-const [faq, acasa, birou] = await Promise.all([getEntry('faq', 'ro'), getEntry('acasa', 'ro/acasa'), getBirou()]);
-if (!faq || !acasa) throw new Error('Lipsesc faq/ro.yaml sau pagini/ro/acasa.yaml.');
-const titlu = t(locale, 'nav.faq');
+/** Întrebări frecvente (RO). Structura e în PaginaFaq, comună pentru /intrebari-frecvente/ și /en/faq/. */
+import PaginaFaq from '../components/PaginaFaq.astro';
 ---
 
-<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu })} description={t(locale, 'faq.seoDescriere')}>
-  <JsonLd date={faqPage(faq.data.intrebari, 'ro')} slot="head" />
-  <BandaTitlu locale={locale} titlu={titlu}>
-    <DraftBadge locale={locale} intrare={faq} />
-  </BandaTitlu>
-
-  <Sectiune>
-    <ListaFaq intrebari={faq.data.intrebari} />
-  </Sectiune>
-
-  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
-</BaseLayout>
+<PaginaFaq locale="ro" />

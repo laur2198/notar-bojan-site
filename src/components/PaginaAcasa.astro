@@ -1,0 +1,194 @@
+---
+/**
+ * Pagina Acasă, aceeași pentru RO (/) și EN (/en/) – structura calibrată după site-ul de
+ * referință ales de clientă:
+ * hero → banda de informații → despre → servicii → cum lucrăm → recenzii → întrebări → CTA.
+ *
+ * Diferențe EN (etapa 6): serviciile vin din servicii-en/servicii.yaml și duc la
+ * /en/services/#{slugRo}; „Despre” afișează nota despre limbă și interpret într-o casetă.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import { cale, t, type Locale } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { linkExtern } from '../lib/contact';
+import { esteDraft, marcheazaPlaceholder } from '../lib/continut';
+import { extrageSectiune } from '../lib/markdown';
+import BandaInfo from './BandaInfo.astro';
+import CardRecenzie from './CardRecenzie.astro';
+import DespreNotar from './DespreNotar.astro';
+import DraftBadge from './DraftBadge.astro';
+import GrilaServicii, { type ServiciuCard } from './GrilaServicii.astro';
+import Hero from './Hero.astro';
+import LinkExtern from './LinkExtern.astro';
+import ListaFaq from './ListaFaq.astro';
+import PasiLucru from './PasiLucru.astro';
+import SectiuneCta from './SectiuneCta.astro';
+import Sectiune from './Sectiune.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+/** Titlul secțiunii din contact.md cu indicațiile de acces (textul din banda de informații). */
+const SECTIUNE_ACCES: Record<Locale, string> = { ro: 'Cum ajungeți', en: 'Finding us' };
+
+const [acasa, birouIntrare, contact, faq, recenzii] = await Promise.all([
+  getEntry('acasa', `${locale}/acasa`),
+  getEntry('birou', 'birou'),
+  getEntry('pagini', `${locale}/contact`),
+  getEntry('faq', locale),
+  getEntry('recenzii', 'recenzii'),
+]);
+if (!acasa || !birouIntrare || !faq || !recenzii) {
+  throw new Error(`Lipsesc fișiere de conținut pentru pagina Acasă (${locale}): acasa, birou, faq sau recenzii.`);
+}
+const birou = birouIntrare.data;
+const a = acasa.data;
+
+let servicii: ServiciuCard[];
+let serviciiDraft: boolean;
+if (locale === 'en') {
+  const serviciiEn = await getEntry('serviciiEn', 'servicii');
+  if (!serviciiEn) throw new Error('Lipsește src/content/servicii-en/servicii.yaml.');
+  servicii = serviciiEn.data.lista.map((s) => ({
+    slug: s.slugRo,
+    titlu: s.titlu,
+    rezumat: s.text,
+    href: `${cale('servicii', 'en')}#${s.slugRo}`,
+  }));
+  serviciiDraft = esteDraft(serviciiEn);
+} else {
+  const lista = (await getCollection('servicii', (s) => s.data.evidentiat)).sort((x, y) => x.data.ordine - y.data.ordine);
+  servicii = lista.map((s) => s.data);
+  serviciiDraft = lista.some((s) => esteDraft(s));
+}
+
+const recenziiAfisate = [...recenzii.data.lista].sort((x, y) => y.data.localeCompare(x.data)).slice(0, 3);
+const intrebari = faq.data.intrebari.slice(0, a.faq.numarAfisat);
+const profilGoogle = linkExtern(birou.googleProfilUrl, '');
+---
+
+
+<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere}>
+  <Hero
+    locale={locale}
+    birou={birou}
+    profesie={a.hero.titlu}
+    subtitlu={a.hero.subtitlu}
+    imagine={a.hero.imagine}
+    imagineAlt={a.hero.imagineAlt}
+  >
+    <DraftBadge locale={locale} intrare={acasa} />
+  </Hero>
+
+  <BandaInfo locale={locale} birou={birou} textLocatie={extrageSectiune(contact?.body, SECTIUNE_ACCES[locale])}>
+    <div class="centrat">
+      <DraftBadge locale={locale} draft={esteDraft(birouIntrare) || (contact ? esteDraft(contact) : false)} />
+    </div>
+  </BandaInfo>
+
+  <DespreNotar
+    locale={locale}
+    titlu={a.despre.titlu}
+    text={a.despre.text}
+    imagine={a.despre.imagine}
+    imagineAlt={a.despre.imagineAlt}
+    caseta={locale === 'en'}
+  />
+
+  <Sectiune id="servicii" centrat titlu={a.servicii.titlu} introHtml={marcheazaPlaceholder(a.servicii.intro)}>
+    <div class="centrat">
+      <DraftBadge locale={locale} draft={serviciiDraft} />
+    </div>
+    <GrilaServicii locale={locale} servicii={servicii} />
+    <p class="centrat sub-grila">
+      <a class="btn btn--secundar" href={cale('servicii', locale)}>{t(locale, 'acasa.toateServiciile')}</a>
+    </p>
+  </Sectiune>
+
+  <Sectiune id="pasi" centrat titlu={a.pasi.titlu} introHtml={marcheazaPlaceholder(a.pasi.intro)} class="sectiune-separata">
+    <PasiLucru pasi={a.pasi.lista} />
+  </Sectiune>
+
+  <Sectiune id="recenzii" ton="gri" centrat titlu={a.recenzii.titlu} introHtml={marcheazaPlaceholder(a.recenzii.intro)}>
+    {
+      recenziiAfisate.length > 0 ? (
+        <ul class="grila-recenzii" role="list">
+          {recenziiAfisate.map((r) => (
+            <li>
+              <CardRecenzie locale={locale} {...r} hrefToate={cale('recenzii', locale)} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="centrat">
+          <DraftBadge locale={locale} draft text={t(locale, 'recenzii.inAsteptare')} />
+        </div>
+      )
+    }
+    <p class="centrat sub-grila">
+      <LinkExtern locale={locale} link={profilGoogle} class="btn btn--secundar">
+        {t(locale, 'recenzii.vedeti')}
+      </LinkExtern>
+    </p>
+  </Sectiune>
+
+  <Sectiune id="intrebari" centrat titlu={a.faq.titlu}>
+    <div class="centrat">
+      <DraftBadge locale={locale} intrare={faq} />
+    </div>
+    <ListaFaq intrebari={intrebari} />
+    <p class="centrat sub-grila">
+      <a class="btn btn--secundar" href={cale('faq', locale)}>{t(locale, 'acasa.toateIntrebarile')}</a>
+    </p>
+  </Sectiune>
+
+  <SectiuneCta locale={locale} birou={birou} titlu={a.final.titlu} text={a.final.text} />
+</BaseLayout>
+
+<style>
+  .centrat {
+    max-width: none;
+    text-align: center;
+  }
+
+  .grila-recenzii {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+    text-align: left;
+  }
+
+  .grila-recenzii > li {
+    display: grid;
+    max-width: none;
+  }
+
+  @media (min-width: 48rem) {
+    .grila-recenzii {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 75rem) {
+    .grila-recenzii {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .sub-grila {
+    margin-top: var(--space-5);
+  }
+
+  /*
+   * Fundalurile, de sus în jos: hero (wood-900) · bandă și despre (gri) · servicii (alb) ·
+   * cum lucrăm (alb) · recenzii (gri) · întrebări (alb) · CTA (wood-800) · footer (gri).
+   * Servicii și „Cum lucrăm” sunt ambele pe alb: o linie fină le separă.
+   */
+  :global(.sectiune-separata) {
+    border-top: 1px solid var(--c-gray-200);
+  }
+</style>

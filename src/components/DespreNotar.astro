@@ -3,9 +3,13 @@
  * „Despre notar” pe Acasă: continuă vizual banda de informații (tot gray-50).
  * Stânga portretul 2:3 (pe mobil, deasupra, lat: 4:3), dreapta titlul, textul și linkul.
  * Fără etichetă cu majuscule deasupra titlului.
+ *
+ * `caseta` (pe /en/): textul e o notă importantă (limba actului, interpretul autorizat) și
+ * apare într-o casetă de informare: fundal alb, contur gray-200, radius-lg, iconiță „i” wood-800.
+ * Linkul spre /despre/ duce la o pagină în română: primește hreflang="ro".
  */
 import type { ImageMetadata } from 'astro';
-import { cale, t, type Locale } from '../i18n';
+import { cale, esteInAltaLimba, t, type Locale } from '../i18n';
 import { marcheazaPlaceholder } from '../lib/continut';
 import Fotografie from './Fotografie.astro';
 import Iconita from './Iconita.astro';
@@ -16,9 +20,12 @@ interface Props {
   text: string;
   imagine?: ImageMetadata;
   imagineAlt?: string;
+  caseta?: boolean;
 }
 
-const { locale, titlu, text, imagine, imagineAlt } = Astro.props;
+const { locale, titlu, text, imagine, imagineAlt, caseta = false } = Astro.props;
+const paragrafe = text.split('\n\n');
+const linkAltaLimba = esteInAltaLimba('despre', locale);
 ---
 
 <section class="despre" aria-labelledby="despre-titlu">
@@ -36,9 +43,20 @@ const { locale, titlu, text, imagine, imagineAlt } = Astro.props;
     </div>
     <div class="despre__text">
       <h2 id="despre-titlu">{titlu}</h2>
-      {text.split('\n\n').map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
+      {
+        caseta ? (
+          <div class="despre__caseta" role="note" aria-label={t(locale, 'despre.nota')}>
+            <Iconita nume="info" class="despre__caseta-iconita" />
+            <div class="despre__caseta-text">
+              {paragrafe.map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
+            </div>
+          </div>
+        ) : (
+          paragrafe.map((p) => <p set:html={marcheazaPlaceholder(p)} />)
+        )
+      }
       <p>
-        <a class="despre__link" href={cale('despre', locale)}>
+        <a class="despre__link" href={cale('despre', locale)} hreflang={linkAltaLimba ? 'ro' : undefined}>
           {t(locale, 'acasa.despreLink')}
           <Iconita nume="sageata" />
         </a>
@@ -78,6 +96,29 @@ const { locale, titlu, text, imagine, imagineAlt } = Astro.props;
 
   .despre__text h2 {
     margin-bottom: calc(var(--space-1) / 2);
+  }
+
+  .despre__caseta {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--c-white);
+    border: 1px solid var(--c-gray-200);
+    border-radius: var(--radius-lg);
+  }
+
+  .despre__caseta :global(.despre__caseta-iconita) {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    color: var(--c-wood-800);
+  }
+
+  .despre__caseta-text {
+    display: grid;
+    gap: var(--space-1);
+    font-weight: 500;
   }
 
   .despre__link {

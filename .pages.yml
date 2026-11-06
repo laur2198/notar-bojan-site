@@ -164,6 +164,10 @@ content:
             type: string
             required: true
             description: Ex. „Crăciunul”.
+          - name: motivEn
+            label: Motivul în engleză (opțional)
+            type: string
+            description: Ex. „Christmas Day”. Apare pe paginile în engleză; dacă lipsește, acolo se afișează motivul în română.
       - name: zileLibereConfirmare
         label: Confirmarea zilelor libere
         type: text

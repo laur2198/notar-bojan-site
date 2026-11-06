@@ -159,6 +159,12 @@ export const ro = {
   'doc.cuprins': 'Cuprins',
   'doc.actualizat': 'Ultima actualizare: {data}',
 
+  // Versiunea în engleză (etapa 6)
+  'faq.titlu': 'Întrebări frecvente',
+  'servicii.detaliiRo': 'Detalii în română',
+  'servicii.onorariiScurt': 'Onorarii',
+  'despre.nota': 'Bine de știut',
+
   // Pagina 404
   '404.titlu': 'Pagina nu a fost găsită',
   '404.descriere': 'Pagina căutată nu există sau a fost mutată.',

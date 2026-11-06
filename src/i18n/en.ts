@@ -75,7 +75,7 @@ export const en: Record<keyof typeof ro, string> = {
   'acasa.programare': 'Request an appointment',
   'acasa.suna': 'Call us: {telefon}',
   'acasa.toateServiciile': 'See all services and fees',
-  'acasa.despreLink': 'About the office',
+  'acasa.despreLink': 'About the office (in Romanian)',
   'acasa.toateIntrebarile': 'All questions',
   'foto.deCompletat': 'Photo – to be added',
 
@@ -111,7 +111,7 @@ export const en: Record<keyof typeof ro, string> = {
   // Services and fees
   'servicii.titlu': 'Services and fees',
   'servicii.seoTitlu': 'Services and fees – Notary public Brasov | Bojan Elena Luminita',
-  'servicii.seoDescriere': 'The services of the notary office in Brasov, the documents needed for each and the indicative fees.',
+  'servicii.seoDescriere': 'Notarial services at the office in Brasov, Romania: property sales, inheritance, powers of attorney, certified copies and signatures.',
   'servicii.onorariiTitlu': 'Indicative fees',
   'servicii.coloanaServiciu': 'Service',
   'servicii.coloanaOnorariu': 'Indicative fee',
@@ -160,6 +160,12 @@ export const en: Record<keyof typeof ro, string> = {
   'harta.titlu': 'Map',
   'doc.cuprins': 'Contents',
   'doc.actualizat': 'Last updated: {data}',
+
+  // English version (stage 6)
+  'faq.titlu': 'Frequently asked questions',
+  'servicii.detaliiRo': 'Details in Romanian',
+  'servicii.onorariiScurt': 'Fees',
+  'despre.nota': 'Good to know',
 
   // 404 page
   '404.titlu': 'Page not found',

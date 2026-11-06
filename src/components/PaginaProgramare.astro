@@ -1,0 +1,154 @@
+---
+/**
+ * /programare/ și /en/appointments/ (CLAUDE.md §8): introducerea, cardul „Alegeți data și ora” (link spre
+ * pagina de programări Google Calendar, în filă nouă, anunțată), alături telefonul, starea
+ * programului și programul săptămânal, apoi restul textului (Înainte de programare, Anulare).
+ * Fără iframe: calendarul nu se încarcă în pagină (vezi EmbedCuConsimtamant, nefolosită).
+ */
+import { getEntry, render } from 'astro:content';
+import BandaTitlu from './BandaTitlu.astro';
+import ContinutMarcat from './ContinutMarcat.astro';
+import DraftBadge from './DraftBadge.astro';
+import Iconita from './Iconita.astro';
+import LinkExtern from './LinkExtern.astro';
+import ProgramSaptamana from './ProgramSaptamana.astro';
+import StareProgram from './StareProgram.astro';
+import TelefonLink from './TelefonLink.astro';
+import { t, type Locale } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { linkExtern, linkTelefon } from '../lib/contact';
+import { getBirou, marcheazaPlaceholder } from '../lib/continut';
+import { extrageIntro } from '../lib/markdown';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const pagina = await getEntry('pagini', `${locale}/programare`);
+if (!pagina) throw new Error(`Lipsește src/content/pagini/${locale}/programare.md.`);
+const birou = await getBirou();
+const { Content } = await render(pagina);
+const intro = extrageIntro(pagina.body);
+const calendar = linkExtern(birou.programareUrl, '');
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
+  <BandaTitlu locale={locale} titlu={pagina.data.titlu} leadHtml={intro ? marcheazaPlaceholder(intro) : undefined}>
+    <DraftBadge locale={locale} intrare={pagina} />
+  </BandaTitlu>
+
+  <section class="programare" aria-labelledby="programare-card">
+    <div class="container programare__grila">
+      <div class="programare__card">
+        <h2 id="programare-card">{t(locale, 'programare.cardTitlu')}</h2>
+        <LinkExtern locale={locale} link={calendar} class="btn btn--primar programare__buton">
+          <Iconita nume="calendar" />
+          {t(locale, 'programare.alegeti')}
+          <Iconita nume="extern" class="programare__extern" />
+        </LinkExtern>
+        <p class="programare__nota">
+          {t(locale, 'programare.nota')} <span aria-hidden="true">{t(locale, 'link.filaNoua')}</span>
+        </p>
+        {
+          !calendar.valid && (
+            <p class="programare__nota" set:html={marcheazaPlaceholder(birou.programareUrl)} />
+          )
+        }
+      </div>
+
+      <aside class="programare__alaturi" aria-labelledby="programare-altfel">
+        <h2 id="programare-altfel" class="programare__subtitlu">{t(locale, 'programare.altfel')}</h2>
+        <TelefonLink locale={locale} telefon={linkTelefon(birou)} class="programare__telefon" />
+        <StareProgram locale={locale} program={birou.program} zileLibere={birou.zileLibere} />
+        <ProgramSaptamana locale={locale} program={birou.program} captionVizibil />
+      </aside>
+    </div>
+  </section>
+
+  <section class="programare__text" aria-label={pagina.data.titlu}>
+    <div class="container">
+      <div class="continut-articol fara-intro">
+        <ContinutMarcat><Content /></ContinutMarcat>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .programare {
+    padding-block: var(--section-y-sm);
+  }
+
+  .programare__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64rem) {
+    .programare__grila {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+  }
+
+  /* Cardul principal: alb, radius-lg, umbră, padding 32 px. */
+  .programare__card {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--c-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .programare__card h2 {
+    font-size: var(--fs-h3);
+  }
+
+  /* Pe toată lățimea cardului pe mobil, natural pe ecrane late. */
+  .programare__card :global(.programare__buton) {
+    width: 100%;
+    font-size: var(--fs-lg);
+  }
+
+  @media (min-width: 48rem) {
+    .programare__card :global(.programare__buton) {
+      width: auto;
+      justify-self: start;
+    }
+  }
+
+  .programare__card :global(.programare__extern) {
+    width: 1em;
+    height: 1em;
+  }
+
+  .programare__nota {
+    color: var(--c-gray-600);
+  }
+
+  .programare__alaturi {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .programare__subtitlu {
+    font-size: var(--fs-h3);
+  }
+
+  .programare__alaturi :global(.programare__telefon) {
+    font-size: var(--fs-lg);
+  }
+
+  .programare__text {
+    padding-block: 0 var(--section-y);
+  }
+
+  /* Introducerea e deja în banda de titlu: paragrafele de dinaintea primului h2 nu se repetă. */
+  .fara-intro :global(> p:not(h2 ~ p)) {
+    display: none;
+  }
+</style>

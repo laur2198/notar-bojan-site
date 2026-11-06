@@ -16,6 +16,7 @@
 import { cale, t, type Locale } from '../i18n';
 import { linkEmail, linkExtern, linkTelefon } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import { ziLiberaPentru } from '../lib/program';
 import CardRating from './CardRating.astro';
 import Iconita from './Iconita.astro';
 import LinkExtern from './LinkExtern.astro';
@@ -46,7 +47,7 @@ const harta = linkExtern(birou.googleMapsUrl, '');
 const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 
 const dateZileLibere = JSON.stringify({
-  zileLibere: birou.zileLibere.map(({ data, motiv }) => ({ data, motiv })),
+  zileLibere: birou.zileLibere.map((z) => ziLiberaPentru(z, locale)),
   sablon: t(locale, 'program.inchisPe'),
   locale,
 });
@@ -139,7 +140,7 @@ const dateZileLibere = JSON.stringify({
 
 <script>
   import { formateazaZiLuna, type Locale } from '../i18n';
-  import { zileLibereApropiate, type ZiLibera } from '../lib/program';
+  import { scrieCuFragmentRo, zileLibereApropiate, type ZiLibera } from '../lib/program';
 
   for (const el of document.querySelectorAll<HTMLElement>('[data-zile-libere-apropiate]')) {
     const { zileLibere, sablon, locale } = JSON.parse(el.dataset.zileLibereApropiate ?? '{}') as {
@@ -151,7 +152,7 @@ const dateZileLibere = JSON.stringify({
     if (apropiate.length === 0) continue;
     for (const zi of apropiate) {
       const p = document.createElement('p');
-      p.textContent = sablon.replace('{data}', formateazaZiLuna(locale, zi.data)).replace('{motiv}', zi.motiv);
+      scrieCuFragmentRo(p, sablon.replace('{data}', formateazaZiLuna(locale, zi.data)).replace('{motiv}', zi.motiv), zi.motivRo ? zi.motiv : undefined);
       el.append(p);
     }
     el.hidden = false;
