@@ -1,0 +1,105 @@
+---
+/**
+ * /contact/: cele trei blocuri ale benzii de informații (adresă, program, telefon și email),
+ * textul Markdown (Cum ajungeți, Parcare) și o zonă de hartă placeholder cu linkul spre
+ * Google Maps. Fără iframe, fără formular de contact (nu e în contract).
+ * JSON-LD-ul biroului se face în etapa 8.
+ */
+import { getEntry, render } from 'astro:content';
+import BandaInfo from '../components/BandaInfo.astro';
+import ContinutMarcat from '../components/ContinutMarcat.astro';
+import BandaTitlu from '../components/BandaTitlu.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import Iconita from '../components/Iconita.astro';
+import LinkExtern from '../components/LinkExtern.astro';
+import { t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { linkExtern } from '../lib/contact';
+import { esteDraft, getBirou, marcheazaPlaceholder } from '../lib/continut';
+
+const locale = 'ro';
+const [pagina, birouIntrare] = await Promise.all([getEntry('pagini', 'ro/contact'), getEntry('birou', 'birou')]);
+if (!pagina || !birouIntrare) throw new Error('Lipsesc pagini/ro/contact.md sau setari/birou.yaml.');
+const birou = await getBirou();
+const { Content } = await render(pagina);
+const harta = linkExtern(birou.googleMapsUrl, '');
+const { strada, codPostal, oras } = birou.adresa;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
+  <BandaTitlu locale={locale} titlu={pagina.data.titlu}>
+    <DraftBadge locale={locale} draft={esteDraft(pagina) || esteDraft(birouIntrare)} />
+  </BandaTitlu>
+
+  <BandaInfo locale={locale} birou={birou} varianta="contact" ton="alb" />
+
+  <div class="contact-detalii">
+    <div class="container contact-detalii__grila">
+      <div class="continut-articol">
+        <ContinutMarcat><Content /></ContinutMarcat>
+      </div>
+      <div class="harta" role="group" aria-labelledby="harta-titlu">
+        <Iconita nume="pin" class="harta__pin" />
+        <h2 id="harta-titlu" class="harta__titlu">{t(locale, 'harta.titlu')}</h2>
+        <p class="harta__adresa">
+          <span set:html={marcheazaPlaceholder(strada)} />
+          <br />
+          <span set:html={marcheazaPlaceholder(codPostal)} /> {oras}
+        </p>
+        <LinkExtern locale={locale} link={harta} class="btn btn--primar">
+          <Iconita nume="extern" />
+          {t(locale, 'harta.deschide')}
+        </LinkExtern>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-detalii {
+    padding-block: var(--section-y-sm) var(--section-y);
+    border-top: 1px solid var(--c-gray-200);
+  }
+
+  .contact-detalii__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64rem) {
+    .contact-detalii__grila {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+  }
+
+  /* Zona de hartă: imagine statică placeholder, fără nimic încărcat de la Google. */
+  .harta {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--space-2);
+    min-height: 20rem;
+    padding: var(--space-4);
+    background: var(--c-gray-50);
+    border: 1px solid var(--c-gray-200);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  .harta :global(.harta__pin) {
+    width: var(--space-6);
+    height: var(--space-6);
+    color: var(--c-red-700);
+    stroke-width: 1.5;
+  }
+
+  .harta__titlu {
+    font-size: var(--fs-h3);
+  }
+
+  .harta__adresa {
+    font-weight: 600;
+  }
+</style>

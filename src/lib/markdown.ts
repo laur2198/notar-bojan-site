@@ -26,3 +26,19 @@ export function extrageSectiune(body: string | undefined, titlu: string): string
     .join('\n\n');
   return text || undefined;
 }
+
+/** Textul de dinaintea primului titlu (introducerea paginii), ca text simplu. */
+export function extrageIntro(body: string | undefined): string | undefined {
+  if (!body) return undefined;
+  const linii = body.replace(/\r\n/g, '\n').split('\n');
+  const sfarsit = linii.findIndex((l) => /^#{1,6}\s+/.test(l));
+  const text = linii
+    .slice(0, sfarsit === -1 ? undefined : sfarsit)
+    .join('\n')
+    .trim()
+    .split(/\n\s*\n/)
+    .map((p) => p.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\[(.+?)\]\(.+?\)/g, '$1').replace(/\s*\n\s*/g, ' ').trim())
+    .filter((p) => p && !p.startsWith('>'))
+    .join('\n\n');
+  return text || undefined;
+}

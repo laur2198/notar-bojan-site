@@ -9,29 +9,41 @@
  * 3. Recenziile clienților: ratingul Google, doar dacă e completat (niciodată inventat).
  *
  * Secțiunea are id-ul `program`, ținta „Program” din bara de jos de pe mobil.
+ *
+ * Varianta `contact` (pagina /contact/): aceleași trei blocuri, cu 1. Adresa (completă, cu
+ * „Deschideți în Google Maps”), 2. Programul, 3. Telefon și email (general și pentru acte).
  */
-import { cale, formateazaNumar, t, tPlural, type Locale } from '../i18n';
-import { linkExtern } from '../lib/contact';
+import { cale, t, type Locale } from '../i18n';
+import { linkEmail, linkExtern, linkTelefon } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import CardRating from './CardRating.astro';
 import Iconita from './Iconita.astro';
 import LinkExtern from './LinkExtern.astro';
-import LogoGoogle from './LogoGoogle.astro';
 import ProgramSaptamana from './ProgramSaptamana.astro';
 import StareProgram from './StareProgram.astro';
-import Stele from './Stele.astro';
 
 interface Props {
   locale: Locale;
   birou: Birou;
   /** Câteva rânduri despre locație (ex. secțiunea „Cum ajungeți” din contact.md). */
   textLocatie?: string;
+  varianta?: 'acasa' | 'contact';
+  /** Fundalul benzii: gri pe Acasă, alb pe /contact/ (sub banda de titlu gri). */
+  ton?: 'gri' | 'alb';
 }
 
-const { locale, birou, textLocatie } = Astro.props;
+const { locale, birou, textLocatie, varianta = 'acasa', ton = 'gri' } = Astro.props;
+const esteContact = varianta === 'contact';
+const telefon = linkTelefon(birou);
+const email = linkEmail(birou.email);
+const emailActe = linkEmail(birou.emailActe);
+const contacte = [
+  { iconita: 'telefon' as const, eticheta: t(locale, 'contact.telefon'), link: telefon },
+  { iconita: 'email' as const, eticheta: t(locale, 'contact.email'), link: email },
+  { iconita: 'email' as const, eticheta: t(locale, 'contact.emailActe'), link: emailActe },
+];
 const harta = linkExtern(birou.googleMapsUrl, '');
 const profilGoogle = linkExtern(birou.googleProfilUrl, '');
-const areRating = birou.rating !== null && birou.numarRecenzii !== null;
-const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
 
 const dateZileLibere = JSON.stringify({
   zileLibere: birou.zileLibere.map(({ data, motiv }) => ({ data, motiv })),
@@ -40,24 +52,40 @@ const dateZileLibere = JSON.stringify({
 });
 ---
 
-<section id="program" class="banda" aria-label={t(locale, 'banda.eticheta')}>
+<section
+  id={esteContact ? undefined : 'program'}
+  class:list={['banda', { 'banda--alb': ton === 'alb' }]}
+  aria-label={t(locale, 'banda.eticheta')}
+>
   <div class="container">
     <slot />
     <div class="banda__grila">
       <div class="banda__coloana">
-        <h2 id="banda-birou" class="banda__titlu">{t(locale, 'banda.birou')}</h2>
+        <h2 id="banda-birou" class="banda__titlu">{t(locale, esteContact ? 'banda.adresaTitlu' : 'banda.birou')}</h2>
         <div class="banda__continut">
           {textLocatie && textLocatie.split('\n\n').map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
-          <p class="banda__adresa">
+          <!-- div, nu p: <address> nu poate sta într-un paragraf (închide automat <p>). -->
+          <div class="banda__adresa">
             <Iconita nume="pin" class="banda__iconita" />
-            <span>
-              <span class="sr-only">{t(locale, 'banda.adresa')}: </span>
-              <span set:html={marcheazaPlaceholder(birou.adresa.strada)} />, {birou.adresa.oras}
-            </span>
-          </p>
+            {
+              esteContact ? (
+                <address>
+                  <span set:html={marcheazaPlaceholder(birou.adresa.strada)} />
+                  <br />
+                  <span set:html={marcheazaPlaceholder(birou.adresa.codPostal)} /> {birou.adresa.oras},{' '}
+                  {t(locale, 'contact.judet', { judet: birou.adresa.judet })}
+                </address>
+              ) : (
+                <span>
+                  <span class="sr-only">{t(locale, 'banda.adresa')}: </span>
+                  <span set:html={marcheazaPlaceholder(birou.adresa.strada)} />, {birou.adresa.oras}
+                </span>
+              )
+            }
+          </div>
         </div>
         <LinkExtern locale={locale} link={harta} class="btn btn--secundar banda__buton">
-          {t(locale, 'banda.cumAjungeti')}
+          {t(locale, esteContact ? 'harta.deschide' : 'banda.cumAjungeti')}
         </LinkExtern>
       </div>
 
@@ -71,31 +99,40 @@ const dateZileLibere = JSON.stringify({
         <a class="btn btn--secundar banda__buton" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
       </div>
 
-      <div class="banda__coloana">
-        <h2 id="banda-recenzii" class="banda__titlu">{t(locale, 'banda.recenziiClienti')}</h2>
-        <div class="banda__continut">
-          <div class="banda__card">
-            <LogoGoogle class="banda__google" />
-            {
-              areRating ? (
-                <>
-                  <p class="banda__nota">
-                    <span>{nota}</span>
-                    <Stele nota={birou.rating!} />
-                    <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota })}</span>
-                  </p>
-                  <p>{tPlural(locale, 'recenzii.numar', birou.numarRecenzii!)}</p>
-                </>
-              ) : (
-                <p>{t(locale, 'recenzii.vedetiNoastre')}</p>
-              )
-            }
+      {
+        esteContact ? (
+          <div class="banda__coloana">
+            <h2 id="banda-contact" class="banda__titlu">{t(locale, 'banda.contactTitlu')}</h2>
+            <ul class="banda__continut banda__contacte" role="list">
+              {contacte.map((c) => (
+                <li class="banda__contact">
+                  <Iconita nume={c.iconita} class="banda__iconita" />
+                  <span>
+                    <span class="banda__eticheta">{c.eticheta}</span>
+                    {c.link.valid ? (
+                      <a class="banda__link" href={c.link.href}>
+                        {c.link.text}
+                      </a>
+                    ) : (
+                      <span class="banda__link" set:html={marcheazaPlaceholder(c.link.text)} />
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-        <LinkExtern locale={locale} link={profilGoogle} class="btn btn--secundar banda__buton">
-          {t(locale, 'banda.vedetiRecenziile')}
-        </LinkExtern>
-      </div>
+        ) : (
+          <div class="banda__coloana">
+            <h2 id="banda-recenzii" class="banda__titlu">{t(locale, 'banda.recenziiClienti')}</h2>
+            <div class="banda__continut">
+              <CardRating locale={locale} birou={birou} />
+            </div>
+            <LinkExtern locale={locale} link={profilGoogle} class="btn btn--secundar banda__buton">
+              {t(locale, 'banda.vedetiRecenziile')}
+            </LinkExtern>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>
@@ -194,32 +231,46 @@ const dateZileLibere = JSON.stringify({
     display: none;
   }
 
-  .banda__card {
-    display: grid;
-    justify-items: center;
-    gap: var(--space-1);
-    padding: var(--space-3);
-    background: var(--c-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    text-align: center;
-  }
-
-  .banda__card :global(.banda__google) {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .banda__nota {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-size: var(--fs-h3);
-    font-weight: 700;
-    color: var(--c-wood-900);
-  }
-
   .banda__coloana :global(.banda__buton) {
     align-self: center;
+  }
+
+  .banda--alb {
+    background: var(--c-white);
+  }
+
+  .banda__adresa :global(address) {
+    font-style: normal;
+  }
+
+  .banda__contacte {
+    padding: 0;
+    list-style: none;
+  }
+
+  .banda__contact {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+    max-width: none;
+  }
+
+  .banda__contact :global(.banda__iconita) {
+    margin-top: calc(var(--space-1) / 4);
+    color: var(--c-wood-800);
+  }
+
+  .banda__eticheta {
+    display: block;
+    color: var(--c-gray-600);
+    font-size: var(--fs-sm);
+  }
+
+  .banda__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
   }
 </style>

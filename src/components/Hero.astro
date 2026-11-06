@@ -65,15 +65,16 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </h1>
     {subtitlu && <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />}
     <div class="hero__butoane">
-      <a class="btn btn--primar" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
+      <!-- Pe fundal închis: primarul e inversat (fundal alb, text wood-800), secundarul are contur alb. -->
+      <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
       {
         telefon.valid ? (
-          <a class="btn btn--invers" href={telefon.href}>
+          <a class="btn btn--contur-invers" href={telefon.href}>
             <Iconita nume="telefon" />
             {textSuna}
           </a>
         ) : (
-          <a class="btn btn--invers" role="link" aria-disabled="true">
+          <a class="btn btn--contur-invers" role="link" aria-disabled="true">
             <Iconita nume="telefon" />
             <span set:html={marcheazaPlaceholder(textSuna)} />
             <span class="sr-only"> ({t(locale, 'actiune.indisponibil')})</span>
@@ -209,10 +210,6 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     }
   }
 
-  /* Butonul primar wood-800 pe fundal închis: contur wood-300 (7.94:1), ca forma să se vadă. */
-  .hero__butoane .btn--primar {
-    --btn-border: var(--c-wood-300);
-  }
 
   .hero__jos {
     display: flex;

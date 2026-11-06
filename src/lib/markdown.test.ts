@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extrageSectiune } from './markdown';
+import { extrageIntro, extrageSectiune } from './markdown';
 
 const CORP = `## Cum ajungeți
 
@@ -24,5 +24,19 @@ describe('extrageSectiune', () => {
   it('secțiune lipsă sau corp gol', () => {
     expect(extrageSectiune(CORP, 'Altceva')).toBeUndefined();
     expect(extrageSectiune(undefined, 'Parcare')).toBeUndefined();
+  });
+});
+
+describe('extrageIntro', () => {
+  it('textul de dinaintea primului titlu', () => {
+    expect(extrageIntro('Alegeți din **calendar** ziua.\nA doua linie.\n\n## Înainte\n\nText.')).toBe('Alegeți din calendar ziua. A doua linie.');
+  });
+  it('fără intro, fără titluri, corp gol', () => {
+    expect(extrageIntro('## Titlu\n\nText.')).toBeUndefined();
+    expect(extrageIntro('Doar text.')).toBe('Doar text.');
+    expect(extrageIntro(undefined)).toBeUndefined();
+  });
+  it('blockquote-urile nu fac parte din intro', () => {
+    expect(extrageIntro('> Notă de lucru.\n\n## Titlu')).toBeUndefined();
   });
 });

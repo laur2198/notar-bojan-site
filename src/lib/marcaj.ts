@@ -40,6 +40,21 @@ export function marcheazaPlaceholder(text: string): string {
   return rezultat + escapeHtml(text.slice(ultim));
 }
 
+/**
+ * Marchează `«DE COMPLETAT…»` în HTML deja randat (ex. corpul Markdown): doar în textul
+ * dintre etichete, nu în atribute. Textul e deja escapat de randare, deci nu se mai escapează.
+ */
+export function marcheazaInHtml(html: string): string {
+  return html
+    .split(/(<[^>]*>)/)
+    .map((bucata) =>
+      bucata.startsWith('<') || !bucata.includes(MARCAJ)
+        ? bucata
+        : bucata.replace(REGEX_MARCAJ, (m) => `<mark class="todo">${m}</mark>`),
+    )
+    .join('');
+}
+
 function contineMarcaj(valoare: unknown): boolean {
   if (typeof valoare === 'string') return valoare.includes(MARCAJ);
   if (Array.isArray(valoare)) return valoare.some(contineMarcaj);
