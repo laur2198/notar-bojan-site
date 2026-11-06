@@ -25,6 +25,7 @@ npm install
 | `npm test` | Testele Vitest pentru logica pură (program, zile libere, linkuri, marcaje, rute, plural, Markdown) |
 | `npm run verifica` | Doar verificarea conținutului (preview: rezumat; `SITE_MODE=production`: listă și cod de ieșire 1) |
 | `npm run verifica:en` | După build: caută text în română (diacritice) pe paginile din `dist/en/`, fără fragmentele `lang="ro"`, marcajele «DE COMPLETAT» și numele proprii |
+| `npm run verifica:seo` | După build: auditul SEO al paginilor indexabile (title, description, h1, canonical, Open Graph, JSON-LD, robots, sitemap). Ține cont de `SITE_URL`, `BASE_PATH`, `SITE_MODE` |
 | `npm run linkuri` | Verifică linkurile interne din `dist/` (pagini, resurse, ancore). Respectă `BASE_PATH`; `-- --ignora /en/` raportează fără să eșueze linkurile spre o zonă încă neconstruită |
 
 Ghidul de stil intern e la `/stil/`: paleta cu contrastele calculate, tipografia, butoanele, diacriticele. Pagina e `noindex` și e exclusă din sitemap.
@@ -76,6 +77,64 @@ BASE_PATH=/notar-bojan-site/ npm run preview   # http://localhost:4321/notar-boj
 Pe Windows (PowerShell): `$env:BASE_PATH="/notar-bojan-site/"; npm run build; npm run preview`. Înainte de lucrul obișnuit, rulați din nou `npm run build` fără variabilă.
 
 **Atenție:** în Astro 7, `npm run preview` pornește serverul **în fundal**. Un server pornit înainte (de ex. fără `BASE_PATH`) rămâne activ și răspunde în locul celui nou; opriți-l cu `npx astro preview stop` (starea: `npx astro preview status`).
+
+## Lansare pe Cloudflare Pages
+
+Producția se publică pe Cloudflare Pages, din același repository (`main`). Checklistul complet, în ordine, e în [`docs/lansare.md`](docs/lansare.md).
+
+### Proiectul Pages
+
+Cloudflare → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → repository-ul `notar-bojan-site`, branch-ul de producție `main`.
+
+| Setare | Valoare |
+|---|---|
+| Framework preset | **Astro** |
+| Build command | `npm run build:prod` |
+| Build output directory | `dist` |
+| Root directory | (gol) |
+
+**Variabile de mediu** (Settings → Variables and Secrets), pentru mediul **Production**:
+
+| Variabilă | Valoare |
+|---|---|
+| `NODE_VERSION` | `22` (versiunea LTS cerută de `engines` din `package.json`) |
+| `SITE_MODE` | `production` |
+| `SITE_URL` | `https://<domeniu>` (domeniul final, fără `/` la sfârșit) |
+
+**Fără `BASE_PATH`**: pe domeniul propriu site-ul stă la rădăcină. `BASE_PATH` e doar pentru preview-ul de pe GitHub Pages.
+
+Pentru mediul **Preview** (deploy-urile din alte branch-uri), nu setați `SITE_MODE`: rămâne `preview`, cu `noindex`, `robots.txt` cu `Disallow: /` și etichetele „Text propus”. Build command pentru preview: `npm run build`.
+
+`npm run build:prod` face trei pași și se oprește la primul eșec:
+
+1. `verifica-continut`: niciun fișier cu `validat: false` sau cu «DE COMPLETAT» (lista fișierelor apare în log);
+2. `astro build` în modul producție: fără `noindex`, fără etichete de draft, fără ghidul `/stil/`, `robots.txt` cu `Allow: /` și sitemap;
+3. `verifica-seo`: canonical, Open Graph, un singur h1, JSON-LD-ul biroului complet și fără marcaje. Titlurile peste ~60 de caractere și descrierile peste ~155 apar ca avertismente (se scurtează în CMS).
+
+### Ce face `public/_headers`
+
+- `/_astro/*` (JS, CSS, fonturi, imagini procesate, toate cu hash în nume): `Cache-Control: public, max-age=31536000, immutable`. HTML-ul: `max-age=0, must-revalidate`, deci modificările din CMS apar imediat după deploy.
+- Antete de securitate: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (fără cameră, microfon, geolocație), `X-Frame-Options: DENY`, HSTS.
+- **Content-Security-Policy strict**: doar `'self'` pentru scripturi, stiluri, fonturi și imagini, fără nimic extern. De aceea build-ul nu pune CSS sau JS inline (`build.inlineStylesheets: 'never'`, `vite.build.assetsInlineLimit: 0` în `astro.config.mjs`), iar componentele nu folosesc atributul `style`. Dacă se activează vreodată `EmbedCuConsimtamant` (calendarul Google încorporat), CSP-ul trebuie să permită `frame-src https://calendar.google.com`.
+
+### Domeniul
+
+1. Pages → proiectul → **Custom domains** → **Set up a custom domain** → domeniul (ex. `notar-exemplu.ro`), apoi și `www.notar-exemplu.ro`.
+2. Dacă DNS-ul domeniului e la Cloudflare, înregistrările se creează automat. Altfel, la registrar: `CNAME www → <proiect>.pages.dev`; pentru domeniul fără `www`, mutați DNS-ul la Cloudflare (CNAME pe apex nu e permis la majoritatea registrarilor).
+3. Certificatul HTTPS se emite automat (câteva minute). SSL/TLS → **Always Use HTTPS**: activat.
+4. `www` → domeniul principal: **Rules** → **Redirect Rules** (redirect 301), ca să existe o singură adresă. Adresa `*.pages.dev` rămâne accesibilă, dar canonical-ul fiecărei pagini indică `SITE_URL`.
+5. Dacă domeniul diferă de cel din `SITE_URL`, actualizați variabila și refaceți deploy-ul (**Deployments** → **Retry deployment**).
+
+### Google Search Console
+
+1. [search.google.com/search-console](https://search.google.com/search-console) → **Add property** → **Domain** → `notar-exemplu.ro`.
+2. Verificare prin DNS: Google dă o înregistrare `TXT` (`google-site-verification=…`); se adaugă în Cloudflare → DNS → **Add record** → Type `TXT`, Name `@`. Verificarea durează de la câteva minute la câteva ore.
+3. **Sitemaps** → `https://notar-exemplu.ro/sitemap-index.xml` → **Submit**.
+4. **URL Inspection** pe pagina principală → **Request indexing**. Tot de aici, **Test live URL** arată datele structurate găsite (`Notary`, `FAQPage`, `BreadcrumbList`); alternativ, [Rich Results Test](https://search.google.com/test/rich-results).
+
+### Zilele libere din JSON-LD
+
+JSON-LD-ul biroului include zilele libere din următoarele 12 luni **de la data build-ului**. Orice publicare din CMS reconstruiește site-ul; dacă site-ul nu se modifică un an întreg, refaceți deploy-ul manual (Deployments → Retry deployment) după actualizarea zilelor libere.
 
 ## Structura
 
@@ -176,7 +235,7 @@ Toate paginile noi încep cu banda de titlu pe gri (`BandaTitlu`) și refolosesc
 - **`/recenzii/`:** ratingul agregat (doar dacă e completat), toate recenziile din `recenzii.yaml`, de la cea mai nouă, text integral, și „Vedeți toate recenziile pe Google”. Cu lista goală: mesaj neutru și butonul. Fără JSON-LD `Review` (recenziile sunt de pe Google, nu proprii).
 - **`/despre/`:** fotografia 4:5 (placeholder până vine cea reală) și textul, cu rând limitat.
 - **`/contact/`:** cele trei blocuri ale benzii de informații (`BandaInfo varianta="contact"`: adresă, program, telefon și emailuri), textul din `contact.md` și o zonă de hartă statică (fără nimic de la Google) cu „Deschideți în Google Maps”. Fără formular, fără iframe. JSON-LD-ul biroului vine în etapa 8.
-- **`/confidentialitate/`:** cuprins generat din titlurile h2 (ancore din id-urile Markdown), data actualizării în bandă, tipografie de document. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în preview; în build-ul de producție containerul primește clasa `fara-nota-de-lucru`, care ascunde primul blockquote (rămâne în HTML, dar `display: none`, deci nu e citit nici de cititoarele de ecran). În practică, înainte de producție clienta oricum șterge sau validează textul.
+- **`/confidentialitate/`:** cuprins generat din titlurile h2 (ancore din id-urile Markdown), data actualizării în bandă, tipografie de document. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în preview; în build-ul de producție `ContinutMarcat faraNotaDeLucru` îl scoate din HTML. În practică, înainte de producție clienta oricum șterge sau validează textul.
 - **404:** mesaj în română și engleză, Acasă / Servicii / Contact și telefonul.
 - **Marcaje în Markdown:** corpul Markdown randat trece prin `ContinutMarcat` (`marcheazaInHtml()` din `src/lib/marcaj.ts`), care pune `«DE COMPLETAT…»` în `<mark class="todo">`. Se aplică și paginilor de serviciu (până acum marcajele din corpul lor nu erau evidențiate).
 
@@ -191,6 +250,14 @@ Cinci pagini (CLAUDE.md §6): `/en/`, `/en/services/`, `/en/appointments/`, `/en
 - **Linkuri spre pagini doar în română** (Despre, Confidențialitate, paginile de serviciu): textul o spune („(in Romanian)”) și linkul are `hreflang="ro"`.
 - **hreflang și sitemap:** perechile vin dintr-un singur loc, `src/i18n/rute.ts` (`RUTE`, `routeMap`, `alternateLimbi`). Paginile au `ro` / `en` / `x-default` → RO; sitemap-ul primește aceleași alternate prin `serialize()` în `astro.config.mjs`, inclusiv pentru perechile cu slug diferit. Paginile fără pereche nu au alternate.
 - **Comutatorul RO/EN:** duce la pereche sau, pe paginile fără pereche, la `/en/` (respectiv `/`).
+
+## SEO (etapa 8)
+
+- **JSON-LD-ul biroului** (`JsonLdBirou`, pe toate paginile, RO și EN): un singur nod `Notary`, `@id` `{site}{bază}#birou`, construit de `notaryBirou()` din `src/lib/jsonld.ts` (testat): nume, adresă, telefon, email, program (zilele cu același interval grupate, cele închise lipsesc), zilele libere din următoarele 12 luni, `geo` doar cu ambele coordonate, `sameAs` cu profilul Google, imaginea din hero dacă există, `knowsLanguage: ["ro"]`. Orice câmp gol sau cu «DE COMPLETAT» lipsește. Fără `aggregateRating` și `review` (CLAUDE.md §9).
+- **Open Graph**: `og:image` pe toate paginile. Implicit `/og/ro.png` și `/og/en.png`, 1200×630, generate la build de `src/pages/og/[limba].png.ts` cu `sharp` (vine cu Astro) și fonturile Inter din `src/assets/og/` (vezi README-ul de acolo). Pe Acasă, fotografia din hero, decupată 1200×630, dacă a fost încărcată. Plus `twitter:card` `summary_large_image`.
+- **Titluri**: `{titlu} | Notar Bojan, Brașov` (EN: `… | Notary Bojan, Brasov`), sub 60 de caractere. În CMS, titlul Acasă are maximum 60 de caractere, iar descrierile 155.
+- **robots.txt** (`src/pages/robots.txt.ts`): în preview `Disallow: /`; în producție `Allow: /` și adresa sitemap-ului. **Sitemap**: doar paginile indexabile (fără `/stil/` și 404), cu alternatele RO/EN.
+- **`/stil/`** se generează doar în preview.
 
 ## WhatsApp și limba recenziilor
 

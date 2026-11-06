@@ -175,7 +175,7 @@ Fiecare fișier de conținut are câmpul **`validat: boolean`**. Clientul îl bi
 ## 9. SEO
 
 - `title` și `meta description` unice pe pagină, canonical, Open Graph.
-- JSON-LD: `Notary` (subtip `LegalService`/`LocalBusiness`) cu adresă, telefon, program (`openingHoursSpecification`), `geo`, `aggregateRating` **doar** dacă `rating` și `numarRecenzii` sunt completate. `FAQPage` pe paginile FAQ. `BreadcrumbList` pe paginile de serviciu.
+- JSON-LD: un singur nod `Notary` (subtip `LegalService`/`LocalBusiness`), `@id` `{site}{bază}#birou`, pe toate paginile: adresă, telefon, email, program (`openingHoursSpecification`), zilele libere din următoarele 12 luni (`specialOpeningHoursSpecification`), `geo` doar cu coordonatele completate, `sameAs` cu profilul Google. Câmpurile goale sau cu «DE COMPLETAT» nu intră. **Fără `aggregateRating` și fără `review`**: Google nu afișează stele pentru recenziile marcate de o firmă pe propriul site, iar recenziile preluate de pe Google nu pot fi marcate ca proprii. Ratingul și recenziile apar doar vizual, cu link spre profilul Google. `FAQPage` pe paginile FAQ. `BreadcrumbList` pe paginile de serviciu.
 - `@astrojs/sitemap` cu i18n; `robots.txt`.
 
 ## 10. Convenții de lucru

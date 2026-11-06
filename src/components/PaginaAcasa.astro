@@ -13,6 +13,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { linkExtern } from '../lib/contact';
 import { esteDraft, marcheazaPlaceholder } from '../lib/continut';
 import { extrageSectiune } from '../lib/markdown';
+import { imagineOgHero, imagineOgImplicita } from '../lib/og';
 import BandaInfo from './BandaInfo.astro';
 import CardRecenzie from './CardRecenzie.astro';
 import DespreNotar from './DespreNotar.astro';
@@ -68,10 +69,14 @@ if (locale === 'en') {
 const recenziiAfisate = [...recenzii.data.lista].sort((x, y) => y.data.localeCompare(x.data)).slice(0, 3);
 const intrebari = faq.data.intrebari.slice(0, a.faq.numarAfisat);
 const profilGoogle = linkExtern(birou.googleProfilUrl, '');
+
+// og:image: fotografia din hero, dacă există; altfel imaginea implicită a limbii.
+const hero = await imagineOgHero(locale);
+const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.notar), ...hero, alt: hero.alt ?? imagineOgImplicita(locale, birou.notar).alt } : undefined;
 ---
 
 
-<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere}>
+<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg}>
   <Hero
     locale={locale}
     birou={birou}

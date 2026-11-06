@@ -32,6 +32,16 @@ export default defineConfig({
   // Astro 7 folosește implicit 'jsx', care șterge spațiul dintre elementele inline
   // (ex. `<a>Sunați</a> <span>…`). Păstrăm comportamentul HTML clasic.
   compressHTML: true,
+  // CSP strict (public/_headers): fără CSS și JS inline, totul din fișiere /_astro/ ('self').
+  build: {
+    inlineStylesheets: 'never',
+  },
+  vite: {
+    build: {
+      // Astro pune inline scripturile mai mici decât această limită; 0 = toate în fișiere.
+      assetsInlineLimit: 0,
+    },
+  },
   i18n: {
     defaultLocale: 'ro',
     locales: ['ro', 'en'],
@@ -41,7 +51,11 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !new URL(page).pathname.startsWith(`${BASE_PATH}stil/`),
+      // Doar paginile indexabile: fără ghidul intern /stil/ și fără 404 (amândouă au noindex).
+      filter: (page) => {
+        const cale = new URL(page).pathname;
+        return !cale.startsWith(`${BASE_PATH}stil/`) && !/\/404(\.html|\/)?$/.test(cale);
+      },
       // Opțiunea `i18n` a integrării împerechează doar căi identice (`/` ↔ `/en/`), deci
       // alternatele se pun aici, din routeMap (src/i18n/rute.ts): și perechile cu slug diferit
       // (`/servicii/` ↔ `/en/services/`). Paginile fără pereche nu primesc alternate.

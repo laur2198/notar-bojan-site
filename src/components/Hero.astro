@@ -57,7 +57,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   </div>
 
   <div class="container hero__continut">
-    <!-- Slot: eticheta „Text propus – în curs de validare”, în preview. -->
+    {/* Slot: eticheta „Text propus – în curs de validare”, în preview. */}
     <slot />
     <h1 id="hero-titlu" class="hero__titlu">
       <span class="hero__nume">{birou.notar}</span>
@@ -65,7 +65,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </h1>
     {subtitlu && <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />}
     <div class="hero__butoane">
-      <!-- Pe fundal închis: primarul e inversat (fundal alb, text wood-800), secundarul are contur alb. -->
+      {/* Pe fundal închis: primarul e inversat (fundal alb, text wood-800), secundarul are contur alb. */}
       <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
       {
         telefon.valid ? (

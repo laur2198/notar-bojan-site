@@ -22,7 +22,7 @@ const variante: { locale: Locale; titluId: string }[] = [
 ---
 
 <BaseLayout locale="ro" title={`${t('ro', '404.titlu')} / ${t('en', '404.titlu')}`} description={t('ro', '404.descriere')} noindex>
-  <!-- Același ritm ca paginile interioare: româna pe gri (ca banda de titlu), engleza pe alb. -->
+  {/* Același ritm ca paginile interioare: româna pe gri (ca banda de titlu), engleza pe alb. */}
   {
     variante.map(({ locale, titluId }) => (
       <Sectiune ton={locale === 'ro' ? 'gri' : 'alb'} compact class={locale === 'ro' ? 'pagina-404__ro' : undefined}>

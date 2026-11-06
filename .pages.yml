@@ -43,9 +43,9 @@ components:
   seoDescriere:
     type: text
     label: Descriere pentru Google
-    description: Una–două propoziții (aprox. 150 de caractere) afișate sub titlu în rezultatele Google.
+    description: Una–două propoziții (cel mult 155 de caractere) afișate sub titlu în rezultatele Google.
     options:
-      maxlength: 160
+      maxlength: 155
 
 content:
   # -------------------------------------------------------------------------
@@ -242,6 +242,9 @@ content:
             label: Titlul paginii în Google
             type: string
             required: true
+            description: Cel mult 60 de caractere, ca să nu fie tăiat în rezultatele Google. Ex. „Notar public în Brașov – Bojan Elena Luminița”.
+            options:
+              maxlength: 60
           - name: descriere
             component: seoDescriere
             required: true

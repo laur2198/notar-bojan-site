@@ -12,7 +12,7 @@ interface Props {
 const { pasi, fundal = 'alb' } = Astro.props;
 ---
 
-<ol class="pasi" role="list" style={`--pasi-fundal: var(${fundal === 'gri' ? '--c-gray-50' : '--c-white'})`}>
+<ol class:list={['pasi', { 'pasi--gri': fundal === 'gri' }]} role="list">
   {
     pasi.map((pas, i) => (
       <li class="pas">
@@ -29,11 +29,16 @@ const { pasi, fundal = 'alb' } = Astro.props;
 <style>
   .pasi {
     --cerc: var(--space-5);
+    --pasi-fundal: var(--c-white);
 
     display: grid;
     gap: var(--space-5);
     padding: 0;
     list-style: none;
+  }
+
+  .pasi--gri {
+    --pasi-fundal: var(--c-gray-50);
   }
 
   @media (min-width: 64rem) {

@@ -107,14 +107,14 @@ export const ro = {
 
   // Servicii și prețuri
   'servicii.titlu': 'Servicii și prețuri',
-  'servicii.seoTitlu': 'Servicii și prețuri – Notar public Brașov | Bojan Elena Luminița',
+  'servicii.seoTitlu': 'Servicii și prețuri | Notar Bojan, Brașov',
   'servicii.seoDescriere': 'Serviciile biroului notarial din Brașov, actele necesare pentru fiecare și onorariile orientative.',
   'servicii.onorariiTitlu': 'Onorarii orientative',
   'servicii.coloanaServiciu': 'Serviciu',
   'servicii.coloanaOnorariu': 'Onorariu orientativ',
   'servicii.onorariuCard': 'Onorariu:',
   'servicii.altele': 'Alte servicii',
-  'servicii.seoTitluPagina': '{titlu} – Notar public Brașov | Bojan Elena Luminița',
+  'servicii.seoTitluPagina': '{titlu} | Notar Bojan, Brașov',
   'breadcrumbs.acasa': 'Acasă',
 
   // Caseta „Pregătiți dosarul”
@@ -137,7 +137,7 @@ export const ro = {
   'email.atasate': 'Am atașat următoarele documente:',
 
   // Pagini (etapa 5)
-  'pagina.seoTitlu': '{titlu} – Notar public Brașov | Bojan Elena Luminița',
+  'pagina.seoTitlu': '{titlu} | Notar Bojan, Brașov',
   'programare.cardTitlu': 'Programare online',
   'programare.alegeti': 'Alegeți data și ora',
   'programare.nota': 'Programarea se face prin Google Calendar. Biroul vă confirmă programarea.',
@@ -163,6 +163,10 @@ export const ro = {
   'servicii.detaliiRo': 'Detalii în română',
   'servicii.onorariiScurt': 'Onorarii',
   'despre.nota': 'Bine de știut',
+
+  // Imaginea de distribuire (Open Graph)
+  'og.subtitlu': 'Notar public în Brașov',
+  'og.alt': '{notar}, notar public în Brașov',
 
   // WhatsApp
   'whatsapp.nume': 'WhatsApp',

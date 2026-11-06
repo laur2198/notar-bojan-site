@@ -3,19 +3,25 @@
  * Fotografie de conținut (CLAUDE.md §5): componenta <Image> din Astro (AVIF/WebP,
  * dimensiuni explicite, `object-fit: cover`) sau, până vin fotografiile reale, un
  * bloc placeholder cu eticheta „Fotografie – de completat”. Fără fotografii stock.
+ *
+ * Raportul de aspect vine din clase (`fotografie--r-4-5`, `fotografie--m-4-3`), nu din atributul
+ * `style`: CSP-ul de producție (public/_headers) nu permite stiluri inline.
  */
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import { t, type Locale } from '../i18n';
+
+/** Rapoartele de aspect folosite pe site (fiecare are o clasă în stilurile de mai jos). */
+export type Raport = '2 / 3' | '4 / 3' | '4 / 5' | '16 / 10';
 
 interface Props {
   locale: Locale;
   imagine?: ImageMetadata;
   alt?: string;
   /** Raportul de aspect, ex. „4 / 5”, „16 / 10”. */
-  raport: string;
+  raport: Raport;
   /** Raport diferit pe ecrane înguste (< 768 px), ex. „4 / 3”. */
-  raportMobil?: string;
+  raportMobil?: Raport;
   /** Lățimile generate și `sizes` (vezi documentația <Image>). */
   latimi?: number[];
   sizes?: string;
@@ -40,24 +46,24 @@ const {
   eticheta = t(locale, 'foto.deCompletat'),
   class: clasa,
 } = Astro.props;
+const clasaRaport = (r: Raport) => r.replace(/\s*\/\s*/, '-');
+const clase = [`fotografie--r-${clasaRaport(raport)}`, `fotografie--m-${clasaRaport(raportMobil)}`];
 ---
 
 {
   imagine ? (
     <Image
-      class:list={['fotografie', clasa]}
+      class:list={['fotografie', ...clase, clasa]}
       src={imagine}
       alt={alt}
       widths={latimi.filter((w) => w <= imagine.width)}
       sizes={sizes}
       loading={prioritar ? 'eager' : 'lazy'}
       fetchpriority={prioritar ? 'high' : 'auto'}
-      style={`--raport: ${raport}; --raport-mobil: ${raportMobil}`}
     />
   ) : (
     <div
-      class:list={['fotografie', 'fotografie--placeholder', { 'fotografie--inchis': inchis }, clasa]}
-      style={`--raport: ${raport}; --raport-mobil: ${raportMobil}`}
+      class:list={['fotografie', ...clase, 'fotografie--placeholder', { 'fotografie--inchis': inchis }, clasa]}
     >
       <span class="fotografie__eticheta">{eticheta}</span>
     </div>
@@ -74,9 +80,41 @@ const {
     border-radius: var(--radius-lg);
   }
 
+  .fotografie--m-2-3 {
+    --raport-mobil: 2 / 3;
+  }
+
+  .fotografie--m-4-3 {
+    --raport-mobil: 4 / 3;
+  }
+
+  .fotografie--m-4-5 {
+    --raport-mobil: 4 / 5;
+  }
+
+  .fotografie--m-16-10 {
+    --raport-mobil: 16 / 10;
+  }
+
   @media (min-width: 48rem) {
     .fotografie {
       aspect-ratio: var(--raport);
+    }
+
+    .fotografie--r-2-3 {
+      --raport: 2 / 3;
+    }
+
+    .fotografie--r-4-3 {
+      --raport: 4 / 3;
+    }
+
+    .fotografie--r-4-5 {
+      --raport: 4 / 5;
+    }
+
+    .fotografie--r-16-10 {
+      --raport: 16 / 10;
     }
   }
 

@@ -1,12 +1,17 @@
 ---
 /**
- * /stil/ – ghid de stil intern (noindex, exclus din sitemap).
+ * /stil/ – ghid de stil intern (noindex, exclus din sitemap), generat doar în preview: în
+ * producție nu există (getStaticPaths întoarce o listă goală), ca site-ul public să nu conțină
+ * mostrele de marcaje și etichete.
  * Culorile se citesc din src/styles/tokens.css, deci rapoartele de contrast
  * sunt calculate din valorile reale, la fiecare build.
  */
+import type { GetStaticPaths } from 'astro';
 import '../styles/global.css';
+
+export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } }] : [])) satisfies GetStaticPaths;
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
-import { marcheazaPlaceholder } from '../lib/continut';
+import { estePreview, marcheazaPlaceholder } from '../lib/continut';
 import { culoare, culori } from '../lib/tokens';
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
