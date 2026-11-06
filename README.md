@@ -44,6 +44,37 @@ Alte variabile:
 
 - `SITE_URL`: adresa publică a site-ului (canonical, sitemap). Implicit `https://notar-bojan.pages.dev`. Se poate pune într-un fișier `.env`, ignorat de git.
 
+## Preview pe GitHub Pages
+
+Preview-ul se publică automat la **https://laur2198.github.io/notar-bojan-site/**, prin workflow-ul `.github/workflows/pages.yml`:
+
+- rulează la fiecare push pe `main` și manual (tab-ul **Actions** → „Preview pe GitHub Pages” → **Run workflow**);
+- face `npm ci` și `npm run build` (build de **preview**: textele nevalidate sunt marcate, paginile au `noindex`), apoi publică doar `dist/`;
+- `public/.nojekyll` oprește procesarea Jekyll a GitHub Pages (altfel README-ul și CLAUDE.md ar apărea ca pagini).
+
+**Calea de bază (`BASE_PATH`).** Un site de proiect pe GitHub Pages stă sub `/notar-bojan-site/`, nu la rădăcina domeniului. Workflow-ul construiește cu:
+
+```sh
+SITE_URL=https://laur2198.github.io BASE_PATH=/notar-bojan-site/ npm run build
+```
+
+- `BASE_PATH` ajunge în `base` din `astro.config.mjs`. Implicit e `/`, deci local (`npm run dev`, `npm run build`) și pe domeniul final site-ul rămâne la rădăcină, neschimbat.
+- Toate linkurile interne trec prin helperul `url()` din `src/lib/url.ts` (care folosește `import.meta.env.BASE_URL`), direct sau prin `cale()` din `src/i18n`. **Nu scrieți căi interne direct** (`href="/servicii/"`): folosiți `cale('servicii', locale)` sau `url('/servicii/')`. Ancorele merg la fel: `` `${cale('acasa', locale)}#program` ``.
+- `RUTE` și `routeMap` conțin căi fără bază; baza se adaugă la afișare. Funcțiile care primesc `Astro.url.pathname` (comutatorul de limbă, `hreflang`, `aria-current`) scot întâi baza.
+- Resursele procesate de Astro (CSS, JS, fonturi, imagini) primesc baza automat; canonical, `hreflang`, Open Graph și sitemap-ul folosesc `SITE_URL` + bază.
+- Pagina `404.html` e servită de GitHub Pages pentru orice adresă inexistentă de sub `/notar-bojan-site/`; are toate căile absolute (cu bază), `noindex` și fără canonical.
+
+Pentru a testa local ca pe GitHub Pages, aceeași `BASE_PATH` trebuie dată și la build, și la preview (preview-ul citește `base` din configurație):
+
+```sh
+BASE_PATH=/notar-bojan-site/ npm run build
+BASE_PATH=/notar-bojan-site/ npm run preview   # http://localhost:4321/notar-bojan-site/
+```
+
+Pe Windows (PowerShell): `$env:BASE_PATH="/notar-bojan-site/"; npm run build; npm run preview`. Înainte de lucrul obișnuit, rulați din nou `npm run build` fără variabilă.
+
+**Atenție:** în Astro 7, `npm run preview` pornește serverul **în fundal**. Un server pornit înainte (de ex. fără `BASE_PATH`) rămâne activ și răspunde în locul celui nou; opriți-l cu `npx astro preview stop` (starea: `npx astro preview status`).
+
 ## Structura
 
 ```
@@ -69,9 +100,11 @@ src/
     program.ts          „Deschis acum / Închis acum”, pe fusul Europe/Bucharest – pur, testat
     contrast.ts         calculul contrastului WCAG
     tokens.ts           culorile din tokens.css, citite la build
+    url.ts              url(): căile interne cu baza site-ului (GitHub Pages) – testat
   pages/
     index.astro         pagina principală RO (temporară până la etapa 3)
     en/index.astro      pagina principală EN (temporară până la etapa 6)
+    404.astro           pagina 404 (RO + EN), funcțională și sub calea de bază
     stil.astro          ghidul de stil intern (/stil/)
   styles/
     tokens.css          design tokens (copie exactă din CLAUDE.md §5)

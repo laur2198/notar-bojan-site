@@ -106,6 +106,13 @@ export const ro = {
   'hero.fotoDeCompletat': 'Fotografie clădire/birou – de completat',
   'servicii.vedeti': 'Vedeți serviciul',
 
+  // Pagina 404
+  '404.titlu': 'Pagina nu a fost găsită',
+  '404.descriere': 'Pagina căutată nu există sau a fost mutată.',
+  '404.text': 'Pagina pe care o căutați nu există sau a fost mutată. Puteți continua de aici:',
+  '404.acasa': 'Pagina principală',
+  '404.telefon': 'Sau sunați-ne:',
+
   // Linkuri
   'link.indisponibil': 'linkul nu este încă disponibil',
 

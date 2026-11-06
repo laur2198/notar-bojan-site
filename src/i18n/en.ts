@@ -108,6 +108,13 @@ export const en: Record<keyof typeof ro, string> = {
   'hero.fotoDeCompletat': 'Photo of the building/office – to be added',
   'servicii.vedeti': 'View service',
 
+  // 404 page
+  '404.titlu': 'Page not found',
+  '404.descriere': 'The page you are looking for does not exist or has been moved.',
+  '404.text': 'The page you are looking for does not exist or has been moved. You can continue here:',
+  '404.acasa': 'Home page',
+  '404.telefon': 'Or call us:',
+
   // Links
   'link.indisponibil': 'link not available yet',
 

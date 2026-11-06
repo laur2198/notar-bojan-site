@@ -1,7 +1,12 @@
 /**
  * i18n: helperul `t(locale, cheie)`, rutele pe limbi și `routeMap` RO ↔ EN (CLAUDE.md §6).
  * Modul pur (fără Astro), testat în i18n.test.ts.
+ *
+ * Calea de bază (GitHub Pages): RUTE și routeMap conțin căi „logice”, fără bază.
+ * `cale()` și `caleInAltaLimba()` întorc căi gata de pus în `href` (cu bază, prin `url()`),
+ * iar funcțiile care primesc `Astro.url.pathname` scot întâi baza (`normalizeazaCale`).
  */
+import { faraBaza, url } from '../lib/url';
 import { en } from './en';
 import { ro } from './ro';
 
@@ -89,10 +94,15 @@ const routeMapInvers: Readonly<Record<string, string>> = Object.fromEntries(
   Object.entries(routeMap).map(([roCale, enCale]) => [enCale, roCale]),
 );
 
-/** Calea paginii în limba cerută; o pagină fără variantă EN întoarce calea RO. */
-export function cale(cheie: CheieRuta, locale: Locale): string {
+/** Calea „logică” a paginii (fără bază), în limba cerută; fără variantă EN întoarce calea RO. */
+export function caleLogica(cheie: CheieRuta, locale: Locale): string {
   const ruta: { ro: string; en?: string } = RUTE[cheie];
   return locale === 'en' ? (ruta.en ?? ruta.ro) : ruta.ro;
+}
+
+/** Calea paginii pentru `href`, cu baza site-ului; fără variantă EN întoarce calea RO. */
+export function cale(cheie: CheieRuta, locale: Locale): string {
+  return url(caleLogica(cheie, locale));
 }
 
 /** `true` dacă linkul către `cheie` duce la o pagină în altă limbă decât `locale`. */
@@ -101,9 +111,9 @@ export function esteInAltaLimba(cheie: CheieRuta, locale: Locale): boolean {
   return locale === 'en' && ruta.en === undefined;
 }
 
-/** Normalizează o cale: începe și se termină cu „/”, fără `index.html`. */
+/** Normalizează o cale: fără baza site-ului, începe și se termină cu „/”, fără `index.html`. */
 export function normalizeazaCale(pathname: string): string {
-  let p = pathname.replace(/index\.html$/, '');
+  let p = faraBaza(pathname).replace(/index\.html$/, '');
   if (!p.startsWith('/')) p = `/${p}`;
   if (!p.endsWith('/')) p = `${p}/`;
   return p;
@@ -119,7 +129,7 @@ export interface PerecheLimbi {
   en: string;
 }
 
-/** Perechea RO/EN a paginii, dacă există (pentru `hreflang`). */
+/** Perechea RO/EN a paginii (căi logice, fără bază), dacă există (pentru `hreflang`). */
 export function perecheLimbi(pathname: string): PerecheLimbi | undefined {
   const p = normalizeazaCale(pathname);
   if (p in routeMap) return { ro: p, en: routeMap[p]! };
@@ -135,8 +145,8 @@ export function caleInAltaLimba(pathname: string): { locale: Locale; href: strin
   const actuala = localeDinCale(pathname);
   const tinta: Locale = actuala === 'ro' ? 'en' : 'ro';
   const pereche = perecheLimbi(pathname);
-  if (pereche) return { locale: tinta, href: pereche[tinta], pereche: true };
-  return { locale: tinta, href: RUTE.acasa[tinta], pereche: false };
+  if (pereche) return { locale: tinta, href: url(pereche[tinta]), pereche: true };
+  return { locale: tinta, href: url(RUTE.acasa[tinta]), pereche: false };
 }
 
 /**
