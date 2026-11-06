@@ -2,9 +2,11 @@
 /**
  * Metadate SEO (CLAUDE.md §9): title, description, canonical, Open Graph,
  * hreflang pe perechile din routeMap și `noindex` în preview.
+ * og:image: imaginea dată (ex. fotografia din hero pe Acasă) sau cea implicită, /og/{limba}.png.
  */
 import { localeDinCale, normalizeazaCale, perecheLimbi, type Locale } from '../i18n';
 import { estePreview } from '../lib/continut';
+import { imagineOgImplicita, type ImagineOg } from '../lib/og';
 import { url } from '../lib/url';
 
 interface Props {
@@ -14,9 +16,12 @@ interface Props {
   numeSite: string;
   /** Pagini care nu se indexează în niciun mod (ex. 404): `noindex`, fără canonical. */
   noindex?: boolean;
+  /** Numele notarului, pentru textul alternativ al imaginii implicite. */
+  notar: string;
+  imagine?: ImagineOg;
 }
 
-const { locale, title, description, numeSite, noindex = false } = Astro.props;
+const { locale, title, description, numeSite, noindex = false, notar, imagine = imagineOgImplicita(locale, notar) } = Astro.props;
 
 const site = Astro.site ?? new URL(Astro.url.origin);
 /** Calea logică (fără bază); adresele absolute o primesc înapoi prin `url()`. */
@@ -55,3 +60,9 @@ if (localeDinCale(caleCurenta) !== locale) {
 {!noindex && <meta property="og:url" content={canonical} />}
 <meta property="og:locale" content={OG_LOCALE[locale]} />
 {pereche && <meta property="og:locale:alternate" content={OG_LOCALE[alternativ]} />}
+<meta property="og:image" content={new URL(imagine.src, site).href} />
+<meta property="og:image:type" content={imagine.tip} />
+<meta property="og:image:width" content={String(imagine.latime)} />
+<meta property="og:image:height" content={String(imagine.inaltime)} />
+<meta property="og:image:alt" content={imagine.alt} />
+<meta name="twitter:card" content="summary_large_image" />

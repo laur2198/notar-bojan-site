@@ -109,14 +109,14 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Services and fees
   'servicii.titlu': 'Services and fees',
-  'servicii.seoTitlu': 'Services and fees – Notary public Brasov | Bojan Elena Luminita',
+  'servicii.seoTitlu': 'Services and fees | Notary Bojan, Brasov',
   'servicii.seoDescriere': 'Notarial services at the office in Brasov, Romania: property sales, inheritance, powers of attorney, certified copies and signatures.',
   'servicii.onorariiTitlu': 'Indicative fees',
   'servicii.coloanaServiciu': 'Service',
   'servicii.coloanaOnorariu': 'Indicative fee',
   'servicii.onorariuCard': 'Fee:',
   'servicii.altele': 'Other services',
-  'servicii.seoTitluPagina': '{titlu} – Notary public Brasov | Bojan Elena Luminita',
+  'servicii.seoTitluPagina': '{titlu} | Notary Bojan, Brasov',
   'breadcrumbs.acasa': 'Home',
 
   // "Prepare your file" box
@@ -139,7 +139,7 @@ export const en: Record<keyof typeof ro, string> = {
   'email.atasate': 'I have attached the following documents:',
 
   // Pages (stage 5)
-  'pagina.seoTitlu': '{titlu} – Notary public Brasov | Bojan Elena Luminita',
+  'pagina.seoTitlu': '{titlu} | Notary Bojan, Brasov',
   'programare.cardTitlu': 'Online appointment',
   'programare.alegeti': 'Choose a date and time',
   'programare.nota': 'Appointments are made through Google Calendar. The office will confirm your appointment.',
@@ -165,6 +165,10 @@ export const en: Record<keyof typeof ro, string> = {
   'servicii.detaliiRo': 'Details in Romanian',
   'servicii.onorariiScurt': 'Fees',
   'despre.nota': 'Good to know',
+
+  // Share image (Open Graph)
+  'og.subtitlu': 'Notary public in Brasov',
+  'og.alt': '{notar}, notary public in Brasov',
 
   // WhatsApp
   'whatsapp.nume': 'WhatsApp',

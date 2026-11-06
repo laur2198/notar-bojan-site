@@ -1,0 +1,27 @@
+---
+/**
+ * JSON-LD-ul biroului (CLAUDE.md §9), pe toate paginile, RO și EN: un singur nod `Notary`,
+ * cu `@id` „{site}{bază}#birou” (același pe care îl referă paginile de serviciu).
+ * Câmpurile încă necompletate («DE COMPLETAT» sau goale) lipsesc. Zilele libere: cele din
+ * următoarele 12 luni de la data build-ului (fus Europe/Bucharest), deci site-ul trebuie
+ * reconstruit măcar o dată pe an (orice publicare din CMS reconstruiește site-ul).
+ */
+import { notaryBirou } from '../lib/jsonld';
+import type { Birou } from '../lib/continut';
+import { imagineOgHero } from '../lib/og';
+import { url } from '../lib/url';
+import JsonLd from './JsonLd.astro';
+
+interface Props {
+  birou: Birou;
+}
+
+const { birou } = Astro.props;
+const site = Astro.site ?? new URL(Astro.url.origin);
+const radacina = new URL(url('/'), site).href;
+const azi = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(new Date());
+const hero = await imagineOgHero();
+const date = notaryBirou(birou, { radacina, azi, imagine: hero ? new URL(hero.src, site).href : undefined, limbi: ['ro'] });
+---
+
+<JsonLd date={date} />

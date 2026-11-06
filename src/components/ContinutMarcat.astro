@@ -3,10 +3,19 @@
  * Învelește corpul Markdown randat (`<Content />`) și evidențiază marcajele
  * `«DE COMPLETAT…»` cu `<mark class="todo">` (CLAUDE.md §7). În producție nu există
  * marcaje (build-ul se oprește înainte), deci HTML-ul rămâne neschimbat.
+ *
+ * `faraNotaDeLucru`: scoate blockquote-ul de la începutul textului (nota „Text propus…” din
+ * confidentialitate.md), ca să nu ajungă deloc în HTML-ul de producție.
  */
 import { marcheazaInHtml } from '../lib/continut';
 
-const html = await Astro.slots.render('default');
+interface Props {
+  faraNotaDeLucru?: boolean;
+}
+
+const { faraNotaDeLucru = false } = Astro.props;
+let html = await Astro.slots.render('default');
+if (faraNotaDeLucru) html = html.replace(/^\s*<blockquote>[\s\S]*?<\/blockquote>/, '');
 ---
 
 <Fragment set:html={marcheazaInHtml(html)} />

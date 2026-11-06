@@ -2,7 +2,7 @@
 /**
  * /confidentialitate/: tipografie de document, cuprinsul generat din titlurile h2 și data
  * actualizării. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în
- * preview; în producție e ascunsă prin CSS (vezi `.fara-nota-de-lucru`).
+ * preview; în producție nu apare deloc în HTML (ContinutMarcat `faraNotaDeLucru`).
  */
 import { getEntry, render } from 'astro:content';
 import BandaTitlu from '../components/BandaTitlu.astro';
@@ -48,8 +48,8 @@ const dataAfisata =
           </nav>
         )
       }
-      <div class:list={['continut-articol', 'document__text', { 'fara-nota-de-lucru': !estePreview }]}>
-        <ContinutMarcat><Content /></ContinutMarcat>
+      <div class="continut-articol document__text">
+        <ContinutMarcat faraNotaDeLucru={!estePreview}><Content /></ContinutMarcat>
       </div>
     </div>
   </section>
@@ -110,10 +110,5 @@ const dataAfisata =
     align-items: center;
     min-height: 48px;
     font-size: var(--fs-sm);
-  }
-
-  /* Producție: nota de lucru („Text propus ca punct de plecare…”) nu se afișează. */
-  .fara-nota-de-lucru :global(> blockquote:first-child) {
-    display: none;
   }
 </style>

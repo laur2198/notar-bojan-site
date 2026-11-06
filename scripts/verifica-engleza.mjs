@@ -24,7 +24,7 @@ const NUME_PROPRII = ['Birou Individual Notarial Bojan Elena Luminița', 'Bojan 
 const DIACRITICE = /[ăâîșțşţĂÂÎȘȚŞŢ]/;
 const CUVANT = /[\p{L}\p{M}'’-]*[ăâîșțşţĂÂÎȘȚŞŢ][\p{L}\p{M}'’-]*/gu;
 const ATRIBUTE_TEXT = new Set(['alt', 'title', 'aria-label', 'placeholder']);
-const META_TEXT = /^(description|og:title|og:description|og:site_name|twitter:)/;
+const META_TEXT = /^(description|og:title|og:description|og:site_name|og:image:alt|twitter:)/;
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 
 /** @param {string} dir @returns {string[]} */

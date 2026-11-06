@@ -59,7 +59,7 @@ const dateZileLibere = JSON.stringify({
         <h2 id="banda-birou" class="banda__titlu">{t(locale, esteContact ? 'banda.adresaTitlu' : 'banda.birou')}</h2>
         <div class="banda__continut">
           {textLocatie && textLocatie.split('\n\n').map((p) => <p set:html={marcheazaPlaceholder(p)} />)}
-          <!-- div, nu p: <address> nu poate sta într-un paragraf (închide automat <p>). -->
+          {/* div, nu p: <address> nu poate sta într-un paragraf (închide automat <p>). */}
           <div class="banda__adresa">
             <Iconita nume="pin" class="banda__iconita" />
             {
