@@ -16,6 +16,7 @@ Operatorul datelor este Biroul Individual Notarial Bojan Elena Luminița, cu sed
 - **Solicitările de programare** făcute prin pagina de programări: nume, telefon, email, data și ora aleasă, tipul actului.
 - **Emailurile cu acte** trimise la adresa dedicată: datele din documentele atașate, care pot include date de identificare, inclusiv CNP, și date despre bunuri.
 - **Apelurile și mesajele** primite de la dumneavoastră.
+- **Mesajele primite pe WhatsApp**, la numărul de WhatsApp Business al biroului: numele afișat, numărul de telefon și conținutul mesajului. Pe WhatsApp nu se primesc acte.
 
 Site-ul nu folosește cookie-uri de analiză sau de publicitate și nu vă urmărește navigarea.
 
@@ -34,6 +35,7 @@ Site-ul nu folosește cookie-uri de analiză sau de publicitate și nu vă urmă
 
 Folosim servicii furnizate de terți, care prelucrează datele în numele biroului:
 - Google (Google Workspace – email și calendarul de programări);
+- WhatsApp (Meta Platforms) – mesajele trimise pe WhatsApp;
 - Cloudflare (găzduirea site-ului).
 
 Datele nu sunt vândute și nu sunt folosite în scopuri de marketing.
