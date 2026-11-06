@@ -22,10 +22,10 @@ const variante: { locale: Locale; titluId: string }[] = [
 ---
 
 <BaseLayout locale="ro" title={`${t('ro', '404.titlu')} / ${t('en', '404.titlu')}`} description={t('ro', '404.descriere')} noindex>
-  <Sectiune>
-    <div class="pagina-404">
-      {
-        variante.map(({ locale, titluId }) => (
+  <!-- Același ritm ca paginile interioare: româna pe gri (ca banda de titlu), engleza pe alb. -->
+  {
+    variante.map(({ locale, titluId }) => (
+      <Sectiune ton={locale === 'ro' ? 'gri' : 'alb'} compact class={locale === 'ro' ? 'pagina-404__ro' : undefined}>
           <section class="pagina-404__limba" lang={locale} aria-labelledby={titluId}>
             {locale === 'ro' ? <h1 id={titluId}>{t(locale, '404.titlu')}</h1> : <h2 id={titluId}>{t(locale, '404.titlu')}</h2>}
             <p>{t(locale, '404.text')}</p>
@@ -50,30 +50,23 @@ const variante: { locale: Locale; titluId: string }[] = [
               {t(locale, '404.telefon')} <TelefonLink locale={locale} telefon={telefon} />
             </p>
           </section>
-        ))
-      }
-    </div>
-  </Sectiune>
+      </Sectiune>
+    ))
+  }
 </BaseLayout>
 
 <style>
-  .pagina-404 {
-    display: grid;
-    gap: var(--space-6);
-  }
-
   .pagina-404__limba {
     display: grid;
     gap: var(--space-2);
   }
 
-  .pagina-404__limba + .pagina-404__limba {
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--c-gray-200);
+  :global(.pagina-404__ro) {
+    border-bottom: 1px solid var(--c-gray-200);
   }
 
-  .pagina-404 h2 {
-    font-size: var(--fs-h1);
+  .pagina-404__limba h2 {
+    font-size: var(--fs-h2);
   }
 
   .pagina-404__linkuri {

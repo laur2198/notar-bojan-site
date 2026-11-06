@@ -1,0 +1,65 @@
+---
+/**
+ * Cardul cu ratingul Google (banda de pe Acasă, /recenzii/): logo, nota, stelele și
+ * numărul de recenzii, doar dacă `rating` și `numarRecenzii` sunt completate. Altfel, doar
+ * „Vedeți recenziile noastre pe Google”. Nu se afișează niciodată un rating inventat.
+ */
+import { formateazaNumar, t, tPlural, type Locale } from '../i18n';
+import type { Birou } from '../lib/continut';
+import LogoGoogle from './LogoGoogle.astro';
+import Stele from './Stele.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+}
+
+const { locale, birou } = Astro.props;
+const areRating = birou.rating !== null && birou.numarRecenzii !== null;
+const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
+---
+
+<div class="card-rating">
+  <LogoGoogle class="card-rating__google" />
+  {
+    areRating ? (
+      <>
+        <p class="card-rating__nota">
+          <span>{nota}</span>
+          <Stele nota={birou.rating!} />
+          <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota })}</span>
+        </p>
+        <p>{tPlural(locale, 'recenzii.numar', birou.numarRecenzii!)}</p>
+      </>
+    ) : (
+      <p>{t(locale, 'recenzii.vedetiNoastre')}</p>
+    )
+  }
+</div>
+
+<style>
+  .card-rating {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    background: var(--c-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .card-rating :global(.card-rating__google) {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .card-rating__nota {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--c-wood-900);
+  }
+</style>

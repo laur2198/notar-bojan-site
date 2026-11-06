@@ -137,6 +137,28 @@ export const ro = {
   'email.observatii': 'Observații:',
   'email.atasate': 'Am atașat următoarele documente:',
 
+  // Pagini (etapa 5)
+  'pagina.seoTitlu': '{titlu} – Notar public Brașov | Bojan Elena Luminița',
+  'programare.cardTitlu': 'Programare online',
+  'programare.alegeti': 'Alegeți data și ora',
+  'programare.nota': 'Programarea se face prin Google Calendar. Biroul vă confirmă programarea.',
+  'programare.altfel': 'Preferați să sunați?',
+  'embed.afiseaza': 'Afișați calendarul aici',
+  'embed.info': 'Calendarul este găzduit de Google. Dacă îl afișați aici, Google poate seta cookie-uri și poate afla că ați vizitat această pagină. Până atunci, pagina nu încarcă nimic de la Google.',
+  'embed.deschide': 'Deschideți calendarul într-o filă nouă',
+  'embed.titluIframe': 'Calendarul de programări',
+  'faq.seoDescriere': 'Răspunsuri la întrebările frecvente despre programare, acte, onorarii și semnarea actelor la biroul notarial din Brașov.',
+  'recenzii.titluPagina': 'Recenzii',
+  'recenzii.seoDescriere': 'Recenziile clienților Biroului Individual Notarial Bojan Elena Luminița din Brașov, publicate pe Google.',
+  'recenzii.vedetiToate': 'Vedeți toate recenziile pe Google',
+  'recenzii.goale': 'Recenziile clienților pot fi citite pe profilul Google al biroului.',
+  'contact.emailActe': 'Email pentru acte',
+  'banda.adresaTitlu': 'Adresa',
+  'banda.contactTitlu': 'Telefon și email',
+  'harta.titlu': 'Harta',
+  'doc.cuprins': 'Cuprins',
+  'doc.actualizat': 'Ultima actualizare: {data}',
+
   // Pagina 404
   '404.titlu': 'Pagina nu a fost găsită',
   '404.descriere': 'Pagina căutată nu există sau a fost mutată.',

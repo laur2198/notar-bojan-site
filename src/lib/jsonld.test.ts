@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { breadcrumbList, idBirou, serializeaza, serviciu } from './jsonld';
+import { breadcrumbList, faqPage, idBirou, serializeaza, serviciu } from './jsonld';
 
 describe('JSON-LD', () => {
   it('idBirou stabil, cu baza site-ului', () => {
@@ -31,5 +31,23 @@ describe('JSON-LD', () => {
     const t = serializeaza({ a: '</script><script>alert(1)</script>' });
     expect(t).not.toContain('</script>');
     expect(JSON.parse(t)).toEqual({ a: '</script><script>alert(1)</script>' });
+  });
+});
+
+describe('faqPage', () => {
+  it('Question/Answer, fără întrebările cu marcaj «DE COMPLETAT»', () => {
+    const f = faqPage(
+      [
+        { intrebare: 'Trebuie programare?', raspuns: 'Da. «DE COMPLETAT: excepții»' },
+        { intrebare: 'Pot trimite actele?', raspuns: 'Da, pe email.' },
+        { intrebare: 'Cum se plătește?', raspuns: '«DE COMPLETAT: numerar, card»' },
+      ],
+      'ro',
+    );
+    expect(f['@type']).toBe('FAQPage');
+    expect(f.inLanguage).toBe('ro');
+    expect(f.mainEntity).toEqual([
+      { '@type': 'Question', name: 'Pot trimite actele?', acceptedAnswer: { '@type': 'Answer', text: 'Da, pe email.' } },
+    ]);
   });
 });

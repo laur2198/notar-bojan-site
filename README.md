@@ -24,6 +24,7 @@ npm install
 | `npm run check` | `astro check`: verifică tipurile TypeScript și schemele de conținut |
 | `npm test` | Testele Vitest pentru logica pură (program, zile libere, linkuri, marcaje, rute, plural, Markdown) |
 | `npm run verifica` | Doar verificarea conținutului (preview: rezumat; `SITE_MODE=production`: listă și cod de ieșire 1) |
+| `npm run linkuri` | Verifică linkurile interne din `dist/` (pagini, resurse, ancore). Respectă `BASE_PATH`; `-- --ignora /en/` raportează fără să eșueze linkurile spre o zonă încă neconstruită |
 
 Ghidul de stil intern e la `/stil/`: paleta cu contrastele calculate, tipografia, butoanele, diacriticele. Pagina e `noindex` și e exclusă din sitemap.
 
@@ -163,6 +164,20 @@ Un singur font, **Inter** (variabil), self-hosted din `@fontsource-variable/inte
 - **Serviciu nou:** un fișier nou în `src/content/servicii/ro/` (din CMS) primește automat pagină și card. Dacă îi lipsește onorariul din `preturi/ro.yaml` (sau invers), build-ul afișează `[servicii] ATENȚIE: …`.
 - **„Trimiteți actele pe email”:** `mailto:` către `emailActe`, cu subiectul `subiectEmail` și un corp precompletat (CRLF, `encodeURIComponent`). Cât `emailActe` conține `«DE COMPLETAT`, butonul e vizibil, fără `href`, cu `aria-disabled`, iar adresa apare marcată.
 - **Caseta `sticky`:** cu textele actuale caseta e mai înaltă decât conținutul, deci derulează normal; se lipește singură dacă textul serviciului devine mai lung decât ea.
+
+## Pagini (etapa 5)
+
+Toate paginile noi încep cu banda de titlu pe gri (`BandaTitlu`) și refolosesc componentele existente.
+
+- **`/programare/`:** cardul alb cu „Alegeți data și ora” (link spre `programareUrl`, filă nouă, anunțată vizual și pentru cititoarele de ecran), alături telefonul, starea „Deschis acum” și programul săptămânal; dedesubt restul textului din `programare.md` (primul paragraf e deja lead-ul benzii și nu se repetă). Cât `programareUrl` conține `«DE COMPLETAT`, butonul e `aria-disabled`, fără `href`, iar adresa apare marcată. Fără iframe.
+- **`EmbedCuConsimtamant.astro`** (nefolosit deocamdată): fațadă „click pentru încărcare” pentru calendarul Google, cu text de informare despre cookie-urile Google și linkul alternativ spre filă nouă. Iframe-ul se creează doar la click. Se folosește numai dacă clienta cere calendarul încorporat: `<EmbedCuConsimtamant locale="ro" src={birou.programareUrl} />`.
+- **`/intrebari-frecvente/`:** toate întrebările (`ListaFaq`, `<details>` nativ) și JSON-LD `FAQPage`. Întrebările sau răspunsurile cu `«DE COMPLETAT` nu intră în JSON-LD (`faqPage()` din `src/lib/jsonld.ts`).
+- **`/recenzii/`:** ratingul agregat (doar dacă e completat), toate recenziile din `recenzii.yaml`, de la cea mai nouă, text integral, și „Vedeți toate recenziile pe Google”. Cu lista goală: mesaj neutru și butonul. Fără JSON-LD `Review` (recenziile sunt de pe Google, nu proprii).
+- **`/despre/`:** fotografia 4:5 (placeholder până vine cea reală) și textul, cu rând limitat.
+- **`/contact/`:** cele trei blocuri ale benzii de informații (`BandaInfo varianta="contact"`: adresă, program, telefon și emailuri), textul din `contact.md` și o zonă de hartă statică (fără nimic de la Google) cu „Deschideți în Google Maps”. Fără formular, fără iframe. JSON-LD-ul biroului vine în etapa 8.
+- **`/confidentialitate/`:** cuprins generat din titlurile h2 (ancore din id-urile Markdown), data actualizării în bandă, tipografie de document. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în preview; în build-ul de producție containerul primește clasa `fara-nota-de-lucru`, care ascunde primul blockquote (rămâne în HTML, dar `display: none`, deci nu e citit nici de cititoarele de ecran). În practică, înainte de producție clienta oricum șterge sau validează textul.
+- **404:** mesaj în română și engleză, Acasă / Servicii / Contact și telefonul.
+- **Marcaje în Markdown:** corpul Markdown randat trece prin `ContinutMarcat` (`marcheazaInHtml()` din `src/lib/marcaj.ts`), care pune `«DE COMPLETAT…»` în `<mark class="todo">`. Se aplică și paginilor de serviciu (până acum marcajele din corpul lor nu erau evidențiate).
 
 ## Note pentru etapele următoare
 

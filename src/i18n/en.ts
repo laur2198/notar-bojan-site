@@ -139,6 +139,28 @@ export const en: Record<keyof typeof ro, string> = {
   'email.observatii': 'Notes:',
   'email.atasate': 'I have attached the following documents:',
 
+  // Pages (stage 5)
+  'pagina.seoTitlu': '{titlu} – Notary public Brasov | Bojan Elena Luminita',
+  'programare.cardTitlu': 'Online appointment',
+  'programare.alegeti': 'Choose a date and time',
+  'programare.nota': 'Appointments are made through Google Calendar. The office will confirm your appointment.',
+  'programare.altfel': 'Prefer to call?',
+  'embed.afiseaza': 'Show the calendar here',
+  'embed.info': 'The calendar is hosted by Google. If you show it here, Google may set cookies and learn that you visited this page. Until then, this page loads nothing from Google.',
+  'embed.deschide': 'Open the calendar in a new tab',
+  'embed.titluIframe': 'Appointment calendar',
+  'faq.seoDescriere': 'Answers to frequently asked questions about appointments, documents, fees and signing notarial acts at the notary office in Brasov.',
+  'recenzii.titluPagina': 'Reviews',
+  'recenzii.seoDescriere': 'Reviews of the notary office of Bojan Elena Luminita in Brasov, published by clients on Google.',
+  'recenzii.vedetiToate': 'See all reviews on Google',
+  'recenzii.goale': 'You can read client reviews on the office Google profile.',
+  'contact.emailActe': 'Email for documents',
+  'banda.adresaTitlu': 'Address',
+  'banda.contactTitlu': 'Phone and email',
+  'harta.titlu': 'Map',
+  'doc.cuprins': 'Contents',
+  'doc.actualizat': 'Last updated: {data}',
+
   // 404 page
   '404.titlu': 'Page not found',
   '404.descriere': 'The page you are looking for does not exist or has been moved.',

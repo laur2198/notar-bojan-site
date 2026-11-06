@@ -1,0 +1,66 @@
+---
+/**
+ * /despre/: două coloane pe desktop, fotografia 4:5 (placeholder până vine cea reală) și
+ * textul (tipografie de articol, rând limitat).
+ */
+import { getEntry, render } from 'astro:content';
+import BandaTitlu from '../components/BandaTitlu.astro';
+import ContinutMarcat from '../components/ContinutMarcat.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import Fotografie from '../components/Fotografie.astro';
+import SectiuneCta from '../components/SectiuneCta.astro';
+import { t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getBirou } from '../lib/continut';
+
+const locale = 'ro';
+const [pagina, acasa, birou] = await Promise.all([getEntry('pagini', 'ro/despre'), getEntry('acasa', 'ro/acasa'), getBirou()]);
+if (!pagina || !acasa) throw new Error('Lipsesc pagini/ro/despre.md sau pagini/ro/acasa.yaml.');
+const { Content } = await render(pagina);
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
+  <BandaTitlu locale={locale} titlu={pagina.data.titlu}>
+    <DraftBadge locale={locale} intrare={pagina} />
+  </BandaTitlu>
+
+  <section class="despre-pagina" aria-label={pagina.data.titlu}>
+    <div class="container despre-pagina__grila">
+      <div class="despre-pagina__foto">
+        <Fotografie
+          locale={locale}
+          imagine={pagina.data.imagine}
+          alt={pagina.data.imagineAlt}
+          raport="4 / 5"
+          latimi={[400, 700, 1000]}
+          sizes="(min-width: 64rem) 24rem, 100vw"
+          prioritar
+        />
+      </div>
+      <div class="continut-articol">
+        <ContinutMarcat><Content /></ContinutMarcat>
+      </div>
+    </div>
+  </section>
+
+  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+</BaseLayout>
+
+<style>
+  .despre-pagina {
+    padding-block: var(--section-y-sm) var(--section-y);
+  }
+
+  .despre-pagina__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64rem) {
+    .despre-pagina__grila {
+      grid-template-columns: 24rem minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+  }
+</style>

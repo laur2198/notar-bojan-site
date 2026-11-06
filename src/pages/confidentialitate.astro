@@ -1,0 +1,119 @@
+---
+/**
+ * /confidentialitate/: tipografie de document, cuprinsul generat din titlurile h2 și data
+ * actualizării. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în
+ * preview; în producție e ascunsă prin CSS (vezi `.fara-nota-de-lucru`).
+ */
+import { getEntry, render } from 'astro:content';
+import BandaTitlu from '../components/BandaTitlu.astro';
+import ContinutMarcat from '../components/ContinutMarcat.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import { formateazaZiLuna, t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { areMarcaj, estePreview, marcheazaPlaceholder } from '../lib/continut';
+
+const locale = 'ro';
+const pagina = await getEntry('pagini', 'ro/confidentialitate');
+if (!pagina) throw new Error('Lipsește src/content/pagini/ro/confidentialitate.md.');
+const { Content, headings } = await render(pagina);
+const cuprins = headings.filter((h) => h.depth === 2);
+
+const actualizat = pagina.data.actualizat;
+const dataAfisata =
+  actualizat && !areMarcaj(actualizat) ? `${formateazaZiLuna(locale, actualizat)} ${actualizat.slice(0, 4)}` : actualizat;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
+  <BandaTitlu
+    locale={locale}
+    titlu={pagina.data.titlu}
+    leadHtml={dataAfisata ? marcheazaPlaceholder(t(locale, 'doc.actualizat', { data: dataAfisata })) : undefined}
+  >
+    <DraftBadge locale={locale} intrare={pagina} />
+  </BandaTitlu>
+
+  <section class="document" aria-label={pagina.data.titlu}>
+    <div class="container document__grila">
+      {
+        cuprins.length > 0 && (
+          <nav class="cuprins" aria-labelledby="cuprins-titlu">
+            <h2 id="cuprins-titlu" class="cuprins__titlu">{t(locale, 'doc.cuprins')}</h2>
+            <ol class="cuprins__lista">
+              {cuprins.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      <div class:list={['continut-articol', 'document__text', { 'fara-nota-de-lucru': !estePreview }]}>
+        <ContinutMarcat><Content /></ContinutMarcat>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .document {
+    padding-block: var(--section-y-sm) var(--section-y);
+  }
+
+  .document__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64rem) {
+    .document__grila {
+      grid-template-columns: 18rem minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-6);
+    }
+
+    .cuprins {
+      position: sticky;
+      top: calc(var(--header-h-sm) + var(--space-3));
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .cuprins {
+      top: calc(var(--header-h) + var(--space-3));
+    }
+  }
+
+  .cuprins {
+    padding: var(--space-3);
+    background: var(--c-gray-50);
+    border-radius: var(--radius-lg);
+  }
+
+  .cuprins__titlu {
+    font-size: var(--fs-base);
+  }
+
+  .cuprins__lista {
+    display: grid;
+    gap: 0;
+    margin-top: var(--space-1);
+    padding-left: var(--space-3);
+  }
+
+  .cuprins__lista li {
+    max-width: none;
+  }
+
+  .cuprins__lista a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-size: var(--fs-sm);
+  }
+
+  /* Producție: nota de lucru („Text propus ca punct de plecare…”) nu se afișează. */
+  .fara-nota-de-lucru :global(> blockquote:first-child) {
+    display: none;
+  }
+</style>

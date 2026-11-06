@@ -43,3 +43,22 @@ export function serviciu(date: { nume: string; descriere: string; url: string; i
 export function serializeaza(date: unknown): string {
   return JSON.stringify(date).replace(/</g, '\\u003c');
 }
+
+/**
+ * FAQPage (schema.org, Google): `mainEntity` cu `Question` / `acceptedAnswer` → `Answer`.
+ * Întrebările cu răspuns încă necompletat («DE COMPLETAT», în întrebare sau răspuns) sunt excluse.
+ */
+export function faqPage(intrebari: readonly { intrebare: string; raspuns: string }[], limba: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: limba,
+    mainEntity: intrebari
+      .filter((q) => !q.intrebare.includes('«DE COMPLETAT') && !q.raspuns.includes('«DE COMPLETAT'))
+      .map((q) => ({
+        '@type': 'Question',
+        name: q.intrebare,
+        acceptedAnswer: { '@type': 'Answer', text: q.raspuns },
+      })),
+  };
+}

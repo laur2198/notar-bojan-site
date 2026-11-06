@@ -4,7 +4,7 @@
  */
 import { getEntry } from 'astro:content';
 
-export { MARCAJ, areMarcaj, escapeHtml, esteDraft, marcheazaPlaceholder, type IntrareContinut } from './marcaj';
+export { MARCAJ, areMarcaj, escapeHtml, esteDraft, marcheazaInHtml, marcheazaPlaceholder, type IntrareContinut } from './marcaj';
 
 // ---------------------------------------------------------------------------
 // Modul de build

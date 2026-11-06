@@ -1,0 +1,115 @@
+---
+/**
+ * /recenzii/: ratingul agregat (doar dacă e completat), toate recenziile reale de pe Google
+ * din recenzii.yaml, de la cea mai nouă, și linkul spre profilul Google. Cu lista goală:
+ * un mesaj neutru și linkul. Fără JSON-LD Review: recenziile Google nu se marchează ca proprii.
+ * Nu se generează niciodată recenzii (CLAUDE.md §3.4, §7).
+ */
+import { getEntry } from 'astro:content';
+import BandaTitlu from '../components/BandaTitlu.astro';
+import CardRating from '../components/CardRating.astro';
+import CardRecenzie from '../components/CardRecenzie.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import LinkExtern from '../components/LinkExtern.astro';
+import Sectiune from '../components/Sectiune.astro';
+import { t } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { linkExtern } from '../lib/contact';
+import { getBirou, marcheazaPlaceholder } from '../lib/continut';
+
+const locale = 'ro';
+const [recenzii, acasa, birou] = await Promise.all([getEntry('recenzii', 'recenzii'), getEntry('acasa', 'ro/acasa'), getBirou()]);
+if (!recenzii || !acasa) throw new Error('Lipsesc recenzii/recenzii.yaml sau pagini/ro/acasa.yaml.');
+const lista = [...recenzii.data.lista].sort((a, b) => b.data.localeCompare(a.data));
+const profil = linkExtern(birou.googleProfilUrl, '');
+const titlu = t(locale, 'recenzii.titluPagina');
+// Ratingul agregat apare doar dacă e completat; altfel butonul de mai jos e suficient.
+const areRating = birou.rating !== null && birou.numarRecenzii !== null;
+---
+
+<BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu })} description={t(locale, 'recenzii.seoDescriere')}>
+  <BandaTitlu locale={locale} titlu={titlu} leadHtml={marcheazaPlaceholder(acasa.data.recenzii.intro)} />
+
+  <Sectiune>
+    <div class="recenzii">
+      {
+        areRating && (
+          <div class="recenzii__rating">
+            <CardRating locale={locale} birou={birou} />
+          </div>
+        )
+      }
+      {
+        lista.length > 0 ? (
+          <ul class="recenzii__lista" role="list">
+            {lista.map((r) => (
+              <li>
+                <CardRecenzie locale={locale} {...r} complet />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div class="recenzii__gol">
+            <DraftBadge locale={locale} draft text={t(locale, 'recenzii.inAsteptare')} />
+            <p>{t(locale, 'recenzii.goale')}</p>
+          </div>
+        )
+      }
+      <p class="recenzii__google">
+        <LinkExtern locale={locale} link={profil} class="btn btn--primar">
+          {t(locale, 'recenzii.vedetiToate')}
+        </LinkExtern>
+      </p>
+    </div>
+  </Sectiune>
+</BaseLayout>
+
+<style>
+  .recenzii {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: center;
+  }
+
+  .recenzii__rating {
+    width: 100%;
+    max-width: 26rem;
+  }
+
+  .recenzii__lista {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recenzii__lista > li {
+    display: grid;
+    max-width: none;
+  }
+
+  @media (min-width: 48rem) {
+    .recenzii__lista {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 75rem) {
+    .recenzii__lista {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .recenzii__gol {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    text-align: center;
+    color: var(--c-gray-600);
+  }
+
+  .recenzii__google {
+    max-width: none;
+  }
+</style>

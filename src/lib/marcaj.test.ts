@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { esteDraft, marcheazaPlaceholder } from './marcaj';
+import { esteDraft, marcheazaInHtml, marcheazaPlaceholder } from './marcaj';
 
 describe('marcheazaPlaceholder', () => {
   it('escapează HTML-ul și marchează toate formele de marcaj', () => {
@@ -22,4 +22,18 @@ describe('esteDraft', () => {
     expect(esteDraft({ data: { validat: true }, body: 'text «DE COMPLETAT: x»' })).toBe(true));
   it('validat și fără marcaje', () =>
     expect(esteDraft({ data: { validat: true, data: new Date(), n: 3 }, body: 'gata' })).toBe(false));
+});
+
+describe('marcheazaInHtml', () => {
+  it('marchează doar în text, nu în atribute', () => {
+    const html = '<h2 id="x">Titlu</h2><p title="«DE COMPLETAT»">Sediul în «DE COMPLETAT: adresa», CIF «DE COMPLETAT».</p>';
+    expect(marcheazaInHtml(html)).toBe(
+      '<h2 id="x">Titlu</h2><p title="«DE COMPLETAT»">Sediul în <mark class="todo">«DE COMPLETAT: adresa»</mark>, CIF <mark class="todo">«DE COMPLETAT»</mark>.</p>',
+    );
+  });
+
+  it('nu atinge HTML-ul fără marcaje și nu trece marcajul neînchis peste o etichetă', () => {
+    expect(marcheazaInHtml('<p>Text <strong>normal</strong></p>')).toBe('<p>Text <strong>normal</strong></p>');
+    expect(marcheazaInHtml('<li>«DE COMPLETAT: alte</li><li>x»</li>')).toBe('<li><mark class="todo">«DE COMPLETAT: alte</mark></li><li>x»</li>');
+  });
 });
