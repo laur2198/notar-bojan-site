@@ -31,7 +31,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ## 4. Accesibilitate (contractual – WCAG 2.1 AA)
 
 - Text de bază **18 px** (`1.125rem`), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
-- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (13 px). Nicăieri altundeva.
+- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (12 px). Nicăieri altundeva.
 - Contrast AA: minim 4.5:1 text normal, 3:1 text mare și elemente UI. Verifică fiecare combinație nouă de culori.
 - Ținte de atingere minim **48×48 px**.
 - `:focus-visible` clar pe toate elementele interactive (contur de 3 px, nu doar schimbare de culoare).
@@ -72,21 +72,21 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
   --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.7rem);
-  --fs-h2:   clamp(1.75rem, 1.3rem + 1.4vw, 2rem);
-  --fs-h1:   clamp(2rem, 1.2rem + 3vw, 3rem);
+  --fs-h3:   clamp(1.25rem, 1.1rem + 0.4vw, 1.375rem);  /* max. 22px */
+  --fs-h2:   clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);    /* max. 28px */
+  --fs-h1:   clamp(2rem, 1.4rem + 1.8vw, 2.5rem);       /* max. 40px */
 
   /* Spațiere, raze, umbre */
   --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
   --space-5: 3rem;  --space-6: 4.5rem; --space-7: 6rem;
-  --section-y:    clamp(4rem, 2rem + 6vw, 8rem);   /* padding sus/jos al secțiunilor */
+  --section-y:    clamp(4rem, 2rem + 6vw, 6rem);   /* padding sus/jos al secțiunilor (max. 96px) */
   --section-y-sm: clamp(3rem, 2rem + 3vw, 4rem);   /* banda de informații */
   --radius: 4px; --radius-lg: 10px; --radius-pill: 999px;
   --shadow: 0 4px 8px rgb(42 26 16 / .12);
   --container: 75rem;
   --gutter: 1.5rem;      /* padding lateral al containerului */
   --gutter-sm: 1rem;     /* sub 480px */
-  --header-h: 80px;      /* header fix pe desktop */
+  --header-h: 72px;      /* header fix pe desktop */
   --header-h-sm: 64px;   /* header fix pe mobil */
   --measure: 68ch;
 }
@@ -94,9 +94,10 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
 
+- Scara titlurilor e compactă (din tokeni): h1 max. 40 px, h2 max. 28 px, h3 max. 22 px; titlurile coloanelor din banda de informații folosesc `--fs-h3`. Subtitlul din hero și lead-urile de sub titluri: 18 px (lead-urile în `--c-gray-600`). Textul de bază rămâne 18 px.
 - Un singur font, Inter; titluri 700. Fără text justify. Fără majuscule integrale pe paragrafe (wordmark-ul și h1-ul din hero pot fi cu majuscule, prin CSS).
 - Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
-- Butonul primar: fundal `--c-wood-800`, text alb, înălțime min. 52 px. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
+- Butoanele: 16 px, 600, înălțime min. 48 px, padding 12×20. Butonul primar: fundal `--c-wood-800`, text alb. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
 - Fundaluri: alb pentru pagină și header (fix sus), `--c-gray-50` pentru secțiunile alternante și footer, `--c-wood-800` pentru secțiunea CTA finală, `--c-wood-900` sub fotografia din hero.
 - Fără texturi sau imagini de lemn; „lemnul” e doar culoarea.
 - `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-gray-900`).

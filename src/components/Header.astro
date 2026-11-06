@@ -3,9 +3,12 @@
  * Antetul site-ului (CLAUDE.md §4, §5, §6): alb, fix sus (sticky), 80 px pe desktop,
  * 64 px pe mobil. Fără scroll: o linie gray-200 jos; după scroll: umbră fină (JS).
  *
- * - Desktop (≥ 80rem): wordmark | meniu | RO | EN | telefon | WhatsApp | email | „Programare”.
- *   (măsurat: ~1.175 px de conținut; containerul are maximum 1.200 px).
- * - 768 px – 80rem: wordmark | telefon | „Programare” | comutator | „Meniu”
+ * - Desktop (≥ 67rem = 1072 px): wordmark | meniu | RO | EN | telefon | WhatsApp | „Programare”,
+ *   în container (max. 1.200 px). Telefonul e doar iconiță (numărul în aria-label); emailul nu
+ *   apare pe desktop (e în /contact/, în footer și în meniul compact).
+ *   Pragul e măsurat: header-ul RO cere 1.012 px de conținut, deci încape de la 1.069 px de ecran
+ *   (EN, cu meniul mai scurt, de la 1.024 px). Sub prag: varianta compactă.
+ * - 768 px – 67rem: wordmark | telefon | „Programare” | comutator | „Meniu”
  *   (bara de jos apare doar sub 768 px, iar telefonul trebuie să fie vizibil pe orice ecran).
  * - < 768 px: wordmark | comutator | „Meniu”; telefonul și „Programare” stau în bara de jos.
  *
@@ -16,7 +19,7 @@
  * Escape (cu focus înapoi pe buton), la click în afara meniului și umbra după scroll.
  */
 import { ariaCurent, cale, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
-import { linkEmail, linkTelefon, linkWhatsapp } from '../lib/contact';
+import { linkTelefon, linkWhatsapp } from '../lib/contact';
 import type { Birou } from '../lib/continut';
 import ButonIconita from './ButonIconita.astro';
 import ComutatorLimba from './ComutatorLimba.astro';
@@ -32,14 +35,14 @@ interface Props {
 const { locale, birou } = Astro.props;
 const pathname = Astro.url.pathname;
 const telefon = linkTelefon(birou);
-const email = linkEmail(birou.email);
 const whatsapp = linkWhatsapp(birou, locale);
 
-const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
+/** `scurt`: eticheta din meniul de desktop, unde spațiul e limitat (ex. „Întrebări”). */
+const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI; scurt?: CheieUI }[]> = {
   ro: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
     { cheie: 'programare', eticheta: 'nav.programare' },
-    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'faq', eticheta: 'nav.faq', scurt: 'nav.faqScurt' },
     { cheie: 'despre', eticheta: 'nav.despre' },
     { cheie: 'contact', eticheta: 'nav.contact' },
   ],
@@ -51,15 +54,14 @@ const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ],
 };
 
-const linkuri = MENIU[locale].map(({ cheie, eticheta }) => {
+const linkuri = MENIU[locale].map(({ cheie, eticheta, scurt }) => {
   const href = cale(cheie, locale);
-  return { href, text: t(locale, eticheta), curent: ariaCurent(href, pathname) };
+  return { href, text: t(locale, eticheta), textScurt: t(locale, scurt ?? eticheta), curent: ariaCurent(href, pathname) };
 });
 
 const hrefProgramare = cale('programare', locale);
 const programareCurenta = ariaCurent(hrefProgramare, pathname) === 'page' ? 'page' : undefined;
 const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
-const etichetaEmail = t(locale, 'antet.email', { email: email.text });
 ---
 
 <header class="antet" data-antet>
@@ -74,7 +76,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
             linkuri.map((l) => (
               <li>
                 <a href={l.href} aria-current={l.curent}>
-                  {l.text}
+                  {l.textScurt}
                 </a>
               </li>
             ))
@@ -82,18 +84,8 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
         </ul>
       </nav>
       <ComutatorLimba locale={locale} />
-      {
-        telefon.valid ? (
-          <a class="antet__telefon" href={telefon.href} aria-label={etichetaTelefon}>
-            <Iconita nume="telefon" />
-            <span class="antet__telefon-numar">{telefon.text}</span>
-          </a>
-        ) : (
-          <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
-        )
-      }
+      <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
       <ButonIconita locale={locale} iconita="whatsapp" link={whatsapp} eticheta={t(locale, 'whatsapp.scrieti')} extern />
-      <ButonIconita locale={locale} iconita="email" link={email} eticheta={etichetaEmail} />
       <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
         {t(locale, 'actiune.programare')}
       </a>
@@ -165,7 +157,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     });
 
     // Trecerea la desktop închide meniul compact (ar rămâne deschis, ascuns).
-    window.matchMedia('(min-width: 80rem)').addEventListener('change', (e) => {
+    window.matchMedia('(min-width: 67rem)').addEventListener('change', (e) => {
       if (e.matches) meniu.open = false;
     });
   }
@@ -196,7 +188,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     min-height: var(--header-h-sm);
   }
 
-  /* --- Compact (< 80rem) --- */
+  /* --- Compact (< 67rem) --- */
   .antet__compact {
     display: flex;
     align-items: center;
@@ -328,13 +320,13 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     text-underline-offset: 0.3em;
   }
 
-  /* --- Desktop (≥ 80rem) --- */
+  /* --- Desktop (≥ 67rem) --- */
 
   .antet__desktop {
     display: none;
   }
 
-  @media (min-width: 80rem) {
+  @media (min-width: 67rem) {
     .antet__interior {
       min-height: var(--header-h);
       gap: var(--space-2);
@@ -348,46 +340,6 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       display: flex;
       align-items: center;
       gap: var(--space-1);
-    }
-
-    /* Header-ul folosește toată lățimea ecranului (cu marginile --gutter), ca la referință:
-       numărul de telefon are nevoie de mai mult loc decât containerul de conținut. */
-    .antet__interior {
-      max-width: none;
-    }
-
-    /* Telefonul: iconiță + număr într-un singur link; sub 88rem (1408 px), doar iconița. */
-    .antet__telefon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-1);
-      min-width: 48px;
-      min-height: 48px;
-      padding-inline: calc(var(--space-1) * 1.5);
-      background: var(--c-white);
-      color: var(--c-gray-900);
-      border: 1px solid var(--c-gray-200);
-      border-radius: var(--radius);
-      font-size: var(--fs-sm);
-      font-weight: 600;
-      text-decoration: none;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .antet__telefon :global(.iconita) {
-      color: var(--c-wood-800);
-    }
-
-    .antet__telefon:hover {
-      color: var(--c-gray-900);
-      background: var(--c-gray-50);
-      border-color: var(--c-wood-800);
-    }
-
-    .antet__telefon-numar {
-      display: none;
     }
 
     .meniu {
@@ -406,10 +358,11 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       justify-content: center;
       min-width: 48px;
       min-height: 48px;
-      padding: calc(var(--space-2) * 1.25) var(--space-2);
+      /* 16 px, 500, 12 px stânga–dreapta: meniul complet încape de la 1024 px. */
+      padding: 0 calc(var(--space-1) * 1.5);
       color: var(--c-gray-900);
       font-size: var(--fs-sm);
-      font-weight: 600;
+      font-weight: 500;
       text-decoration: none;
       white-space: nowrap;
     }
@@ -426,11 +379,4 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     }
   }
 
-  /* Numărul de telefon apare de la 88rem (1408 px): pragul măsurat la care header-ul încape pe un rând
-     cu butonul WhatsApp (cu număr valid: 1.396 px necesari). */
-  @media (min-width: 88rem) {
-    .antet__telefon-numar {
-      display: inline;
-    }
-  }
 </style>
