@@ -22,7 +22,7 @@ npm install
 | `npm run build:prod` | Build de **producție**: oprește build-ul dacă există conținut nevalidat (vezi mai jos) |
 | `npm run preview` | Servește local ultimul build din `dist/` |
 | `npm run check` | `astro check`: verifică tipurile TypeScript și schemele de conținut |
-| `npm test` | Testele Vitest pentru logica pură (program, linkuri de contact, marcaje, rute) |
+| `npm test` | Testele Vitest pentru logica pură (program, zile libere, linkuri, marcaje, rute, plural, Markdown) |
 | `npm run verifica` | Doar verificarea conținutului (preview: rezumat; `SITE_MODE=production`: listă și cod de ieșire 1) |
 
 Ghidul de stil intern e la `/stil/`: paleta cu contrastele calculate, tipografia, butoanele, diacriticele. Pagina e `noindex` și e exclusă din sitemap.
@@ -98,24 +98,25 @@ media:
 ```
 
 - Imaginile stau în `src/assets/media/`, nu în `public/`. Astfel trec prin `image()` și `<Image>`: AVIF/WebP, dimensiuni explicite. Imaginile din `public/` nu sunt optimizate.
-- `image()` rezolvă calea **relativ la fișierul de conținut**, iar Pages CMS scrie în fișier `output` + numele imaginii. `../../../assets/media` e corect pentru fișierele din `src/content/pagini/ro/` și `src/content/pagini/en/`. Acolo sunt toate câmpurile de imagine de acum (Acasă RO/EN, Despre).
+- `image()` rezolvă calea **relativ la fișierul de conținut**, iar Pages CMS scrie în fișier `output` + numele imaginii. `../../../assets/media` e corect pentru fișierele din `src/content/pagini/{ro,en}/` și `src/content/servicii/ro/` (aceeași adâncime). Acolo sunt toate câmpurile de imagine (Acasă RO/EN, Despre, imaginea opțională a fiecărui serviciu).
 - **Limitare:** un câmp de imagine adăugat într-un fișier de altă adâncime (de ex. `src/content/setari/birou.yaml`) are nevoie de altă cale. Soluția e o a doua sursă `media` cu nume propriu și `output` potrivit, aleasă din câmp cu `options.media`.
 - Formate acceptate: JPG, PNG, WebP. Fișierele HEIC de pe iPhone nu sunt acceptate, pentru că Astro nu le poate procesa. Numele fișierelor încărcate sunt transformate automat în nume sigure (`rename: safe`).
 
-## Fonturi
+## Font
 
-Fonturile sunt self-hosted din pachetele Fontsource `@fontsource-variable/source-serif-4` (titluri) și `@fontsource-variable/source-sans-3` (text). `src/styles/fonturi.css` declară doar subseturile **latin** și **latin-ext**, axa `wght`, stil normal: 4 fișiere, aproximativ 180 KB în total. Literele ș, ț și ă sunt în latin-ext, deci o pagină în română le încarcă pe ambele.
+Un singur font, **Inter** (variabil), self-hosted din `@fontsource-variable/inter`, pentru titluri și text. `src/styles/fonturi.css` declară doar subseturile **latin** și **latin-ext**, axa `wght`, stil normal: 2 fișiere, ~133 KB în total. ș, ț și ă sunt în latin-ext, deci o pagină în română le încarcă pe amândouă.
 
-- **Fără italic.** Niciun text din `src/content/` nu conține italic (`*…*` sau `_…_`), așa că fișierele italice nu se încarcă. Dacă apare italic în conținut, se adaugă în `fonturi.css` fișierul `source-sans-3-{latin,latin-ext}-wght-italic.woff2`. Până atunci browserul ar sintetiza italicul.
-- Source Serif 4 se încarcă fără axa de dimensiune optică (`opsz`), ale cărei fișiere sunt de circa 2,4 ori mai mari.
+- **Fără italic.** Niciun text din `src/content/` nu conține italic (`*…*` sau `_…_`), deci fișierele italice nu se încarcă. Dacă apare italic, se adaugă în `fonturi.css` `inter-{latin,latin-ext}-wght-italic.woff2`.
 
-## Carcasa (etapa 2)
+## Carcasa și pagina Acasă (etapele 2–3, calibrate după referința aleasă de clientă)
 
-- **Header:** desktop (≥ 1024 px) pe două niveluri: telefonul și comutatorul de limbă sus, meniul și butonul „Programare” jos. Sub 1024 px: wordmark, comutator (doar linkul către cealaltă limbă) și „Meniu”, un `<details>` care merge fără JS; JS adaugă închiderea la Escape și la click în afară. Între 768 și 1023 px header-ul are un rând în plus cu telefonul și „Programare”, pentru că bara de jos apare doar sub 768 px.
-- **Bara de jos** (< 768 px): „Sunați” și „Programare”. `body` primește `padding-bottom` cât bara (`--inaltime-bara` în `global.css`).
-- **Date necompletate:** `linkTelefon()` / `linkEmail()` nu generează `tel:` / `mailto:` din texte `«DE COMPLETAT`. În preview, textul apare marcat, iar „Sunați” din bara de jos rămâne vizibil cu `aria-disabled="true"` și fără `href`.
-- **„Deschis acum”** se calculează în browser pe fusul Europe/Bucharest, din `program` și `zileLibere`, și se actualizează la fiecare minut. Fără JS nu apare; programul complet e oricum în footer.
-- **Pe fundal închis** (`.pe-inchis`: header, footer), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
+- **Calibrare doar din `tokens.css`:** spațierile și razele din componente sunt `var(--space-*)`, `var(--section-y*)`, `var(--radius*)` sau expresii derivate din ele (`calc(var(--space-1) / 2)`). Valori scrise direct rămân doar minimele de accesibilitate (48 / 52 / 56 px) și câteva lățimi (ex. lista de întrebări, max. 61.25rem).
+- **Header:** alb, fix sus (`position: sticky`), `--header-h` (80 px) pe desktop și `--header-h-sm` (64 px) pe mobil; linie gray-200 jos, umbră după scroll (JS). Desktop (≥ 1280 px): wordmark | meniu | RO | EN | iconițe telefon și email | „Programare”. Sub 1280 px: meniu compact (`<details>`, merge fără JS); între 768 și 1279 px, telefonul și „Programare” rămân vizibile în header.
+- **Bara de jos** (< 768 px): albă, patru acțiuni cu iconiță și etichetă de 14 px (`--fs-xs`): Sunați, Programare, Program (`/#program`), Locație (Google Maps).
+- **Pagina Acasă:** hero pe toată lățimea → banda de informații (`#program`) → despre → servicii → cum lucrăm → recenzii → întrebări → CTA. Pastila și cardul cu ratingul Google apar doar dacă `rating` și `numarRecenzii` sunt completate.
+- **Date necompletate:** `linkTelefon()`, `linkEmail()`, `linkExtern()` nu generează `tel:`, `mailto:` sau linkuri externe din texte `«DE COMPLETAT`. În preview, butoanele rămân vizibile, cu `aria-disabled="true"` și fără `href`.
+- **„Deschis acum”, programul de azi și zilele libere din următoarele 14 zile** se calculează în browser (fusul Europe/Bucharest). Fără JS nu apar; programul săptămânal complet e oricum în pagină.
+- **Pe fundal închis** (`.pe-inchis`: hero, CTA, footer), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
 
 ## Note pentru etapele următoare
 

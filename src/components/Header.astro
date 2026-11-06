@@ -1,21 +1,23 @@
 ---
 /**
- * Antetul site-ului (CLAUDE.md §4, §6).
+ * Antetul site-ului (CLAUDE.md §4, §5, §6): alb, fix sus (sticky), 80 px pe desktop,
+ * 64 px pe mobil. Fără scroll: o linie gray-200 jos; după scroll: umbră fină (JS).
  *
- * - ≥ 1024 px: wordmark | (telefon, comutator) / (meniu, buton „Programare”).
- * - 768–1023 px: wordmark, comutator, „Meniu” + un rând cu telefonul și „Programare”
+ * - Desktop (≥ 80rem): wordmark | meniu | RO | EN | telefon | email | „Programare”.
+ *   (măsurat: ~1.175 px de conținut; containerul are maximum 1.200 px).
+ * - 768 px – 80rem: wordmark | telefon | „Programare” | comutator | „Meniu”
  *   (bara de jos apare doar sub 768 px, iar telefonul trebuie să fie vizibil pe orice ecran).
- * - < 768 px: wordmark, comutator, „Meniu”; telefonul și „Programare” stau în bara de jos.
+ * - < 768 px: wordmark | comutator | „Meniu”; telefonul și „Programare” stau în bara de jos.
  *
- * Meniul compact e un `<details>`: se deschide și fără JS. JS adaugă doar închiderea
- * la Escape (cu focus înapoi pe buton) și la click în afara meniului.
+ * Meniul compact e un `<details>`: se deschide și fără JS. JS adaugă închiderea la
+ * Escape (cu focus înapoi pe buton), la click în afara meniului și umbra după scroll.
  */
-import { ariaCurent, cale, t, type CheieRuta, type Locale } from '../i18n';
-import { linkTelefon } from '../lib/contact';
+import { ariaCurent, cale, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
+import { linkEmail, linkTelefon } from '../lib/contact';
 import type { Birou } from '../lib/continut';
+import ButonIconita from './ButonIconita.astro';
 import ComutatorLimba from './ComutatorLimba.astro';
 import Iconita from './Iconita.astro';
-import TelefonLink from './TelefonLink.astro';
 
 interface Props {
   locale: Locale;
@@ -25,8 +27,9 @@ interface Props {
 const { locale, birou } = Astro.props;
 const pathname = Astro.url.pathname;
 const telefon = linkTelefon(birou);
+const email = linkEmail(birou.email);
 
-const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: Parameters<typeof t>[1] }[]> = {
+const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ro: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
     { cheie: 'programare', eticheta: 'nav.programare' },
@@ -48,43 +51,49 @@ const linkuri = MENIU[locale].map(({ cheie, eticheta }) => {
 });
 
 const hrefProgramare = cale('programare', locale);
+const programareCurenta = ariaCurent(hrefProgramare, pathname) === 'page' ? 'page' : undefined;
+const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
+const etichetaEmail = t(locale, 'antet.email', { email: email.text });
 ---
 
-<header class="antet pe-inchis">
+<header class="antet" data-antet>
   <div class="container antet__interior">
     <a class="wordmark" href={cale('acasa', locale)}>
       <span class="wordmark__nume">{birou.notar}</span>
       <span class="wordmark__profesie">{t(locale, 'wordmark.profesie')} · {birou.adresa.oras}</span>
     </a>
 
-    <!-- Desktop (≥ 1024 px) -->
+    <!-- Desktop -->
     <div class="antet__desktop">
-      <div class="antet__utilitar">
-        <TelefonLink locale={locale} telefon={telefon} class="antet__telefon" />
-        <ComutatorLimba locale={locale} />
-      </div>
-      <div class="antet__principal">
-        <nav aria-label={t(locale, 'nav.principal')}>
-          <ul class="meniu" role="list">
-            {
-              linkuri.map((l) => (
-                <li>
-                  <a href={l.href} aria-current={l.curent}>
-                    {l.text}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-        <a class="btn btn--invers" href={hrefProgramare} aria-current={ariaCurent(hrefProgramare, pathname) === 'page' ? 'page' : undefined}>
+      <nav aria-label={t(locale, 'nav.principal')}>
+        <ul class="meniu" role="list">
+          {
+            linkuri.map((l) => (
+              <li>
+                <a href={l.href} aria-current={l.curent}>
+                  {l.text}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <ComutatorLimba locale={locale} />
+      <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
+      <ButonIconita locale={locale} iconita="email" link={email} eticheta={etichetaEmail} />
+      <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
+        {t(locale, 'actiune.programare')}
+      </a>
+    </div>
+
+    <!-- Compact -->
+    <div class="antet__compact">
+      <div class="antet__tableta">
+        <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
+        <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
           {t(locale, 'actiune.programare')}
         </a>
       </div>
-    </div>
-
-    <!-- Compact (< 1024 px) -->
-    <div class="antet__compact">
       <ComutatorLimba locale={locale} compact />
       <details class="meniu-compact" data-meniu-compact>
         <summary class="meniu-compact__buton">
@@ -115,17 +124,16 @@ const hrefProgramare = cale('programare', locale);
       </details>
     </div>
   </div>
-
-  <!-- Tabletă (768–1023 px): telefonul și programarea rămân vizibile -->
-  <div class="antet__tableta">
-    <div class="container antet__tableta-interior">
-      <TelefonLink locale={locale} telefon={telefon} class="antet__telefon" />
-      <a class="btn btn--invers" href={hrefProgramare}>{t(locale, 'actiune.programare')}</a>
-    </div>
-  </div>
 </header>
 
 <script>
+  const antet = document.querySelector<HTMLElement>('[data-antet]');
+  if (antet) {
+    const actualizeaza = () => antet.toggleAttribute('data-derulat', window.scrollY > 0);
+    actualizeaza();
+    window.addEventListener('scroll', actualizeaza, { passive: true });
+  }
+
   for (const meniu of document.querySelectorAll<HTMLDetailsElement>('[data-meniu-compact]')) {
     const buton = meniu.querySelector('summary');
 
@@ -141,7 +149,7 @@ const hrefProgramare = cale('programare', locale);
     });
 
     // Trecerea la desktop închide meniul compact (ar rămâne deschis, ascuns).
-    window.matchMedia('(min-width: 64rem)').addEventListener('change', (e) => {
+    window.matchMedia('(min-width: 80rem)').addEventListener('change', (e) => {
       if (e.matches) meniu.open = false;
     });
   }
@@ -149,70 +157,103 @@ const hrefProgramare = cale('programare', locale);
 
 <style>
   .antet {
-    position: relative;
-    z-index: 20;
-    background: var(--c-wood-800);
-    color: var(--c-white);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--c-white);
+    color: var(--c-gray-900);
+    box-shadow: 0 1px 0 var(--c-gray-200);
+    transition: box-shadow 150ms ease;
+  }
+
+  .antet[data-derulat] {
+    box-shadow:
+      0 1px 0 var(--c-gray-200),
+      var(--shadow);
   }
 
   .antet__interior {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    padding-block: var(--space-1);
+    gap: var(--space-2);
+    min-height: var(--header-h-sm);
   }
 
-  /* Wordmark: nume în serif, profesia în fontul de text, fără majuscule. */
+  /* Wordmark pe două rânduri, cu majuscule (prin CSS: textul rămâne normal pentru cititoarele de ecran). */
   .wordmark {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     min-height: 48px;
+    color: var(--c-wood-900);
     text-decoration: none;
-    line-height: 1.2;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+
+  .wordmark:hover {
+    color: var(--c-wood-900);
   }
 
   .wordmark__nume {
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: var(--fs-base);
-  }
-
-  /* Telefoane înguste (360–399 px): wordmark, comutator și „Meniu” încap pe un rând. */
-  @media (max-width: 24.99rem) {
-    .wordmark__nume {
-      font-size: 1rem;
-    }
+    font-size: var(--fs-sm);
+    font-weight: 700;
   }
 
   .wordmark__profesie {
-    font-size: var(--fs-sm);
-    color: var(--c-gray-200);
+    font-size: calc(var(--fs-sm) * 0.75);
+    font-weight: 500;
+    color: var(--c-gray-600);
   }
 
   .wordmark:hover .wordmark__nume {
     text-decoration: underline;
+    text-decoration-color: var(--c-red-700);
     text-decoration-thickness: 0.08em;
     text-underline-offset: 0.18em;
   }
 
-  /* --- Compact (< 1024 px) --- */
+  /* Sub 480 px numele se poate rupe pe două rânduri; de acolo în sus rămâne pe unul. */
+  @media (min-width: 30rem) {
+    .wordmark {
+      white-space: nowrap;
+    }
+
+    .wordmark__nume {
+      font-size: var(--fs-lg);
+    }
+  }
+
+  /* --- Compact (< 80rem) --- */
   .antet__compact {
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    margin-left: auto;
+  }
+
+  .antet__tableta {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .antet__tableta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-right: var(--space-1);
+    }
   }
 
   .meniu-compact__buton {
     display: inline-flex;
     align-items: center;
     min-height: 48px;
-    padding: 0 0.5rem;
-    border: 2px solid var(--c-gray-200);
+    padding: 0 var(--space-1);
+    border: 1px solid var(--c-gray-200);
     border-radius: var(--radius);
+    color: var(--c-gray-900);
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
     list-style: none;
@@ -224,13 +265,17 @@ const hrefProgramare = cale('programare', locale);
   }
 
   .meniu-compact__buton:hover {
-    background: var(--c-wood-900);
+    background: var(--c-gray-50);
+  }
+
+  .meniu-compact__buton :global(.iconita) {
+    color: var(--c-wood-800);
   }
 
   .meniu-compact__stare {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: calc(var(--space-1) * 0.75);
   }
 
   .meniu-compact__stare--deschis,
@@ -247,9 +292,9 @@ const hrefProgramare = cale('programare', locale);
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--c-wood-800);
-    border-top: 1px solid rgb(255 255 255 / 0.25);
-    box-shadow: 0 12px 24px rgb(43 27 18 / 0.25);
+    background: var(--c-white);
+    border-top: 1px solid var(--c-gray-200);
+    box-shadow: var(--shadow);
   }
 
   .meniu-compact__lista {
@@ -263,97 +308,58 @@ const hrefProgramare = cale('programare', locale);
   }
 
   .meniu-compact__lista li + li {
-    border-top: 1px solid rgb(255 255 255 / 0.15);
+    border-top: 1px solid var(--c-gray-200);
   }
 
   .meniu-compact__lista a {
     display: flex;
     align-items: center;
     min-height: 56px;
+    color: var(--c-gray-900);
     font-size: var(--fs-lg);
     font-weight: 600;
     text-decoration: none;
   }
 
   .meniu-compact__lista a:hover {
+    color: var(--c-red-700);
     text-decoration: underline;
   }
 
   .meniu-compact__lista a[aria-current] {
     text-decoration: underline;
+    text-decoration-color: var(--c-red-700);
     text-decoration-thickness: 3px;
     text-underline-offset: 0.3em;
   }
 
-  /* --- Tabletă (768–1023 px) --- */
-  .antet__tableta {
-    display: none;
-  }
-
-  .antet__tableta-interior {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-3);
-    padding-block: var(--space-1);
-    border-top: 1px solid rgb(255 255 255 / 0.2);
-  }
-
-  @media (min-width: 48rem) {
-    .antet__tableta {
-      display: block;
-    }
-
-    .wordmark__nume {
-      font-size: var(--fs-lg);
-    }
-  }
-
-  /* --- Desktop (≥ 1024 px) --- */
+  /* --- Desktop (≥ 80rem) --- */
   .antet__desktop {
     display: none;
   }
 
-  @media (min-width: 64rem) {
-    .antet__compact,
-    .antet__tableta {
-      display: none;
-    }
-
+  @media (min-width: 80rem) {
     .antet__interior {
-      flex-wrap: nowrap;
-      gap: var(--space-4);
-      padding-block: var(--space-2);
+      min-height: var(--header-h);
+      gap: var(--space-2);
     }
 
     .wordmark__nume {
-      font-size: 1.375rem;
+      font-size: var(--fs-base);
+    }
+
+    .antet__compact {
+      display: none;
     }
 
     .antet__desktop {
-      display: grid;
-      justify-items: end;
-      gap: 0.25rem;
-      margin-left: auto;
-    }
-
-    .antet__utilitar {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
-    }
-
-    .antet__principal {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
+      gap: var(--space-1);
     }
 
     .meniu {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
       padding: 0;
       list-style: none;
     }
@@ -368,22 +374,23 @@ const hrefProgramare = cale('programare', locale);
       justify-content: center;
       min-width: 48px;
       min-height: 48px;
-      padding-inline: 0.5rem;
+      padding: calc(var(--space-2) * 1.25) var(--space-2);
+      color: var(--c-gray-900);
+      font-size: var(--fs-sm);
       font-weight: 600;
       text-decoration: none;
       white-space: nowrap;
     }
 
     .meniu a:hover {
-      text-decoration: underline;
-      text-decoration-thickness: 0.08em;
-      text-underline-offset: 0.3em;
+      color: var(--c-red-700);
     }
 
     .meniu a[aria-current] {
       text-decoration: underline;
+      text-decoration-color: var(--c-red-700);
       text-decoration-thickness: 3px;
-      text-underline-offset: 0.3em;
+      text-underline-offset: 0.4em;
     }
   }
 </style>

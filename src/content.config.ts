@@ -198,7 +198,7 @@ const pagini = defineCollection({
 const servicii = defineCollection({
   // `id` = câmpul `slug` din frontmatter (comportament implicit al glob()).
   loader: glob({ base: `${BAZA}/servicii/ro`, pattern: '*.md' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     titlu: z.string().min(1),
     slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug-ul poate conține doar litere mici fără diacritice, cifre și cratimă.'),
     ordine: z.number().int(),
@@ -209,6 +209,9 @@ const servicii = defineCollection({
     onorariu: z.string().min(1),
     acteNecesare: z.array(z.string().min(1)).min(1),
     subiectEmail: z.string().min(1),
+    /** Opțional: imaginea 16:10 de pe cardul serviciului. */
+    imagine: imagineOptionala(image),
+    imagineAlt: z.string().optional(),
     validat,
   }),
 });

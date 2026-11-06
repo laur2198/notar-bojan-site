@@ -23,6 +23,14 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Header-ul e fix: ancorele și elementele focusate nu ajung sub el. */
+  scroll-padding-top: calc(var(--header-h-sm) + var(--space-2));
+}
+
+@media (min-width: 64rem) {
+  html {
+    scroll-padding-top: calc(var(--header-h) + var(--space-2));
+  }
 }
 
 body {
@@ -86,12 +94,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Un singur font (Inter); titlurile 700 (CLAUDE.md §5). */
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-serif);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 700;
   line-height: 1.2;
   color: var(--c-wood-900);
   text-wrap: balance;
@@ -104,10 +113,12 @@ h1 {
 
 h2 {
   font-size: var(--fs-h2);
+  line-height: 1.25;
 }
 
 h3 {
   font-size: var(--fs-h3);
+  line-height: 1.25;
 }
 
 h4 {
@@ -127,7 +138,7 @@ p {
 
 strong,
 b {
-  font-weight: 650;
+  font-weight: 700;
 }
 
 small {
@@ -161,7 +172,7 @@ hr {
 :focus-visible {
   outline: 3px solid var(--c-focus);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: calc(var(--radius) / 3);
 }
 
 /*
@@ -203,14 +214,14 @@ hr {
 
 .container {
   width: 100%;
-  max-width: var(--container);
+  max-width: calc(var(--container) + 2 * var(--gutter));
   margin-inline: auto;
-  padding-inline: var(--space-2);
+  padding-inline: var(--gutter);
 }
 
-@media (min-width: 48rem) {
+@media (max-width: 29.99rem) {
   .container {
-    padding-inline: var(--space-4);
+    padding-inline: var(--gutter-sm);
   }
 }
 
@@ -221,8 +232,8 @@ hr {
 mark.todo {
   background-color: #fff1b8;
   color: var(--c-gray-900);
-  padding: 0 0.2em;
-  border-radius: 3px;
+  padding: 0 calc(var(--space-1) / 2);
+  border-radius: calc(var(--radius) / 2);
   outline: 1px dashed var(--c-gray-600);
   outline-offset: 1px;
   -webkit-box-decoration-break: clone;
@@ -245,7 +256,7 @@ mark.todo {
   gap: var(--space-1);
   min-height: 52px;
   min-width: 48px;
-  padding: 0.75rem 1.5rem;
+  padding: calc(var(--space-1) * 1.5) calc(var(--space-2) * 1.25);
   border: 2px solid var(--btn-border);
   border-radius: var(--radius);
   background-color: var(--btn-bg);
@@ -282,16 +293,20 @@ mark.todo {
   color: var(--c-white);
 }
 
-/* Secundar: contur --c-wood-800 pe fundal transparent; hover cu fundal --c-gray-50 (11.32:1). */
+/*
+ * Secundar: plin --c-gray-200, text --c-gray-900 (13.04:1), fără contur (CLAUDE.md §5).
+ * Hover: un ton mai închis, derivat din gray-200 (text 11.2:1).
+ */
 .btn--secundar {
-  --btn-bg: transparent;
-  --btn-fg: var(--c-wood-800);
-  --btn-border: var(--c-wood-800);
+  --btn-bg: var(--c-gray-200);
+  --btn-fg: var(--c-gray-900);
+  --btn-border: var(--c-gray-200);
 }
 
 .btn--secundar:hover {
-  --btn-bg: var(--c-gray-50);
-  color: var(--c-wood-800);
+  --btn-bg: color-mix(in srgb, var(--c-gray-200), var(--c-gray-900) 10%);
+  --btn-border: color-mix(in srgb, var(--c-gray-200), var(--c-gray-900) 10%);
+  color: var(--c-gray-900);
 }
 
 /* Invers, pe secțiunile wood (header, secțiunea finală): fundal alb, text --c-wood-800 (12.35:1). */
@@ -323,14 +338,14 @@ mark.todo {
    --------------------------------------------------------------------------- */
 
 :root {
-  /* buton 52 px + 2 × 8 px spațiere + 1 px bordură */
-  --inaltime-bara: calc(52px + 1rem + 1px);
+  /* țintă 56 px + 2 × 4 px spațiere + 1 px bordură */
+  --inaltime-bara: calc(56px + var(--space-1) + 1px);
 }
 
 @media (max-width: 47.99rem) {
   html {
     /* Elementele focusate prin Tab nu ajung sub bară. */
-    scroll-padding-bottom: calc(var(--inaltime-bara) + env(safe-area-inset-bottom, 0px) + 1rem);
+    scroll-padding-bottom: calc(var(--inaltime-bara) + env(safe-area-inset-bottom, 0px) + var(--space-2));
   }
 
   body {

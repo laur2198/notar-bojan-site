@@ -170,3 +170,28 @@ export function mesajStare(stare: Stare, e: EticheteStare): string {
     inceput + SEPARATOR + inlocuieste(e.deschidem, { cand: candDeschidem(stare.urmatoarea, e), ora: stare.urmatoarea.ora })
   );
 }
+
+// ---------------------------------------------------------------------------
+// Zile libere apropiate (nota din banda de informații)
+// ---------------------------------------------------------------------------
+
+/**
+ * Zilele libere de azi până la `zile` zile înainte (inclusiv), sortate după dată.
+ * Ex. pe 20 dec., cu fereastra de 14 zile: 25 și 26 decembrie, 1 și 2 ianuarie.
+ */
+export function zileLibereApropiate(
+  acum: Date,
+  zileLibere: readonly ZiLibera[],
+  zile = 14,
+  fus: string = FUS_ORAR,
+): ZiLibera[] {
+  const azi = momentLocal(acum, fus).data;
+  const limita = adaugaZile(azi, zile);
+  return zileLibere.filter((z) => z.data >= azi && z.data <= limita).sort((a, b) => a.data.localeCompare(b.data));
+}
+
+/** Zilele libere de azi încolo, sortate (lista din „Vedeți programul complet”). */
+export function zileLibereViitoare(acum: Date, zileLibere: readonly ZiLibera[], fus: string = FUS_ORAR): ZiLibera[] {
+  const azi = momentLocal(acum, fus).data;
+  return zileLibere.filter((z) => z.data >= azi).sort((a, b) => a.data.localeCompare(b.data));
+}

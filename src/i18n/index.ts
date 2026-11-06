@@ -21,6 +21,30 @@ export function t(locale: Locale, cheie: CheieUI, parametri: Record<string, stri
   );
 }
 
+/**
+ * Text cu plural corect (Intl.PluralRules): în română „1 recenzie”, „3 recenzii”,
+ * „20 de recenzii”. Cheile sunt `{baza}.one`, `{baza}.few`, `{baza}.other`.
+ */
+export function tPlural(locale: Locale, baza: 'recenzii.numar', n: number): string {
+  const categorie = new Intl.PluralRules(LOCALE_INTL[locale]).select(n);
+  const cheie = (['one', 'few'].includes(categorie) ? `${baza}.${categorie}` : `${baza}.other`) as CheieUI;
+  return t(locale, cheie, { n: formateazaNumar(locale, n) });
+}
+
+/** Număr formatat local, ex. 4,8 (RO) / 4.8 (EN); `zecimale` fixe dacă e dat. */
+export function formateazaNumar(locale: Locale, n: number, zecimale?: number): string {
+  return new Intl.NumberFormat(LOCALE_INTL[locale], {
+    ...(zecimale !== undefined && { minimumFractionDigits: zecimale, maximumFractionDigits: zecimale }),
+  }).format(n);
+}
+
+/** Data „25 decembrie” / „25 December”, dintr-un string YYYY-MM-DD. */
+export function formateazaZiLuna(locale: Locale, data: string): string {
+  return new Intl.DateTimeFormat(LOCALE_INTL[locale], { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(
+    new Date(`${data}T00:00:00Z`),
+  );
+}
+
 /** Numele zilelor, de luni (index 0) până duminică. */
 export function zileSaptamana(locale: Locale): string[] {
   return [0, 1, 2, 3, 4, 5, 6].map((i) => t(locale, `zi.${i}` as CheieUI));

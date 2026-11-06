@@ -1,26 +1,178 @@
 ---
-/** Pagină temporară (etapa 2): verifică carcasa. Etapa 3 o înlocuiește cu pagina Acasă. */
-import { getEntry } from 'astro:content';
-import StareProgram from '../components/StareProgram.astro';
+/**
+ * Pagina Acasă (RO) – propunerea de design (etapa 3), cu structura calibrată după
+ * site-ul de referință ales de clientă:
+ * hero → banda de informații → despre → servicii → cum lucrăm → recenzii → întrebări → CTA.
+ */
+import { getCollection, getEntry } from 'astro:content';
+import BandaInfo from '../components/BandaInfo.astro';
+import CardRecenzie from '../components/CardRecenzie.astro';
+import CardServiciu from '../components/CardServiciu.astro';
+import DespreNotar from '../components/DespreNotar.astro';
+import DraftBadge from '../components/DraftBadge.astro';
+import Hero from '../components/Hero.astro';
+import LinkExtern from '../components/LinkExtern.astro';
+import ListaFaq from '../components/ListaFaq.astro';
+import PasiLucru from '../components/PasiLucru.astro';
+import SectiuneCta from '../components/SectiuneCta.astro';
+import Sectiune from '../components/Sectiune.astro';
+import { cale, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { esteDraft, getBirou } from '../lib/continut';
+import { linkExtern } from '../lib/contact';
+import { esteDraft, marcheazaPlaceholder } from '../lib/continut';
+import { extrageSectiune } from '../lib/markdown';
 
-const acasa = await getEntry('acasa', 'ro/acasa');
-if (!acasa) throw new Error('Lipsește src/content/pagini/ro/acasa.yaml.');
-const birou = await getBirou();
+const locale = 'ro';
+
+const [acasa, birouIntrare, contact, faq, recenzii] = await Promise.all([
+  getEntry('acasa', 'ro/acasa'),
+  getEntry('birou', 'birou'),
+  getEntry('pagini', 'ro/contact'),
+  getEntry('faq', 'ro'),
+  getEntry('recenzii', 'recenzii'),
+]);
+if (!acasa || !birouIntrare || !faq || !recenzii) {
+  throw new Error('Lipsesc fișiere de conținut pentru pagina Acasă (acasa, birou, faq sau recenzii).');
+}
+const birou = birouIntrare.data;
+const a = acasa.data;
+
+const servicii = (await getCollection('servicii', (s) => s.data.evidentiat)).sort((x, y) => x.data.ordine - y.data.ordine);
+const hrefServiciu = (slug: string) => `${cale('servicii', locale)}${slug}/`;
+
+const recenziiAfisate = [...recenzii.data.lista].sort((x, y) => y.data.localeCompare(x.data)).slice(0, 3);
+const intrebari = faq.data.intrebari.slice(0, a.faq.numarAfisat);
+const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 ---
 
-<BaseLayout locale="ro" title={acasa.data.seo.titlu} description={acasa.data.seo.descriere} draft={esteDraft(acasa)}>
-  <div class="container temporar">
-    <h1>{acasa.data.hero.titlu}</h1>
-    <StareProgram locale="ro" program={birou.program} zileLibere={birou.zileLibere} />
-  </div>
+<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere}>
+  <Hero locale={locale} birou={birou} profesie={a.hero.titlu} imagine={a.hero.imagine} imagineAlt={a.hero.imagineAlt}>
+    <DraftBadge locale={locale} intrare={acasa} />
+  </Hero>
+
+  <BandaInfo locale={locale} birou={birou} textLocatie={extrageSectiune(contact?.body, 'Cum ajungeți')}>
+    <div class="centrat">
+      <DraftBadge locale={locale} draft={esteDraft(birouIntrare) || (contact ? esteDraft(contact) : false)} />
+    </div>
+  </BandaInfo>
+
+  <DespreNotar
+    locale={locale}
+    titlu={a.despre.titlu}
+    text={a.despre.text}
+    imagine={a.despre.imagine}
+    imagineAlt={a.despre.imagineAlt}
+  />
+
+  <Sectiune id="servicii" centrat titlu={a.servicii.titlu} introHtml={marcheazaPlaceholder(a.servicii.intro)}>
+    <div class="centrat">
+      <DraftBadge locale={locale} draft={servicii.some((s) => esteDraft(s))} />
+    </div>
+    <ul class="grila-servicii" role="list">
+      {
+        servicii.map((s) => (
+          <li>
+            <CardServiciu
+              locale={locale}
+              titlu={s.data.titlu}
+              href={hrefServiciu(s.data.slug)}
+              rezumat={s.data.rezumat}
+              imagine={s.data.imagine}
+              imagineAlt={s.data.imagineAlt}
+            />
+          </li>
+        ))
+      }
+    </ul>
+    <p class="centrat sub-grila">
+      <a class="btn btn--secundar" href={cale('servicii', locale)}>{t(locale, 'acasa.toateServiciile')}</a>
+    </p>
+  </Sectiune>
+
+  <Sectiune id="pasi" ton="gri" centrat titlu={a.pasi.titlu} introHtml={marcheazaPlaceholder(a.pasi.intro)}>
+    <PasiLucru pasi={a.pasi.lista} />
+  </Sectiune>
+
+  <Sectiune id="recenzii" centrat titlu={a.recenzii.titlu} introHtml={marcheazaPlaceholder(a.recenzii.intro)}>
+    {
+      recenziiAfisate.length > 0 ? (
+        <ul class="grila-recenzii" role="list">
+          {recenziiAfisate.map((r) => (
+            <li>
+              <CardRecenzie locale={locale} {...r} hrefToate={cale('recenzii', locale)} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="centrat">
+          <DraftBadge locale={locale} draft text={t(locale, 'recenzii.inAsteptare')} />
+        </div>
+      )
+    }
+    <p class="centrat sub-grila">
+      <LinkExtern locale={locale} link={profilGoogle} class="btn btn--secundar">
+        {t(locale, 'recenzii.vedeti')}
+      </LinkExtern>
+    </p>
+  </Sectiune>
+
+  <Sectiune id="intrebari" centrat titlu={a.faq.titlu} class="sectiune-faq">
+    <div class="centrat">
+      <DraftBadge locale={locale} intrare={faq} />
+    </div>
+    <ListaFaq intrebari={intrebari} />
+    <p class="centrat sub-grila">
+      <a class="btn btn--secundar" href={cale('faq', locale)}>{t(locale, 'acasa.toateIntrebarile')}</a>
+    </p>
+  </Sectiune>
+
+  <SectiuneCta locale={locale} birou={birou} titlu={a.final.titlu} text={a.final.text} />
 </BaseLayout>
 
 <style>
-  .temporar {
+  .centrat {
+    max-width: none;
+    text-align: center;
+  }
+
+  .grila-servicii,
+  .grila-recenzii {
     display: grid;
     gap: var(--space-3);
-    padding-block: var(--space-5) var(--space-7);
+    padding: 0;
+    list-style: none;
+    text-align: left;
+  }
+
+  .grila-servicii > li,
+  .grila-recenzii > li {
+    display: grid;
+    max-width: none;
+  }
+
+  @media (min-width: 48rem) {
+    .grila-servicii,
+    .grila-recenzii {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 75rem) {
+    .grila-servicii {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .grila-recenzii {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .sub-grila {
+    margin-top: var(--space-5);
+  }
+
+  /* Recenziile și întrebările sunt ambele pe alb: o linie fină le separă. */
+  :global(.sectiune-faq) {
+    border-top: 1px solid var(--c-gray-200);
   }
 </style>

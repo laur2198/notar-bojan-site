@@ -1,0 +1,64 @@
+---
+/**
+ * Buton-iconiță pătrat, 48×48 (CLAUDE.md §4): fundal alb, contur gray-200, iconiță wood-800.
+ * Numele accesibil vine din `eticheta` (aria-label), ex. „Sunați: 0268 123 456”.
+ * Dacă linkul nu e gata (date «DE COMPLETAT», doar în preview), butonul rămâne vizibil,
+ * fără `href` și cu `aria-disabled="true"`.
+ */
+import { t, type Locale } from '../i18n';
+import type { LinkContact } from '../lib/contact';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  locale: Locale;
+  iconita: 'telefon' | 'email';
+  link: LinkContact;
+  eticheta: string;
+}
+
+const { locale, iconita, link, eticheta } = Astro.props;
+const indisponibil = `${eticheta} (${t(locale, 'link.indisponibil')})`;
+---
+
+{
+  link.valid ? (
+    <a class="buton-iconita" href={link.href} aria-label={eticheta}>
+      <Iconita nume={iconita} />
+    </a>
+  ) : (
+    <a class="buton-iconita" role="link" aria-disabled="true" aria-label={indisponibil}>
+      <Iconita nume={iconita} />
+    </a>
+  )
+}
+
+<style>
+  .buton-iconita {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    background: var(--c-white);
+    color: var(--c-wood-800);
+    border: 1px solid var(--c-gray-200);
+    border-radius: var(--radius);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .buton-iconita:hover {
+    background: var(--c-gray-50);
+    border-color: var(--c-wood-800);
+    color: var(--c-wood-800);
+  }
+
+  .buton-iconita[aria-disabled='true'] {
+    color: var(--c-gray-600);
+    border-style: dashed;
+    border-color: var(--c-gray-600);
+    cursor: not-allowed;
+  }
+</style>

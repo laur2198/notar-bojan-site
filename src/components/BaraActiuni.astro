@@ -1,14 +1,16 @@
 ---
 /**
- * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): „Sunați” și „Programare”,
- * două butoane egale. Respectă `env(safe-area-inset-bottom)`; spațiul de sub
- * conținut e rezervat în global.css (`--inaltime-bara`).
+ * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): patru acțiuni egale, cu
+ * iconiță line (wood-800) și etichetă dedesubt: Sunați, Programare, Program
+ * (ancoră spre banda de informații de pe Acasă) și Locație (Google Maps).
+ * Respectă `env(safe-area-inset-bottom)`; spațiul de sub conținut e rezervat în
+ * global.css (`--inaltime-bara`).
  *
- * Dacă telefonul nu e încă completat (doar în preview), „Sunați” rămâne vizibil,
- * dar fără `href` și cu `aria-disabled="true"`.
+ * Linkurile încă necompletate (doar în preview) rămân vizibile, fără `href`,
+ * cu `aria-disabled="true"`.
  */
 import { cale, t, type Locale } from '../i18n';
-import { linkTelefon } from '../lib/contact';
+import { linkExtern, linkTelefon, type LinkContact } from '../lib/contact';
 import type { Birou } from '../lib/continut';
 import Iconita from './Iconita.astro';
 
@@ -18,26 +20,59 @@ interface Props {
 }
 
 const { locale, birou } = Astro.props;
-const telefon = linkTelefon(birou);
-const hrefProgramare = cale('programare', locale);
+
+interface Actiune {
+  iconita: 'telefon' | 'calendar' | 'ceas' | 'pin';
+  eticheta: string;
+  link: LinkContact;
+  extern?: boolean;
+}
+
+const intern = (href: string, text: string): LinkContact => ({ href, text, valid: true });
+
+const actiuni: Actiune[] = [
+  { iconita: 'telefon', eticheta: t(locale, 'actiune.suna'), link: linkTelefon(birou) },
+  {
+    iconita: 'calendar',
+    eticheta: t(locale, 'actiune.programareScurt'),
+    link: intern(cale('programare', locale), ''),
+  },
+  { iconita: 'ceas', eticheta: t(locale, 'bara.program'), link: intern(`${cale('acasa', locale)}#program`, '') },
+  {
+    iconita: 'pin',
+    eticheta: t(locale, 'bara.locatie'),
+    link: linkExtern(birou.googleMapsUrl, ''),
+    extern: true,
+  },
+];
 ---
 
 <nav class="bara-actiuni" aria-label={t(locale, 'actiune.bara')}>
-  {
-    telefon.valid ? (
-      <a class="btn btn--secundar" href={telefon.href}>
-        <Iconita nume="telefon" />
-        {t(locale, 'actiune.suna')}
-      </a>
-    ) : (
-      <a class="btn btn--secundar" role="link" aria-disabled="true">
-        <Iconita nume="telefon" />
-        {t(locale, 'actiune.suna')}
-        <span class="sr-only"> ({t(locale, 'actiune.indisponibil')})</span>
-      </a>
-    )
-  }
-  <a class="btn btn--primar" href={hrefProgramare}>{t(locale, 'actiune.programareScurt')}</a>
+  <ul role="list">
+    {
+      actiuni.map((a) => (
+        <li>
+          {a.link.valid ? (
+            <a
+              class="bara-actiuni__link"
+              href={a.link.href}
+              {...(a.extern && { target: '_blank', rel: 'noopener noreferrer' })}
+            >
+              <Iconita nume={a.iconita} />
+              <span class="bara-actiuni__eticheta">{a.eticheta}</span>
+              {a.extern && <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>}
+            </a>
+          ) : (
+            <a class="bara-actiuni__link" role="link" aria-disabled="true">
+              <Iconita nume={a.iconita} />
+              <span class="bara-actiuni__eticheta">{a.eticheta}</span>
+              <span class="sr-only"> ({t(locale, 'link.indisponibil')})</span>
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
 </nav>
 
 <style>
@@ -45,19 +80,61 @@ const hrefProgramare = cale('programare', locale);
     position: fixed;
     inset: auto 0 0 0;
     z-index: 30;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    padding: 0.5rem max(0.5rem, env(safe-area-inset-right, 0px)) calc(0.5rem + env(safe-area-inset-bottom, 0px))
-      max(0.5rem, env(safe-area-inset-left, 0px));
+    padding: calc(var(--space-1) / 2) max(calc(var(--space-1) / 2), env(safe-area-inset-right, 0px))
+      calc(var(--space-1) / 2 + env(safe-area-inset-bottom, 0px)) max(calc(var(--space-1) / 2), env(safe-area-inset-left, 0px));
     background: var(--c-white);
     border-top: 1px solid var(--c-gray-200);
-    box-shadow: 0 -4px 16px rgb(43 27 18 / 0.08);
   }
 
-  .bara-actiuni .btn {
-    width: 100%;
-    padding-inline: 0.5rem;
+  ul {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    max-width: none;
+  }
+
+  .bara-actiuni__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space-1) / 2);
+    min-height: 56px;
+    color: var(--c-gray-900);
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  .bara-actiuni__link:hover {
+    color: var(--c-gray-900);
+    background: var(--c-gray-50);
+  }
+
+  .bara-actiuni__link :global(.iconita) {
+    width: 24px;
+    height: 24px;
+    color: var(--c-wood-800);
+  }
+
+  .bara-actiuni__eticheta {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .bara-actiuni__link[aria-disabled='true'] {
+    color: var(--c-gray-600);
+    cursor: not-allowed;
+  }
+
+  .bara-actiuni__link[aria-disabled='true'] :global(.iconita) {
+    color: var(--c-gray-600);
+    stroke-dasharray: 3 2;
   }
 
   @media (min-width: 48rem) {

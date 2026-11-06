@@ -34,10 +34,10 @@ const afiseaza = estePreview && (draft ?? (intrare ? esteDraft(intrare) : false)
   .draft-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-1);
     max-width: 100%;
     margin-block: var(--space-2);
-    padding: 0.25rem 0.75rem;
+    padding: calc(var(--space-1) / 2) calc(var(--space-1) * 1.5);
     background: #fff1b8;
     color: var(--c-gray-900);
     border: 1px dashed var(--c-gray-600);

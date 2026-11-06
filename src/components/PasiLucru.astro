@@ -1,0 +1,89 @@
+---
+/**
+ * „Cum lucrăm”: pașii ca listă ordonată. Numerele 700, bordo, într-un cerc subțire bordo;
+ * pe desktop, o linie bordo leagă cercurile (decorativă). Fundalul îl dă secțiunea (gray-50).
+ */
+interface Props {
+  pasi: { titlu: string; text: string }[];
+}
+
+const { pasi } = Astro.props;
+---
+
+<ol class="pasi" role="list">
+  {
+    pasi.map((pas, i) => (
+      <li class="pas">
+        <span class="pas__numar" aria-hidden="true">
+          {i + 1}
+        </span>
+        <h3 class="pas__titlu">{pas.titlu}</h3>
+        <p class="pas__text">{pas.text}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .pasi {
+    --cerc: var(--space-5);
+
+    display: grid;
+    gap: var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 64rem) {
+    .pasi {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  .pas {
+    position: relative;
+    display: grid;
+    gap: var(--space-1);
+    max-width: none;
+  }
+
+  .pas__numar {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--cerc);
+    height: var(--cerc);
+    margin-bottom: var(--space-1);
+    background: var(--c-gray-50);
+    color: var(--c-red-700);
+    border: 1.5px solid var(--c-red-700);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Linia de legătură dintre cercuri, doar pe desktop (decorativă). */
+  @media (min-width: 64rem) {
+    .pas:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: calc(var(--cerc) / 2);
+      left: calc(var(--cerc) + var(--space-2));
+      right: calc(-1 * var(--space-4) + var(--space-2));
+      height: 1px;
+      background: var(--c-red-700);
+    }
+  }
+
+  .pas__titlu {
+    font-size: var(--fs-lg);
+  }
+
+  .pas__text {
+    color: var(--c-gray-600);
+  }
+</style>

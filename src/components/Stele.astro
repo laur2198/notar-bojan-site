@@ -1,0 +1,58 @@
+---
+/**
+ * Nota în stele (1–5), cu umplere parțială (ex. 4,8 → 4 stele și 80% din a cincea).
+ * Decorativ (aria-hidden): nota se afișează mereu și ca text lângă stele.
+ */
+interface Props {
+  nota: number;
+  class?: string;
+}
+
+const { nota, class: clasa } = Astro.props;
+const procent = Math.max(0, Math.min(5, nota)) * 20;
+const STEA = 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z';
+const stele = [0, 1, 2, 3, 4];
+---
+
+<span class:list={['stele', clasa]} style={`--procent: ${procent}%`} aria-hidden="true">
+  <span class="stele__strat stele__strat--gol">
+    {stele.map(() => <svg viewBox="0 0 24 24" width="20" height="20"><path d={STEA} /></svg>)}
+  </span>
+  <span class="stele__strat stele__strat--plin">
+    {stele.map(() => <svg viewBox="0 0 24 24" width="20" height="20"><path d={STEA} /></svg>)}
+  </span>
+</span>
+
+<style>
+  .stele {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .stele__strat {
+    display: inline-flex;
+    gap: calc(var(--space-1) / 4);
+  }
+
+  .stele__strat svg {
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .stele__strat--gol svg {
+    fill: var(--c-gray-200);
+  }
+
+  .stele__strat--plin {
+    position: absolute;
+    inset: 0;
+    width: var(--procent);
+    overflow: hidden;
+  }
+
+  .stele__strat--plin svg {
+    fill: var(--c-red-700);
+  }
+</style>

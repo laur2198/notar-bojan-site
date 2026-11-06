@@ -1,0 +1,111 @@
+---
+/**
+ * Secțiune de pagină cu ritm vertical comun (CLAUDE.md §5): fundal alb, gri (gray-50)
+ * sau wood (wood-800), padding sus/jos din `--section-y` (sau `--section-y-sm`).
+ * Titlul e mereu `h2` (fără eyebrow deasupra). Totul se calibrează din tokens.css.
+ */
+interface Props {
+  id?: string;
+  titlu?: string;
+  /** Id-ul titlului, pentru `aria-labelledby`. Implicit: `${id}-titlu`. */
+  titluId?: string;
+  /** Intro sub titlu, ca HTML sigur (deja trecut prin `marcheazaPlaceholder`). */
+  introHtml?: string;
+  ton?: 'alb' | 'gri' | 'wood';
+  centrat?: boolean;
+  compact?: boolean;
+  /** Fără padding sus (secțiune care continuă vizual pe cea de deasupra). */
+  continuare?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  titlu,
+  titluId = id ? `${id}-titlu` : undefined,
+  introHtml,
+  ton = 'alb',
+  centrat = false,
+  compact = false,
+  continuare = false,
+  class: clasa,
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={[
+    'sectiune',
+    `sectiune--${ton}`,
+    { 'sectiune--centrata': centrat, 'sectiune--compacta': compact, 'sectiune--continuare': continuare, 'pe-inchis': ton === 'wood' },
+    clasa,
+  ]}
+  aria-labelledby={titlu ? titluId : undefined}
+>
+  <div class="container">
+    {
+      titlu && (
+        <div class="sectiune__antet">
+          <h2 id={titluId}>{titlu}</h2>
+          {introHtml && <p class="sectiune__intro" set:html={introHtml} />}
+        </div>
+      )
+    }
+    <slot />
+  </div>
+</section>
+
+<style>
+  .sectiune {
+    padding-block: var(--section-y);
+  }
+
+  .sectiune--compacta {
+    padding-block: var(--section-y-sm);
+  }
+
+  .sectiune--continuare {
+    padding-top: 0;
+  }
+
+  .sectiune--alb {
+    background: var(--c-white);
+  }
+
+  .sectiune--gri {
+    background: var(--c-gray-50);
+  }
+
+  .sectiune--wood {
+    background: var(--c-wood-800);
+    color: var(--c-white);
+  }
+
+  .sectiune--wood :global(h2) {
+    color: var(--c-white);
+  }
+
+  .sectiune__antet {
+    margin-bottom: var(--space-5);
+  }
+
+  .sectiune__antet h2 {
+    margin-bottom: calc(var(--space-1) * 1.5);
+  }
+
+  .sectiune__intro {
+    color: var(--c-gray-600);
+  }
+
+  .sectiune--wood .sectiune__intro {
+    color: var(--c-gray-200);
+  }
+
+  .sectiune--centrata .sectiune__antet {
+    text-align: center;
+  }
+
+  .sectiune--centrata .sectiune__intro {
+    margin-inline: auto;
+  }
+</style>

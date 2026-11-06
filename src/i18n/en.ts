@@ -70,6 +70,46 @@ export const en: Record<keyof typeof ro, string> = {
   'subsol.contact': 'Contact',
   'subsol.copyright': '© {an} {denumire}',
 
+  // Home page
+  'acasa.programare': 'Request an appointment',
+  'acasa.suna': 'Call us: {telefon}',
+  'acasa.toateServiciile': 'See all services and fees',
+  'acasa.despreLink': 'About the office',
+  'acasa.toateIntrebarile': 'All questions',
+  'foto.deCompletat': 'Photo – to be added',
+
+  // Practical information band
+  'banda.eticheta': 'Practical information',
+  'banda.adresa': 'Address',
+  'program.inchisPe': 'The office is closed on {data} – {motiv}',
+  'harta.deschide': 'Open in Google Maps',
+
+  // Reviews
+  'recenzii.numar.one': '{n} Google review',
+  'recenzii.numar.few': '{n} Google reviews',
+  'recenzii.numar.other': '{n} Google reviews',
+  'recenzii.vedetiNoastre': 'See our reviews on Google',
+  'recenzii.vedeti': 'See the reviews on Google',
+  'recenzii.inAsteptare': 'Reviews will be added once the Google profiles are sorted out',
+  'recenzii.citestiTot': 'Read more',
+  'recenzii.sursa': 'Google review',
+  'recenzii.notaStele': 'Rating: {nota} out of 5 stars',
+
+  // Header, bottom bar, band, services (calibration after the reference site)
+  'antet.email': 'Email us: {email}',
+  'bara.program': 'Hours',
+  'bara.locatie': 'Location',
+  'banda.birou': 'The notary office',
+  'banda.programul': 'Our opening hours',
+  'banda.recenziiClienti': 'Client reviews',
+  'banda.cumAjungeti': 'Getting here',
+  'banda.vedetiRecenziile': 'See the reviews',
+  'hero.fotoDeCompletat': 'Photo of the building/office – to be added',
+  'servicii.vedeti': 'View service',
+
+  // Links
+  'link.indisponibil': 'link not available yet',
+
   // Misc
   'draft.eticheta': 'Proposed text – awaiting approval',
   'breadcrumbs.eticheta': 'You are here',
