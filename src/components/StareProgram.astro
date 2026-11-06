@@ -1,0 +1,100 @@
+---
+/**
+ * „Deschis acum · până la 17:00” / „Închis acum · deschidem luni la 09:00” /
+ * „Închis astăzi – Crăciunul · …” (CLAUDE.md §8). Calculat în browser, pe fusul
+ * Europe/Bucharest; fără JS nu afișează nimic (elementul rămâne `hidden`).
+ */
+import { LOCALE_INTL, t, zileSaptamana, type Locale } from '../i18n';
+import type { EticheteStare, ZiLibera, ZiProgram } from '../lib/program';
+
+interface Props {
+  locale: Locale;
+  program: readonly ZiProgram[];
+  zileLibere: readonly ZiLibera[];
+  class?: string;
+}
+
+const { locale, program, zileLibere, class: clasa } = Astro.props;
+
+const etichete: EticheteStare = {
+  deschisAcum: t(locale, 'program.deschisAcum'),
+  panaLa: t(locale, 'program.panaLa'),
+  inchisAcum: t(locale, 'program.inchisAcum'),
+  inchisAstazi: t(locale, 'program.inchisAstazi'),
+  deschidem: t(locale, 'program.deschidem'),
+  azi: t(locale, 'program.azi'),
+  maine: t(locale, 'program.maine'),
+  inZiua: t(locale, 'program.inZiua'),
+  laData: t(locale, 'program.laData'),
+  zile: zileSaptamana(locale),
+  localeData: LOCALE_INTL[locale],
+};
+
+const date = JSON.stringify({
+  program: program.map(({ zi, deschidere, inchidere, inchis }) => ({ zi, deschidere, inchidere, inchis })),
+  zileLibere: zileLibere.map(({ data, motiv }) => ({ data, motiv })),
+  etichete,
+});
+---
+
+<p class:list={['stare-program', clasa]} data-stare-program={date} hidden></p>
+
+<script>
+  import { calculeazaStare, mesajStare, type EticheteStare, type ZiLibera, type ZiProgram } from '../lib/program';
+
+  interface Date_ {
+    program: ZiProgram[];
+    zileLibere: ZiLibera[];
+    etichete: EticheteStare;
+  }
+
+  const elemente = [...document.querySelectorAll<HTMLElement>('[data-stare-program]')];
+
+  function actualizeaza() {
+    const acum = new Date();
+    for (const el of elemente) {
+      const { program, zileLibere, etichete } = JSON.parse(el.dataset.stareProgram ?? '{}') as Date_;
+      const stare = calculeazaStare(acum, program, zileLibere);
+      el.textContent = mesajStare(stare, etichete);
+      el.dataset.tip = stare.tip;
+      el.hidden = false;
+    }
+  }
+
+  if (elemente.length > 0) {
+    actualizeaza();
+    setInterval(actualizeaza, 60_000);
+  }
+</script>
+
+<style>
+  .stare-program {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .stare-program[hidden] {
+    display: none;
+  }
+
+  /* Punctul colorat dublează textul; informația e în text, nu doar în culoare. */
+  .stare-program::before {
+    content: '';
+    flex: none;
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translateY(-0.05em);
+  }
+
+  .stare-program[data-tip='deschis'] {
+    color: var(--c-ok);
+  }
+
+  .stare-program[data-tip='inchis'] {
+    color: var(--c-closed);
+  }
+</style>

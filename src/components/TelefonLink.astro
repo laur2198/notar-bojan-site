@@ -1,0 +1,54 @@
+---
+/**
+ * Telefonul biroului: link `tel:` cu iconiță dacă numărul e valid; altfel
+ * (date «DE COMPLETAT», doar în preview) textul marcat, fără link.
+ */
+import { t, type Locale } from '../i18n';
+import { type LinkContact } from '../lib/contact';
+import { marcheazaPlaceholder } from '../lib/continut';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  locale: Locale;
+  telefon: LinkContact;
+  class?: string;
+}
+
+const { locale, telefon, class: clasa } = Astro.props;
+---
+
+{
+  telefon.valid ? (
+    <a class:list={['telefon', clasa]} href={telefon.href}>
+      <Iconita nume="telefon" />
+      <span>
+        <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
+        {telefon.text}
+      </span>
+    </a>
+  ) : (
+    <span class:list={['telefon', 'telefon--indisponibil', clasa]}>
+      <Iconita nume="telefon" />
+      <span>
+        <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
+        <Fragment set:html={marcheazaPlaceholder(telefon.text)} />
+      </span>
+    </span>
+  )
+}
+
+<style>
+  .telefon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .telefon--indisponibil {
+    white-space: normal;
+  }
+</style>

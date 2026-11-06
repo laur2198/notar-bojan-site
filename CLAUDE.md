@@ -42,25 +42,28 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 ## 5. Design
 
-**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e **maro închis**, stabilită cu clienta. Nu se discută.
+**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e maro-lemn închis, cu gri, alb și accente bordo, stabilite cu clienta. Nu se discută.
 
 ### Tokens (în `src/styles/tokens.css`)
 
 ```css
 :root {
   /* Culori */
-  --c-brown-900: #2B1B12;  /* text principal, fundal footer */
-  --c-brown-800: #3D281C;  /* culoarea de brand: butoane primare, header */
-  --c-brown-600: #6B4A36;  /* text secundar pe crem (verificat AA) */
-  --c-cream-50:  #FBF8F3;  /* fundal pagină */
-  --c-cream-100: #F4EDE3;  /* fundal secțiuni alternante */
-  --c-sand-200:  #E6DACA;  /* borduri, separatoare */
-  --c-ochre-500: #B0844A;  /* decorativ pe crem (3.2:1 – NU text); pe --c-brown-900 poate fi text (4.9:1) */
-  --c-white:     #FFFFFF;
-  --c-focus:     #1F5FBF;  /* contur focus pe fundaluri deschise (5.2–5.7:1) */
-  --c-focus-on-dark: #F4EDE3; /* contur focus pe header/footer/butoane maro (≥13:1); #1F5FBF pică acolo (2.3:1) */
-  --c-ok:        #2F6B3A;  /* „Deschis acum” */
-  --c-closed:    #8A2E22;  /* „Închis” */
+  --c-wood-900: #2A1A10;  /* fundal footer, titluri */
+  --c-wood-800: #4A2E1E;  /* culoarea de brand: header, butoane primare */
+  --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
+  --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
+  --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
+  --c-gray-600: #5E5C59;  /* text secundar (6.7:1 pe alb, 6.1:1 pe gray-50) */
+  --c-gray-200: #E2E1DF;  /* borduri, separatoare (doar decorativ) */
+  --c-gray-50:  #F5F5F4;  /* fundal secțiuni alternante */
+  --c-white:    #FFFFFF;  /* fundal pagină */
+  --c-red-700:  #9B1C1C;  /* accent bordo: linii, numere de pași, iconițe, linkuri hover, „Închis” (8.2:1 pe alb, poate fi text) */
+  --c-red-800:  #7A1414;  /* hover pe elementele roșii */
+  --c-focus:    #4A2E1E;  /* contur focus pe fundal deschis, outline-offset 3px */
+  --c-focus-on-dark: #C9AE94; /* contur focus pe wood-800/900 */
+  --c-ok:       #2F6B3A;  /* „Deschis acum” */
+  --c-closed:   #9B1C1C;  /* „Închis” */
 
   /* Tipografie */
   --font-serif: 'Source Serif 4 Variable', Georgia, serif;
@@ -82,11 +85,16 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 }
 ```
 
-Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-brown-800`, `--c-brown-600` pe `--c-cream-100`) și ajustează valoarea, nu regula, dacă una pică AA.
+Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
 
 - Titluri în serif, text în sans. Fără text justify. Fără majuscule integrale pe paragrafe.
-- Butonul primar: fundal `--c-brown-800`, text alb, înălțime min. 52 px. Butonul secundar: contur `--c-brown-800`, fundal transparent.
-- Fotografii: un singur raport de aspect per secțiune, `object-fit: cover`, componenta `<Image>` din Astro (AVIF/WebP, `width`/`height` explicite). Până vin fotografiile reale, folosește blocuri placeholder cu fundal `--c-cream-100` și eticheta „Fotografie – de completat”. Fără fotografii stock.
+- Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
+- Butonul primar: fundal `--c-wood-800`, text alb, înălțime min. 52 px. Butonul secundar: contur `--c-wood-800`, fundal transparent. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
+- Fundaluri: alb pentru pagină, `--c-gray-50` pentru secțiunile alternante, `--c-wood-800`/`--c-wood-900` pentru header, footer și secțiunea CTA finală.
+- Fără texturi sau imagini de lemn; „lemnul” e doar culoarea.
+- `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-gray-900`).
+- `theme-color` devine `--c-wood-800`.
+- Fotografii: un singur raport de aspect per secțiune, `object-fit: cover`, componenta `<Image>` din Astro (AVIF/WebP, `width`/`height` explicite). Până vin fotografiile reale, folosește blocuri placeholder cu fundal `--c-gray-50` și eticheta „Fotografie – de completat”. Fără fotografii stock.
 
 ## 6. Limbi și rute
 

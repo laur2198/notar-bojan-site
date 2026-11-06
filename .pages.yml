@@ -1,0 +1,713 @@
+# Configurare Pages CMS – panoul de administrare al site-ului.
+# Documentație: https://pagescms.org/docs/configuration/
+#
+# Câmpurile de aici trebuie să corespundă schemelor din src/content.config.ts.
+# Indicațiile pentru birou stau în `description`, nu în comentariile din fișierele de
+# conținut: Pages CMS rescrie fișierul la salvare, iar comentariile YAML se pierd.
+
+# Imaginile încărcate din panou ajung în src/assets/media/, ca Astro să le optimizeze
+# (AVIF/WebP, dimensiuni explicite). În conținut se scrie calea relativă față de fișierele
+# din src/content/pagini/{ro,en}/, singurul loc care are câmpuri de imagine.
+# Un câmp de imagine într-un fișier de altă adâncime ar avea nevoie de altă cale (vezi README).
+media:
+  input: src/assets/media
+  output: ../../../assets/media
+  rename: safe
+  extensions: [jpg, jpeg, png, webp]
+
+settings:
+  content:
+    # Păstrează cheile care nu sunt descrise aici, în loc să le șteargă la salvare.
+    merge: true
+
+components:
+  validat:
+    type: boolean
+    label: Text verificat și aprobat de birou
+    description: Bifați doar după ce ați citit și aprobat textul. Site-ul nu poate fi publicat cât timp există texte neaprobate.
+    default: false
+  corp:
+    type: rich-text
+    label: Textul paginii
+    options:
+      format: markdown
+      media: false
+  imagine:
+    type: image
+    label: Fotografie
+    description: Fotografie reală (JPG, PNG sau WebP), de preferință de cel puțin 1600 px pe latura lungă. Fără fotografii de stoc.
+  imagineAlt:
+    type: string
+    label: Descrierea fotografiei
+    description: Ce se vede în fotografie, pentru persoanele care folosesc cititoare de ecran. Ex. „Notarul public în biroul din Brașov”.
+  seoDescriere:
+    type: text
+    label: Descriere pentru Google
+    description: Una–două propoziții (aprox. 150 de caractere) afișate sub titlu în rezultatele Google.
+    options:
+      maxlength: 160
+
+content:
+  # -------------------------------------------------------------------------
+  - name: birou
+    label: Setări birou
+    type: file
+    path: src/content/setari/birou.yaml
+    format: yaml
+    operations:
+      delete: false
+    fields:
+      - name: denumire
+        label: Denumirea biroului
+        type: string
+        required: true
+      - name: notar
+        label: Numele notarului public
+        type: string
+        required: true
+      - name: adresa
+        label: Adresa
+        type: object
+        fields:
+          - name: strada
+            label: Strada și numărul
+            type: string
+            required: true
+          - name: oras
+            label: Orașul
+            type: string
+            required: true
+          - name: judet
+            label: Județul
+            type: string
+            required: true
+          - name: codPostal
+            label: Codul poștal
+            type: string
+            required: true
+            pattern:
+              regex: "^(\\d{6}|.*«DE COMPLETAT.*)$"
+              message: Codul poștal are 6 cifre.
+      - name: telefon
+        label: Telefon (pentru butonul „Sunați”)
+        type: string
+        required: true
+        description: Format internațional, fără spații, ex. +40268123456.
+        pattern:
+          regex: "^(\\+40\\d{9}|.*«DE COMPLETAT.*)$"
+          message: Scrieți numărul ca +40 urmat de 9 cifre, fără spații.
+      - name: telefonAfisat
+        label: Telefon (cum apare scris pe site)
+        type: string
+        required: true
+        description: Ex. 0268 123 456.
+      - name: email
+        label: Email general
+        type: string
+        required: true
+      - name: emailActe
+        label: Email pentru trimiterea actelor
+        type: string
+        required: true
+        description: Adresa la care clienții trimit actele de pe paginile serviciilor.
+      - name: program
+        label: Programul săptămânal
+        type: object
+        description: Orele în formatul HH:MM (ex. 09:00). Pentru zilele în care biroul este închis, bifați „Închis” și lăsați orele goale.
+        list:
+          min: 7
+          max: 7
+          collapsible:
+            collapsed: true
+            summary: "{zi}"
+        fields:
+          - name: zi
+            label: Ziua
+            type: string
+            readonly: true
+          - name: deschidere
+            label: Deschidere
+            type: string
+            pattern:
+              regex: "^(([01]\\d|2[0-3]):[0-5]\\d)?$"
+              message: Folosiți formatul HH:MM, ex. 09:00.
+          - name: inchidere
+            label: Închidere
+            type: string
+            pattern:
+              regex: "^(([01]\\d|2[0-3]):[0-5]\\d)?$"
+              message: Folosiți formatul HH:MM, ex. 17:00.
+          - name: inchis
+            label: Închis
+            type: boolean
+      - name: programConfirmare
+        label: Confirmarea programului
+        type: text
+        description: Ștergeți textul după ce confirmați datele de mai sus
+      - name: zileLibere
+        label: Zile în care biroul este închis
+        type: object
+        description: Sărbători legale și alte zile în care biroul este închis. Apar pe site ca „Închis astăzi – motivul”.
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{data} – {motiv}"
+        fields:
+          - name: data
+            label: Data
+            type: date
+            required: true
+            options:
+              format: yyyy-MM-dd
+          - name: motiv
+            label: Motivul
+            type: string
+            required: true
+            description: Ex. „Crăciunul”.
+      - name: zileLibereConfirmare
+        label: Confirmarea zilelor libere
+        type: text
+        description: Ștergeți textul după ce confirmați datele de mai sus
+      - name: googleMapsUrl
+        label: Link Google Maps
+        type: string
+        required: true
+        description: Linkul profilului biroului din Google Maps (cel rămas după unificarea profilurilor duplicate). Începe cu https://.
+      - name: googleProfilUrl
+        label: Link recenzii Google
+        type: string
+        required: true
+        description: Linkul care deschide recenziile biroului pe Google. Începe cu https://.
+      - name: rating
+        label: Nota medie pe Google
+        type: number
+        description: Ex. 4.8. Lăsați gol până la rezolvarea profilurilor duplicate. Nu se completează o notă estimată.
+        options:
+          min: 1
+          max: 5
+      - name: numarRecenzii
+        label: Numărul de recenzii pe Google
+        type: number
+        description: Ex. 37. Lăsați gol dacă nota medie e goală.
+        options:
+          min: 0
+      - name: programareUrl
+        label: Link pagină de programări (Google Calendar)
+        type: string
+        required: true
+        description: Linkul paginii de programări din Google Calendar. Începe cu https://.
+      - name: coordonate
+        label: Coordonatele sediului
+        type: object
+        description: Din Google Maps, click dreapta pe pin; primul număr e latitudinea, al doilea longitudinea. Lăsați gol dacă nu sunt sigure.
+        fields:
+          - name: lat
+            label: Latitudine
+            type: number
+            description: Ex. 45.6427
+          - name: lng
+            label: Longitudine
+            type: number
+            description: Ex. 25.5887
+      - name: validat
+        component: validat
+
+  # -------------------------------------------------------------------------
+  - name: acasa-ro
+    label: Pagina Acasă
+    type: file
+    path: src/content/pagini/ro/acasa.yaml
+    format: yaml
+    operations:
+      delete: false
+    # Ancora &campuri-acasa e refolosită de pagina Acasă în engleză.
+    fields: &campuri-acasa
+      - name: seo
+        label: Google
+        type: object
+        fields:
+          - name: titlu
+            label: Titlul paginii în Google
+            type: string
+            required: true
+          - name: descriere
+            component: seoDescriere
+            required: true
+      - name: hero
+        label: Prima secțiune
+        type: object
+        fields:
+          - name: eticheta
+            label: Rândul mic de deasupra titlului
+            type: string
+            required: true
+            description: Denumirea legală, scrisă normal (fără majuscule).
+          - name: titlu
+            label: Titlul principal
+            type: string
+            required: true
+          - name: subtitlu
+            label: Subtitlu
+            type: text
+            required: true
+          - name: imagine
+            component: imagine
+          - name: imagineAlt
+            component: imagineAlt
+      - name: servicii
+        label: Secțiunea Servicii
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: intro
+            label: Text introductiv
+            type: text
+            required: true
+      - name: pasi
+        label: Secțiunea „Cum lucrăm”
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: intro
+            label: Text introductiv
+            type: text
+            required: true
+          - name: lista
+            label: Pași
+            type: object
+            list:
+              min: 1
+              collapsible:
+                collapsed: true
+                summary: "{index}. {titlu}"
+            fields:
+              - name: titlu
+                label: Titlul pasului
+                type: string
+                required: true
+              - name: text
+                label: Descriere
+                type: text
+                required: true
+      - name: recenzii
+        label: Secțiunea Recenzii
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: intro
+            label: Text introductiv
+            type: text
+            required: true
+      - name: despre
+        label: Secțiunea Despre
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: text
+            label: Text
+            type: text
+            required: true
+          - name: imagine
+            component: imagine
+          - name: imagineAlt
+            component: imagineAlt
+      - name: faq
+        label: Secțiunea Întrebări frecvente
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: numarAfisat
+            label: Câte întrebări apar pe pagina principală
+            type: number
+            required: true
+            options:
+              min: 0
+              max: 10
+      - name: final
+        label: Secțiunea finală (fundal maro)
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: text
+            label: Text
+            type: text
+            required: true
+      - name: validat
+        component: validat
+
+  # -------------------------------------------------------------------------
+  - name: servicii
+    label: Servicii
+    type: collection
+    path: src/content/servicii/ro
+    format: yaml-frontmatter
+    filename: "{fields.slug}.md"
+    operations:
+      rename: false
+    view:
+      primary: titlu
+      fields: [titlu, ordine, evidentiat, validat]
+      sort: [ordine, titlu]
+      default:
+        sort: ordine
+        order: asc
+    fields:
+      - name: titlu
+        label: Denumirea serviciului
+        type: string
+        required: true
+      - name: slug
+        label: Adresa paginii (slug)
+        type: string
+        required: true
+        description: "ATENȚIE: nu modificați după publicare. Schimbarea strică linkurile existente și pe cele din Google. Doar litere mici fără diacritice, cifre și cratimă, ex. vanzare-cumparare."
+        pattern:
+          regex: "^[a-z0-9]+(-[a-z0-9]+)*$"
+          message: Doar litere mici fără diacritice, cifre și cratimă.
+      - name: ordine
+        label: Ordinea în listă
+        type: number
+        required: true
+        description: 1 apare primul.
+      - name: evidentiat
+        label: Apare pe pagina principală
+        type: boolean
+      - name: rezumat
+        label: Rezumat
+        type: text
+        required: true
+        description: Maximum 160 de caractere. Apare pe cardul serviciului și ca descriere în Google.
+        options:
+          maxlength: 160
+      - name: pentruCine
+        label: Pentru cine este
+        type: text
+        required: true
+      - name: durata
+        label: Durata
+        type: string
+        required: true
+        description: Ex. „aprox. 1 oră”. Fără termene garantate.
+      - name: onorariu
+        label: Onorariu
+        type: text
+        required: true
+        description: Doar texte stabilite de birou, conform normelor. Fără reduceri sau promoții.
+      - name: acteNecesare
+        label: Acte necesare
+        type: string
+        list:
+          min: 1
+          collapsible: false
+      - name: subiectEmail
+        label: Subiectul emailului cu acte
+        type: string
+        required: true
+        description: "ATENȚIE: nu modificați fără să anunțați biroul. Biroul poate filtra emailurile primite după acest subiect."
+      - name: validat
+        component: validat
+      - name: body
+        component: corp
+        description: Păstrați cele trei secțiuni, „Ce este”, „Cum decurge” (listă numerotată) și „Bine de știut”, ca titluri de nivel 2.
+
+  # -------------------------------------------------------------------------
+  - name: preturi
+    label: Prețuri
+    type: file
+    path: src/content/preturi/ro.yaml
+    format: yaml
+    operations:
+      delete: false
+    fields:
+      - name: intro
+        label: Text introductiv
+        type: text
+        required: true
+      - name: nota
+        label: Notă sub tabel
+        type: text
+        required: true
+      - name: lista
+        label: Onorarii orientative
+        type: object
+        description: Doar valori stabilite de birou, conform normelor privind onorariile. Fără reduceri, promoții sau comparații.
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{serviciu}"
+        fields:
+          - name: serviciu
+            label: Serviciul (slug)
+            type: string
+            required: true
+            description: Exact ca adresa paginii serviciului, ex. vanzare-cumparare.
+          - name: text
+            label: Onorariu orientativ
+            type: string
+            required: true
+      - name: validat
+        component: validat
+
+  # -------------------------------------------------------------------------
+  - name: faq-ro
+    label: Întrebări frecvente
+    type: file
+    path: src/content/faq/ro.yaml
+    format: yaml
+    operations:
+      delete: false
+    # Ancora &campuri-faq e refolosită de întrebările în engleză.
+    fields: &campuri-faq
+      - name: intrebari
+        label: Întrebări
+        type: object
+        list:
+          min: 1
+          collapsible:
+            collapsed: true
+            summary: "{intrebare}"
+        fields:
+          - name: intrebare
+            label: Întrebarea
+            type: string
+            required: true
+          - name: raspuns
+            label: Răspunsul
+            type: text
+            required: true
+      - name: validat
+        component: validat
+
+  # -------------------------------------------------------------------------
+  - name: recenzii
+    label: Recenzii Google
+    description: Copiați aici doar recenzii reale de pe Google
+    type: file
+    path: src/content/recenzii/recenzii.yaml
+    format: yaml
+    operations:
+      delete: false
+    fields:
+      - name: lista
+        label: Recenzii
+        type: object
+        description: Copiați aici doar recenzii reale de pe Google
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{autor} – {data}"
+        fields:
+          - name: autor
+            label: Autor
+            type: string
+            required: true
+            description: Ca pe Google, ex. „Maria P.”.
+          - name: data
+            label: Data recenziei
+            type: date
+            required: true
+            options:
+              format: yyyy-MM-dd
+          - name: nota
+            label: Nota (1–5 stele)
+            type: number
+            required: true
+            options:
+              min: 1
+              max: 5
+          - name: text
+            label: Textul recenziei
+            type: text
+            required: true
+            description: Copiat exact, fără modificări.
+          - name: sursa
+            label: Sursa
+            type: select
+            required: true
+            default: Google
+            options:
+              values: [Google]
+      - name: validat
+        component: validat
+
+  # -------------------------------------------------------------------------
+  - name: pagini
+    label: Pagini
+    type: group
+    items:
+      - name: despre
+        label: Despre birou
+        type: file
+        path: src/content/pagini/ro/despre.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        fields:
+          - name: titlu
+            label: Titlul paginii
+            type: string
+            required: true
+          - name: seoDescriere
+            component: seoDescriere
+            required: true
+          - name: imagine
+            component: imagine
+          - name: imagineAlt
+            component: imagineAlt
+          - name: validat
+            component: validat
+          - name: body
+            component: corp
+      - name: programare-ro
+        label: Programare
+        type: file
+        path: src/content/pagini/ro/programare.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        # Ancora &campuri-pagina e refolosită de Contact și de paginile în engleză.
+        fields: &campuri-pagina
+          - name: titlu
+            label: Titlul paginii
+            type: string
+            required: true
+          - name: seoDescriere
+            component: seoDescriere
+            required: true
+          - name: validat
+            component: validat
+          - name: body
+            component: corp
+      - name: contact-ro
+        label: Contact
+        type: file
+        path: src/content/pagini/ro/contact.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        fields: *campuri-pagina
+      - name: confidentialitate
+        label: Politica de confidențialitate
+        type: file
+        path: src/content/pagini/ro/confidentialitate.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        fields:
+          - name: titlu
+            label: Titlul paginii
+            type: string
+            required: true
+          - name: seoDescriere
+            component: seoDescriere
+            required: true
+          - name: actualizat
+            label: Data ultimei actualizări
+            type: string
+            description: În formatul AAAA-LL-ZZ, ex. 2026-11-20.
+            pattern:
+              regex: "^(\\d{4}-\\d{2}-\\d{2}|.*«DE COMPLETAT.*)?$"
+              message: Folosiți formatul AAAA-LL-ZZ, ex. 2026-11-20.
+          - name: validat
+            component: validat
+          - name: body
+            component: corp
+
+  # -------------------------------------------------------------------------
+  - name: engleza
+    label: Engleză
+    type: group
+    items:
+      - name: acasa-en
+        label: Home page (EN)
+        type: file
+        path: src/content/pagini/en/acasa.yaml
+        format: yaml
+        operations:
+          delete: false
+        fields: *campuri-acasa
+      - name: servicii-en
+        label: Services (EN)
+        type: file
+        path: src/content/servicii-en/servicii.yaml
+        format: yaml
+        operations:
+          delete: false
+        fields:
+          - name: intro
+            label: Text introductiv
+            type: text
+            required: true
+          - name: lista
+            label: Servicii
+            type: object
+            list:
+              min: 1
+              collapsible:
+                collapsed: true
+                summary: "{titlu}"
+            fields:
+              - name: titlu
+                label: Titlu (EN)
+                type: string
+                required: true
+              - name: text
+                label: Descriere (EN)
+                type: text
+                required: true
+              - name: slugRo
+                label: Pagina în română (slug)
+                type: string
+                required: true
+                description: Adresa paginii serviciului în română, ex. vanzare-cumparare.
+                pattern:
+                  regex: "^[a-z0-9]+(-[a-z0-9]+)*$"
+                  message: Doar litere mici fără diacritice, cifre și cratimă.
+          - name: fees
+            label: Text despre onorarii (EN)
+            type: text
+            required: true
+          - name: validat
+            component: validat
+      - name: programare-en
+        label: Appointments (EN)
+        type: file
+        path: src/content/pagini/en/programare.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        fields: *campuri-pagina
+      - name: faq-en
+        label: FAQ (EN)
+        type: file
+        path: src/content/faq/en.yaml
+        format: yaml
+        operations:
+          delete: false
+        fields: *campuri-faq
+      - name: contact-en
+        label: Contact (EN)
+        type: file
+        path: src/content/pagini/en/contact.md
+        format: yaml-frontmatter
+        operations:
+          delete: false
+        fields: *campuri-pagina

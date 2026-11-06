@@ -14,7 +14,7 @@ Schelet-ul, schemele de conținut și tokens-urile există deja. Acum construie�
 
 1. **Texte de interfață** în `src/i18n/ro.ts` și `src/i18n/en.ts`, cu helperul `t(locale, key)` și `routeMap` RO↔EN (secțiunea 6). Include etichetele de meniu, butoanele („Programare” / „Book an appointment”, „Sunați” / „Call us”), „Sari la conținut”, zilele săptămânii, „Deschis acum”, „Închis acum”, „Închis astăzi – {motiv}”.
 2. **`src/layouts/BaseLayout.astro`** (props: `locale`, `title`, `description`, `draft?`, `breadcrumbs?`):
-   - `<html lang>`, meta viewport, `theme-color` (`--c-brown-800`), favicon placeholder (SVG simplu cu inițiala „B” pe maro);
+   - `<html lang>`, meta viewport, `theme-color` (`--c-wood-800`), favicon placeholder (SVG simplu cu inițiala „B” pe maro);
    - componenta `Seo.astro`: title, description, canonical, Open Graph, `hreflang` pentru perechile din `routeMap`, plus `noindex` în modul preview;
    - SkipLink → Header → `<main id="continut">` → Footer → BaraActiuni.
 3. **`Header.astro`:**
@@ -23,7 +23,7 @@ Schelet-ul, schemele de conținut și tokens-urile există deja. Acum construie�
    - sub 1024 px: wordmark, comutator și butonul „Meniu”. Meniul mobil folosește `<details>/<summary>` sau `<dialog>`, ca să funcționeze **fără JS**. Linkurile din el au cel puțin 48 px înălțime, iar meniul se închide la Escape (enhancement cu JS);
    - pagina curentă e marcată cu `aria-current="page"`.
 4. **`BaraActiuni.astro`**, doar sub 768 px: bară fixă jos, cu două butoane egale, „Sunați” (`tel:`) și „Programare” (`/programare/` sau `/en/appointments/`). Respectă `env(safe-area-inset-bottom)`. `body` primește `padding-bottom` cât înălțimea barei, ca să nu acopere footer-ul.
-5. **`Footer.astro`**, pe fundal `--c-brown-900`:
+5. **`Footer.astro`**, pe fundal `--c-wood-900`:
    - denumirea completă a biroului, adresa, telefonul, emailul;
    - programul săptămânal (`ProgramSaptamana.astro`);
    - linkuri: Servicii, Recenzii, Întrebări frecvente, Contact, Politica de confidențialitate;

@@ -8,7 +8,7 @@ Citește `CLAUDE.md` (secțiunile 3, 5 și 8), `src/content/pagini/ro/acasa.yaml
 
 ## Context
 
-Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de restul site-ului (etapa 3 din contract), deci trebuie să arate finisat. Clienta a ales ca model structura site-ului notariatului Jesús Benavides din Barcelona: imediat sub prima secțiune apar informațiile practice (program, rating Google, adresă). Paleta e maro închis pe crem, conform secțiunii 5 din `CLAUDE.md`. Tonul e sobru, cald și de încredere: nu e un site de agenție, nu e „startup”.
+Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de restul site-ului (etapa 3 din contract), deci trebuie să arate finisat. Clienta a ales ca model structura site-ului notariatului Jesús Benavides din Barcelona: imediat sub prima secțiune apar informațiile practice (program, rating Google, adresă). Paleta e maro închis pe alb, conform secțiunii 5 din `CLAUDE.md`. Tonul e sobru, cald și de încredere: nu e un site de agenție, nu e „startup”.
 
 ## Ce construiești: secțiunile, în ordine
 
@@ -23,7 +23,7 @@ Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de res
 
    Pe mobil, cele trei coloane devin trei carduri stivuite.
 3. **Servicii:** `h2`, intro și un grid cu serviciile `evidentiat: true`, ordonate după `ordine`. Grid-ul are 3 coloane pe desktop, 2 pe tabletă și 1 pe mobil. Fiecare card conține titlul (serif), `rezumat` și o săgeată decorativă. Titlul cardului e chiar linkul; fără „Aflați mai multe” repetat pe fiecare card. **Tot cardul e clicabil**, cu un singur link real (tehnica pseudo-element pe `a`), fără linkuri imbricate. Sub grid: „Vedeți toate serviciile și onorariile”.
-4. **Cum lucrăm:** cei 3 pași din `pasi.lista`, ca listă ordonată, cu numere mari în serif și o linie de legătură decorativă `--c-ochre-500` pe desktop. Fundal `--c-cream-100`.
+4. **Cum lucrăm:** cei 3 pași din `pasi.lista`, ca listă ordonată, cu numere mari în serif și o linie de legătură decorativă `--c-red-700` pe desktop. Fundal `--c-gray-50`.
 5. **Recenzii:**
    - dacă `recenzii.lista` are elemente: maximum 3 carduri cu nota, textul (trunchiat elegant la ~5 rânduri, cu „Citiți tot” spre `/recenzii/`), autorul, data și sursa „Google”;
    - dacă lista e goală: secțiunea afișează doar titlul, intro-ul și butonul „Vedeți recenziile pe Google”, iar în preview și un `DraftBadge` cu textul „Recenziile se adaugă după rezolvarea profilurilor Google”.
@@ -31,14 +31,14 @@ Pagina asta e **propunerea de design** pe care clienta o aprobă înainte de res
    Nu genera recenzii.
 6. **Despre:** fotografia (placeholder), `despre.titlu`, `despre.text` (trecut prin `marcheazaPlaceholder`) și linkul „Despre birou”.
 7. **Întrebări frecvente:** primele `faq.numarAfisat` întrebări din `faq/ro.yaml`, cu `<details>/<summary>`, plus linkul „Toate întrebările”.
-8. **Secțiunea finală:** fundal `--c-brown-800`, text alb, `final.titlu`, `final.text`, butonul „Solicitați o programare” (stil inversat: fundal crem, text maro) și telefonul mare, clicabil.
+8. **Secțiunea finală:** fundal `--c-wood-800`, text alb, `final.titlu`, `final.text`, butonul „Solicitați o programare” (stil inversat: fundal alb, text maro) și telefonul mare, clicabil.
 
 ## Cerințe
 
 - Toate textele vin din conținut sau din `src/i18n/`. Nimic hardcodat.
 - Componente reutilizabile: `CardServiciu`, `BandaInfo`, `PasiLucru`, `CardRecenzie`, `ListaFaq`, `SectiuneCta`. Le vor folosi și paginile următoare.
-- Ritm vertical consecvent: secțiunile alternează fundalul crem cu crem închis, cu `--space-6`/`--space-7` între ele.
-- Detaliile care dau calitate: linii subțiri `--c-sand-200`, numerele pașilor în serif, umbre discrete. Fără gradienți stridenți, fără iconițe de tip clipart. **Fără eyebrow** (text mic deasupra unui `h2`, care doar anunță titlul) și fără etichete cu MAJUSCULE spațiate: sunt cele mai recognoscibile semne de design generat de AI. Fiecare secțiune începe direct cu `h2`.
+- Ritm vertical consecvent: secțiunile alternează fundalul alb cu gri deschis, cu `--space-6`/`--space-7` între ele.
+- Detaliile care dau calitate: linii subțiri `--c-gray-200`, numerele pașilor în serif, umbre discrete. Fără gradienți stridenți, fără iconițe de tip clipart. **Fără eyebrow** (text mic deasupra unui `h2`, care doar anunță titlul) și fără etichete cu MAJUSCULE spațiate: sunt cele mai recognoscibile semne de design generat de AI. Fiecare secțiune începe direct cu `h2`.
 - Lighthouse pe mobil, în preview: Performance ≥ 95, Accessibility 100, Best Practices ≥ 95.
 - Imaginile, când vor exista, trec prin `<Image>` din Astro. Hero-ul are `loading="eager"` și `fetchpriority="high"`.
 

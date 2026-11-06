@@ -1,0 +1,106 @@
+---
+/**
+ * Programul săptămânal ca tabel semantic (CLAUDE.md §8). Fără JS e complet;
+ * cu JS, ziua curentă (pe fusul Europe/Bucharest) e evidențiată.
+ * `programConfirmare` / `zileLibereConfirmare` nu se afișează niciodată.
+ */
+import { majusculaInitiala, t, zileSaptamana, type Locale } from '../i18n';
+import type { ZiProgram } from '../lib/program';
+
+interface Props {
+  locale: Locale;
+  program: readonly ZiProgram[];
+  /** Fundalul pe care stă tabelul; „inchis” pentru footer. */
+  ton?: 'deschis' | 'inchis';
+  /** Titlul tabelului vizibil (implicit doar pentru cititoare de ecran). */
+  captionVizibil?: boolean;
+}
+
+const { locale, program, ton = 'deschis', captionVizibil = false } = Astro.props;
+const zile = zileSaptamana(locale);
+
+const ore = (zi: ZiProgram) =>
+  zi.inchis || !zi.deschidere || !zi.inchidere
+    ? t(locale, 'program.inchis')
+    : t(locale, 'program.interval', { deschidere: zi.deschidere, inchidere: zi.inchidere });
+---
+
+<table class:list={['program', `program--${ton}`]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
+  <caption class:list={{ 'sr-only': !captionVizibil }}>{t(locale, 'program.caption')}</caption>
+  <thead class="sr-only">
+    <tr>
+      <th scope="col">{t(locale, 'program.coloanaZi')}</th>
+      <th scope="col">{t(locale, 'program.coloanaOre')}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      program.map((zi, i) => (
+        <tr data-zi={i}>
+          <th scope="row">{majusculaInitiala(zile[i] ?? zi.zi, locale)}</th>
+          <td>{ore(zi)}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<script>
+  import { momentLocal } from '../lib/program';
+
+  const { ziIndex } = momentLocal(new Date());
+  for (const tabel of document.querySelectorAll<HTMLTableElement>('[data-program-saptamana]')) {
+    const rand = tabel.querySelector<HTMLTableRowElement>(`tr[data-zi="${ziIndex}"]`);
+    const celulaZi = rand?.querySelector('th');
+    if (!rand || !celulaZi) continue;
+    rand.setAttribute('aria-current', 'date');
+    const eticheta = document.createElement('span');
+    eticheta.className = 'program__azi';
+    eticheta.textContent = ` · ${tabel.dataset.etichetaAzi ?? ''}`;
+    celulaZi.append(eticheta);
+  }
+</script>
+
+<style>
+  .program {
+    width: 100%;
+    max-width: 22rem;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  caption {
+    text-align: left;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+  }
+
+  th,
+  td {
+    padding: 0.35rem 0;
+    text-align: left;
+    font-weight: 400;
+    border-bottom: 1px solid var(--c-gray-200);
+  }
+
+  td {
+    text-align: right;
+    white-space: nowrap;
+    padding-left: var(--space-2);
+  }
+
+  .program--inchis th,
+  .program--inchis td {
+    border-bottom-color: rgb(255 255 255 / 0.2);
+  }
+
+  tr[aria-current='date'] th,
+  tr[aria-current='date'] td {
+    font-weight: 700;
+  }
+
+  tr[aria-current='date'] th {
+    box-shadow: inset 4px 0 0 currentColor;
+    padding-left: 0.75rem;
+  }
+</style>

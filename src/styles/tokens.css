@@ -1,0 +1,37 @@
+/* Design tokens – copiate exact din CLAUDE.md §5. Nu se modifică aici fără a modifica CLAUDE.md. */
+:root {
+  /* Culori */
+  --c-wood-900: #2A1A10;  /* fundal footer, titluri */
+  --c-wood-800: #4A2E1E;  /* culoarea de brand: header, butoane primare */
+  --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
+  --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
+  --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
+  --c-gray-600: #5E5C59;  /* text secundar (6.7:1 pe alb, 6.1:1 pe gray-50) */
+  --c-gray-200: #E2E1DF;  /* borduri, separatoare (doar decorativ) */
+  --c-gray-50:  #F5F5F4;  /* fundal secțiuni alternante */
+  --c-white:    #FFFFFF;  /* fundal pagină */
+  --c-red-700:  #9B1C1C;  /* accent bordo: linii, numere de pași, iconițe, linkuri hover, „Închis” (8.2:1 pe alb, poate fi text) */
+  --c-red-800:  #7A1414;  /* hover pe elementele roșii */
+  --c-focus:    #4A2E1E;  /* contur focus pe fundal deschis, outline-offset 3px */
+  --c-focus-on-dark: #C9AE94; /* contur focus pe wood-800/900 */
+  --c-ok:       #2F6B3A;  /* „Deschis acum” */
+  --c-closed:   #9B1C1C;  /* „Închis” */
+
+  /* Tipografie */
+  --font-serif: 'Source Serif 4 Variable', Georgia, serif;
+  --font-sans:  'Source Sans 3 Variable', system-ui, sans-serif;
+  --fs-base: 1.125rem;   /* 18px */
+  --fs-sm:   1rem;       /* 16px – minim absolut, doar pentru note */
+  --fs-lg:   1.25rem;
+  --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  --fs-h2:   clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  --fs-h1:   clamp(2.125rem, 1.6rem + 2vw, 3.25rem);
+
+  /* Spațiere, raze, umbre */
+  --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
+  --space-5: 3rem;  --space-6: 4.5rem; --space-7: 6rem;
+  --radius: 6px; --radius-lg: 12px;
+  --shadow: 0 1px 2px rgb(43 27 18 / .06), 0 4px 16px rgb(43 27 18 / .06);
+  --container: 72rem;
+  --measure: 68ch;
+}

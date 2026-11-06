@@ -1,0 +1,26 @@
+---
+/** Pagină temporară (etapa 2): verifică carcasa. Etapa 3 o înlocuiește cu pagina Acasă. */
+import { getEntry } from 'astro:content';
+import StareProgram from '../components/StareProgram.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { esteDraft, getBirou } from '../lib/continut';
+
+const acasa = await getEntry('acasa', 'ro/acasa');
+if (!acasa) throw new Error('Lipsește src/content/pagini/ro/acasa.yaml.');
+const birou = await getBirou();
+---
+
+<BaseLayout locale="ro" title={acasa.data.seo.titlu} description={acasa.data.seo.descriere} draft={esteDraft(acasa)}>
+  <div class="container temporar">
+    <h1>{acasa.data.hero.titlu}</h1>
+    <StareProgram locale="ro" program={birou.program} zileLibere={birou.zileLibere} />
+  </div>
+</BaseLayout>
+
+<style>
+  .temporar {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-5) var(--space-7);
+  }
+</style>

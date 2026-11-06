@@ -1,0 +1,31 @@
+{
+  "name": "notar-bojan-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/verifica-continut.mjs && astro build",
+    "build:prod": "cross-env SITE_MODE=production node scripts/verifica-continut.mjs && cross-env SITE_MODE=production astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "verifica": "node scripts/verifica-continut.mjs",
+    "astro": "astro",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/source-sans-3": "^5.3.1",
+    "@fontsource-variable/source-serif-4": "^5.3.1",
+    "astro": "^7.4.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "cross-env": "^10.1.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

@@ -24,7 +24,7 @@ Restul paginilor în română. Reutilizează componentele din etapele 3 și 4: n
 5. **`/contact/`:**
    - pe desktop, un grid cu: carduri pentru adresă (cu „Deschideți în Google Maps”), telefon, email general și email pentru acte, plus programul complet și `StareProgram`;
    - textul Markdown (Cum ajungeți, Parcare);
-   - o zonă de hartă: imagine statică placeholder (bloc crem cu iconiță de pin și adresa), cu linkul spre Google Maps. Fără iframe;
+   - o zonă de hartă: imagine statică placeholder (bloc gri deschis cu iconiță de pin și adresa), cu linkul spre Google Maps. Fără iframe;
    - JSON-LD-ul nu se face aici, ci în etapa 8.
 6. **`/confidentialitate/`:** tipografie de document, cuprins generat din `h2` și data actualizării. Blockquote-ul inițial apare doar în preview: la build de producție nu se afișează (sau scrie în raport cum ai rezolvat).
 7. **`404`:** mesaj în română și engleză, cu linkuri spre Acasă, Servicii și Contact și telefonul.

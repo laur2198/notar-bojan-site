@@ -1,0 +1,66 @@
+---
+/** Firimituri de navigare: listă ordonată, ultimul element = pagina curentă. */
+import { t, type Locale } from '../i18n';
+
+export interface Firimitura {
+  eticheta: string;
+  /** Lipsește la ultimul element (pagina curentă). */
+  href?: string;
+}
+
+interface Props {
+  locale: Locale;
+  elemente: Firimitura[];
+}
+
+const { locale, elemente } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label={t(locale, 'breadcrumbs.eticheta')}>
+  <ol>
+    {
+      elemente.map((el, i) => {
+        const ultimul = i === elemente.length - 1;
+        return <li>{ultimul || !el.href ? <span aria-current={ultimul ? 'page' : undefined}>{el.eticheta}</span> : <a href={el.href}>{el.eticheta}</a>}</li>;
+      })
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    padding-block: var(--space-2);
+    font-size: var(--fs-sm);
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: none;
+  }
+
+  li + li::before {
+    content: '›' / '';
+    color: var(--c-gray-600);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+  }
+
+  [aria-current='page'] {
+    color: var(--c-gray-600);
+  }
+</style>

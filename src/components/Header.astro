@@ -1,0 +1,389 @@
+---
+/**
+ * Antetul site-ului (CLAUDE.md §4, §6).
+ *
+ * - ≥ 1024 px: wordmark | (telefon, comutator) / (meniu, buton „Programare”).
+ * - 768–1023 px: wordmark, comutator, „Meniu” + un rând cu telefonul și „Programare”
+ *   (bara de jos apare doar sub 768 px, iar telefonul trebuie să fie vizibil pe orice ecran).
+ * - < 768 px: wordmark, comutator, „Meniu”; telefonul și „Programare” stau în bara de jos.
+ *
+ * Meniul compact e un `<details>`: se deschide și fără JS. JS adaugă doar închiderea
+ * la Escape (cu focus înapoi pe buton) și la click în afara meniului.
+ */
+import { ariaCurent, cale, t, type CheieRuta, type Locale } from '../i18n';
+import { linkTelefon } from '../lib/contact';
+import type { Birou } from '../lib/continut';
+import ComutatorLimba from './ComutatorLimba.astro';
+import Iconita from './Iconita.astro';
+import TelefonLink from './TelefonLink.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+}
+
+const { locale, birou } = Astro.props;
+const pathname = Astro.url.pathname;
+const telefon = linkTelefon(birou);
+
+const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: Parameters<typeof t>[1] }[]> = {
+  ro: [
+    { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'programare', eticheta: 'nav.programare' },
+    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'despre', eticheta: 'nav.despre' },
+    { cheie: 'contact', eticheta: 'nav.contact' },
+  ],
+  en: [
+    { cheie: 'servicii', eticheta: 'nav.servicii' },
+    { cheie: 'programare', eticheta: 'nav.programare' },
+    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'contact', eticheta: 'nav.contact' },
+  ],
+};
+
+const linkuri = MENIU[locale].map(({ cheie, eticheta }) => {
+  const href = cale(cheie, locale);
+  return { href, text: t(locale, eticheta), curent: ariaCurent(href, pathname) };
+});
+
+const hrefProgramare = cale('programare', locale);
+---
+
+<header class="antet pe-inchis">
+  <div class="container antet__interior">
+    <a class="wordmark" href={cale('acasa', locale)}>
+      <span class="wordmark__nume">{birou.notar}</span>
+      <span class="wordmark__profesie">{t(locale, 'wordmark.profesie')} · {birou.adresa.oras}</span>
+    </a>
+
+    <!-- Desktop (≥ 1024 px) -->
+    <div class="antet__desktop">
+      <div class="antet__utilitar">
+        <TelefonLink locale={locale} telefon={telefon} class="antet__telefon" />
+        <ComutatorLimba locale={locale} />
+      </div>
+      <div class="antet__principal">
+        <nav aria-label={t(locale, 'nav.principal')}>
+          <ul class="meniu" role="list">
+            {
+              linkuri.map((l) => (
+                <li>
+                  <a href={l.href} aria-current={l.curent}>
+                    {l.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <a class="btn btn--invers" href={hrefProgramare} aria-current={ariaCurent(hrefProgramare, pathname) === 'page' ? 'page' : undefined}>
+          {t(locale, 'actiune.programare')}
+        </a>
+      </div>
+    </div>
+
+    <!-- Compact (< 1024 px) -->
+    <div class="antet__compact">
+      <ComutatorLimba locale={locale} compact />
+      <details class="meniu-compact" data-meniu-compact>
+        <summary class="meniu-compact__buton">
+          <span class="meniu-compact__stare meniu-compact__stare--inchis">
+            <Iconita nume="meniu" />
+            {t(locale, 'meniu.deschide')}
+          </span>
+          <span class="meniu-compact__stare meniu-compact__stare--deschis">
+            <Iconita nume="inchide" />
+            {t(locale, 'meniu.inchide')}
+          </span>
+        </summary>
+        <div class="meniu-compact__panou">
+          <nav class="container" aria-label={t(locale, 'nav.principal')}>
+            <ul class="meniu-compact__lista" role="list">
+              {
+                linkuri.map((l) => (
+                  <li>
+                    <a href={l.href} aria-current={l.curent}>
+                      {l.text}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Tabletă (768–1023 px): telefonul și programarea rămân vizibile -->
+  <div class="antet__tableta">
+    <div class="container antet__tableta-interior">
+      <TelefonLink locale={locale} telefon={telefon} class="antet__telefon" />
+      <a class="btn btn--invers" href={hrefProgramare}>{t(locale, 'actiune.programare')}</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  for (const meniu of document.querySelectorAll<HTMLDetailsElement>('[data-meniu-compact]')) {
+    const buton = meniu.querySelector('summary');
+
+    meniu.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && meniu.open) {
+        meniu.open = false;
+        buton?.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (meniu.open && e.target instanceof Node && !meniu.contains(e.target)) meniu.open = false;
+    });
+
+    // Trecerea la desktop închide meniul compact (ar rămâne deschis, ascuns).
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', (e) => {
+      if (e.matches) meniu.open = false;
+    });
+  }
+</script>
+
+<style>
+  .antet {
+    position: relative;
+    z-index: 20;
+    background: var(--c-wood-800);
+    color: var(--c-white);
+  }
+
+  .antet__interior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  /* Wordmark: nume în serif, profesia în fontul de text, fără majuscule. */
+  .wordmark {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 48px;
+    text-decoration: none;
+    line-height: 1.2;
+  }
+
+  .wordmark__nume {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: var(--fs-base);
+  }
+
+  /* Telefoane înguste (360–399 px): wordmark, comutator și „Meniu” încap pe un rând. */
+  @media (max-width: 24.99rem) {
+    .wordmark__nume {
+      font-size: 1rem;
+    }
+  }
+
+  .wordmark__profesie {
+    font-size: var(--fs-sm);
+    color: var(--c-gray-200);
+  }
+
+  .wordmark:hover .wordmark__nume {
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+  }
+
+  /* --- Compact (< 1024 px) --- */
+  .antet__compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: auto;
+  }
+
+  .meniu-compact__buton {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 0.5rem;
+    border: 2px solid var(--c-gray-200);
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .meniu-compact__buton::-webkit-details-marker {
+    display: none;
+  }
+
+  .meniu-compact__buton:hover {
+    background: var(--c-wood-900);
+  }
+
+  .meniu-compact__stare {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .meniu-compact__stare--deschis,
+  .meniu-compact[open] .meniu-compact__stare--inchis {
+    display: none;
+  }
+
+  .meniu-compact[open] .meniu-compact__stare--deschis {
+    display: inline-flex;
+  }
+
+  .meniu-compact__panou {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--c-wood-800);
+    border-top: 1px solid rgb(255 255 255 / 0.25);
+    box-shadow: 0 12px 24px rgb(43 27 18 / 0.25);
+  }
+
+  .meniu-compact__lista {
+    display: grid;
+    padding: var(--space-1) 0 var(--space-2);
+    list-style: none;
+  }
+
+  .meniu-compact__lista li {
+    max-width: none;
+  }
+
+  .meniu-compact__lista li + li {
+    border-top: 1px solid rgb(255 255 255 / 0.15);
+  }
+
+  .meniu-compact__lista a {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .meniu-compact__lista a:hover {
+    text-decoration: underline;
+  }
+
+  .meniu-compact__lista a[aria-current] {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.3em;
+  }
+
+  /* --- Tabletă (768–1023 px) --- */
+  .antet__tableta {
+    display: none;
+  }
+
+  .antet__tableta-interior {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-1);
+    border-top: 1px solid rgb(255 255 255 / 0.2);
+  }
+
+  @media (min-width: 48rem) {
+    .antet__tableta {
+      display: block;
+    }
+
+    .wordmark__nume {
+      font-size: var(--fs-lg);
+    }
+  }
+
+  /* --- Desktop (≥ 1024 px) --- */
+  .antet__desktop {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .antet__compact,
+    .antet__tableta {
+      display: none;
+    }
+
+    .antet__interior {
+      flex-wrap: nowrap;
+      gap: var(--space-4);
+      padding-block: var(--space-2);
+    }
+
+    .wordmark__nume {
+      font-size: 1.375rem;
+    }
+
+    .antet__desktop {
+      display: grid;
+      justify-items: end;
+      gap: 0.25rem;
+      margin-left: auto;
+    }
+
+    .antet__utilitar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .antet__principal {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .meniu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      padding: 0;
+      list-style: none;
+    }
+
+    .meniu li {
+      max-width: none;
+    }
+
+    .meniu a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      min-height: 48px;
+      padding-inline: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .meniu a:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.3em;
+    }
+
+    .meniu a[aria-current] {
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 0.3em;
+    }
+  }
+</style>

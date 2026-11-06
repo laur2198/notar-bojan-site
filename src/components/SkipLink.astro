@@ -1,0 +1,41 @@
+---
+/** „Sari la conținut”: primul element focusabil, vizibil doar la focus. */
+import { t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<a class="skip-link" href="#continut">{t(locale, 'skip.continut')}</a>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: var(--space-1);
+    left: var(--space-1);
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0.5rem 1rem;
+    background: var(--c-white);
+    color: var(--c-gray-900);
+    font-weight: 600;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transform: translateY(calc(-100% - 2rem));
+  }
+
+  .skip-link:focus-visible,
+  .skip-link:focus {
+    transform: none;
+  }
+
+  /* Linkul apare peste header-ul wood-800, unde conturul --c-focus (tot wood-800) nu s-ar vedea. */
+  .skip-link:focus-visible {
+    outline-color: var(--c-focus-on-dark);
+  }
+</style>
