@@ -1,0 +1,84 @@
+---
+/**
+ * Grila de carduri de servicii, aceeași peste tot (Acasă, /servicii/, „Alte servicii”):
+ * 4 coloane pe desktop, 2 pe tabletă, 1 pe mobil, gap 24 px. `coloane` limitează grila
+ * pe desktop (ex. 3 pentru „Alte servicii”).
+ */
+import type { ImageMetadata } from 'astro';
+import { cale, type Locale } from '../i18n';
+import CardServiciu from './CardServiciu.astro';
+
+export interface ServiciuCard {
+  slug: string;
+  titlu: string;
+  rezumat: string;
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+  /**
+   * Textul de onorariu din preturi/ro.yaml, afișat pe card doar pe /servicii/.
+   * (Nu `onorariu`: acela e câmpul din fișierul serviciului, pentru caseta „Pregătiți dosarul”.)
+   */
+  textOnorariu?: string;
+}
+
+interface Props {
+  locale: Locale;
+  servicii: ServiciuCard[];
+  coloane?: 3 | 4;
+  /** Nivelul titlurilor din carduri: h3 sub un h2 de secțiune (implicit), h2 direct sub h1. */
+  nivel?: 'h2' | 'h3';
+}
+
+const { locale, servicii, coloane = 4, nivel = 'h3' } = Astro.props;
+const hrefServiciu = (slug: string) => `${cale('servicii', locale)}${slug}/`;
+---
+
+<ul class:list={['grila-servicii', `grila-servicii--${coloane}`]} role="list">
+  {
+    servicii.map((s) => (
+      <li>
+        <CardServiciu
+          locale={locale}
+          titlu={s.titlu}
+          href={hrefServiciu(s.slug)}
+          rezumat={s.rezumat}
+          imagine={s.imagine}
+          imagineAlt={s.imagineAlt}
+          onorariu={s.textOnorariu}
+          nivel={nivel}
+        />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .grila-servicii {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+    text-align: left;
+  }
+
+  .grila-servicii > li {
+    display: grid;
+    max-width: none;
+  }
+
+  @media (min-width: 48rem) {
+    .grila-servicii {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 75rem) {
+    .grila-servicii--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .grila-servicii--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

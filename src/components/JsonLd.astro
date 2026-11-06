@@ -1,0 +1,12 @@
+---
+/** Date structurate JSON-LD (CLAUDE.md §9), serializate sigur (fără „</script>” în text). */
+import { serializeaza } from '../lib/jsonld';
+
+interface Props {
+  date: unknown;
+}
+
+const { date } = Astro.props;
+---
+
+<script type="application/ld+json" is:inline set:html={serializeaza(date)} />

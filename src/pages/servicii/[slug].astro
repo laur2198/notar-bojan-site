@@ -1,0 +1,227 @@
+---
+/**
+ * /servicii/[slug]/ – pagina unui serviciu (etapa 4). Câte o pagină pentru fiecare fișier din
+ * src/content/servicii/ro/ (un serviciu nou adăugat din CMS primește automat pagină).
+ *
+ * Structura: bandă de titlu (breadcrumbs, h1, lead) pe gray-50; apoi, pe alb, conținutul
+ * (Ce este / Cum decurge / Bine de știut) și caseta „Pregătiți dosarul” (sticky pe desktop,
+ * imediat după lead pe mobil); „Alte servicii”; CTA. JSON-LD: BreadcrumbList și Service.
+ *
+ * TODO: întrebările din faq/ro.yaml care privesc serviciul nu se leagă automat. Dacă biroul
+ * vrea, se poate adăuga în schema serviciilor un câmp opțional cu întrebările alese manual.
+ */
+import { getCollection, getEntry, render } from 'astro:content';
+import BandaTitlu from '../../components/BandaTitlu.astro';
+import CasetaDosar from '../../components/CasetaDosar.astro';
+import DraftBadge from '../../components/DraftBadge.astro';
+import GrilaServicii from '../../components/GrilaServicii.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import SectiuneCta from '../../components/SectiuneCta.astro';
+import Sectiune from '../../components/Sectiune.astro';
+import { caleLogica, t } from '../../i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getBirou, marcheazaPlaceholder } from '../../lib/continut';
+import { breadcrumbList, idBirou, serviciu as serviciuJsonLd } from '../../lib/jsonld';
+import { serviciiVecine } from '../../lib/servicii';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const servicii = await getCollection('servicii');
+  return servicii.map((intrare) => ({ params: { slug: intrare.data.slug }, props: { intrare } }));
+}
+
+const locale = 'ro';
+const { intrare } = Astro.props;
+const s = intrare.data;
+const { Content } = await render(intrare);
+const [birou, acasa, toate] = await Promise.all([getBirou(), getEntry('acasa', 'ro/acasa'), getCollection('servicii')]);
+if (!acasa) throw new Error('Lipsește src/content/pagini/ro/acasa.yaml.');
+
+const caleServicii = caleLogica('servicii', locale);
+const caleaPaginii = `${caleServicii}${s.slug}/`;
+const vecine = serviciiVecine(
+  toate.map((x) => x.data),
+  s.slug,
+);
+
+// Breadcrumbs: căi cu bază pentru linkuri; adrese absolute pentru JSON-LD.
+const site = Astro.site ?? new URL(Astro.url.origin);
+const absolut = (cale: string) => new URL(url(cale), site).href;
+const firimituri = [
+  { eticheta: t(locale, 'breadcrumbs.acasa'), cale: caleLogica('acasa', locale) },
+  { eticheta: t(locale, 'servicii.titlu'), cale: caleServicii },
+  { eticheta: s.titlu, cale: caleaPaginii },
+];
+const jsonld = [
+  breadcrumbList(firimituri.map((f) => ({ nume: f.eticheta, url: absolut(f.cale) }))),
+  serviciuJsonLd({
+    nume: s.titlu,
+    descriere: s.rezumat,
+    url: absolut(caleaPaginii),
+    idBirou: idBirou(absolut(caleLogica('acasa', locale))),
+    zona: birou.adresa.oras,
+  }),
+];
+---
+
+<BaseLayout locale={locale} title={t(locale, 'servicii.seoTitluPagina', { titlu: s.titlu })} description={s.rezumat}>
+  <JsonLd date={jsonld} slot="head" />
+  <BandaTitlu
+    locale={locale}
+    titlu={s.titlu}
+    leadHtml={marcheazaPlaceholder(s.pentruCine)}
+    breadcrumbs={firimituri.map((f, i) => ({ eticheta: f.eticheta, href: i < firimituri.length - 1 ? url(f.cale) : undefined }))}
+  >
+    <DraftBadge locale={locale} intrare={intrare} />
+  </BandaTitlu>
+
+  <section class="serviciu" aria-label={s.titlu}>
+    <div class="container serviciu__grila">
+      <div class="serviciu__caseta">
+        <CasetaDosar
+          locale={locale}
+          birou={birou}
+          durata={s.durata}
+          onorariu={s.onorariu}
+          acte={s.acteNecesare}
+          subiectEmail={s.subiectEmail}
+        />
+      </div>
+      <div class="serviciu__continut continut-articol">
+        <Content />
+      </div>
+    </div>
+  </section>
+
+  {
+    vecine.length > 0 && (
+      <Sectiune id="alte-servicii" ton="gri" titlu={t(locale, 'servicii.altele')}>
+        <GrilaServicii locale={locale} servicii={vecine} coloane={3} />
+      </Sectiune>
+    )
+  }
+
+  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+</BaseLayout>
+
+<style>
+  .serviciu {
+    padding-block: var(--section-y-sm) var(--section-y);
+    background: var(--c-white);
+  }
+
+  .serviciu__grila {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  /* Desktop: conținutul în stânga, caseta în dreapta, lipită sub header-ul fix. */
+  @media (min-width: 64rem) {
+    .serviciu__grila {
+      grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
+      grid-template-areas: 'continut caseta';
+      align-items: start;
+      gap: var(--space-6);
+    }
+
+    .serviciu__continut {
+      grid-area: continut;
+    }
+
+    /*
+     * Sticky: caseta rămâne sub header cât timp conținutul e mai lung decât ea. Cu textele
+     * actuale caseta e coloana mai înaltă, deci nu are de ce să se lipească; regula intră
+     * în funcțiune singură dacă textele serviciului se lungesc.
+     */
+    .serviciu__caseta {
+      grid-area: caseta;
+      position: sticky;
+      top: calc(var(--header-h-sm) + var(--space-3));
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .serviciu__caseta {
+      top: calc(var(--header-h) + var(--space-3));
+    }
+  }
+
+  /* Tipografia corpului Markdown (Ce este, Cum decurge, Bine de știut). */
+  .continut-articol {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure);
+  }
+
+  .continut-articol :global(h2) {
+    margin-top: var(--space-4);
+    font-size: var(--fs-h3);
+  }
+
+  .continut-articol :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .continut-articol :global(strong) {
+    font-weight: 700;
+    color: var(--c-gray-900);
+  }
+
+  .continut-articol :global(ul) {
+    display: grid;
+    gap: var(--space-1);
+    padding-left: var(--space-3);
+  }
+
+  .continut-articol :global(ul li::marker) {
+    color: var(--c-red-700);
+  }
+
+  /* „Cum decurge”: pașii numerotați, în stilul PasiLucru (număr 700, bordo, în cerc subțire). */
+  .continut-articol :global(ol) {
+    --cerc: var(--space-5);
+
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+    counter-reset: pas;
+  }
+
+  .continut-articol :global(ol > li) {
+    position: relative;
+    min-height: var(--cerc);
+    padding-left: calc(var(--cerc) + var(--space-2));
+    padding-top: calc((var(--cerc) - 1.6em) / 2);
+    counter-increment: pas;
+  }
+
+  .continut-articol :global(ol > li)::before {
+    content: counter(pas);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--cerc);
+    height: var(--cerc);
+    color: var(--c-red-700);
+    border: 1.5px solid var(--c-red-700);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Linia de legătură dintre pași (decorativă). */
+  .continut-articol :global(ol > li:not(:last-child))::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--cerc) / 2);
+    top: var(--cerc);
+    bottom: calc(-1 * var(--space-3));
+    width: 1px;
+    background: var(--c-red-700);
+  }
+</style>

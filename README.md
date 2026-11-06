@@ -101,9 +101,13 @@ src/
     contrast.ts         calculul contrastului WCAG
     tokens.ts           culorile din tokens.css, citite la build
     url.ts              url(): căile interne cu baza site-ului (GitHub Pages) – testat
+    servicii.ts         serviciile vecine, potrivirea servicii ↔ preturi – testat
+    jsonld.ts           BreadcrumbList, Service, @id-ul biroului (…/#birou) – testat
   pages/
     index.astro         pagina principală RO (temporară până la etapa 3)
     en/index.astro      pagina principală EN (temporară până la etapa 6)
+    servicii/index.astro    /servicii/ – toate serviciile, onorariile orientative
+    servicii/[slug].astro   /servicii/{slug}/ – câte o pagină pentru fiecare fișier din src/content/servicii/ro/
     404.astro           pagina 404 (RO + EN), funcțională și sub calea de bază
     stil.astro          ghidul de stil intern (/stil/)
   styles/
@@ -151,6 +155,14 @@ Un singur font, **Inter** (variabil), self-hosted din `@fontsource-variable/inte
 - **Date necompletate:** `linkTelefon()`, `linkEmail()`, `linkExtern()` nu generează `tel:`, `mailto:` sau linkuri externe din texte `«DE COMPLETAT`. În preview, butoanele rămân vizibile, cu `aria-disabled="true"` și fără `href`.
 - **„Deschis acum”, programul de azi și zilele libere din următoarele 14 zile** se calculează în browser (fusul Europe/Bucharest). Fără JS nu apar; programul săptămânal complet e oricum în pagină.
 - **Pe fundal închis** (`.pe-inchis`: hero, CTA), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
+
+## Servicii (etapa 4)
+
+- **`/servicii/`:** toate serviciile, în grila de pe Acasă (`GrilaServicii`), cu onorariul din `preturi/ro.yaml` pe card; tabelul „Onorarii orientative” (pe mobil, listă de perechi) și nota de sub el.
+- **`/servicii/{slug}/`:** bandă de titlu pe gri (breadcrumbs, h1, lead), apoi conținutul Markdown și caseta „Pregătiți dosarul” (pe mobil imediat după lead, cu „Trimiteți actele pe email” din primul ecran; pe desktop în dreapta, `sticky` sub header). „Alte servicii”: 3 servicii vecine după `ordine`. JSON-LD `BreadcrumbList` și `Service`, cu `provider` → `{site}{bază}#birou`.
+- **Serviciu nou:** un fișier nou în `src/content/servicii/ro/` (din CMS) primește automat pagină și card. Dacă îi lipsește onorariul din `preturi/ro.yaml` (sau invers), build-ul afișează `[servicii] ATENȚIE: …`.
+- **„Trimiteți actele pe email”:** `mailto:` către `emailActe`, cu subiectul `subiectEmail` și un corp precompletat (CRLF, `encodeURIComponent`). Cât `emailActe` conține `«DE COMPLETAT`, butonul e vizibil, fără `href`, cu `aria-disabled`, iar adresa apare marcată.
+- **Caseta `sticky`:** cu textele actuale caseta e mai înaltă decât conținutul, deci derulează normal; se lipește singură dacă textul serviciului devine mai lung decât ea.
 
 ## Note pentru etapele următoare
 
