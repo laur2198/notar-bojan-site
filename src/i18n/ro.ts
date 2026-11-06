@@ -11,6 +11,7 @@ export const ro = {
   'nav.servicii': 'Servicii',
   'nav.programare': 'Programare',
   'nav.faq': 'Întrebări frecvente',
+  'nav.faqScurt': 'Întrebări',
   'nav.despre': 'Despre',
   'nav.contact': 'Contact',
   'nav.recenzii': 'Recenzii',
@@ -95,7 +96,6 @@ export const ro = {
   'recenzii.notaStele': 'Nota: {nota} din 5 stele',
 
   // Antet, bara de jos, banda, servicii (calibrare după referință)
-  'antet.email': 'Trimiteți un email: {email}',
   'bara.locatie': 'Locație',
   'banda.birou': 'Biroul notarial',
   'banda.programul': 'Programul nostru',

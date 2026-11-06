@@ -13,6 +13,7 @@ export const en: Record<keyof typeof ro, string> = {
   'nav.servicii': 'Services',
   'nav.programare': 'Appointments',
   'nav.faq': 'FAQ',
+  'nav.faqScurt': 'FAQ',
   'nav.despre': 'About',
   'nav.contact': 'Contact',
   'nav.recenzii': 'Reviews',
@@ -97,7 +98,6 @@ export const en: Record<keyof typeof ro, string> = {
   'recenzii.notaStele': 'Rating: {nota} out of 5 stars',
 
   // Header, bottom bar, band, services (calibration after the reference site)
-  'antet.email': 'Email us: {email}',
   'bara.locatie': 'Location',
   'banda.birou': 'The notary office',
   'banda.programul': 'Our opening hours',

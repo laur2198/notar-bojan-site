@@ -43,8 +43,8 @@ const { locale, birou } = Astro.props;
   }
 
   .wordmark__profesie {
-    /* 13 px */
-    font-size: calc(var(--fs-sm) * 0.8125);
+    /* 12 px (excepția din CLAUDE.md §4) */
+    font-size: calc(var(--fs-sm) * 0.75);
     font-weight: 500;
     color: var(--c-gray-600);
   }
@@ -67,10 +67,10 @@ const { locale, birou } = Astro.props;
     }
   }
 
-  /* Pe desktop, 18 px: header-ul complet (meniu, telefon, email, „Programare”) încape pe un rând. */
-  @media (min-width: 80rem) {
+  /* Pe desktop (≥ 67rem, pragul meniului complet din Header), 17 px. */
+  @media (min-width: 67rem) {
     .wordmark__nume {
-      font-size: var(--fs-base);
+      font-size: calc(var(--fs-sm) * 1.0625);
     }
   }
 </style>

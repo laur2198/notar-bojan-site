@@ -12,7 +12,7 @@ import '../styles/global.css';
 export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } }] : [])) satisfies GetStaticPaths;
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
 import { estePreview, marcheazaPlaceholder } from '../lib/continut';
-import { culoare, culori } from '../lib/tokens';
+import { culoare, culori, marimeMaximaPx } from '../lib/tokens';
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
 
@@ -104,7 +104,7 @@ const perechi: Pereche[] = [
   { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: titlurile coloanelor și linkurile (16 px)' },
   { fata: 'c-gray-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: denumirea completă, © și confidențialitatea (16 px)' },
   { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'ui', folosire: 'Iconițele din footer (pin, telefon, email)' },
-  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Rândul 2 al wordmark-ului (13 px, majuscule); rezumatul cardurilor de serviciu' },
+  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Rândul 2 al wordmark-ului (12 px, majuscule); rezumatul cardurilor de serviciu' },
   { fata: 'c-wood-800', fundal: 'c-white', uz: 'ui', folosire: 'Iconițele line din header și din bara de jos' },
   { fata: 'c-red-700', fundal: 'c-white', uz: 'ui', folosire: 'Stelele ratingului, cercul „+” din întrebări, linia de accent a cardurilor' },
   { fata: 'c-red-700', fundal: 'c-gray-50', uz: 'ui', folosire: 'Cercurile și linia dintre pași; iconița adresei din bandă' },
@@ -138,9 +138,9 @@ const fraSedila = !/[şţŞŢ]/.test(DIACRITICE);
 const coduri = [...'șȘțȚ'].map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`);
 
 const scara = [
-  { nume: 'Titlu h1 (hero, majuscule)', variabila: '--fs-h1', clasa: 'scara-h1 scara-majuscule' },
-  { nume: 'Titlu h2', variabila: '--fs-h2', clasa: 'scara-h2' },
-  { nume: 'Titlu h3 / titluri de coloană', variabila: '--fs-h3', clasa: 'scara-h3' },
+  { nume: `Titlu h1 (hero, majuscule; max. ${marimeMaximaPx('fs-h1')} px)`, variabila: '--fs-h1', clasa: 'scara-h1 scara-majuscule' },
+  { nume: `Titlu h2 (max. ${marimeMaximaPx('fs-h2')} px)`, variabila: '--fs-h2', clasa: 'scara-h2' },
+  { nume: `Titlu h3 / titluri de coloană (max. ${marimeMaximaPx('fs-h3')} px)`, variabila: '--fs-h3', clasa: 'scara-h3' },
   { nume: 'Text mare', variabila: '--fs-lg', clasa: 'scara-lg' },
   { nume: 'Text de bază (18 px)', variabila: '--fs-base', clasa: 'scara-base' },
   { nume: 'Note, meniu, rezumate (16 px)', variabila: '--fs-sm', clasa: 'scara-sm' },
@@ -270,7 +270,7 @@ const exempluMarcaj =
       <section aria-labelledby="butoane">
         <h2 id="butoane">Butoane</h2>
         <p>
-          Înălțime minimă 52 px. Butoanele din primul rând sunt reale: treceți cu mouse-ul peste ele sau navigați cu
+          16 px, 600, înălțime minimă 48 px, padding 12×20. Butoanele din primul rând sunt reale: treceți cu mouse-ul peste ele sau navigați cu
           tasta Tab. Rândurile următoare arată static stările hover și focus.
         </p>
         <h3>Normal</h3>

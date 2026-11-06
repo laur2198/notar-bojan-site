@@ -27,7 +27,8 @@ html {
   scroll-padding-top: calc(var(--header-h-sm) + var(--space-2));
 }
 
-@media (min-width: 64rem) {
+/* De la pragul meniului complet (Header.astro), header-ul are --header-h. */
+@media (min-width: 67rem) {
   html {
     scroll-padding-top: calc(var(--header-h) + var(--space-2));
   }
@@ -254,7 +255,8 @@ mark.todo {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  min-height: 52px;
+  /* 16 px, 600, min. 48 px înălțime, padding 12×20. */
+  min-height: 48px;
   min-width: 48px;
   padding: calc(var(--space-1) * 1.5) calc(var(--space-2) * 1.25);
   border: 2px solid var(--btn-border);
@@ -262,7 +264,7 @@ mark.todo {
   background-color: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-sans);
-  font-size: var(--fs-base);
+  font-size: var(--fs-sm);
   font-weight: 600;
   line-height: 1.25;
   text-align: center;
