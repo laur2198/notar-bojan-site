@@ -8,6 +8,7 @@ adresa:
   codPostal: "«DE COMPLETAT: cod poștal»"
 telefon: "+40«DE COMPLETAT»"          # format internațional, fără spații – folosit în link-ul tel:
 telefonAfisat: "«DE COMPLETAT: 0268 xxx xxx»"
+whatsapp: "+40«DE COMPLETAT»"         # număr WhatsApp Business al biroului, format internațional fără spații
 email: "«DE COMPLETAT: contact@domeniu.ro»"
 emailActe: "«DE COMPLETAT: acte@domeniu.ro»"
 program:

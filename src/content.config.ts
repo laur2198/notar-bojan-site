@@ -94,6 +94,8 @@ const birou = defineCollection({
     }),
     telefon,
     telefonAfisat: z.string().min(1),
+    /** Numărul WhatsApp Business al biroului, același format ca `telefon`. */
+    whatsapp: telefon,
     email,
     emailActe: email,
     program: z
@@ -293,6 +295,8 @@ const recenzii = defineCollection({
         nota: z.number().int().min(1).max(5),
         text: z.string().min(1),
         sursa: z.literal('Google'),
+        /** Limba recenziei (implicit română); textul primește `lang` dacă diferă de limba paginii. */
+        limba: z.enum(['ro', 'en', 'de', 'fr', 'hu', 'it', 'es']).optional(),
       }),
     ),
     validat,

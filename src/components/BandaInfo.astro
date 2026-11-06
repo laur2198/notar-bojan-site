@@ -11,15 +11,17 @@
  * Secțiunea are id-ul `program`, ținta „Program” din bara de jos de pe mobil.
  *
  * Varianta `contact` (pagina /contact/): aceleași trei blocuri, cu 1. Adresa (completă, cu
- * „Deschideți în Google Maps”), 2. Programul, 3. Telefon și email (general și pentru acte).
+ * „Deschideți în Google Maps”), 2. Programul, 3. Telefon, WhatsApp și email (general și pentru
+ * acte), cu nota despre WhatsApp (ListaContacte).
  */
 import { cale, t, type Locale } from '../i18n';
-import { linkEmail, linkExtern, linkTelefon } from '../lib/contact';
+import { linkExtern } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
 import { ziLiberaPentru } from '../lib/program';
 import CardRating from './CardRating.astro';
 import Iconita from './Iconita.astro';
 import LinkExtern from './LinkExtern.astro';
+import ListaContacte from './ListaContacte.astro';
 import ProgramSaptamana from './ProgramSaptamana.astro';
 import StareProgram from './StareProgram.astro';
 
@@ -35,14 +37,6 @@ interface Props {
 
 const { locale, birou, textLocatie, varianta = 'acasa', ton = 'gri' } = Astro.props;
 const esteContact = varianta === 'contact';
-const telefon = linkTelefon(birou);
-const email = linkEmail(birou.email);
-const emailActe = linkEmail(birou.emailActe);
-const contacte = [
-  { iconita: 'telefon' as const, eticheta: t(locale, 'contact.telefon'), link: telefon },
-  { iconita: 'email' as const, eticheta: t(locale, 'contact.email'), link: email },
-  { iconita: 'email' as const, eticheta: t(locale, 'contact.emailActe'), link: emailActe },
-];
 const harta = linkExtern(birou.googleMapsUrl, '');
 const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 
@@ -104,23 +98,7 @@ const dateZileLibere = JSON.stringify({
         esteContact ? (
           <div class="banda__coloana">
             <h2 id="banda-contact" class="banda__titlu">{t(locale, 'banda.contactTitlu')}</h2>
-            <ul class="banda__continut banda__contacte" role="list">
-              {contacte.map((c) => (
-                <li class="banda__contact">
-                  <Iconita nume={c.iconita} class="banda__iconita" />
-                  <span>
-                    <span class="banda__eticheta">{c.eticheta}</span>
-                    {c.link.valid ? (
-                      <a class="banda__link" href={c.link.href}>
-                        {c.link.text}
-                      </a>
-                    ) : (
-                      <span class="banda__link" set:html={marcheazaPlaceholder(c.link.text)} />
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <ListaContacte locale={locale} birou={birou} emailActe class="banda__continut" />
           </div>
         ) : (
           <div class="banda__coloana">
@@ -244,34 +222,4 @@ const dateZileLibere = JSON.stringify({
     font-style: normal;
   }
 
-  .banda__contacte {
-    padding: 0;
-    list-style: none;
-  }
-
-  .banda__contact {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-1);
-    max-width: none;
-  }
-
-  .banda__contact :global(.banda__iconita) {
-    margin-top: calc(var(--space-1) / 4);
-    color: var(--c-wood-800);
-  }
-
-  .banda__eticheta {
-    display: block;
-    color: var(--c-gray-600);
-    font-size: var(--fs-sm);
-  }
-
-  .banda__link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 48px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
 </style>

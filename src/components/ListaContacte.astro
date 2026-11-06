@@ -1,0 +1,129 @@
+---
+/**
+ * Lista de contacte directe: telefon, WhatsApp, email (și, opțional, emailul pentru acte),
+ * fiecare cu iconiță și text. Folosită în meniul compact, pe /programare/ și pe /contact/
+ * (prin BandaInfo), în RO și EN. Sub listă, nota despre WhatsApp: acolo nu se trimit acte.
+ *
+ * Datele încă necompletate («DE COMPLETAT», doar în preview) apar ca text marcat, fără link.
+ * WhatsApp se deschide într-o filă nouă (anunțat pentru cititoarele de ecran).
+ */
+import { t, type CheieUI, type Locale } from '../i18n';
+import { linkEmail, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Iconita from './Iconita.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  /** Adaugă emailul pentru acte (pe /contact/). */
+  emailActe?: boolean;
+  /** Eticheta mică deasupra fiecărui contact („Telefon”, „WhatsApp”, „Email”). */
+  etichete?: boolean;
+  /** Nota despre WhatsApp și acte, sub listă. */
+  nota?: boolean;
+  class?: string;
+}
+
+const { locale, birou, emailActe = false, etichete = true, nota = true, class: clasa } = Astro.props;
+
+interface Contact {
+  iconita: 'telefon' | 'whatsapp' | 'email';
+  eticheta: CheieUI;
+  link: LinkContact;
+  extern?: boolean;
+}
+
+const contacte: Contact[] = [
+  { iconita: 'telefon', eticheta: 'contact.telefon', link: linkTelefon(birou) },
+  { iconita: 'whatsapp', eticheta: 'whatsapp.nume', link: linkWhatsapp(birou, locale), extern: true },
+  { iconita: 'email', eticheta: 'contact.email', link: linkEmail(birou.email) },
+  ...(emailActe ? [{ iconita: 'email' as const, eticheta: 'contact.emailActe' as const, link: linkEmail(birou.emailActe) }] : []),
+];
+---
+
+<div class:list={['contacte', clasa]}>
+  <ul class="contacte__lista" role="list">
+    {
+      contacte.map((c) => (
+        <li class="contacte__rand">
+          <Iconita nume={c.iconita} class="contacte__iconita" />
+          <span class="contacte__corp">
+            <span class:list={['contacte__eticheta', { 'sr-only': !etichete }]}>
+              {t(locale, c.eticheta)}
+              {!etichete && ': '}
+            </span>
+            {c.link.valid ? (
+              <a
+                class="contacte__link"
+                href={c.link.href}
+                {...(c.extern && { target: '_blank', rel: 'noopener' })}
+              >
+                {c.link.text}
+                {c.extern && <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>}
+              </a>
+            ) : (
+              <span class="contacte__link contacte__link--indisponibil">
+                <span set:html={marcheazaPlaceholder(c.link.text)} />
+                <span class="sr-only"> ({t(locale, 'link.indisponibil')})</span>
+              </span>
+            )}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+  {nota && <p class="contacte__nota">{t(locale, 'whatsapp.nota')}</p>}
+</div>
+
+<style>
+  .contacte {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .contacte__lista {
+    display: grid;
+    gap: var(--space-1);
+    padding: 0;
+    list-style: none;
+  }
+
+  .contacte__rand {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1);
+    max-width: none;
+  }
+
+  .contacte__rand :global(.contacte__iconita) {
+    margin-top: calc(var(--space-1) * 0.75);
+    color: var(--c-wood-800);
+  }
+
+  .contacte__corp {
+    display: grid;
+    min-width: 0;
+  }
+
+  .contacte__eticheta:not(.sr-only) {
+    color: var(--c-gray-600);
+    font-size: var(--fs-sm);
+  }
+
+  .contacte__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .contacte__nota {
+    padding: var(--space-1) var(--space-2);
+    border-left: 3px solid var(--c-red-700);
+    background: var(--c-gray-50);
+    border-radius: var(--radius);
+    color: var(--c-gray-900);
+    font-size: var(--fs-sm);
+  }
+</style>

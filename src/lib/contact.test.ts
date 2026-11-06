@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { linkActe, linkEmail, linkExtern, linkTelefon } from './contact';
+import { linkActe, linkEmail, linkExtern, linkTelefon, linkWhatsapp } from './contact';
 
 describe('linkTelefon', () => {
   it('număr valid: link tel: în format internațional', () => {
@@ -99,5 +99,32 @@ describe('linkActe', () => {
       valid: false,
     });
     expect(linkActe('acte@', 'x', CORP).valid).toBe(false);
+  });
+});
+
+describe('linkWhatsapp', () => {
+  it('număr valid: wa.me fără „+”, mesaj RO codificat, text în format național', () => {
+    const l = linkWhatsapp({ whatsapp: '+40722123456' }, 'ro');
+    expect(l.valid).toBe(true);
+    expect(l.text).toBe('0722 123 456');
+    expect(l.href).toBe(
+      'https://wa.me/40722123456?text=' + encodeURIComponent('Bună ziua, aș dori informații despre…'),
+    );
+    expect(l.href).toBe(
+      'https://wa.me/40722123456?text=Bun%C4%83%20ziua%2C%20a%C8%99%20dori%20informa%C8%9Bii%20despre%E2%80%A6',
+    );
+    expect(decodeURIComponent(new URL(l.href!).searchParams.get('text')!)).toBe('Bună ziua, aș dori informații despre…');
+  });
+
+  it('mesajul EN', () => {
+    const l = linkWhatsapp({ whatsapp: '+40722123456' }, 'en');
+    expect(l.href).toBe('https://wa.me/40722123456?text=Hello%2C%20I%20would%20like%20information%20about%E2%80%A6');
+    expect(new URL(l.href!).searchParams.get('text')).toBe('Hello, I would like information about…');
+  });
+
+  it('marcaj «DE COMPLETAT» sau format greșit: fără href, valid=false', () => {
+    expect(linkWhatsapp({ whatsapp: '+40«DE COMPLETAT»' }, 'ro')).toEqual({ href: undefined, text: '+40«DE COMPLETAT»', valid: false });
+    expect(linkWhatsapp({ whatsapp: '0722 123 456' }, 'ro').valid).toBe(false);
+    expect(linkWhatsapp({ whatsapp: '+4072212345' }, 'en').href).toBeUndefined();
   });
 });
