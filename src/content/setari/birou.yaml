@@ -2,10 +2,10 @@
 denumire: "Birou Individual Notarial Bojan Elena Luminița"
 notar: "Bojan Elena Luminița"
 adresa:
-  strada: "«DE COMPLETAT: strada și numărul»"
+  strada: "Bulevardul Griviței nr. 64, bl. 5, ap. 3"
   oras: "Brașov"
   judet: "Brașov"
-  codPostal: "«DE COMPLETAT: cod poștal»"
+  codPostal: "500173"
 telefon: "+40«DE COMPLETAT»"          # format internațional, fără spații – folosit în link-ul tel:
 telefonAfisat: "«DE COMPLETAT: 0268 xxx xxx»"
 whatsapp: "+40«DE COMPLETAT»"         # număr WhatsApp Business al biroului, format internațional fără spații
@@ -32,12 +32,12 @@ zileLibere:
   - { data: "2027-01-07", motiv: "Sfântul Ioan Botezătorul" }
   - { data: "2027-01-24", motiv: "Ziua Unirii Principatelor Române" }
 zileLibereConfirmare: "«DE COMPLETAT: confirmați zilele în care biroul este închis, apoi ștergeți acest text.»"
-googleMapsUrl: "«DE COMPLETAT: link Google Maps al profilului rămas după unificare»"
+googleMapsUrl: "https://maps.google.com/?cid=1662429516727779866"
 googleProfilUrl: "«DE COMPLETAT: link recenzii Google»"
 rating:            # ex. 4.8 – se completează după rezolvarea profilurilor duplicate
 numarRecenzii:     # ex. 37
 programareUrl: "«DE COMPLETAT: link pagină de programări Google Calendar»"
 coordonate:        # coordonatele exacte ale sediului (din Google Maps: click dreapta pe pin)
-  lat:             # ex. 45.6427 – cât timp e gol, JSON-LD nu include „geo”
-  lng:
+  lat: 45.6535809  # ex. 45.6427 – cât timp e gol, JSON-LD nu include „geo”
+  lng: 25.6029971
 validat: false
