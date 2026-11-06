@@ -4,6 +4,9 @@
  * sau o bandă gray-50 cu o linie bordo de accent. Tot cardul e clicabil, cu un singur
  * link real: titlul (pseudo-element întins peste card). „Vedeți serviciul →” e doar
  * vizual (aria-hidden), ca numele accesibil al linkului să fie numele serviciului.
+ *
+ * Varianta cu `linkRo` (/en/services/): cardul nu e clicabil în întregime; titlul e text,
+ * iar jos e un link real „Details in Romanian →” spre pagina RO a serviciului (hreflang="ro").
  */
 import type { ImageMetadata } from 'astro';
 import { t, type Locale } from '../i18n';
@@ -14,7 +17,12 @@ import Iconita from './Iconita.astro';
 interface Props {
   locale: Locale;
   titlu: string;
-  href: string;
+  /** Linkul întregului card (lipsește în varianta cu `linkRo`). */
+  href?: string;
+  /** Ancora cardului (ex. slugul RO pe /en/services/, ținta linkurilor de pe /en/). */
+  id?: string;
+  /** Pagina RO a serviciului, ca link secundar explicit (pe /en/services/). */
+  linkRo?: string;
   rezumat: string;
   imagine?: ImageMetadata;
   imagineAlt?: string;
@@ -24,11 +32,11 @@ interface Props {
   onorariu?: string;
 }
 
-const { locale, titlu, href, rezumat, imagine, imagineAlt, nivel = 'h3', onorariu } = Astro.props;
+const { locale, titlu, href, id, linkRo, rezumat, imagine, imagineAlt, nivel = 'h3', onorariu } = Astro.props;
 const Titlu = nivel;
 ---
 
-<article class="card-serviciu">
+<article id={id} class:list={['card-serviciu', { 'card-serviciu--static': !href }]}>
   {
     imagine ? (
       <Fotografie
@@ -46,7 +54,7 @@ const Titlu = nivel;
   }
   <div class="card-serviciu__corp">
     <Titlu class="card-serviciu__titlu">
-      <a class="card-serviciu__link" href={href}>{titlu}</a>
+      {href ? <a class="card-serviciu__link" href={href}>{titlu}</a> : titlu}
     </Titlu>
     <p class="card-serviciu__rezumat" set:html={marcheazaPlaceholder(rezumat)} />
     {
@@ -60,10 +68,23 @@ const Titlu = nivel;
         </p>
       )
     }
-    <p class="card-serviciu__mai-mult" aria-hidden="true">
-      {t(locale, 'servicii.vedeti')}
-      <Iconita nume="sageata" />
-    </p>
+    {
+      linkRo ? (
+        <p class="card-serviciu__detalii">
+          <a href={linkRo} hreflang="ro">
+            {t(locale, 'servicii.detaliiRo')}
+            <Iconita nume="sageata" />
+          </a>
+        </p>
+      ) : (
+        href && (
+          <p class="card-serviciu__mai-mult" aria-hidden="true">
+            {t(locale, 'servicii.vedeti')}
+            <Iconita nume="sageata" />
+          </p>
+        )
+      )
+    }
   </div>
 </article>
 
@@ -79,7 +100,7 @@ const Titlu = nivel;
     transition: box-shadow 150ms ease;
   }
 
-  .card-serviciu:hover {
+  .card-serviciu:not(.card-serviciu--static):hover {
     box-shadow:
       var(--shadow),
       0 0 0 1px var(--c-gray-200);
@@ -196,6 +217,29 @@ const Titlu = nivel;
     color: var(--c-wood-800);
     font-size: var(--fs-sm);
     font-weight: 700;
+  }
+
+  .card-serviciu__detalii {
+    margin-top: var(--space-1);
+  }
+
+  .card-serviciu__detalii a {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--space-1) * 0.75);
+    min-height: 48px;
+    color: var(--c-wood-800);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .card-serviciu__detalii :global(.iconita) {
+    color: var(--c-red-700);
+  }
+
+  /* Cardul are overflow: hidden; conturul de focus se desenează în interior, ca să nu fie tăiat. */
+  .card-serviciu__detalii a:focus-visible {
+    outline-offset: -3px;
   }
 
   .card-serviciu__mai-mult :global(.iconita) {

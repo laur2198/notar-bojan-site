@@ -67,27 +67,8 @@ export const LOCALE_INTL: Record<Locale, string> = { ro: 'ro-RO', en: 'en-GB' };
 // Rute
 // ---------------------------------------------------------------------------
 
-/**
- * Paginile site-ului pe limbi (tabelul din CLAUDE.md §6). Paginile fără `en`
- * există doar în română.
- */
-export const RUTE = {
-  acasa: { ro: '/', en: '/en/' },
-  servicii: { ro: '/servicii/', en: '/en/services/' },
-  programare: { ro: '/programare/', en: '/en/appointments/' },
-  faq: { ro: '/intrebari-frecvente/', en: '/en/faq/' },
-  contact: { ro: '/contact/', en: '/en/contact/' },
-  recenzii: { ro: '/recenzii/' },
-  despre: { ro: '/despre/' },
-  confidentialitate: { ro: '/confidentialitate/' },
-} as const satisfies Record<string, { ro: string; en?: string }>;
-
-export type CheieRuta = keyof typeof RUTE;
-
-/** RO → EN, doar pentru paginile care au pereche. */
-export const routeMap: Readonly<Record<string, string>> = Object.fromEntries(
-  Object.values(RUTE).flatMap((r) => ('en' in r ? [[r.ro, r.en]] : [])),
-);
+export { RUTE, routeMap, type CheieRuta } from './rute';
+import { RUTE, routeMap, type CheieRuta } from './rute';
 
 /** EN → RO. */
 const routeMapInvers: Readonly<Record<string, string>> = Object.fromEntries(

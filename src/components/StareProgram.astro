@@ -5,7 +5,7 @@
  * Europe/Bucharest; fără JS nu afișează nimic (elementul rămâne `hidden`).
  */
 import { LOCALE_INTL, t, zileSaptamana, type Locale } from '../i18n';
-import type { EticheteStare, ZiLibera, ZiProgram } from '../lib/program';
+import { ziLiberaPentru, type EticheteStare, type ZiLibera, type ZiProgram } from '../lib/program';
 
 interface Props {
   locale: Locale;
@@ -32,15 +32,16 @@ const etichete: EticheteStare = {
 
 const date = JSON.stringify({
   program: program.map(({ zi, deschidere, inchidere, inchis }) => ({ zi, deschidere, inchidere, inchis })),
-  zileLibere: zileLibere.map(({ data, motiv }) => ({ data, motiv })),
+  zileLibere: zileLibere.map((z) => ziLiberaPentru(z, locale)),
   etichete,
 });
 ---
 
-<p class:list={['stare-program', clasa]} data-stare-program={date} hidden></p>
+<!-- Textul stă într-un singur span: un motiv marcat lang="ro" nu devine element flex separat. -->
+<p class:list={['stare-program', clasa]} data-stare-program={date} hidden><span class="stare-program__text"></span></p>
 
 <script>
-  import { calculeazaStare, mesajStare, type EticheteStare, type ZiLibera, type ZiProgram } from '../lib/program';
+  import { calculeazaStare, mesajStare, scrieCuFragmentRo, type EticheteStare, type ZiLibera, type ZiProgram } from '../lib/program';
 
   interface Date_ {
     program: ZiProgram[];
@@ -55,7 +56,8 @@ const date = JSON.stringify({
     for (const el of elemente) {
       const { program, zileLibere, etichete } = JSON.parse(el.dataset.stareProgram ?? '{}') as Date_;
       const stare = calculeazaStare(acum, program, zileLibere);
-      el.textContent = mesajStare(stare, etichete);
+      const motivRo = stare.tip === 'inchis' && zileLibere.some((z) => z.motivRo && z.motiv === stare.motiv) ? stare.motiv : undefined;
+      scrieCuFragmentRo(el.querySelector<HTMLElement>('.stare-program__text') ?? el, mesajStare(stare, etichete), motivRo);
       el.dataset.tip = stare.tip;
       el.hidden = false;
     }

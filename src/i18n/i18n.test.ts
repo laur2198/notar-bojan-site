@@ -1,3 +1,4 @@
+import { alternateLimbi } from './rute';
 import { describe, expect, it } from 'vitest';
 import { en } from './en';
 import { ariaCurent, caleInAltaLimba, cale, formateazaNumar, formateazaZiLuna, perecheLimbi, routeMap, t, tPlural, zileSaptamana } from './index';
@@ -83,5 +84,25 @@ describe('plural, numere, date', () => {
   it('ziua și luna', () => {
     expect(formateazaZiLuna('ro', '2026-12-25')).toBe('25 decembrie');
     expect(formateazaZiLuna('en', '2026-12-25')).toBe('25 December');
+  });
+});
+
+describe('alternateLimbi (sitemap)', () => {
+  it('leagă perechile cu slug diferit, în ambele sensuri, cu x-default → RO', () => {
+    const asteptat = [
+      { lang: 'ro', cale: '/servicii/' },
+      { lang: 'en', cale: '/en/services/' },
+      { lang: 'x-default', cale: '/servicii/' },
+    ];
+    expect(alternateLimbi('/servicii/')).toEqual(asteptat);
+    expect(alternateLimbi('/en/services/')).toEqual(asteptat);
+    expect(alternateLimbi('/en/faq/')?.[0]).toEqual({ lang: 'ro', cale: '/intrebari-frecvente/' });
+    expect(alternateLimbi('/en/appointments/')?.[0]).toEqual({ lang: 'ro', cale: '/programare/' });
+  });
+
+  it('nu dă alternate paginilor fără pereche', () => {
+    expect(alternateLimbi('/despre/')).toBeUndefined();
+    expect(alternateLimbi('/servicii/succesiune/')).toBeUndefined();
+    expect(alternateLimbi('/confidentialitate/')).toBeUndefined();
   });
 });

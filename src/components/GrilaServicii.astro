@@ -19,6 +19,12 @@ export interface ServiciuCard {
    * (Nu `onorariu`: acela e câmpul din fișierul serviciului, pentru caseta „Pregătiți dosarul”.)
    */
   textOnorariu?: string;
+  /** Linkul cardului, dacă nu e pagina serviciului (ex. /en/services/#slug pe /en/). */
+  href?: string;
+  /** Ancora cardului (pe /en/services/). */
+  id?: string;
+  /** Pagina RO a serviciului, ca link secundar (pe /en/services/; cardul nu mai e clicabil întreg). */
+  linkRo?: string;
 }
 
 interface Props {
@@ -40,7 +46,9 @@ const hrefServiciu = (slug: string) => `${cale('servicii', locale)}${slug}/`;
         <CardServiciu
           locale={locale}
           titlu={s.titlu}
-          href={hrefServiciu(s.slug)}
+          href={s.linkRo ? undefined : (s.href ?? hrefServiciu(s.slug))}
+          id={s.id}
+          linkRo={s.linkRo}
           rezumat={s.rezumat}
           imagine={s.imagine}
           imagineAlt={s.imagineAlt}

@@ -105,6 +105,8 @@ const birou = defineCollection({
       z.object({
         data: dataCalendaristica,
         motiv: z.string().min(1),
+        /** Traducerea motivului pentru paginile EN (etapa 6). Fără ea, apare motivul în română. */
+        motivEn: z.string().min(1).optional(),
       }),
     ),
     zileLibereConfirmare: z.string().optional(),

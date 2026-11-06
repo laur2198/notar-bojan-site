@@ -12,6 +12,7 @@ import {
   type ZiProgram,
   zileLibereApropiate,
   zileLibereViitoare,
+  ziLiberaPentru,
 } from './program';
 
 // Programul din exemplu: luni–joi 09–17, vineri 09–15, weekend închis.
@@ -199,5 +200,27 @@ describe('zileLibereApropiate / zileLibereViitoare', () => {
 
   it('zileLibereViitoare exclude zilele trecute', () => {
     expect(zileLibereViitoare(new Date('2026-12-26T12:00:00Z'), lista).map((z) => z.data)).toEqual(['2026-12-26', '2027-01-01']);
+  });
+});
+
+describe('ziLiberaPentru (motivul în limba paginii)', () => {
+  const craciun: ZiLibera = { data: '2026-12-25', motiv: 'Crăciunul', motivEn: 'Christmas Day' };
+  const andrei: ZiLibera = { data: '2026-11-30', motiv: 'Sfântul Andrei' };
+
+  it('RO: motivul în română, fără marcaj', () => {
+    expect(ziLiberaPentru(craciun, 'ro')).toEqual({ data: '2026-12-25', motiv: 'Crăciunul' });
+  });
+
+  it('EN: motivEn când există', () => {
+    expect(ziLiberaPentru(craciun, 'en')).toEqual({ data: '2026-12-25', motiv: 'Christmas Day' });
+  });
+
+  it('EN fără traducere: motivul în română, marcat motivRo', () => {
+    expect(ziLiberaPentru(andrei, 'en')).toEqual({ data: '2026-11-30', motiv: 'Sfântul Andrei', motivRo: true });
+  });
+
+  it('mesajul EN folosește motivEn („Closed today – Christmas Day”)', () => {
+    const stare = calculeazaStare(new Date('2026-12-25T10:00:00Z'), PROGRAM, [ziLiberaPentru(craciun, 'en')]);
+    expect(mesajStare(stare, EN).startsWith('Closed today – Christmas Day')).toBe(true);
   });
 });

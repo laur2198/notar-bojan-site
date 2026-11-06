@@ -22,6 +22,35 @@ export interface ZiProgram {
 export interface ZiLibera {
   data: string;
   motiv: string;
+  /** Traducerea motivului (paginile EN). */
+  motivEn?: string;
+  /** Pe paginile EN: motivul a rămas în română (fără traducere), deci se marchează `lang="ro"`. */
+  motivRo?: boolean;
+}
+
+/**
+ * Ziua liberă pregătită pentru o limbă: pe EN, `motivEn` dacă există; altfel motivul în
+ * română, marcat `motivRo` (ca textul să primească `lang="ro"`).
+ */
+export function ziLiberaPentru(zi: ZiLibera, locale: 'ro' | 'en'): ZiLibera {
+  if (locale === 'ro') return { data: zi.data, motiv: zi.motiv };
+  return zi.motivEn ? { data: zi.data, motiv: zi.motivEn } : { data: zi.data, motiv: zi.motiv, motivRo: true };
+}
+
+/**
+ * Scrie `text` în `el`; dacă `fragmentRo` apare în text, îl învelește într-un
+ * `<span lang="ro">` (un motiv netradus pe o pagină EN). Doar în browser.
+ */
+export function scrieCuFragmentRo(el: HTMLElement, text: string, fragmentRo?: string): void {
+  const i = fragmentRo ? text.indexOf(fragmentRo) : -1;
+  if (!fragmentRo || i < 0) {
+    el.textContent = text;
+    return;
+  }
+  const span = document.createElement('span');
+  span.lang = 'ro';
+  span.textContent = fragmentRo;
+  el.replaceChildren(text.slice(0, i), span, text.slice(i + fragmentRo.length));
 }
 
 export interface MomentLocal {

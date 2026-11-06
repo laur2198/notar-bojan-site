@@ -24,6 +24,7 @@ npm install
 | `npm run check` | `astro check`: verifică tipurile TypeScript și schemele de conținut |
 | `npm test` | Testele Vitest pentru logica pură (program, zile libere, linkuri, marcaje, rute, plural, Markdown) |
 | `npm run verifica` | Doar verificarea conținutului (preview: rezumat; `SITE_MODE=production`: listă și cod de ieșire 1) |
+| `npm run verifica:en` | După build: caută text în română (diacritice) pe paginile din `dist/en/`, fără fragmentele `lang="ro"`, marcajele «DE COMPLETAT» și numele proprii |
 | `npm run linkuri` | Verifică linkurile interne din `dist/` (pagini, resurse, ancore). Respectă `BASE_PATH`; `-- --ignora /en/` raportează fără să eșueze linkurile spre o zonă încă neconstruită |
 
 Ghidul de stil intern e la `/stil/`: paleta cu contrastele calculate, tipografia, butoanele, diacriticele. Pagina e `noindex` și e exclusă din sitemap.
@@ -179,8 +180,18 @@ Toate paginile noi încep cu banda de titlu pe gri (`BandaTitlu`) și refolosesc
 - **404:** mesaj în română și engleză, Acasă / Servicii / Contact și telefonul.
 - **Marcaje în Markdown:** corpul Markdown randat trece prin `ContinutMarcat` (`marcheazaInHtml()` din `src/lib/marcaj.ts`), care pune `«DE COMPLETAT…»` în `<mark class="todo">`. Se aplică și paginilor de serviciu (până acum marcajele din corpul lor nu erau evidențiate).
 
+## Versiunea în engleză (etapa 6)
+
+Cinci pagini (CLAUDE.md §6): `/en/`, `/en/services/`, `/en/appointments/`, `/en/faq/`, `/en/contact/`.
+
+- **Aceleași componente ca RO:** Acasă, Programare, Întrebări frecvente și Contact sunt câte o componentă comună (`PaginaAcasa`, `PaginaProgramare`, `PaginaFaq`, `PaginaContact`) cu prop-ul `locale`; fișierele din `src/pages/` și `src/pages/en/` doar o apelează. Conținutul vine din `src/content/*/en`.
+- **`/en/`:** aceeași ordine de secțiuni ca `/`. Cardurile de servicii (din `servicii-en/servicii.yaml`) duc la `/en/services/#{slugRo}`. „About the office” afișează nota despre limbă și interpret într-o casetă de informare (`DespreNotar caseta`). Banda de informații are `id="program"` (ținta „Hours” din bara de jos).
+- **`/en/services/`:** carduri cu `id={slugRo}`, fiecare cu un singur link real, „Details in Romanian” → `/servicii/{slugRo}/`, cu `hreflang="ro"` (fără `lang="ro"`: textul linkului e în engleză, WCAG 3.1.2). Secțiunea „Fees” cu textul `fees`; fără tabel de prețuri. Build-ul se oprește dacă un `slugRo` nu are pagină RO.
+- **Zile libere:** câmpul opțional `motivEn` din `birou.yaml` (schema și CMS) apare pe paginile EN („Closed today – Christmas Day”). Fără el, motivul rămâne în română și e marcat `lang="ro"`. Datele folosesc `Intl` cu `en-GB`.
+- **Linkuri spre pagini doar în română** (Despre, Confidențialitate, paginile de serviciu): textul o spune („(in Romanian)”) și linkul are `hreflang="ro"`.
+- **hreflang și sitemap:** perechile vin dintr-un singur loc, `src/i18n/rute.ts` (`RUTE`, `routeMap`, `alternateLimbi`). Paginile au `ro` / `en` / `x-default` → RO; sitemap-ul primește aceleași alternate prin `serialize()` în `astro.config.mjs`, inclusiv pentru perechile cu slug diferit. Paginile fără pereche nu au alternate.
+- **Comutatorul RO/EN:** duce la pereche sau, pe paginile fără pereche, la `/en/` (respectiv `/`).
+
 ## Note pentru etapele următoare
 
-- **Sitemap (etapa 6):** opțiunea `i18n` din `@astrojs/sitemap` împerechează doar căi identice (`/` ↔ `/en/`). Pentru perechile cu slug diferit (`/servicii/` ↔ `/en/services/`) e nevoie de `serialize()` cu `routeMap`. Locul e marcat cu un TODO în `astro.config.mjs`.
-- **hreflang:** paginile folosesc `ro` / `en` (CLAUDE.md §6), iar sitemap-ul `ro-RO` / `en-US` (promptul etapei 1). Ar fi bine să fie aceleași coduri; de unificat în etapa 6.
 - `compressHTML: true` e setat explicit. Astro 7 folosește implicit `'jsx'`, care șterge spațiile dintre elementele inline.
