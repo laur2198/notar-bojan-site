@@ -46,7 +46,14 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 ---
 
 <BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere}>
-  <Hero locale={locale} birou={birou} profesie={a.hero.titlu} imagine={a.hero.imagine} imagineAlt={a.hero.imagineAlt}>
+  <Hero
+    locale={locale}
+    birou={birou}
+    profesie={a.hero.titlu}
+    subtitlu={a.hero.subtitlu}
+    imagine={a.hero.imagine}
+    imagineAlt={a.hero.imagineAlt}
+  >
     <DraftBadge locale={locale} intrare={acasa} />
   </Hero>
 
@@ -89,11 +96,11 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </p>
   </Sectiune>
 
-  <Sectiune id="pasi" ton="gri" centrat titlu={a.pasi.titlu} introHtml={marcheazaPlaceholder(a.pasi.intro)}>
+  <Sectiune id="pasi" centrat titlu={a.pasi.titlu} introHtml={marcheazaPlaceholder(a.pasi.intro)} class="sectiune-separata">
     <PasiLucru pasi={a.pasi.lista} />
   </Sectiune>
 
-  <Sectiune id="recenzii" centrat titlu={a.recenzii.titlu} introHtml={marcheazaPlaceholder(a.recenzii.intro)}>
+  <Sectiune id="recenzii" ton="gri" centrat titlu={a.recenzii.titlu} introHtml={marcheazaPlaceholder(a.recenzii.intro)}>
     {
       recenziiAfisate.length > 0 ? (
         <ul class="grila-recenzii" role="list">
@@ -116,7 +123,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </p>
   </Sectiune>
 
-  <Sectiune id="intrebari" centrat titlu={a.faq.titlu} class="sectiune-faq">
+  <Sectiune id="intrebari" centrat titlu={a.faq.titlu}>
     <div class="centrat">
       <DraftBadge locale={locale} intrare={faq} />
     </div>
@@ -171,8 +178,12 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     margin-top: var(--space-5);
   }
 
-  /* Recenziile și întrebările sunt ambele pe alb: o linie fină le separă. */
-  :global(.sectiune-faq) {
+  /*
+   * Fundalurile, de sus în jos: hero (wood-900) · bandă și despre (gri) · servicii (alb) ·
+   * cum lucrăm (alb) · recenzii (gri) · întrebări (alb) · CTA (wood-800) · footer (gri).
+   * Servicii și „Cum lucrăm” sunt ambele pe alb: o linie fină le separă.
+   */
+  :global(.sectiune-separata) {
     border-top: 1px solid var(--c-gray-200);
   }
 </style>

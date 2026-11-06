@@ -31,6 +31,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ## 4. Accesibilitate (contractual – WCAG 2.1 AA)
 
 - Text de bază **18 px** (`1.125rem`), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
+- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (13 px). Nicăieri altundeva.
 - Contrast AA: minim 4.5:1 text normal, 3:1 text mare și elemente UI. Verifică fiecare combinație nouă de culori.
 - Ținte de atingere minim **48×48 px**.
 - `:focus-visible` clar pe toate elementele interactive (contur de 3 px, nu doar schimbare de culoare).
@@ -49,8 +50,8 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ```css
 :root {
   /* Culori */
-  --c-wood-900: #2A1A10;  /* fundal footer, titluri */
-  --c-wood-800: #4A2E1E;  /* culoarea de brand: header, butoane primare */
+  --c-wood-900: #2A1A10;  /* titluri, fundalul hero-ului fără fotografie */
+  --c-wood-800: #4A2E1E;  /* culoarea de brand: butoane primare, secțiunea CTA finală */
   --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
   --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
   --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
@@ -68,7 +69,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
   /* Tipografie */
   --font-sans: 'Inter Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
-  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții: --fs-xs și rândul 2 al wordmark-ului */
+  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
   --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.7rem);
@@ -96,7 +97,7 @@ Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--
 - Un singur font, Inter; titluri 700. Fără text justify. Fără majuscule integrale pe paragrafe (wordmark-ul și h1-ul din hero pot fi cu majuscule, prin CSS).
 - Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
 - Butonul primar: fundal `--c-wood-800`, text alb, înălțime min. 52 px. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
-- Fundaluri: alb pentru pagină, `--c-gray-50` pentru secțiunile alternante, `--c-wood-800`/`--c-wood-900` pentru header, footer și secțiunea CTA finală.
+- Fundaluri: alb pentru pagină și header (fix sus), `--c-gray-50` pentru secțiunile alternante și footer, `--c-wood-800` pentru secțiunea CTA finală, `--c-wood-900` sub fotografia din hero.
 - Fără texturi sau imagini de lemn; „lemnul” e doar culoarea.
 - `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-gray-900`).
 - `theme-color` devine `--c-wood-800`.

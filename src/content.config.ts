@@ -134,7 +134,8 @@ const acasa = defineCollection({
         descriere: z.string().min(1),
       }),
       hero: z.object({
-        eticheta: z.string().min(1),
+        /** Nu se mai afișează (structura calibrată după referință); păstrat opțional pentru fișierele existente. */
+        eticheta: z.string().optional(),
         titlu: z.string().min(1),
         subtitlu: z.string().min(1),
         imagine: imagineOptionala(image),

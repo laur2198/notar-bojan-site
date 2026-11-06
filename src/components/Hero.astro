@@ -21,11 +21,13 @@ interface Props {
   birou: Birou;
   /** Al doilea rând al titlului, ex. „Notar public în Brașov” (din acasa.yaml). */
   profesie: string;
+  /** Subtitlul de sub titlu (hero.subtitlu din acasa.yaml). */
+  subtitlu?: string;
   imagine?: ImageMetadata;
   imagineAlt?: string;
 }
 
-const { locale, birou, profesie, imagine, imagineAlt = '' } = Astro.props;
+const { locale, birou, profesie, subtitlu, imagine, imagineAlt = '' } = Astro.props;
 const telefon = linkTelefon(birou);
 const textSuna = t(locale, 'acasa.suna', { telefon: telefon.text });
 const areRating = birou.rating !== null && birou.numarRecenzii !== null;
@@ -61,6 +63,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
       <span class="hero__nume">{birou.notar}</span>
       <span class="hero__profesie" set:html={marcheazaPlaceholder(profesie)} />
     </h1>
+    {subtitlu && <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />}
     <div class="hero__butoane">
       <a class="btn btn--primar" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
       {
@@ -176,6 +179,16 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     font-weight: 500;
     line-height: 1.4;
     text-transform: uppercase;
+  }
+
+  /* 18–20 px, 400, alb 90% (pe wood-900: ~13:1), max. 40ch. */
+  .hero__subtitlu {
+    max-width: 40ch;
+    margin-top: calc(-1 * var(--space-2));
+    color: rgb(255 255 255 / 0.9);
+    font-size: clamp(var(--fs-base), 1rem + 0.4vw, var(--fs-lg));
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   .hero__butoane {

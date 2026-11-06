@@ -237,11 +237,6 @@ content:
         label: Prima secțiune
         type: object
         fields:
-          - name: eticheta
-            label: Rândul mic de deasupra titlului
-            type: string
-            required: true
-            description: Denumirea legală, scrisă normal (fără majuscule).
           - name: titlu
             label: Titlul principal
             type: string

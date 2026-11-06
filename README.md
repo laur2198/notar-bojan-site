@@ -111,12 +111,13 @@ Un singur font, **Inter** (variabil), self-hosted din `@fontsource-variable/inte
 ## Carcasa și pagina Acasă (etapele 2–3, calibrate după referința aleasă de clientă)
 
 - **Calibrare doar din `tokens.css`:** spațierile și razele din componente sunt `var(--space-*)`, `var(--section-y*)`, `var(--radius*)` sau expresii derivate din ele (`calc(var(--space-1) / 2)`). Valori scrise direct rămân doar minimele de accesibilitate (48 / 52 / 56 px) și câteva lățimi (ex. lista de întrebări, max. 61.25rem).
-- **Header:** alb, fix sus (`position: sticky`), `--header-h` (80 px) pe desktop și `--header-h-sm` (64 px) pe mobil; linie gray-200 jos, umbră după scroll (JS). Desktop (≥ 1280 px): wordmark | meniu | RO | EN | iconițe telefon și email | „Programare”. Sub 1280 px: meniu compact (`<details>`, merge fără JS); între 768 și 1279 px, telefonul și „Programare” rămân vizibile în header.
-- **Bara de jos** (< 768 px): albă, patru acțiuni cu iconiță și etichetă de 14 px (`--fs-xs`): Sunați, Programare, Program (`/#program`), Locație (Google Maps).
-- **Pagina Acasă:** hero pe toată lățimea → banda de informații (`#program`) → despre → servicii → cum lucrăm → recenzii → întrebări → CTA. Pastila și cardul cu ratingul Google apar doar dacă `rating` și `numarRecenzii` sunt completate.
+- **Header:** alb, fix sus (`position: sticky`), `--header-h` (80 px) pe desktop și `--header-h-sm` (64 px) pe mobil; linie gray-200 jos, umbră după scroll (JS). Desktop (≥ 1280 px, pe toată lățimea ecranului): wordmark | meniu | RO | EN | telefon | email | „Programare”. Telefonul e un singur link, iconiță + număr; numărul apare de la 1360 px (pragul măsurat: header-ul cere ~1.292 px), sub prag rămâne doar iconița (cu numărul în `aria-label`). Sub 1280 px: meniu compact (`<details>`, merge fără JS); între 768 și 1279 px, telefonul și „Programare” rămân vizibile în header.
+- **Bara de jos** (< 768 px): albă, patru acțiuni cu iconiță și etichetă de 14 px, 600 (`--fs-xs`): Sunați, Programare, Program (`/#program`), Locație (Google Maps). Etichetele și rândul de 13 px din wordmark sunt singurele texte sub 16 px (CLAUDE.md §4).
+- **Footer:** deschis (gray-50, linie gray-200 sus), 4 coloane: wordmark + denumirea completă | Contact | Program | Linkuri; dedesubt © și politica de confidențialitate. Focusul e cel standard (`--c-focus`).
+- **Pagina Acasă:** hero (wood-900, cu subtitlu) → banda de informații (`#program`, gri) → despre (gri) → servicii (alb) → cum lucrăm (alb, separat printr-o linie) → recenzii (gri) → întrebări (alb) → CTA (wood-800) → footer (gri). Pastila și cardul cu ratingul Google apar doar dacă `rating` și `numarRecenzii` sunt completate.
 - **Date necompletate:** `linkTelefon()`, `linkEmail()`, `linkExtern()` nu generează `tel:`, `mailto:` sau linkuri externe din texte `«DE COMPLETAT`. În preview, butoanele rămân vizibile, cu `aria-disabled="true"` și fără `href`.
 - **„Deschis acum”, programul de azi și zilele libere din următoarele 14 zile** se calculează în browser (fusul Europe/Bucharest). Fără JS nu apar; programul săptămânal complet e oricum în pagină.
-- **Pe fundal închis** (`.pe-inchis`: hero, CTA, footer), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
+- **Pe fundal închis** (`.pe-inchis`: hero, CTA), linkurile preiau culoarea textului, iar focusul devine `--c-focus-on-dark` (wood-300).
 
 ## Note pentru etapele următoare
 

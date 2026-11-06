@@ -16,9 +16,11 @@ interface Props {
   captionVizibil?: boolean;
   /** Fără borduri, ziua bold, „Închis” în accentul bordo (banda de pe Acasă). */
   simplu?: boolean;
+  /** Text de 16 px și rânduri mai strânse (footer). */
+  compact?: boolean;
 }
 
-const { locale, program, ton = 'deschis', captionVizibil = false, simplu = false } = Astro.props;
+const { locale, program, ton = 'deschis', captionVizibil = false, simplu = false, compact = false } = Astro.props;
 const zile = zileSaptamana(locale);
 
 const ore = (zi: ZiProgram) =>
@@ -27,7 +29,7 @@ const ore = (zi: ZiProgram) =>
     : t(locale, 'program.interval', { deschidere: zi.deschidere, inchidere: zi.inchidere });
 ---
 
-<table class:list={['program', `program--${ton}`, { 'program--simplu': simplu }]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
+<table class:list={['program', `program--${ton}`, { 'program--simplu': simplu, 'program--compact': compact }]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
   <caption class:list={{ 'sr-only': !captionVizibil }}>{t(locale, 'program.caption')}</caption>
   <thead class="sr-only">
     <tr>
@@ -123,5 +125,14 @@ const ore = (zi: ZiProgram) =>
   tr[aria-current='date'] th {
     box-shadow: inset 4px 0 0 currentColor;
     padding-left: calc(var(--space-1) * 1.5);
+  }
+
+  .program--compact {
+    font-size: var(--fs-sm);
+  }
+
+  .program--compact th,
+  .program--compact td {
+    padding-block: calc(var(--space-1) / 4);
   }
 </style>

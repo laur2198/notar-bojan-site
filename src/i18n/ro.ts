@@ -66,6 +66,7 @@ export const ro = {
 
   // Subsol
   'subsol.contact': 'Contact',
+  'subsol.linkuri': 'Linkuri',
   'subsol.copyright': '© {an} {denumire}',
 
   // Pagina Acasă

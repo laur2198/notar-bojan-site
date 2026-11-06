@@ -1,16 +1,18 @@
 ---
 /**
  * „Cum lucrăm”: pașii ca listă ordonată. Numerele 700, bordo, într-un cerc subțire bordo;
- * pe desktop, o linie bordo leagă cercurile (decorativă). Fundalul îl dă secțiunea (gray-50).
+ * pe desktop, o linie bordo leagă cercurile (decorativă). Cercul are fundalul secțiunii
+ * (`fundal`), ca să acopere capătul liniei.
  */
 interface Props {
   pasi: { titlu: string; text: string }[];
+  fundal?: 'alb' | 'gri';
 }
 
-const { pasi } = Astro.props;
+const { pasi, fundal = 'alb' } = Astro.props;
 ---
 
-<ol class="pasi" role="list">
+<ol class="pasi" role="list" style={`--pasi-fundal: var(${fundal === 'gri' ? '--c-gray-50' : '--c-white'})`}>
   {
     pasi.map((pas, i) => (
       <li class="pas">
@@ -57,7 +59,7 @@ const { pasi } = Astro.props;
     width: var(--cerc);
     height: var(--cerc);
     margin-bottom: var(--space-1);
-    background: var(--c-gray-50);
+    background: var(--pasi-fundal);
     color: var(--c-red-700);
     border: 1.5px solid var(--c-red-700);
     border-radius: var(--radius-pill);

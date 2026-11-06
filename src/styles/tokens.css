@@ -1,8 +1,8 @@
 /* Design tokens – copiate exact din CLAUDE.md §5. Nu se modifică aici fără a modifica CLAUDE.md. */
 :root {
   /* Culori */
-  --c-wood-900: #2A1A10;  /* fundal footer, titluri */
-  --c-wood-800: #4A2E1E;  /* culoarea de brand: header, butoane primare */
+  --c-wood-900: #2A1A10;  /* titluri, fundalul hero-ului fără fotografie */
+  --c-wood-800: #4A2E1E;  /* culoarea de brand: butoane primare, secțiunea CTA finală */
   --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
   --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
   --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
@@ -20,7 +20,7 @@
   /* Tipografie */
   --font-sans: 'Inter Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
-  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții: --fs-xs și rândul 2 al wordmark-ului */
+  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
   --fs-h3:   clamp(1.375rem, 1.2rem + 0.6vw, 1.7rem);

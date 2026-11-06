@@ -68,6 +68,7 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Footer
   'subsol.contact': 'Contact',
+  'subsol.linkuri': 'Links',
   'subsol.copyright': '© {an} {denumire}',
 
   // Home page

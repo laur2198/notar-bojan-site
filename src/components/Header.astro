@@ -18,6 +18,7 @@ import type { Birou } from '../lib/continut';
 import ButonIconita from './ButonIconita.astro';
 import ComutatorLimba from './ComutatorLimba.astro';
 import Iconita from './Iconita.astro';
+import Wordmark from './Wordmark.astro';
 
 interface Props {
   locale: Locale;
@@ -58,10 +59,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
 
 <header class="antet" data-antet>
   <div class="container antet__interior">
-    <a class="wordmark" href={cale('acasa', locale)}>
-      <span class="wordmark__nume">{birou.notar}</span>
-      <span class="wordmark__profesie">{t(locale, 'wordmark.profesie')} · {birou.adresa.oras}</span>
-    </a>
+    <Wordmark locale={locale} birou={birou} />
 
     <!-- Desktop -->
     <div class="antet__desktop">
@@ -79,7 +77,16 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
         </ul>
       </nav>
       <ComutatorLimba locale={locale} />
-      <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
+      {
+        telefon.valid ? (
+          <a class="antet__telefon" href={telefon.href} aria-label={etichetaTelefon}>
+            <Iconita nume="telefon" />
+            <span class="antet__telefon-numar">{telefon.text}</span>
+          </a>
+        ) : (
+          <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
+        )
+      }
       <ButonIconita locale={locale} iconita="email" link={email} eticheta={etichetaEmail} />
       <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
         {t(locale, 'actiune.programare')}
@@ -178,51 +185,6 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
     justify-content: space-between;
     gap: var(--space-2);
     min-height: var(--header-h-sm);
-  }
-
-  /* Wordmark pe două rânduri, cu majuscule (prin CSS: textul rămâne normal pentru cititoarele de ecran). */
-  .wordmark {
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 48px;
-    color: var(--c-wood-900);
-    text-decoration: none;
-    text-transform: uppercase;
-    line-height: 1.15;
-  }
-
-  .wordmark:hover {
-    color: var(--c-wood-900);
-  }
-
-  .wordmark__nume {
-    font-size: var(--fs-sm);
-    font-weight: 700;
-  }
-
-  .wordmark__profesie {
-    font-size: calc(var(--fs-sm) * 0.75);
-    font-weight: 500;
-    color: var(--c-gray-600);
-  }
-
-  .wordmark:hover .wordmark__nume {
-    text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
-    text-decoration-thickness: 0.08em;
-    text-underline-offset: 0.18em;
-  }
-
-  /* Sub 480 px numele se poate rupe pe două rânduri; de acolo în sus rămâne pe unul. */
-  @media (min-width: 30rem) {
-    .wordmark {
-      white-space: nowrap;
-    }
-
-    .wordmark__nume {
-      font-size: var(--fs-lg);
-    }
   }
 
   /* --- Compact (< 80rem) --- */
@@ -334,6 +296,7 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
   }
 
   /* --- Desktop (≥ 80rem) --- */
+
   .antet__desktop {
     display: none;
   }
@@ -344,10 +307,6 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       gap: var(--space-2);
     }
 
-    .wordmark__nume {
-      font-size: var(--fs-base);
-    }
-
     .antet__compact {
       display: none;
     }
@@ -356,6 +315,46 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       display: flex;
       align-items: center;
       gap: var(--space-1);
+    }
+
+    /* Header-ul folosește toată lățimea ecranului (cu marginile --gutter), ca la referință:
+       numărul de telefon are nevoie de mai mult loc decât containerul de conținut. */
+    .antet__interior {
+      max-width: none;
+    }
+
+    /* Telefonul: iconiță + număr într-un singur link; sub 85rem (1360 px), doar iconița. */
+    .antet__telefon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      min-width: 48px;
+      min-height: 48px;
+      padding-inline: calc(var(--space-1) * 1.5);
+      background: var(--c-white);
+      color: var(--c-gray-900);
+      border: 1px solid var(--c-gray-200);
+      border-radius: var(--radius);
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .antet__telefon :global(.iconita) {
+      color: var(--c-wood-800);
+    }
+
+    .antet__telefon:hover {
+      color: var(--c-gray-900);
+      background: var(--c-gray-50);
+      border-color: var(--c-wood-800);
+    }
+
+    .antet__telefon-numar {
+      display: none;
     }
 
     .meniu {
@@ -391,6 +390,13 @@ const etichetaEmail = t(locale, 'antet.email', { email: email.text });
       text-decoration-color: var(--c-red-700);
       text-decoration-thickness: 3px;
       text-underline-offset: 0.4em;
+    }
+  }
+
+  /* Numărul de telefon apare de la 85rem (1360 px): pragul măsurat la care header-ul încape pe un rând. */
+  @media (min-width: 85rem) {
+    .antet__telefon-numar {
+      display: inline;
     }
   }
 </style>
