@@ -121,9 +121,9 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     await pagina.goto(server.url + '/');
     const hero = pagina.locator('.hero [data-semnatura="hero"]');
     await pagina.waitForFunction(() => document.querySelector('.hero [data-semnatura="hero"]')?.classList.contains('instant'));
-    const stil = await hero.locator('path').evaluate((p) => ({ offset: parseFloat(getComputedStyle(p).strokeDashoffset), tranzitie: getComputedStyle(p).transitionDuration }));
-    assert.equal(stil.offset, 0);
-    assert.equal(stil.tranzitie, '0s');
+    const stiluri = await hero.locator('path').evaluateAll((p) => p.map((x) => ({ offset: Number(getComputedStyle(x).strokeDashoffset.match(/-?[\d.]+/)[0]), tranzitie: getComputedStyle(x).transitionDuration })));
+    assert.ok(stiluri.every((x) => x.offset === 0 && x.tranzitie === '0s'), JSON.stringify(stiluri[0]));
+    assert.equal(await hero.evaluate((s) => getComputedStyle(s).getPropertyValue('--progres').trim()), '1');
     await ctx.close();
   });
 });

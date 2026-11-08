@@ -1,0 +1,24 @@
+/*
+ * Generat de scripts/genereaza-semnatura.mjs. Nu se editează manual.
+ * Intervalul fiecărei trăsături din gestul total (0–1): --delay = început, --d = durată,
+ * proporțional cu lungimea reală. Suma lui --d = 1; trăsăturile se succed fără suprapunere.
+ * Lungime totală: 2430.3 unități viewBox, 13 trăsături.
+ */
+.semnatura {
+  /* Cât coboară linia de semnătură sub baza SVG-ului: (înălțime − bază) / înălțime. */
+  --semnatura-sub-baza: 19.433962%;
+}
+
+.semnatura__traseu[data-segment="0"] { --delay: 0; --d: 0.065303; }
+.semnatura__traseu[data-segment="1"] { --delay: 0.065303; --d: 0.042091; }
+.semnatura__traseu[data-segment="2"] { --delay: 0.107394; --d: 0.071879; }
+.semnatura__traseu[data-segment="3"] { --delay: 0.179273; --d: 0.009281; }
+.semnatura__traseu[data-segment="4"] { --delay: 0.188554; --d: 0.071678; }
+.semnatura__traseu[data-segment="5"] { --delay: 0.260232; --d: 0.063402; }
+.semnatura__traseu[data-segment="6"] { --delay: 0.323635; --d: 0.273956; }
+.semnatura__traseu[data-segment="7"] { --delay: 0.597591; --d: 0.116099; }
+.semnatura__traseu[data-segment="8"] { --delay: 0.71369; --d: 0.042091; }
+.semnatura__traseu[data-segment="9"] { --delay: 0.755782; --d: 0.103675; }
+.semnatura__traseu[data-segment="10"] { --delay: 0.859457; --d: 0.003562; }
+.semnatura__traseu[data-segment="11"] { --delay: 0.863019; --d: 0.071678; }
+.semnatura__traseu[data-segment="12"] { --delay: 0.934697; --d: 0.065303; }

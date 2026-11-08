@@ -114,6 +114,8 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   // viewport (IntersectionObserver, threshold 0.4), apoi observatorul se deconectează.
   const semnatura = document.querySelector<SVGSVGElement>('[data-semnatura="hero"]');
   if (semnatura) {
+    // Fără @property, --progres nu se animă: trăsăturile primesc tranziții lineare proprii.
+    if (!window.CSS?.registerProperty) semnatura.classList.add('fara-property');
     if (document.documentElement.classList.contains('intro-rulat')) {
       semnatura.classList.add('desenat', 'instant');
     } else if (!('IntersectionObserver' in window)) {
@@ -245,8 +247,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 
 
   /*
-   * Linia de semnătură: 1 px, gri deschis atenuat pe fundalul închis (decorativă). Semnătura
-   * coboară peste linie: linia cade pe y ≈ 228 din cele 278 ale desenului.
+   * Linia de semnătură: 1 px, gri deschis atenuat pe fundalul închis (decorativă).
    */
   .hero__semnatura {
     padding-bottom: var(--space-4);
@@ -275,9 +276,13 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     border-bottom: 1px solid color-mix(in srgb, var(--c-gray-200) 40%, transparent);
   }
 
-  /* Procentul din translate se raportează la înălțimea SVG-ului: 50/278 ≈ 18%. */
+  /*
+   * Linia cade exact pe linia de bază a semnăturii: SVG-ul coboară cu (înălțime − bază) / înălțime
+   * din înălțimea lui (--semnatura-sub-baza, generat în src/styles/semnatura-segmente.css).
+   * Descendenta lui „j” trece de linie, ca la o semnătură pe rând.
+   */
   .hero__rand :global(.semnatura) {
-    translate: 0 18%;
+    translate: 0 var(--semnatura-sub-baza);
   }
 
   .hero__jos {

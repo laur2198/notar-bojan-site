@@ -1,29 +1,36 @@
 ---
 /**
- * Semnătura desenată (decorativă): un singur <path> cu pathLength="100", „scris” prin
- * stroke-dashoffset 100 → 0 (dasharray 100 101).
+ * Semnătura desenată (decorativă): „notar” · mâini · „bojan”, generată static de
+ * scripts/genereaza-semnatura.mjs în src/assets/semnatura.svg (trei grupuri, câte un <path> pe
+ * trăsătură, fiecare cu pathLength="100") și src/styles/semnatura-segmente.css (intervalul
+ * fiecărei trăsături: --delay, --d, fracțiuni din gestul total, proporționale cu lungimea).
+ *
+ * Animația: un singur element animat, variabila --progres (0 → 1, @property), cu easing-ul
+ * cubic-bezier(0.77, 0, 0.175, 1) pe TOT gestul. Fiecare trăsătură își calculează dashoffset-ul
+ * (dasharray 100 101, 100 → 0) din --progres, cu clamp pe intervalul ei: strict secvențial, stânga
+ * → dreapta. Fără @property (clasa .fara-property, pusă din JS): tranziții lineare pe trăsături,
+ * cu delay-uri, aceeași durată totală.
  *
  * Stări:
  *  - fără JS (html fără .js) sau prefers-reduced-motion: reduce → desenată complet, fără tranziție;
- *  - cu JS: nedesenată până la clasa .desenat, apoi 3.5 s cubic-bezier(0.77, 0, 0.175, 1).
- * La capăt, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după ce desenul se termină
- * (delay = durata desenului). Fără JS și la mișcare redusă e vizibil direct.
+ *  - cu JS: nedesenată până la clasa .desenat; .instant = desenată fără tranziție.
+ * La capăt, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după desen (delay = durata).
  * Culori doar din token-uri: traseul wood-300 (hero-ul și intro-ul au fundal închis), punctul red-700.
- * Clasa `.js` o pune scriptul din <head> (BaseLayout), înainte de primul paint.
  *
- * Componenta nu are script propriu (poate fi randată și într-un <template>, unde un script n-ar
- * rula): varianta „hero” e pornită de Hero.astro (IntersectionObserver), varianta „intro” de
- * scriptul din <head> (src/scripts/intro-semnatura.js). Clasa `.instant` = desenată fără tranziție.
+ * Componenta nu are script propriu (e randată și într-un <template>, unde un script n-ar rula):
+ * varianta „hero” e pornită de Hero.astro (IntersectionObserver), varianta „intro” de scriptul din
+ * <head> (src/scripts/intro-semnatura.js). Clasa `.js` o pune scriptul din <head> (BaseLayout).
  */
 import svgSemnatura from '../assets/semnatura.svg?raw';
 import { citesteSemnatura } from '../lib/semnatura';
+import '../styles/semnatura-segmente.css';
 
 interface Props {
   varianta: 'hero' | 'intro';
 }
 
 const { varianta } = Astro.props;
-const { viewBox, latime, inaltime, d, capat } = citesteSemnatura(svgSemnatura);
+const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
 ---
 
 <svg
@@ -39,15 +46,20 @@ const { viewBox, latime, inaltime, d, capat } = citesteSemnatura(svgSemnatura);
   stroke-linejoin="round"
   aria-hidden="true"
   focusable="false"
->
-  <path class="semnatura__traseu" d={d} pathLength="100" vector-effect="non-scaling-stroke" />
-  <circle class="semnatura__punct" cx={capat.x} cy={capat.y} r={capat.r} />
-</svg>
-
+  set:html={interior}
+/>
 
 <style>
+  /* Progresul gestului: număr animabil (0 = nedesenată, 1 = desenată). */
+  @property --progres {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 1;
+  }
+
   .semnatura {
     --semnatura-durata: 3.5s;
+    --progres: 1;
     display: block;
     height: auto;
     max-width: 100%;
@@ -74,37 +86,55 @@ const { viewBox, latime, inaltime, d, capat } = citesteSemnatura(svgSemnatura);
     }
   }
 
-  /* Starea finală e cea implicită: fără JS și la mișcare redusă semnătura apare desenată. */
-  .semnatura__traseu {
+  /*
+   * Fiecare trăsătură: desenată proporțional cu cât din intervalul ei [--delay, --delay + --d]
+   * a parcurs --progres. Starea finală (--progres: 1) e cea implicită: fără JS și la mișcare
+   * redusă semnătura apare desenată.
+   */
+  .semnatura :global(.semnatura__traseu) {
     stroke-dasharray: 100 101;
-    stroke-dashoffset: 0;
+    stroke-dashoffset: calc(100 - 100 * clamp(0, (var(--progres) - var(--delay, 0)) / var(--d, 1), 1));
   }
 
-  .semnatura__punct {
+  .semnatura :global(.semnatura__punct) {
     fill: var(--c-red-700);
     stroke: none;
     opacity: 1;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    :global(.js) .semnatura:not(.desenat) .semnatura__traseu {
-      stroke-dashoffset: 100;
+    :global(.js) .semnatura:not(.desenat) {
+      --progres: 0;
     }
 
-    :global(.js) .semnatura:not(.desenat) .semnatura__punct {
+    :global(.js) .semnatura:not(.desenat) :global(.semnatura__punct) {
       opacity: 0;
     }
 
-    .semnatura.desenat .semnatura__traseu {
-      transition: stroke-dashoffset var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
+    .semnatura.desenat {
+      transition: --progres var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
     }
 
-    .semnatura.desenat .semnatura__punct {
+    .semnatura.desenat :global(.semnatura__punct) {
       transition: opacity 0.3s ease var(--semnatura-durata);
     }
 
-    .semnatura.instant .semnatura__traseu,
-    .semnatura.instant .semnatura__punct {
+    /* Fallback fără @property: --progres nu se poate anima, deci trăsăturile au tranziții proprii. */
+    .semnatura.fara-property :global(.semnatura__traseu) {
+      stroke-dashoffset: 0;
+    }
+
+    :global(.js) .semnatura.fara-property:not(.desenat) :global(.semnatura__traseu) {
+      stroke-dashoffset: 100;
+    }
+
+    .semnatura.fara-property.desenat :global(.semnatura__traseu) {
+      transition: stroke-dashoffset calc(var(--d) * var(--semnatura-durata)) linear calc(var(--delay) * var(--semnatura-durata));
+    }
+
+    .semnatura.instant,
+    .semnatura.instant :global(.semnatura__traseu),
+    .semnatura.instant :global(.semnatura__punct) {
       transition: none;
     }
   }

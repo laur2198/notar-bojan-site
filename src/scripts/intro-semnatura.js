@@ -12,6 +12,7 @@
   if (!strat) return;
   strat = strat.cloneNode(true);
   var semnatura = strat.querySelector('svg');
+  if (!(window.CSS && CSS.registerProperty)) semnatura.classList.add('fara-property');
   var evenimente = ['click', 'touchstart', 'keydown', 'wheel'];
   var inchis = false;
   var temporizator;

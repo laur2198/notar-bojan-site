@@ -1,38 +1,42 @@
 /**
- * Citirea desenului semnăturii (src/assets/semnatura.svg) la build: viewBox-ul și path-ul unic.
- * Componenta Semnatura.astro randează propriul <svg> din aceste date, deci desenul final se
- * înlocuiește doar în asset (un singur path, același viewBox).
+ * Citirea semnăturii generate (src/assets/semnatura.svg, din scripts/genereaza-semnatura.mjs) la
+ * build: viewBox-ul, grupurile (notar · mâini · bojan) și interiorul SVG-ului, pe care componenta
+ * Semnatura.astro îl pune în propriul <svg>. Intervalele trăsăturilor (--delay, --d) stau în
+ * src/styles/semnatura-segmente.css, generat de același script.
  */
 
 export interface DateSemnatura {
   viewBox: string;
   latime: number;
   inaltime: number;
-  d: string;
-  /** Punctul de accent, pus exact pe ultimul punct al path-ului (scris în asset). */
-  capat: { x: number; y: number; r: number };
-}
-
-/** Ultimul punct al unui path cu comenzi absolute (ultimele două numere ale lui d). */
-export function ultimulPunct(d: string): { x: number; y: number } {
-  const comenzi = d.match(/[a-zA-Z][^a-zA-Z]*/g) ?? [];
-  const ultima = comenzi.filter((c) => !/^[zZ]/.test(c)).at(-1) ?? '';
-  if (!/^[MLCSQT]/.test(ultima)) throw new Error(`semnatura.svg: ultima comandă a path-ului trebuie să fie absolută (M, L, C, S, Q, T), nu „${ultima[0]}”.`);
-  const numere = ultima.slice(1).match(/-?\d*\.?\d+(?:e-?\d+)?/gi)?.map(Number) ?? [];
-  return { x: numere.at(-2)!, y: numere.at(-1)! };
+  /** Numele grupurilor, în ordine (data-grup). */
+  grupuri: string[];
+  /** Conținutul <svg>-ului, fără comentarii. */
+  interior: string;
 }
 
 export function citesteSemnatura(svg: string): DateSemnatura {
   const faraComentarii = svg.replace(/<!--[\s\S]*?-->/g, '');
-  const viewBox = faraComentarii.match(/<svg[^>]*\sviewBox="([^"]+)"/)?.[1];
+  const viewBox = faraComentarii.match(/<svg[^>]*\sviewBox="([^"]+)"/)?.[1]?.trim();
   if (!viewBox) throw new Error('semnatura.svg: lipsește viewBox pe <svg>.');
-  const [, , latime, inaltime] = viewBox.trim().split(/[\s,]+/).map(Number);
+  const [, , latime, inaltime] = viewBox.split(/[\s,]+/).map(Number);
   if (!latime || !inaltime) throw new Error(`semnatura.svg: viewBox invalid „${viewBox}”.`);
-  const trasee = [...faraComentarii.matchAll(/<path\b[^>]*\sd="([^"]+)"/g)];
-  if (trasee.length !== 1) throw new Error(`semnatura.svg: trebuie exact un <path>, găsite ${trasee.length}.`);
-  const cerc = faraComentarii.match(/<circle\b[^>]*>/)?.[0] ?? '';
-  const atribut = (nume: string) => Number(cerc.match(new RegExp(`\\s${nume}="([^"]+)"`))?.[1]);
-  const capat = { x: atribut('cx'), y: atribut('cy'), r: atribut('r') };
-  if (!cerc || [capat.x, capat.y, capat.r].some(Number.isNaN)) throw new Error('semnatura.svg: lipsește <circle cx cy r> (punctul de la capătul path-ului).');
-  return { viewBox: viewBox.trim(), latime, inaltime, d: trasee[0]![1]!.replace(/\s+/g, ' ').trim(), capat };
+  const interior = faraComentarii.match(/<svg\b[^>]*>([\s\S]*)<\/svg>/)?.[1]?.replace(/\n\s*/g, '').trim() ?? '';
+  const grupuri = [...interior.matchAll(/<g\b[^>]*data-grup="([^"]+)"/g)].map((m) => m[1]!);
+  return { viewBox, latime, inaltime, grupuri, interior };
+}
+
+export interface IntervalSegment {
+  segment: number;
+  delay: number;
+  d: number;
+}
+
+/** Intervalele trăsăturilor din CSS-ul generat (`[data-segment="i"] { --delay: x; --d: y; }`). */
+export function citesteIntervale(css: string): IntervalSegment[] {
+  return [...css.matchAll(/\[data-segment="(\d+)"\]\s*\{\s*--delay:\s*([\d.e-]+);\s*--d:\s*([\d.e-]+);\s*\}/g)].map(([, s, delay, d]) => ({
+    segment: Number(s),
+    delay: Number(delay),
+    d: Number(d),
+  }));
 }
