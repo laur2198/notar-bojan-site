@@ -31,7 +31,9 @@
   --granulatie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.05'/%3E%3C/svg%3E");
 
   /* Tipografie */
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-wordmark: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
   --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */

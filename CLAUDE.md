@@ -14,7 +14,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 - **Astro**, ultima versiune stabilă, `output: 'static'`. Content Layer API (`src/content.config.ts`, loader `glob`/`file`). Verifică documentația curentă Astro înainte de API-uri de care nu ești sigur.
 - **CSS propriu** cu custom properties (design tokens) în `src/styles/`. Fără Tailwind, fără framework UI, fără jQuery.
 - **JavaScript minim**, doar ca progressive enhancement (ex.: „Deschis acum / Închis”). Site-ul trebuie să funcționeze complet cu JS dezactivat.
-- **Fonturi self-hosted** prin Fontsource (vezi §5 Tipografie): Geist pentru text și titluri, Geist Mono pentru etichetele mono decorative, plus fontul wordmark-ului gigant. Doar subseturile latin + latin-ext, `font-display: swap`, preload doar pentru fontul de text (latin). Verifică pentru orice font nou randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ), și ă â î. Un font fără ele nu se folosește.
+- **Fonturi self-hosted** prin Fontsource (vezi §5 Tipografie): Geist (`@fontsource-variable/geist`) pentru text și titluri, Geist Mono (`@fontsource-variable/geist-mono`) pentru etichetele mono decorative, Funnel Display (`@fontsource-variable/funnel-display`) pentru wordmark (ales față de Geist 700: la dimensiuni mari are personalitate proprie și se distinge de textul de bază). Doar subseturile latin + latin-ext, `font-display: swap`, preload doar pentru fontul de text (latin). Verifică pentru orice font nou randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ), și ă â î. Un font fără ele nu se folosește.
 - **Animații:** GSAP + ScrollTrigger, instalate prin npm (nu CDN), inițializate din `src/scripts/miscare.ts` (vezi §3.2).
 - **Pages CMS** (`.pages.yml` în rădăcină) pentru editarea conținutului. Documentație: https://pagescms.org/llms-full.txt
 - **Găzduire:** Cloudflare (static). Fără funcții server, fără bază de date.
@@ -78,7 +78,9 @@ Pe `main` rămâne versiunea „clasică” a site-ului, ca șablon pentru alți
   --granulatie: url("data:image/svg+xml,…feTurbulence…"); /* zgomot gri, opacitate 0.05 */
 
   /* Tipografie */
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;          /* @fontsource-variable/geist */
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;    /* @fontsource-variable/geist-mono */
+  --font-wordmark: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif; /* @fontsource-variable/funnel-display */
   --fs-base: 1.125rem;   /* 18px */
   --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
