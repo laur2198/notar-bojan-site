@@ -14,7 +14,8 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 - **Astro**, ultima versiune stabilă, `output: 'static'`. Content Layer API (`src/content.config.ts`, loader `glob`/`file`). Verifică documentația curentă Astro înainte de API-uri de care nu ești sigur.
 - **CSS propriu** cu custom properties (design tokens) în `src/styles/`. Fără Tailwind, fără framework UI, fără jQuery.
 - **JavaScript minim**, doar ca progressive enhancement (ex.: „Deschis acum / Închis”). Site-ul trebuie să funcționeze complet cu JS dezactivat.
-- **Font self-hosted** prin Fontsource: `@fontsource-variable/inter` (un singur font, pentru titluri și text), subseturile latin + latin-ext. Verifică randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ).
+- **Fonturi self-hosted** prin Fontsource (vezi §5 Tipografie): Geist pentru text și titluri, Geist Mono pentru etichetele mono decorative, plus fontul wordmark-ului gigant. Doar subseturile latin + latin-ext, `font-display: swap`, preload doar pentru fontul de text (latin). Verifică pentru orice font nou randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ), și ă â î. Un font fără ele nu se folosește.
+- **Animații:** GSAP + ScrollTrigger, instalate prin npm (nu CDN), inițializate din `src/scripts/miscare.ts` (vezi §3.2).
 - **Pages CMS** (`.pages.yml` în rădăcină) pentru editarea conținutului. Documentație: https://pagescms.org/llms-full.txt
 - **Găzduire:** Cloudflare (static). Fără funcții server, fără bază de date.
 - **Node:** versiunea LTS curentă. Package manager: npm.
@@ -22,7 +23,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ## 3. Interdicții (nu se negociază)
 
 1. **Fără resurse externe încărcate automat:** fără Google Fonts, CDN-uri, iframe Google Maps sau Google Calendar la încărcarea paginii, fără analytics, fără pixeli. Motiv: GDPR (clientul este operator de date) și performanță. Hărțile și programarea se deschid prin link sau, dacă se cere embed, prin „click pentru încărcare” (facade) cu text de informare.
-2. **Fără scroll hijacking, fullpage scroll, parallax, carusele automate, animații de intrare.** Respectă `prefers-reduced-motion`. Tranzițiile de hover/focus sunt permise (max. 200 ms).
+2. **Mișcare.** Permise: dezvăluiri la scroll (opacitate, translate max. 24 px, culoare text), secțiuni sticky cu progres legat de scroll, intro-ul cu semnătura. Interzise: scroll hijacking, smooth scroll/Lenis, fullpage scroll, parallax pe fotografii, carusele automate, preloader care blochează conținutul. Orice animație: GSAP + ScrollTrigger, instalate prin npm (nu CDN). La `prefers-reduced-motion: reduce`, TOT conținutul apare direct în starea finală, fără mișcare. Conținutul e în HTML și lizibil fără JS. Tranzițiile de hover/focus sunt permise (max. 200 ms).
 3. **Fără calculator de onorarii** și fără cifre de onorarii inventate.
 4. **Restricții deontologice ale profesiei notariale:** fără superlative („cel mai bun”, „cel mai rapid”), fără comparații cu alți notari, fără reduceri sau promoții, fără promisiuni de rezultat sau de termen garantat, fără mărturii scrise de noi. Recenziile afișate sunt exclusiv recenzii reale de pe Google, introduse de client.
 5. **Nu inventa date ale biroului** (telefon, adresă, CIF, program, ani de experiență). Folosește marcajul `«DE COMPLETAT: ...»`.
@@ -31,7 +32,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 ## 4. Accesibilitate (contractual – WCAG 2.1 AA)
 
 - Text de bază **18 px** (`1.125rem`), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
-- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (12 px). Nicăieri altundeva.
+- Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600), rândul de sus din wordmark-ul compact (12 px) și etichetele mono decorative (14 px: numerotarea 01–06, etichetele coloanelor din footer). Nicăieri altundeva.
 - Contrast AA: minim 4.5:1 text normal, 3:1 text mare și elemente UI. Verifică fiecare combinație nouă de culori.
 - Ținte de atingere minim **48×48 px**.
 - `:focus-visible` clar pe toate elementele interactive (contur de 3 px, nu doar schimbare de culoare).
@@ -43,7 +44,9 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 ## 5. Design
 
-**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e maro-lemn închis, cu gri, alb și accente bordo, stabilite cu clienta. Nu se discută. Structură și ritm după notariatul Jesús Benavides: un singur font sans, raze mici, spațiere generoasă, header alb fix.
+**Direcție:** minimalist, expresiv, premium. Alternanță fundal crem / fundal închis (wood-900). Tipografie mare, contrast puternic de mărime. Numele «bojan elena luminița» uriaș, cu minuscule, în hero și footer. Accent bordo foarte rar.
+
+Pe `main` rămâne versiunea „clasică” a site-ului, ca șablon pentru alți notari; direcția de mai sus e a ramurii `redesign-premium`.
 
 ### Tokens (în `src/styles/tokens.css`)
 
@@ -94,8 +97,9 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
 
-- Scara titlurilor e compactă (din tokeni): h1 max. 40 px, h2 max. 28 px, h3 max. 22 px; titlurile coloanelor din banda de informații folosesc `--fs-h3`. Subtitlul din hero și lead-urile de sub titluri: 18 px (lead-urile în `--c-gray-600`). Textul de bază rămâne 18 px.
-- Un singur font, Inter; titluri 700. Fără text justify. Fără majuscule integrale pe paragrafe (wordmark-ul și h1-ul din hero pot fi cu majuscule, prin CSS).
+- **Tipografie:** Geist pentru text și titluri; Geist Mono doar pentru etichetele mono decorative; fontul wordmark-ului gigant e cel din tokenul `--font-wordmark`. Textul de bază rămâne 18 px. Scara (din tokeni, fără plafoanele vechi de 40/28/22 px) e în blocul de tokeni de mai sus: `--fs-lead`, `--fs-h3`, `--fs-h2`, `--fs-h1`, `--fs-statement` (frazele mari), `--fs-wordmark`, `--fs-mono`. Lead-urile de sub titluri în culoarea „muted” a fundalului.
+- Fără text justify. Fără majuscule integrale pe paragrafe. Majusculele sunt permise DOAR la etichetele mono decorative (14 px) și la rândul de sus al wordmark-ului compact.
+- **Wordmark:** linia de sus „Birou Individual Notarial” (exact în această ordine, e denumirea oficială), linia de jos „bojan elena luminița” (minuscule, ordinea exactă). Varianta „compact” (header: cele două linii, mici) și varianta „gigant” (doar „bojan elena luminița”, pe toată lățimea containerului, `aria-hidden`, pentru că numele apare ca text în altă parte; sub 768 px se poate rupe pe două rânduri, „bojan elena” / „luminița”, aliniat stânga, dacă pe un rând ar ieși sub 48 px). Numele de familie e „Bojan”. Denumirea legală completă, „Birou Individual Notarial Bojan Elena Luminița”, rămâne în footer, JSON-LD și confidențialitate.
 - Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
 - Butoanele: 16 px, 600, înălțime min. 48 px, padding 12×20. Butonul primar: fundal `--c-wood-800`, text alb. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
 - Fundaluri: alb pentru pagină și header (fix sus), `--c-gray-50` pentru secțiunile alternante și footer, `--c-wood-800` pentru secțiunea CTA finală, `--c-wood-900` sub fotografia din hero.
