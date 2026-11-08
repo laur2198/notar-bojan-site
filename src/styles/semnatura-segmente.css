@@ -4,6 +4,12 @@
  * proporțional cu lungimea reală. Suma lui --d = 1; trăsăturile se succed fără suprapunere.
  * Lungime totală: 2751 unități viewBox, 13 trăsături.
  */
+:root {
+  /* Proporțiile desenului, pentru așezarea în pagină: înălțime / lățime și partea de sub linia de bază. */
+  --semnatura-raport: 0.170476;
+  --semnatura-sub-baza-f: 0.37933;
+}
+
 .semnatura {
   /* Cât coboară linia de semnătură sub baza SVG-ului: (înălțime − bază) / înălțime. */
   --semnatura-sub-baza: 37.932961%;

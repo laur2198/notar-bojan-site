@@ -249,18 +249,26 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   /*
    * Linia de semnătură: 1 px, gri deschis atenuat pe fundalul închis (decorativă).
    */
+  /*
+   * Lățimea semnăturii: 320 px la 375 px viewport → 600 px de la 1024 px, liniar (max-width: 100%
+   * pe ecranele mai înguste). Spațiul de dedesubt cuprinde partea desenului de sub linie
+   * (descendenta lui „j”), ca hero-ul (overflow: hidden) să n-o taie.
+   */
   .hero__semnatura {
-    padding-bottom: var(--space-4);
+    --semnatura-latime: clamp(320px, 158.2px + 43.14vw, 600px);
+    padding-bottom: calc(var(--semnatura-latime) * var(--semnatura-raport) * var(--semnatura-sub-baza-f) + var(--space-2));
   }
 
   /*
-   * De la 48rem hero-ul are înălțime minimă mai mare decât conținutul: conținutul se centrează
-   * peste rândurile 1–2, ca înainte de semnătură, deci titlul și butoanele nu se mută. Semnătura
-   * ocupă spațiul liber de sub butoane. Pe mobil rămâne în flux, sub butoane (nu le împinge sub
-   * primul ecran). Pe ecranele joase (sub 720 px înălțime) n-ar încăpea sub butoane fără să le
-   * atingă, deci rămâne tot în flux.
+   * Când hero-ul are înălțime minimă mai mare decât conținutul, conținutul se centrează peste
+   * rândurile 1–2, ca înainte de semnătură, deci titlul și butoanele nu se mută; semnătura ocupă
+   * spațiul liber de sub butoane. Asta încape:
+   *   - de la 64rem (hero = ecranul de sub header), dacă ecranul are cel puțin 43rem înălțime;
+   *   - între 48 și 64rem (hero = 70svh), doar pe ecranele înalte (tabletă portret, ≥ 60rem).
+   * În rest (mobil, ecrane joase) semnătura rămâne în flux, sub butoane, fără să le atingă.
+   * Verificat la 1024×700, 1100×690, 1280×720, 1366×700, 768×1024 (fără suprapunere).
    */
-  @media (min-width: 48rem) and (min-height: 45rem) {
+  @media (min-width: 64rem) and (min-height: 43rem), (min-width: 48rem) and (min-height: 60rem) {
     .hero__continut {
       grid-row: 1 / 3;
       grid-column: 1;

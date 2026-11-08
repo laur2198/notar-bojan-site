@@ -188,6 +188,12 @@ const css = `/*
  * proporțional cu lungimea reală. Suma lui --d = 1; trăsăturile se succed fără suprapunere.
  * Lungime totală: ${r1(total)} unități viewBox, ${segmente.length} trăsături.
  */
+:root {
+  /* Proporțiile desenului, pentru așezarea în pagină: înălțime / lățime și partea de sub linia de bază. */
+  --semnatura-raport: ${f6(INALTIME / LATIME)};
+  --semnatura-sub-baza-f: ${f6((INALTIME - BAZA) / INALTIME)};
+}
+
 .semnatura {
   /* Cât coboară linia de semnătură sub baza SVG-ului: (înălțime − bază) / înălțime. */
   --semnatura-sub-baza: ${f6(((INALTIME - BAZA) / INALTIME) * 100)}%;

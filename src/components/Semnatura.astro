@@ -14,7 +14,8 @@
  * Stări:
  *  - fără JS (html fără .js) sau prefers-reduced-motion: reduce → desenată complet, fără tranziție;
  *  - cu JS: nedesenată până la clasa .desenat; .instant = desenată fără tranziție.
- * La capăt, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după desen (delay = durata).
+ * La capăt, în hero, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după desen (delay =
+ * durata); în intro punctul nu apare.
  * Culori doar din token-uri: traseul wood-300 (hero-ul și intro-ul au fundal închis), punctul red-700.
  *
  * Componenta nu are script propriu (e randată și într-un <template>, unde un script n-ar rula):
@@ -67,8 +68,9 @@ const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
     stroke: var(--c-wood-300);
   }
 
+  /* 320 px pe mobil (375 px) → 600 px de la 1024 px, interpolat liniar; --semnatura-latime vine din Hero. */
   .semnatura--hero {
-    width: 240px;
+    width: var(--semnatura-latime, 320px);
   }
 
   .semnatura--intro {
@@ -77,10 +79,6 @@ const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
   }
 
   @media (min-width: 48rem) {
-    .semnatura--hero {
-      width: 375px;
-    }
-
     .semnatura--intro {
       width: 420px;
     }
@@ -100,6 +98,11 @@ const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
     fill: var(--c-red-700);
     stroke: none;
     opacity: 1;
+  }
+
+  /* În intro nu apare punctul de accent (doar în hero). */
+  .semnatura--intro :global(.semnatura__punct) {
+    display: none;
   }
 
   @media (prefers-reduced-motion: no-preference) {

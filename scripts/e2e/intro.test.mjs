@@ -45,6 +45,14 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     await ctx.close();
   });
 
+  test('în intro nu apare punctul bordo; în hero apare', async () => {
+    const { ctx, pagina } = await context();
+    await pagina.goto(server.url + '/');
+    assert.equal(await pagina.locator(`${STRAT} .semnatura__punct`).evaluate((c) => getComputedStyle(c).display), 'none');
+    assert.notEqual(await pagina.locator('.hero .semnatura__punct').evaluate((c) => getComputedStyle(c).display), 'none');
+    await ctx.close();
+  });
+
   test('se scoate singur din DOM în maximum 2.3 s (+ toleranță)', async () => {
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/', { waitUntil: 'commit' });
