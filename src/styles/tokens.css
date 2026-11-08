@@ -17,6 +17,19 @@
   --c-ok:       #2F6B3A;  /* „Deschis acum” */
   --c-closed:   #9B1C1C;  /* „Închis” */
 
+  /* Redesign premium: crem + închis (contrastele în CLAUDE.md §5) */
+  --c-cream:    #F7EFE6;  /* fundalul paginii (în locul albului) */
+  --c-cream-2:  #EFE4D8;  /* borduri și separatoare pe crem (doar decorativ) */
+  --c-ink:      var(--c-wood-900); /* fundalul secțiunilor închise și textul principal pe crem (14.7:1) */
+  --c-ink-muted:   #706054; /* text secundar pe crem (5.3:1; ≥ 4.6:1 și pe pixelii granulației) */
+  --c-cream-muted: #A8968A; /* text „stins” pe închis (5.9:1 pe ink; ≥ 5.0:1 cu granulație) */
+
+  /*
+   * Granulație: zgomot fin (feTurbulence), gri, opacitate 0.05, ca background-image pe body și pe
+   * secțiunile închise (nu ca strat fixed peste pagină). Data URI: CSP-ul permite img-src data:.
+   */
+  --granulatie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.05'/%3E%3C/svg%3E");
+
   /* Tipografie */
   --font-sans: 'Inter Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */

@@ -69,6 +69,14 @@ Pe `main` rămâne versiunea „clasică” a site-ului, ca șablon pentru alți
   --c-ok:       #2F6B3A;  /* „Deschis acum” */
   --c-closed:   #9B1C1C;  /* „Închis” */
 
+  /* Redesign premium: crem + închis */
+  --c-cream:    #F7EFE6;  /* fundalul paginii (în locul albului) */
+  --c-cream-2:  #EFE4D8;  /* borduri și separatoare pe crem (doar decorativ) */
+  --c-ink:      var(--c-wood-900); /* fundalul secțiunilor închise, textul principal pe crem */
+  --c-ink-muted:   #706054; /* text secundar pe crem */
+  --c-cream-muted: #A8968A; /* text „stins” pe închis */
+  --granulatie: url("data:image/svg+xml,…feTurbulence…"); /* zgomot gri, opacitate 0.05 */
+
   /* Tipografie */
   --font-sans: 'Inter Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
@@ -94,6 +102,24 @@ Pe `main` rămâne versiunea „clasică” a site-ului, ca șablon pentru alți
   --measure: 68ch;
 }
 ```
+
+**Contrastul perechilor text/fundal (WCAG 2.1, calculat cu `src/lib/contrast.ts`).** Granulația (zgomot gri la opacitate 0.05) închide sau deschide local fundalul cu cel mult ~5%; coloana „cu granulație” e cazul cel mai defavorabil.
+
+| Text | Fundal | Contrast | Cu granulație | Uz |
+|---|---|---|---|---|
+| `--c-ink` (#2A1A10) | `--c-cream` | 14.7:1 | ≥ 13:1 | text principal |
+| `--c-ink-muted` (#706054) | `--c-cream` | 5.3:1 | ≥ 4.6:1 | text secundar, lead-uri |
+| `--c-gray-600` (#5E5C59) | `--c-cream` | 5.9:1 | ≥ 5.1:1 | text secundar (componente vechi) |
+| `--c-wood-800` (#4A2E1E) | `--c-cream` | 10.8:1 | ≥ 9.6:1 | butoane, linkuri |
+| `--c-red-700` (#9B1C1C) | `--c-cream` | 7.2:1 | ≥ 6.4:1 | accent, „Închis” |
+| `--c-ok` (#2F6B3A) | `--c-cream` | 5.6:1 | ≥ 5.0:1 | „Deschis acum” |
+| `--c-cream` (#F7EFE6) | `--c-ink` | 14.7:1 | ≥ 12:1 | text pe secțiunile închise |
+| `--c-cream-muted` (#A8968A) | `--c-ink` | 5.9:1 | ≥ 5.0:1 | text „stins” pe închis |
+| `--c-wood-300` (#C9AE94) | `--c-ink` | 8.0:1 | ≥ 6.8:1 | decorativ, focus pe închis |
+| alb / `--c-cream` | `--c-wood-800` | 12.4:1 / 10.8:1 | ≥ 9:1 | butonul primar, CTA |
+| `--c-red-700` | `--c-ink` | 2.1:1 | – | **interzis ca text sau UI**; doar decorativ |
+
+Valoarea propusă inițial pentru `--c-ink-muted`, #7A6A5E, trecea la limită pe crem simplu (4.55:1), dar cobora la ~4.1:1 pe pixelii cei mai închiși ai granulației; de aceea e închisă la #706054. `--c-cream-muted` #A8968A trece și cu granulație și rămâne.
 
 Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
 
