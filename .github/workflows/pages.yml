@@ -5,9 +5,14 @@
 
 name: Preview pe GitHub Pages
 
+# Ramura publicată: TEMPORAR `redesign-premium` (ramura de integrare a redesign-ului), până la
+# merge-ul final în main. Cum se revine la main, după acel merge:
+#   1. aici, `branches: [redesign-premium]` → `branches: [main]` (commit pe main);
+#   2. în GitHub: Settings → Environments → github-pages → Deployment branches: lăsați main
+#      (și scoateți redesign-premium, adăugat pentru preview-ul redesign-ului).
 on:
   push:
-    branches: [main]
+    branches: [redesign-premium]
   workflow_dispatch:
 
 # Permisiuni minime: citirea codului (checkout) și publicarea pe Pages (OIDC).
