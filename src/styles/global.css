@@ -87,8 +87,9 @@ body {
   font-family: var(--font-sans);
   font-size: var(--fs-base);
   line-height: 1.6;
-  color: var(--c-gray-900);
-  background-color: var(--c-white);
+  color: var(--c-ink);
+  background-color: var(--c-cream);
+  background-image: var(--granulatie);
   /* Variabilele acoperă toate grosimile; doar italicul se poate sintetiza (nu e încărcat). */
   font-synthesis: style;
   -webkit-font-smoothing: antialiased;
@@ -182,6 +183,10 @@ hr {
  * primește clasa `.pe-inchis`, iar focusul devine --c-focus-on-dark (wood-300):
  * 5.86:1 pe wood-800, 7.95:1 pe wood-900.
  */
+.pe-inchis {
+  background-image: var(--granulatie);
+}
+
 .pe-inchis :focus-visible,
 .pe-inchis:focus-visible {
   outline-color: var(--c-focus-on-dark);

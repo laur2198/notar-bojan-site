@@ -21,6 +21,8 @@ import { url } from '../lib/url';
 // Scriptul din <head> (sincron, înainte de primul paint). E inline, deci hash-ul lui sha256 stă în
 // CSP-ul din public/_headers; `npm run build` verifică potrivirea (scripts/verifica-csp.mjs).
 import scriptCap from '../scripts/cap-pagina.js?raw';
+// Preload doar pentru fontul de text, subsetul latin (cel folosit la primul paint de orice pagină).
+import fontTextLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 
 interface Props {
   locale: Locale;
@@ -47,6 +49,7 @@ const birou = await getBirou();
     <script is:inline set:html={scriptCap.trim()} />
     <IntroSemnatura />
     <meta name="theme-color" content={culoare('c-wood-800')} />
+    <link rel="preload" href={fontTextLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <Seo
       locale={locale}

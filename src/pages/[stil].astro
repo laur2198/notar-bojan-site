@@ -13,6 +13,11 @@ export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } 
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
 import { estePreview, marcheazaPlaceholder } from '../lib/continut';
 import { culoare, culori, marimeMaximaPx } from '../lib/tokens';
+import { getBirou } from '../lib/continut';
+import EtichetaMono from '../components/EtichetaMono.astro';
+import Wordmark from '../components/Wordmark.astro';
+
+const birou = await getBirou();
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
 
@@ -27,6 +32,8 @@ const amesteca = (a: string, b: string, p: number) =>
 
 const hex = (token: string) => {
   if (token === 'mark') return MARK_FUNDAL;
+  // --c-ink e un alias: var(--c-wood-900).
+  if (token === 'c-ink') return culoare('c-wood-900');
   if (token === 'hover-secundar') return amesteca(culoare('c-gray-200'), culoare('c-gray-900'), 0.1);
   // Alb 90% peste fundalul hero-ului (wood-900).
   if (token === 'hero-subtitlu') return amesteca(culoare('c-wood-900'), culoare('c-white'), 0.9);
@@ -44,6 +51,25 @@ interface Pereche {
 }
 
 const perechi: Pereche[] = [
+  // Redesign premium: crem / închis (CLAUDE.md §5). Granulația (zgomot gri, opacitate 0.05) poate
+  // închide sau deschide local fundalul cu cel mult ~5%; tabelul din CLAUDE.md dă și acel caz.
+  { fata: 'c-ink', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: text principal și titluri pe crem' },
+  { fata: 'c-ink-muted', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: text secundar, lead-uri, etichete mono pe crem' },
+  { fata: 'c-wood-800', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: linkuri și butonul primar (contur/text) pe crem' },
+  { fata: 'c-red-700', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: accent bordo pe crem (foarte rar)' },
+  { fata: 'c-gray-600', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: text secundar al componentelor vechi, pe crem' },
+  { fata: 'c-ok', fundal: 'c-cream', uz: 'text', folosire: 'Redesign: „Deschis acum” pe crem' },
+  { fata: 'c-cream', fundal: 'c-ink', uz: 'text', folosire: 'Redesign: text pe secțiunile închise' },
+  { fata: 'c-cream-muted', fundal: 'c-ink', uz: 'text', folosire: 'Redesign: text „stins” și etichete mono pe închis' },
+  { fata: 'c-cream', fundal: 'c-wood-800', uz: 'text', folosire: 'Redesign: text crem pe butonul primar / CTA' },
+  { fata: 'c-cream-2', fundal: 'c-cream', uz: 'decorativ', folosire: 'Redesign: borduri și separatoare pe crem', nota: 'Doar decorativ.' },
+  {
+    fata: 'c-red-700',
+    fundal: 'c-ink',
+    uz: 'decorativ',
+    folosire: 'Redesign: bordo pe închis',
+    nota: 'Nu se folosește ca text sau element de interfață: contrast prea mic.',
+  },
   { fata: 'c-gray-900', fundal: 'c-white', uz: 'text', folosire: 'Text principal pe fundalul paginii' },
   { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Text principal pe secțiunile alternante' },
   { fata: 'c-wood-900', fundal: 'c-white', uz: 'text', folosire: 'Titluri pe fundalul paginii' },
@@ -138,13 +164,16 @@ const fraSedila = !/[şţŞŢ]/.test(DIACRITICE);
 const coduri = [...'șȘțȚ'].map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`);
 
 const scara = [
-  { nume: `Titlu h1 (hero, majuscule; max. ${marimeMaximaPx('fs-h1')} px)`, variabila: '--fs-h1', clasa: 'scara-h1 scara-majuscule' },
+  { nume: `Frază mare („statement”, 600, -0.03em; max. ${marimeMaximaPx('fs-statement')} px)`, variabila: '--fs-statement', clasa: 'scara-statement' },
+  { nume: `Titlu h1 (max. ${marimeMaximaPx('fs-h1')} px)`, variabila: '--fs-h1', clasa: 'scara-h1' },
   { nume: `Titlu h2 (max. ${marimeMaximaPx('fs-h2')} px)`, variabila: '--fs-h2', clasa: 'scara-h2' },
-  { nume: `Titlu h3 / titluri de coloană (max. ${marimeMaximaPx('fs-h3')} px)`, variabila: '--fs-h3', clasa: 'scara-h3' },
+  { nume: `Titlu h3 (max. ${marimeMaximaPx('fs-h3')} px)`, variabila: '--fs-h3', clasa: 'scara-h3' },
+  { nume: `Lead (max. ${marimeMaximaPx('fs-lead')} px)`, variabila: '--fs-lead', clasa: 'scara-lead' },
   { nume: 'Text mare', variabila: '--fs-lg', clasa: 'scara-lg' },
   { nume: 'Text de bază (18 px)', variabila: '--fs-base', clasa: 'scara-base' },
   { nume: 'Note, meniu, rezumate (16 px)', variabila: '--fs-sm', clasa: 'scara-sm' },
   { nume: 'Etichetele barei de jos (14 px)', variabila: '--fs-xs', clasa: 'scara-xs' },
+  { nume: 'Etichetă mono decorativă (Geist Mono, 14 px, majuscule)', variabila: '--fs-mono', clasa: 'scara-mono' },
 ];
 
 const exempluMarcaj =
@@ -245,7 +274,10 @@ const exempluMarcaj =
 
       <section aria-labelledby="tipografie">
         <h2 id="tipografie">Scara tipografică</h2>
-        <p>Un singur font: Inter (variabil, self-hosted). Titlurile 700. Dimensiunile titlurilor cresc fluid cu lățimea ecranului.</p>
+        <p>
+          Geist (variabil, self-hosted) pentru text și titluri; Geist Mono doar pentru etichetele mono decorative; Funnel
+          Display pentru wordmark. Textul de bază rămâne 18 px; titlurile cresc fluid cu lățimea ecranului.
+        </p>
         <dl class="scara">
           {
             scara.map((s) => (
@@ -304,6 +336,65 @@ const exempluMarcaj =
         </div>
       </section>
 
+      <section aria-labelledby="fonturi">
+        <h2 id="fonturi">Fonturi</h2>
+        <p>
+          Toate trei au ș Ș ț Ț cu virgulă (U+0218–U+021B) și ă â î, verificat în tabelele cmap ale fișierelor woff2
+          (subseturile latin + latin-ext).
+        </p>
+        <dl class="fonturi">
+          <div>
+            <dt><code>--font-sans</code> Geist Variable · text și titluri</dt>
+            <dd class="font-mostra font-mostra--sans">Știință, țară, însemnătate: actele se semnează în fața notarului. ȘȚĂÂÎ</dd>
+          </div>
+          <div>
+            <dt><code>--font-mono</code> Geist Mono Variable · etichete mono</dt>
+            <dd class="font-mostra font-mostra--mono">01 — Servicii · Ștampilă · Țară · ăâîșț</dd>
+          </div>
+          <div>
+            <dt><code>--font-wordmark</code> Funnel Display Variable · wordmark</dt>
+            <dd class="font-mostra font-mostra--wordmark">bojan elena luminița · ȘȚĂÂÎ</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="crem-inchis">
+        <h2 id="crem-inchis">Crem și închis</h2>
+        <p>
+          Cele două fundaluri ale redesign-ului, cu granulația fină (SVG feTurbulence ca data URI, opacitate 0.05,
+          background-image, nu strat fix). Pe fiecare: eticheta mono, o frază mare, lead-ul „muted”, textul de bază și
+          wordmark-ul gigant (aria-hidden), care umple exact lățimea containerului.
+        </p>
+        <div class="panou panou--crem">
+          <EtichetaMono>01 — Pe crem</EtichetaMono>
+          <p class="panou__statement">Actele, pregătite din timp.</p>
+          <p class="panou__lead">Text secundar pe crem: <code>--c-ink-muted</code>.</p>
+          <p>Text de bază pe crem, 18 px, <code>--c-ink</code>. Linkuri: <a href="#crem-inchis">exemplu de link</a>.</p>
+          <Wordmark varianta="gigant" birou={birou} />
+          <div class="panou__coloane">
+            <EtichetaMono>Contact</EtichetaMono>
+            <EtichetaMono>Program</EtichetaMono>
+            <EtichetaMono>Adresă</EtichetaMono>
+          </div>
+        </div>
+        <div class="panou panou--inchis pe-inchis">
+          <EtichetaMono>02 — Pe închis</EtichetaMono>
+          <p class="panou__statement">La birou veniți doar pentru semnare.</p>
+          <p class="panou__lead">Text „stins” pe închis: <code>--c-cream-muted</code>.</p>
+          <p>Text de bază pe închis, 18 px, <code>--c-cream</code>. Linkuri: <a href="#crem-inchis">exemplu de link</a>.</p>
+          <Wordmark varianta="gigant" birou={birou} />
+          <div class="panou__coloane">
+            <EtichetaMono>Contact</EtichetaMono>
+            <EtichetaMono>Program</EtichetaMono>
+            <EtichetaMono>Adresă</EtichetaMono>
+          </div>
+        </div>
+        <h3>Wordmark compact (header)</h3>
+        <div class="panou panou--crem panou--compact">
+          <Wordmark locale="ro" birou={birou} />
+        </div>
+      </section>
+
       <section aria-labelledby="diacritice">
         <h2 id="diacritice">Diacritice</h2>
         <p class="diacritice diacritice--bold">{DIACRITICE}</p>
@@ -328,6 +419,12 @@ const exempluMarcaj =
         <p class="exemplu-marcaj" set:html={marcheazaPlaceholder(exempluMarcaj)} />
       </section>
     </main>
+    <script>
+      // Infrastructura de mișcare (fără animații încă): marchează <html data-miscare="activa">
+      // doar dacă prefers-reduced-motion e „no-preference”.
+      import { pornesteMiscarea } from '../scripts/miscare';
+      pornesteMiscarea();
+    </script>
   </body>
 </html>
 
@@ -503,6 +600,110 @@ const exempluMarcaj =
 
   .font-sans {
     font-family: var(--font-sans);
+  }
+
+  .scara-statement {
+    font-size: var(--fs-statement);
+    font-weight: var(--fw-statement);
+    line-height: var(--lh-statement);
+    letter-spacing: var(--ls-statement);
+  }
+
+  .scara-lead {
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    color: var(--c-ink-muted);
+  }
+
+  .scara-mono {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .fonturi {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .font-mostra {
+    margin: 0;
+    font-size: var(--fs-h3);
+    line-height: 1.3;
+  }
+
+  .font-mostra--sans {
+    font-family: var(--font-sans);
+  }
+
+  .font-mostra--mono {
+    font-family: var(--font-mono);
+  }
+
+  .font-mostra--wordmark {
+    font-family: var(--font-wordmark);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .panou {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--gutter);
+    margin-inline: calc(-1 * var(--gutter));
+  }
+
+  @media (max-width: 29.99rem) {
+    .panou {
+      padding-inline: var(--gutter-sm);
+      margin-inline: calc(-1 * var(--gutter-sm));
+    }
+  }
+
+  .panou--crem {
+    background-color: var(--c-cream);
+    background-image: var(--granulatie);
+    color: var(--c-ink);
+  }
+
+  .panou--inchis {
+    background-color: var(--c-ink);
+    color: var(--c-cream);
+  }
+
+  .panou--inchis a {
+    color: var(--c-cream);
+  }
+
+  .panou--compact {
+    padding-block: var(--space-3);
+  }
+
+  .panou__statement {
+    max-width: 18ch;
+    margin: 0;
+    font-size: var(--fs-statement);
+    font-weight: var(--fw-statement);
+    line-height: var(--lh-statement);
+    letter-spacing: var(--ls-statement);
+  }
+
+  .panou__lead {
+    margin: 0;
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    color: var(--c-ink-muted);
+  }
+
+  .panou--inchis .panou__lead {
+    color: var(--c-cream-muted);
+  }
+
+  .panou__coloane {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
   }
 
   .scara-h1 {

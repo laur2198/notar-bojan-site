@@ -17,15 +17,58 @@
   --c-ok:       #2F6B3A;  /* „Deschis acum” */
   --c-closed:   #9B1C1C;  /* „Închis” */
 
+  /* Redesign premium: crem + închis (contrastele în CLAUDE.md §5) */
+  --c-cream:    #F7EFE6;  /* fundalul paginii (în locul albului) */
+  --c-cream-2:  #EFE4D8;  /* borduri și separatoare pe crem (doar decorativ) */
+  --c-ink:      var(--c-wood-900); /* fundalul secțiunilor închise și textul principal pe crem (14.7:1) */
+  --c-ink-muted:   #706054; /* text secundar pe crem (5.3:1; ≥ 4.6:1 și pe pixelii granulației) */
+  --c-cream-muted: #A8968A; /* text „stins” pe închis (5.9:1 pe ink; ≥ 5.0:1 cu granulație) */
+
+  /*
+   * Granulație: zgomot fin (feTurbulence), gri, opacitate 0.05, ca background-image pe body și pe
+   * secțiunile închise (nu ca strat fixed peste pagină). Data URI: CSP-ul permite img-src data:.
+   */
+  --granulatie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.05'/%3E%3C/svg%3E");
+
   /* Tipografie */
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-wordmark: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif;
   --fs-base: 1.125rem;   /* 18px */
   --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.25rem, 1.1rem + 0.4vw, 1.375rem);  /* max. 22px */
-  --fs-h2:   clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);    /* max. 28px */
-  --fs-h1:   clamp(2rem, 1.4rem + 1.8vw, 2.5rem);       /* max. 40px */
+  --fs-lead: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);      /* 20 → 24 px: lead-urile de sub titluri */
+  --fs-h3:   clamp(1.5rem, 1.3rem + 0.6vw, 2rem);         /* 24 → 32 px */
+  --fs-h2:   clamp(2rem, 1.5rem + 1.6vw, 3rem);           /* 32 → 48 px */
+  --fs-h1:   clamp(2.5rem, 1.4rem + 3.6vw, 4.5rem);       /* 40 → 72 px */
+  --fs-mono: 0.875rem;  /* 14 px – doar etichetele mono decorative (uppercase permis doar aici) */
+
+  /* Frazele mari („statements”) */
+  --fs-statement: clamp(2.25rem, 1rem + 4vw, 4.5rem);     /* 36 → 72 px */
+  --lh-statement: 1.1;
+  --ls-statement: -0.03em;
+  --fw-statement: 600;
+
+  /*
+   * Wordmark-ul gigant: „bojan elena luminița” umple exact lățimea containerului.
+   * Lățimea textului, măsurată în Chromium pentru Funnel Display 600 cu letter-spacing -0.04em:
+   *   un rând („bojan elena luminița”) = 8.917 × font-size; rândul lung la două rânduri
+   *   („bojan elena”) = 5.092 × font-size. Dacă se schimbă fontul, greutatea sau textul, se
+   *   remăsoară (pagina /stil/ arată lățimea reală față de container).
+   * Lățimea de conținut a containerului = min(100vw − 2 × gutter, --container), deci:
+   *   font-size = lățime / 8.917 → max. 75rem / 8.917 = 8.41rem (134.6 px).
+   * Sub ~460 px viewport, pe un rând ar ieși sub 48 px (48 × 8.917 = 428 px de conținut), deci
+   * se rupe pe două rânduri: font-size = lățime / 5.092 (67 px la 375 px).
+   * Componenta Wordmark folosește aceiași factori cu unități de container (cqi), exacte și cu
+   * bară de derulare; tokenii cu vw sunt fallback-ul.
+   */
+  --wordmark-k: 8.917;
+  --wordmark-k-2r: 5.092;
+  --fs-wordmark: clamp(2.375rem, (100vw - 2 * var(--gutter)) / var(--wordmark-k), 8.41rem);
+  --fs-wordmark-2r: calc((100vw - 2 * var(--gutter-sm)) / var(--wordmark-k-2r));
+  --ls-wordmark: -0.04em;
+  --lh-wordmark: 0.85;
 
   /* Spațiere, raze, umbre */
   --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;

@@ -28,6 +28,8 @@ export const ro = {
 
   // Wordmark
   'wordmark.profesie': 'Notar public',
+  // Denumirea oficială (rândul de sus al wordmark-ului compact); aceeași în ambele limbi.
+  'wordmark.birou': 'Birou Individual Notarial',
 
   // Limba
   'limba.comutator': 'Limba site-ului',

@@ -30,6 +30,8 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Wordmark
   'wordmark.profesie': 'Notary public',
+  // Official Romanian name of the office: not translated (rendered with lang="ro").
+  'wordmark.birou': 'Birou Individual Notarial',
 
   // Language
   'limba.comutator': 'Site language',
