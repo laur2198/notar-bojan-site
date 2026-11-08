@@ -85,9 +85,19 @@ Pe `main` rămâne versiunea „clasică” a site-ului, ca șablon pentru alți
   --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
   --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.25rem, 1.1rem + 0.4vw, 1.375rem);  /* max. 22px */
-  --fs-h2:   clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);    /* max. 28px */
-  --fs-h1:   clamp(2rem, 1.4rem + 1.8vw, 2.5rem);       /* max. 40px */
+  --fs-lead: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);      /* 20 → 24 px */
+  --fs-h3:   clamp(1.5rem, 1.3rem + 0.6vw, 2rem);         /* 24 → 32 px */
+  --fs-h2:   clamp(2rem, 1.5rem + 1.6vw, 3rem);           /* 32 → 48 px */
+  --fs-h1:   clamp(2.5rem, 1.4rem + 3.6vw, 4.5rem);       /* 40 → 72 px */
+  --fs-mono: 0.875rem;  /* 14 px – doar etichetele mono decorative */
+  --fs-statement: clamp(2.25rem, 1rem + 4vw, 4.5rem);     /* frazele mari, 36 → 72 px */
+  --lh-statement: 1.1; --ls-statement: -0.03em; --fw-statement: 600;
+  /* Wordmark gigant: umple containerul. Factori măsurați (Funnel Display 600, -0.04em):
+     un rând = 8.917 × font-size, „bojan elena” = 5.092 × font-size. */
+  --wordmark-k: 8.917; --wordmark-k-2r: 5.092;
+  --fs-wordmark: clamp(2.375rem, (100vw - 2 * var(--gutter)) / var(--wordmark-k), 8.41rem); /* max. 134.6 px */
+  --fs-wordmark-2r: calc((100vw - 2 * var(--gutter-sm)) / var(--wordmark-k-2r));  /* sub ~460 px, două rânduri */
+  --ls-wordmark: -0.04em; --lh-wordmark: 0.85;
 
   /* Spațiere, raze, umbre */
   --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
