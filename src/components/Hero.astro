@@ -108,6 +108,31 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   }
 </section>
 
+<script>
+  // Semnătura din hero: dacă intro-ul a rulat la această încărcare (clasa .intro-rulat pusă din
+  // <head>), apare direct desenată. Altfel se desenează o singură dată, la prima intrare în
+  // viewport (IntersectionObserver, threshold 0.4), apoi observatorul se deconectează.
+  const semnatura = document.querySelector<SVGSVGElement>('[data-semnatura="hero"]');
+  if (semnatura) {
+    if (document.documentElement.classList.contains('intro-rulat')) {
+      semnatura.classList.add('desenat', 'instant');
+    } else if (!('IntersectionObserver' in window)) {
+      semnatura.classList.add('desenat');
+    } else {
+      const observator = new IntersectionObserver(
+        (intrari) => {
+          if (intrari.some((i) => i.isIntersecting)) {
+            semnatura.classList.add('desenat');
+            observator.disconnect();
+          }
+        },
+        { threshold: 0.4 },
+      );
+      observator.observe(semnatura);
+    }
+  }
+</script>
+
 <style>
   .hero {
     position: relative;

@@ -1,0 +1,48 @@
+---
+/**
+ * Intro-ul cu semnătura, o dată pe sesiune (în <head>, pe toate paginile, din BaseLayout).
+ *
+ * În HTML există doar un <template> inert: stratul îl creează scriptul inline de mai jos
+ * (src/scripts/intro-semnatura.js), înainte de primul paint, și numai dacă:
+ *   - prefers-reduced-motion nu e „reduce”;
+ *   - sessionStorage merge și nu are cheia „intro-vazut” (cheia se pune la pornire).
+ * Fără JS stratul nu există, deci nu poate bloca pagina. Pagina se randează normal dedesubt.
+ *
+ * Desfășurare: semnătura se desenează în 1.8 s, apoi stratul face fade-out 0.4 s și se scoate
+ * din DOM (total ≤ 2.3 s). Click, touchstart, keydown sau wheel îl închid imediat, cu același fade.
+ * Stratul e aria-hidden și inert, fără elemente focalizabile: Tab ajunge direct la skip link.
+ * Pe <html> rămâne clasa `.intro-rulat`: semnătura din hero apare atunci direct desenată.
+ *
+ * Scriptul e inline (trebuie să ruleze înainte de primul paint); hash-ul lui e în CSP
+ * (public/_headers), verificat la build de scripts/verifica-csp.mjs.
+ */
+import scriptIntro from '../scripts/intro-semnatura.js?raw';
+import Semnatura from './Semnatura.astro';
+---
+
+<template id="intro-semnatura">
+  <div class="intro" aria-hidden="true" inert>
+    <Semnatura varianta="intro" />
+  </div>
+</template>
+<script is:inline set:html={scriptIntro.trim()} />
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    /* Peste header (40), bara de jos (30) și skip link (100). */
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+    background: var(--c-white);
+    transition: opacity 0.4s ease;
+  }
+
+  /* În timpul fade-ului pagina e deja utilizabilă: click-urile trec prin strat. */
+  .intro--iese {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>

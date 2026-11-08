@@ -30,8 +30,8 @@ function cspImplicit() {
 /** Pornește serverul static; întoarce { url, inchide }. */
 export async function serveste() {
   if (!existsSync(join(DIST, 'index.html'))) throw new Error('Lipsește dist/: rulați `npm run build` înainte de `npm run test:e2e`.');
-  const csp = cspImplicit();
   const server = createServer((req, res) => {
+    const csp = cspImplicit();
     let cale = join(DIST, decodeURIComponent(new URL(req.url, 'http://x').pathname));
     if (existsSync(cale) && statSync(cale).isDirectory()) cale = join(cale, 'index.html');
     if (!cale.startsWith(DIST) || !existsSync(cale)) {

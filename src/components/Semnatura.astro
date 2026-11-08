@@ -8,13 +8,15 @@
  *  - cu JS: nedesenată până la clasa .desenat, apoi 3.5 s cubic-bezier(0.77, 0, 0.175, 1).
  * Clasa `.js` o pune scriptul din <head> (BaseLayout), înainte de primul paint.
  *
- * Varianta „hero” pornește la prima intrare în viewport (IntersectionObserver, threshold 0.4).
+ * Componenta nu are script propriu (poate fi randată și într-un <template>, unde un script n-ar
+ * rula): varianta „hero” e pornită de Hero.astro (IntersectionObserver), varianta „intro” de
+ * scriptul din <head> (src/scripts/intro-semnatura.js). Clasa `.instant` = desenată fără tranziție.
  */
 import svgSemnatura from '../assets/semnatura.svg?raw';
 import { citesteSemnatura } from '../lib/semnatura';
 
 interface Props {
-  varianta: 'hero';
+  varianta: 'hero' | 'intro';
 }
 
 const { varianta } = Astro.props;
@@ -38,26 +40,6 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
   <path class="semnatura__traseu" d={d} pathLength="100" vector-effect="non-scaling-stroke" />
 </svg>
 
-<script>
-  // Pornește desenul o singură dată, la prima intrare în viewport.
-  const semnatura = document.querySelector<SVGSVGElement>('[data-semnatura="hero"]');
-  if (semnatura) {
-    if (!('IntersectionObserver' in window)) {
-      semnatura.classList.add('desenat');
-    } else {
-      const observator = new IntersectionObserver(
-        (intrari) => {
-          if (intrari.some((i) => i.isIntersecting)) {
-            semnatura.classList.add('desenat');
-            observator.disconnect();
-          }
-        },
-        { threshold: 0.4 },
-      );
-      observator.observe(semnatura);
-    }
-  }
-</script>
 
 <style>
   .semnatura {
@@ -73,9 +55,18 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
     width: 240px;
   }
 
+  .semnatura--intro {
+    --semnatura-durata: 1.8s;
+    width: 260px;
+  }
+
   @media (min-width: 48rem) {
     .semnatura--hero {
       width: 375px;
+    }
+
+    .semnatura--intro {
+      width: 420px;
     }
   }
 
@@ -92,6 +83,10 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
 
     .semnatura.desenat .semnatura__traseu {
       transition: stroke-dashoffset var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .semnatura.instant .semnatura__traseu {
+      transition: none;
     }
   }
 </style>

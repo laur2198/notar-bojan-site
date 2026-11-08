@@ -35,8 +35,9 @@ describe('Semnătura din hero', { skip: playwright ? false : 'Playwright nu e di
     });
   }
 
-  test('cu JS: pornește nedesenată și ajunge desenată după 3.5 s', async () => {
+  test('cu JS, fără intro (sesiune văzută): pornește nedesenată și ajunge desenată după 3.5 s', async () => {
     const pagina = await browser.newPage({ reducedMotion: 'no-preference' });
+    await pagina.addInitScript(() => sessionStorage.setItem('intro-vazut', '1'));
     const erori = [];
     pagina.on('console', (m) => m.type() === 'error' && erori.push(m.text()));
     await pagina.goto(server.url + '/');

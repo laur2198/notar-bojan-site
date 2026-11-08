@@ -9,6 +9,7 @@ import BaraActiuni from '../components/BaraActiuni.astro';
 import DraftBadge from '../components/DraftBadge.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import IntroSemnatura from '../components/IntroSemnatura.astro';
 import JsonLdBirou from '../components/JsonLdBirou.astro';
 import Seo from '../components/Seo.astro';
 import SkipLink from '../components/SkipLink.astro';
@@ -44,6 +45,7 @@ const birou = await getBirou();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <script is:inline set:html={scriptCap.trim()} />
+    <IntroSemnatura />
     <meta name="theme-color" content={culoare('c-wood-800')} />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <Seo

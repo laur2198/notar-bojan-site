@@ -8,9 +8,11 @@
  * La nepotrivire afișează hash-ul corect și iese cu 1.
  *
  * Utilizare (după build): node scripts/verifica-csp.mjs
+ *   cu `--actualizeaza`: rescrie hash-urile din script-src în public/_headers (după ce ați
+ *   modificat un script inline), apoi verifică din nou.
  */
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
 const DIST = resolve('dist');
@@ -28,6 +30,13 @@ for (const f of fisiere(DIST)) {
     const h = hash(continut);
     inline.set(h, [...(inline.get(h) ?? []), '/' + relative(DIST, f).replace(/\\/g, '/')]);
   }
+}
+
+if (process.argv.includes('--actualizeaza')) {
+  const hashuri = [...inline.keys()].sort().join(' ');
+  const text = readFileSync(HEADERS, 'utf8').replace(/script-src 'self'(?: 'sha256-[^']+')*/g, `script-src 'self'${hashuri ? ' ' + hashuri : ''}`);
+  writeFileSync(HEADERS, text);
+  console.log('public/_headers: hash-urile din script-src au fost rescrise.');
 }
 
 const politici = [...readFileSync(HEADERS, 'utf8').matchAll(/Content-Security-Policy:\s*(.+)/g)].map((m) => m[1]);
