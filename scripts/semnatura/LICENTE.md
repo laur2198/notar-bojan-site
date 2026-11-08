@@ -9,5 +9,5 @@ Nu se servesc pe site. Sursa: pachetul npm `hersheytext` 2.0.0 (MIT), dosarul `s
 | `EMSAllure.svg` | EMS Allure (Sheldon B. Michaels, derivat din Allura de Rob Leuschke, TypeSETit) | SIL Open Font License 1.1 – https://openfontlicense.org |
 
 Fontul folosit în semnătură: **EMS Allure** (Hershey Script a fost comparat și abandonat). Mențiunile de licență sunt păstrate în metadatele fișierului.
-`maini.svg` este sursa grupului din mijloc: deocamdată o linie de legătură provizorie; `scripts/vectorizeaza-maini.mjs` o înlocuiește cu mâinile vectorizate din `src/assets/surse/maini.jpg`.
-`geometrie.mjs`: simplificare, netezire Catmull-Rom → Bézier, parsare de path-uri, comune celor două scripturi.
+`maini.svg`: linia de legătură provizorie din mijloc, folosită cât timp lipsește desenul cu licență `src/assets/surse/maini.svg` (vezi README-ul de acolo).
+`geometrie.mjs`: simplificare, netezire Catmull-Rom → Bézier, parsarea path-urilor SVG. `extrage-maini.mjs`: extragerea și înlănțuirea desenului mâinilor.

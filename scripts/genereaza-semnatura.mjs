@@ -15,18 +15,20 @@
  * următoarei (scris legat); unde „stiloul” se ridică, trăsătura următoare e alt <path>.
  *
  * Continuitatea: „notar” se termină cu o trăsătură de ieșire (din r) spre centru, „bojan” începe
- * cu o trăsătură de intrare din centru; între ele, zona mâinilor (~35% din lățime), luată din
- * scripts/semnatura/maini.svg și așezată prin similaritate între cele două capete (provizoriu: o
- * linie ușor ondulată; scripts/vectorizeaza-maini.mjs o înlocuiește din fotografie).
+ * cu o trăsătură de intrare din centru; între ele, zona mâinilor (~35% din lățime): desenul
+ * continuous-line cu licență din src/assets/surse/maini.svg (extras, înlănțuit și netezit de
+ * scripts/semnatura/extrage-maini.mjs), așezat prin similaritate între cele două capete. Până vine
+ * fișierul: linia de legătură ușor ondulată din scripts/semnatura/maini.svg.
  *
  * Lungimile se calculează aici și dau durata fiecărei trăsături, proporțional; trăsăturile se
  * desenează strict secvențial, stânga → dreapta.
  *
- * Utilizare: node scripts/genereaza-semnatura.mjs [--svg cale] [--css cale] [--maini cale]
+ * Utilizare: node scripts/genereaza-semnatura.mjs [--svg cale] [--css cale] [--maini src/assets/surse/maini.svg]
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { aduna, catmullRom, dDinSegmente, dist, esantioneaza, lungime, ori, parseazaPath, rotunjesteIntoarceri, scade, similaritate, simplifica, unitar } from './semnatura/geometrie.mjs';
+import { extrageTrasaturi, inlantuie } from './semnatura/extrage-maini.mjs';
 
 const arg = (nume, implicit) => {
   const i = process.argv.indexOf(`--${nume}`);
@@ -34,7 +36,9 @@ const arg = (nume, implicit) => {
 };
 const IESIRE_SVG = resolve(arg('svg', 'src/assets/semnatura.svg'));
 const IESIRE_CSS = resolve(arg('css', 'src/styles/semnatura-segmente.css'));
-const SURSA_MAINI = resolve(arg('maini', 'scripts/semnatura/maini.svg'));
+// Mâinile: SVG-ul continuous-line cu licență, când există; altfel linia de legătură provizorie.
+const SURSA_MAINI = resolve(arg('maini', 'src/assets/surse/maini.svg'));
+const PROVIZORIU_MAINI = resolve('scripts/semnatura/maini.svg');
 
 // Compoziția (unități viewBox). Lățimea și înălțimea rezultă din litere, ca să încapă
 // ascendentele și descendentele, care ies mult peste/sub linia de bază, ca la o semnătură.
@@ -133,13 +137,22 @@ const traseeBojan = bojan.map(muta(xBojan, BAZA)).map(neteda);
   prima.unshift({ a: S, c1: [S[0] + 0.45 * d, S[1]], c2: scade(B, ori(directie, 0.45 * d)), b: B });
 }
 
-// Mâinile: path-ul din maini.svg, așezat prin similaritate între E și S, apoi netezit.
-const svgMaini = readFileSync(SURSA_MAINI, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
-const sursaMaini = svgMaini.match(/data-sursa="([^"]*)"/)?.[1] ?? 'necunoscută';
-const subpathsMaini = [...svgMaini.matchAll(/<path\b[^>]*\sd="([^"]+)"/g)].flatMap(([, d]) => parseazaPath(d));
-if (!subpathsMaini.length) throw new Error(`${SURSA_MAINI}: niciun <path>.`);
-const asaza = similaritate([subpathsMaini[0][0].a, subpathsMaini.at(-1).at(-1).b], [E, S]);
-const traseeMaini = subpathsMaini.map((segmente) => neteda(esantioneaza(segmente).map(asaza)));
+// Mâinile: trăsăturile extrase (SVG-ul cu licență) sau linia provizorie, așezate prin similaritate
+// (primul punct pe E, ultimul pe S), apoi netezite ca literele.
+let polilinMaini;
+let sursaMaini;
+if (existsSync(SURSA_MAINI)) {
+  const { trasaturi, avertismente } = extrageTrasaturi(readFileSync(SURSA_MAINI, 'utf8'));
+  polilinMaini = inlantuie(trasaturi);
+  sursaMaini = SURSA_MAINI.replace(`${process.cwd()}/`, '');
+  for (const a of avertismente) console.warn(`⚠ ${sursaMaini}: ${a}`);
+} else {
+  const svgProvizoriu = readFileSync(PROVIZORIU_MAINI, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+  polilinMaini = [...svgProvizoriu.matchAll(/<path\b[^>]*\sd="([^"]+)"/g)].flatMap(([, d]) => parseazaPath(d)).map((segmente) => esantioneaza(segmente));
+  sursaMaini = 'provizoriu (linie de legătură)';
+}
+const asaza = similaritate([polilinMaini[0][0], polilinMaini.at(-1).at(-1)], [E, S]);
+const traseeMaini = polilinMaini.map((p) => neteda(p.map(asaza)));
 
 const grupuri = [
   { nume: 'notar', trasee: traseeNotar },

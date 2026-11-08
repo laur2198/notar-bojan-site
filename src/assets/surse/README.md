@@ -1,9 +1,14 @@
 # Surse pentru semnătură
 
-- `maini.jpg` (de adăugat): fotografia desenului cu mâinile care se strâng – linie închisă pe fond
-  deschis, o singură trăsătură dacă se poate, capătul din stânga și cel din dreapta la aceeași înălțime.
-  Apoi: `node scripts/vectorizeaza-maini.mjs` (opțional `--prag 40` dacă linia iese întreruptă,
-  `--prag 60` dacă apar pete). Scriptul scrie `scripts/semnatura/maini.svg` și regenerează
-  `src/assets/semnatura.svg` și `src/styles/semnatura-segmente.css`.
+- `maini.svg` (de adăugat): desenul mâinilor care se strâng, **continuous-line** (trăsături, nu
+  contururi umplute), cu licență care permite folosirea pe site. Păstrați lângă el dovada licenței
+  (ex. `maini-licenta.txt`: sursa, autorul, tipul licenței, data).
+  Apoi: `node scripts/genereaza-semnatura.mjs`. Generatorul (prin `scripts/semnatura/extrage-maini.mjs`):
+  - extrage `<path>`, `<polyline>`, `<line>` cu transformările lor (fără `<defs>`, măști etc.);
+  - înlănțuie bucățile într-o trăsătură continuă (golurile mici se leagă), de la stânga la dreapta;
+  - le netezește ca literele (Catmull-Rom) și le așază între ieșirea din „notar” și intrarea în
+    „bojan” (capătul din stânga al desenului pe ieșire, cel din dreapta pe intrare);
+  - avertizează dacă desenul pare un contur umplut.
+- Până vine fișierul, în mijloc rămâne linia de legătură provizorie din `scripts/semnatura/maini.svg`.
 
 Fișierele de aici nu se servesc pe site (nu sunt importate de nicio pagină).

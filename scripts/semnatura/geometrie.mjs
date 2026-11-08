@@ -1,5 +1,5 @@
 /**
- * Geometria comună a semnăturii (folosită de genereaza-semnatura.mjs și vectorizeaza-maini.mjs):
+ * Geometria comună a semnăturii (folosită de genereaza-semnatura.mjs și extrage-maini.mjs):
  * simplificarea poliliniilor, netezirea Catmull-Rom → Bézier cubic, lungimi, parsarea path-urilor.
  * Un punct e [x, y]; un segment cubic e { a, c1, c2, b }.
  */
@@ -77,48 +77,116 @@ export const esantioneaza = (segmente, pas = 12) => [segmente[0].a, ...segmente.
 export const dreapta = (a, b) => ({ a, c1: aduna(a, ori(scade(b, a), 1 / 3)), c2: aduna(a, ori(scade(b, a), 2 / 3)), b });
 
 /**
- * Parsează un path SVG cu comenzi M, L, C, Z (absolute sau relative, cum le scrie autotrace sau
- * un editor) în subpath-uri de segmente cubice.
+ * Parsează un path SVG (M, L, H, V, C, S, Q, T, A, Z; absolute sau relative, cum le scrie un editor)
+ * în subpath-uri de segmente cubice. Q/T devin cubice exact; arcele (A) se aproximează cu segmente
+ * cubice pe bucăți de cel mult 90°.
  */
 export function parseazaPath(d) {
   const subpaths = [];
   let p = [0, 0];
   let start = [0, 0];
-  for (const [, cmd, rest] of d.matchAll(/([MmLlCcZzHhVv])([^MmLlCcZzHhVv]*)/g)) {
-    const n = (rest.match(/-?\d*\.?\d+(?:e-?\d+)?/gi) ?? []).map(Number);
+  let ultimC2 = null; // pentru S (reflexia ultimului punct de control cubic)
+  let ultimQ = null; // pentru T (reflexia ultimului punct de control pătratic)
+  const adauga = (seg) => {
+    if (!subpaths.length) subpaths.push([]);
+    subpaths.at(-1).push(seg);
+  };
+  for (const [, cmd, rest] of d.matchAll(/([MmLlHhVvCcSsQqTtAaZz])([^MmLlHhVvCcSsQqTtAaZz]*)/g)) {
+    const n = (rest.match(/-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/gi) ?? []).map(Number);
     const rel = cmd === cmd.toLowerCase();
     const abs = (x, y) => (rel ? [p[0] + x, p[1] + y] : [x, y]);
-    switch (cmd.toUpperCase()) {
+    const C = cmd.toUpperCase();
+    if (C !== 'C' && C !== 'S') ultimC2 = null;
+    if (C !== 'Q' && C !== 'T') ultimQ = null;
+    switch (C) {
       case 'M':
         for (let i = 0; i < n.length; i += 2) {
           const q = abs(n[i], n[i + 1]);
-          if (i === 0) { start = q; subpaths.push([]); } else subpaths.at(-1).push(dreapta(p, q));
+          if (i === 0) { start = q; subpaths.push([]); } else adauga(dreapta(p, q));
           p = q;
         }
         break;
       case 'L':
-        for (let i = 0; i < n.length; i += 2) { const q = abs(n[i], n[i + 1]); subpaths.at(-1).push(dreapta(p, q)); p = q; }
+        for (let i = 0; i < n.length; i += 2) { const q = abs(n[i], n[i + 1]); adauga(dreapta(p, q)); p = q; }
         break;
       case 'H':
-        for (const x of n) { const q = [rel ? p[0] + x : x, p[1]]; subpaths.at(-1).push(dreapta(p, q)); p = q; }
+        for (const x of n) { const q = [rel ? p[0] + x : x, p[1]]; adauga(dreapta(p, q)); p = q; }
         break;
       case 'V':
-        for (const y of n) { const q = [p[0], rel ? p[1] + y : y]; subpaths.at(-1).push(dreapta(p, q)); p = q; }
+        for (const y of n) { const q = [p[0], rel ? p[1] + y : y]; adauga(dreapta(p, q)); p = q; }
         break;
       case 'C':
         for (let i = 0; i < n.length; i += 6) {
           const c1 = abs(n[i], n[i + 1]), c2 = abs(n[i + 2], n[i + 3]), b = abs(n[i + 4], n[i + 5]);
-          subpaths.at(-1).push({ a: p, c1, c2, b });
+          adauga({ a: p, c1, c2, b });
+          [p, ultimC2] = [b, c2];
+        }
+        break;
+      case 'S':
+        for (let i = 0; i < n.length; i += 4) {
+          const c1 = ultimC2 ? [2 * p[0] - ultimC2[0], 2 * p[1] - ultimC2[1]] : p;
+          const c2 = abs(n[i], n[i + 1]), b = abs(n[i + 2], n[i + 3]);
+          adauga({ a: p, c1, c2, b });
+          [p, ultimC2] = [b, c2];
+        }
+        break;
+      case 'Q':
+      case 'T':
+        for (let i = 0; i < n.length; i += C === 'Q' ? 4 : 2) {
+          const q = C === 'Q' ? abs(n[i], n[i + 1]) : ultimQ ? [2 * p[0] - ultimQ[0], 2 * p[1] - ultimQ[1]] : p;
+          const b = C === 'Q' ? abs(n[i + 2], n[i + 3]) : abs(n[i], n[i + 1]);
+          adauga({ a: p, c1: aduna(p, ori(scade(q, p), 2 / 3)), c2: aduna(b, ori(scade(q, b), 2 / 3)), b });
+          [p, ultimQ] = [b, q];
+        }
+        break;
+      case 'A':
+        for (let i = 0; i < n.length; i += 7) {
+          const b = abs(n[i + 5], n[i + 6]);
+          for (const seg of arcInCubice(p, n[i], n[i + 1], n[i + 2], n[i + 3], n[i + 4], b)) adauga(seg);
           p = b;
         }
         break;
       case 'Z':
-        if (dist(p, start) > 1e-6) subpaths.at(-1).push(dreapta(p, start));
+        if (subpaths.length && dist(p, start) > 1e-6) adauga(dreapta(p, start));
         p = start;
         break;
     }
   }
   return subpaths.filter((s) => s.length);
+}
+
+/** Arc eliptic SVG (parametrizare la capete) → segmente cubice (conversia standard SVG 1.1 F.6.5). */
+function arcInCubice(a, rx, ry, rotatie, mare, sens, b) {
+  if ((!rx || !ry) || dist(a, b) < 1e-9) return [dreapta(a, b)];
+  const phi = (rotatie * Math.PI) / 180;
+  const [cos, sin] = [Math.cos(phi), Math.sin(phi)];
+  const dx = (a[0] - b[0]) / 2, dy = (a[1] - b[1]) / 2;
+  const x1 = cos * dx + sin * dy, y1 = -sin * dx + cos * dy;
+  rx = Math.abs(rx); ry = Math.abs(ry);
+  const l = (x1 * x1) / (rx * rx) + (y1 * y1) / (ry * ry);
+  if (l > 1) { rx *= Math.sqrt(l); ry *= Math.sqrt(l); }
+  const semn = mare === sens ? -1 : 1;
+  const num = rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1;
+  const k = semn * Math.sqrt(Math.max(0, num / (rx * rx * y1 * y1 + ry * ry * x1 * x1)));
+  const cx1 = (k * rx * y1) / ry, cy1 = (-k * ry * x1) / rx;
+  const cx = cos * cx1 - sin * cy1 + (a[0] + b[0]) / 2, cy = sin * cx1 + cos * cy1 + (a[1] + b[1]) / 2;
+  const unghi = (ux, uy, vx, vy) => Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+  const t1 = unghi(1, 0, (x1 - cx1) / rx, (y1 - cy1) / ry);
+  let dt = unghi((x1 - cx1) / rx, (y1 - cy1) / ry, (-x1 - cx1) / rx, (-y1 - cy1) / ry);
+  if (!sens && dt > 0) dt -= 2 * Math.PI;
+  if (sens && dt < 0) dt += 2 * Math.PI;
+  const bucati = Math.ceil(Math.abs(dt) / (Math.PI / 2));
+  const pas = dt / bucati;
+  const punct = (t) => [cx + rx * Math.cos(t) * cos - ry * Math.sin(t) * sin, cy + rx * Math.cos(t) * sin + ry * Math.sin(t) * cos];
+  const derivata = (t) => [-rx * Math.sin(t) * cos - ry * Math.cos(t) * sin, -rx * Math.sin(t) * sin + ry * Math.cos(t) * cos];
+  const alfa = (4 / 3) * Math.tan(pas / 4);
+  const segmente = [];
+  for (let i = 0; i < bucati; i++) {
+    const [ta, tb] = [t1 + i * pas, t1 + (i + 1) * pas];
+    const [pa, pb] = [i === 0 ? a : punct(ta), i === bucati - 1 ? b : punct(tb)];
+    segmente.push({ a: pa, c1: aduna(pa, ori(derivata(ta), alfa)), c2: scade(pb, ori(derivata(tb), alfa)), b: pb });
+  }
+  return segmente;
 }
 
 const r1 = (n) => Math.round(n * 10) / 10;

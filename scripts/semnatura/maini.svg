@@ -1,7 +1,7 @@
-<!-- Mâinile – provizoriu: până vine fotografia (src/assets/surse/maini.jpg), doar o linie de legătură
-     ușor ondulată. Se înlocuiește rulând node scripts/vectorizeaza-maini.mjs (sau cu un desen manual:
-     un path, de la capătul din stânga la cel din dreapta). Generatorul așază path-ul prin similaritate:
-     primul punct pe ieșirea din „notar”, ultimul pe intrarea în „bojan”.
+<!-- Mâinile – provizoriu: până vine desenul continuous-line cu licență (src/assets/surse/maini.svg),
+     doar o linie de legătură ușor ondulată. Generatorul folosește automat src/assets/surse/maini.svg
+     când există. Path-ul se așază prin similaritate: primul punct pe ieșirea din „notar”, ultimul pe
+     intrarea în „bojan”.
      După modificare: node scripts/genereaza-semnatura.mjs -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -20 300 40" data-sursa="provizoriu">
   <path d="M 0 0 C 50 -10, 100 -10, 150 0 C 200 10, 250 10, 300 0"/>
