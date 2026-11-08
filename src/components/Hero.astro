@@ -14,6 +14,7 @@ import { marcheazaPlaceholder, type Birou } from '../lib/continut';
 import Iconita from './Iconita.astro';
 import LinkExtern from './LinkExtern.astro';
 import LogoGoogle from './LogoGoogle.astro';
+import Semnatura from './Semnatura.astro';
 import Stele from './Stele.astro';
 
 interface Props {
@@ -84,6 +85,13 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </div>
   </div>
 
+  {/* Semnătura „pe rând”: jos-stânga, ușor suprapusă peste o linie fină cât containerul. */}
+  <div class="container hero__semnatura">
+    <div class="hero__rand">
+      <Semnatura varianta="hero" />
+    </div>
+  </div>
+
   {
     areRating && (
       <div class="container hero__jos">
@@ -105,7 +113,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     position: relative;
     isolation: isolate;
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr auto auto;
     /* ~70% din înălțimea ecranului pe mobil */
     min-height: 70svh;
     color: var(--c-white);
@@ -210,6 +218,42 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     }
   }
 
+
+  /*
+   * Linia de semnătură: 1 px, gri deschis atenuat pe fundalul închis (decorativă). Semnătura
+   * coboară peste linie: linia cade pe y ≈ 228 din cele 278 ale desenului.
+   */
+  .hero__semnatura {
+    padding-bottom: var(--space-4);
+  }
+
+  /*
+   * De la 48rem hero-ul are înălțime minimă mai mare decât conținutul: conținutul se centrează
+   * peste rândurile 1–2, ca înainte de semnătură, deci titlul și butoanele nu se mută. Semnătura
+   * ocupă spațiul liber de sub butoane. Pe mobil rămâne în flux, sub butoane (nu le împinge sub
+   * primul ecran). Pe ecranele joase (sub 720 px înălțime) n-ar încăpea sub butoane fără să le
+   * atingă, deci rămâne tot în flux.
+   */
+  @media (min-width: 48rem) and (min-height: 45rem) {
+    .hero__continut {
+      grid-row: 1 / 3;
+      grid-column: 1;
+    }
+
+    .hero__semnatura {
+      grid-row: 2;
+      grid-column: 1;
+    }
+  }
+
+  .hero__rand {
+    border-bottom: 1px solid color-mix(in srgb, var(--c-gray-200) 40%, transparent);
+  }
+
+  /* Procentul din translate se raportează la înălțimea SVG-ului: 50/278 ≈ 18%. */
+  .hero__rand :global(.semnatura) {
+    translate: 0 18%;
+  }
 
   .hero__jos {
     display: flex;

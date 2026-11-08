@@ -17,6 +17,9 @@ import { getBirou } from '../lib/continut';
 import type { ImagineOg } from '../lib/og';
 import { culoare } from '../lib/tokens';
 import { url } from '../lib/url';
+// Scriptul din <head> (sincron, înainte de primul paint). E inline, deci hash-ul lui sha256 stă în
+// CSP-ul din public/_headers; `npm run build` verifică potrivirea (scripts/verifica-csp.mjs).
+import scriptCap from '../scripts/cap-pagina.js?raw';
 
 interface Props {
   locale: Locale;
@@ -40,6 +43,7 @@ const birou = await getBirou();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline set:html={scriptCap.trim()} />
     <meta name="theme-color" content={culoare('c-wood-800')} />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <Seo

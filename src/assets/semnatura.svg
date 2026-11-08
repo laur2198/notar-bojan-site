@@ -1,0 +1,4 @@
+<!-- Provizoriu. Se înlocuiește cu desenul final (un singur path, același viewBox). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 747 278" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 22 200 C 52 140, 96 52, 140 50 C 178 48, 150 150, 112 196 C 92 220, 70 214, 84 190 C 100 164, 170 150, 214 132 C 246 118, 262 82, 282 88 C 304 96, 268 186, 254 204 C 244 216, 250 182, 300 162 C 336 148, 362 116, 348 104 C 330 92, 316 152, 362 162 C 398 170, 420 118, 404 110 C 386 102, 380 160, 428 166 C 466 170, 490 140, 512 150 C 534 160, 520 196, 500 196 C 482 196, 492 160, 540 156 C 590 152, 588 222, 560 230 C 534 237, 560 216, 616 214 C 664 212, 702 216, 726 212"/>
+</svg>

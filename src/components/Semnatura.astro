@@ -1,0 +1,97 @@
+---
+/**
+ * Semnătura desenată (decorativă): un singur <path> cu pathLength="100", „scris” prin
+ * stroke-dashoffset 100 → 0 (dasharray 100 101).
+ *
+ * Stări:
+ *  - fără JS (html fără .js) sau prefers-reduced-motion: reduce → desenată complet, fără tranziție;
+ *  - cu JS: nedesenată până la clasa .desenat, apoi 3.5 s cubic-bezier(0.77, 0, 0.175, 1).
+ * Clasa `.js` o pune scriptul din <head> (BaseLayout), înainte de primul paint.
+ *
+ * Varianta „hero” pornește la prima intrare în viewport (IntersectionObserver, threshold 0.4).
+ */
+import svgSemnatura from '../assets/semnatura.svg?raw';
+import { citesteSemnatura } from '../lib/semnatura';
+
+interface Props {
+  varianta: 'hero';
+}
+
+const { varianta } = Astro.props;
+const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
+---
+
+<svg
+  class:list={['semnatura', `semnatura--${varianta}`]}
+  data-semnatura={varianta}
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={viewBox}
+  width={latime}
+  height={inaltime}
+  fill="none"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path class="semnatura__traseu" d={d} pathLength="100" vector-effect="non-scaling-stroke" />
+</svg>
+
+<script>
+  // Pornește desenul o singură dată, la prima intrare în viewport.
+  const semnatura = document.querySelector<SVGSVGElement>('[data-semnatura="hero"]');
+  if (semnatura) {
+    if (!('IntersectionObserver' in window)) {
+      semnatura.classList.add('desenat');
+    } else {
+      const observator = new IntersectionObserver(
+        (intrari) => {
+          if (intrari.some((i) => i.isIntersecting)) {
+            semnatura.classList.add('desenat');
+            observator.disconnect();
+          }
+        },
+        { threshold: 0.4 },
+      );
+      observator.observe(semnatura);
+    }
+  }
+</script>
+
+<style>
+  .semnatura {
+    --semnatura-durata: 3.5s;
+    display: block;
+    height: auto;
+    max-width: 100%;
+    overflow: visible;
+    stroke: var(--c-wood-800);
+  }
+
+  .semnatura--hero {
+    width: 240px;
+  }
+
+  @media (min-width: 48rem) {
+    .semnatura--hero {
+      width: 375px;
+    }
+  }
+
+  /* Starea finală e cea implicită: fără JS și la mișcare redusă semnătura apare desenată. */
+  .semnatura__traseu {
+    stroke-dasharray: 100 101;
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .semnatura:not(.desenat) .semnatura__traseu {
+      stroke-dashoffset: 100;
+    }
+
+    .semnatura.desenat .semnatura__traseu {
+      transition: stroke-dashoffset var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
+    }
+  }
+</style>
