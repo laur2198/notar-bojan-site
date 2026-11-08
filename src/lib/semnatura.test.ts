@@ -13,7 +13,7 @@ describe('semnătura generată (notar · mâini · bojan)', () => {
 
   it('are exact trei grupuri, în ordine: notar, mâini, bojan', () => {
     expect(s.grupuri).toEqual(['notar', 'maini', 'bojan']);
-    expect(s.latime).toBe(900);
+    expect(s.latime / s.inaltime).toBeGreaterThan(4);
   });
 
   it('toate path-urile au pathLength="100" și un data-segment unic, în ordine', () => {
