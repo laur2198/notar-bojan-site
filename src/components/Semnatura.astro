@@ -6,6 +6,9 @@
  * Stări:
  *  - fără JS (html fără .js) sau prefers-reduced-motion: reduce → desenată complet, fără tranziție;
  *  - cu JS: nedesenată până la clasa .desenat, apoi 3.5 s cubic-bezier(0.77, 0, 0.175, 1).
+ * La capăt, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după ce desenul se termină
+ * (delay = durata desenului). Fără JS și la mișcare redusă e vizibil direct.
+ * Culori doar din token-uri: traseul wood-300 (hero-ul și intro-ul au fundal închis), punctul red-700.
  * Clasa `.js` o pune scriptul din <head> (BaseLayout), înainte de primul paint.
  *
  * Componenta nu are script propriu (poate fi randată și într-un <template>, unde un script n-ar
@@ -20,7 +23,7 @@ interface Props {
 }
 
 const { varianta } = Astro.props;
-const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
+const { viewBox, latime, inaltime, d, capat } = citesteSemnatura(svgSemnatura);
 ---
 
 <svg
@@ -38,6 +41,7 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
   focusable="false"
 >
   <path class="semnatura__traseu" d={d} pathLength="100" vector-effect="non-scaling-stroke" />
+  <circle class="semnatura__punct" cx={capat.x} cy={capat.y} r={capat.r} />
 </svg>
 
 
@@ -48,7 +52,7 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
     height: auto;
     max-width: 100%;
     overflow: visible;
-    stroke: var(--c-wood-800);
+    stroke: var(--c-wood-300);
   }
 
   .semnatura--hero {
@@ -76,16 +80,31 @@ const { viewBox, latime, inaltime, d } = citesteSemnatura(svgSemnatura);
     stroke-dashoffset: 0;
   }
 
+  .semnatura__punct {
+    fill: var(--c-red-700);
+    stroke: none;
+    opacity: 1;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     :global(.js) .semnatura:not(.desenat) .semnatura__traseu {
       stroke-dashoffset: 100;
+    }
+
+    :global(.js) .semnatura:not(.desenat) .semnatura__punct {
+      opacity: 0;
     }
 
     .semnatura.desenat .semnatura__traseu {
       transition: stroke-dashoffset var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
     }
 
-    .semnatura.instant .semnatura__traseu {
+    .semnatura.desenat .semnatura__punct {
+      transition: opacity 0.3s ease var(--semnatura-durata);
+    }
+
+    .semnatura.instant .semnatura__traseu,
+    .semnatura.instant .semnatura__punct {
       transition: none;
     }
   }
