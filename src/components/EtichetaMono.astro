@@ -1,0 +1,37 @@
+---
+/**
+ * Eticheta mono decorativă (CLAUDE.md §4–5): Geist Mono, 14 px, majuscule prin CSS (singurul
+ * loc unde sunt permise), ex. numerotarea „01”–„06” sau etichetele coloanelor din footer.
+ * Culoarea „muted” a fundalului: --c-ink-muted pe crem (5.3:1), --c-cream-muted pe închis (5.9:1).
+ *
+ * `decorativ` (implicit true) o ascunde de cititoarele de ecran (aria-hidden), pentru numerotări
+ * și etichete care repetă un titlu existent. Cu `decorativ={false}` rămâne citibilă.
+ */
+interface Props {
+  decorativ?: boolean;
+  /** Elementul HTML: implicit <span>. */
+  element?: 'span' | 'p' | 'div';
+  class?: string;
+}
+
+const { decorativ = true, element: Element = 'span', class: clasa } = Astro.props;
+---
+
+<Element class:list={['eticheta-mono', clasa]} aria-hidden={decorativ ? 'true' : undefined}><slot /></Element>
+
+<style>
+  .eticheta-mono {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-ink-muted);
+  }
+
+  :global(.pe-inchis) .eticheta-mono {
+    color: var(--c-cream-muted);
+  }
+</style>

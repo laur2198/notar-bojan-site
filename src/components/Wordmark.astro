@@ -1,52 +1,81 @@
 ---
 /**
- * Wordmark-ul text (logo-ul grafic vine mai târziu), folosit în header și în footer:
- * numele notarului (700) și dedesubt „Notar public · Brașov” (13 px, 500), ambele cu
- * majuscule prin CSS (textul rămâne normal pentru cititoarele de ecran).
- * Rândul de 13 px e una dintre cele două excepții sub 16 px permise de CLAUDE.md §4.
+ * Wordmark-ul text (CLAUDE.md §5), în două variante:
+ *
+ * - „compact” (header, footer): link spre Acasă, pe două linii: sus denumirea oficială „Birou
+ *   Individual Notarial” (12 px, majuscule prin CSS – excepția din CLAUDE.md §4), jos numele
+ *   „bojan elena luminița” (minuscule, Funnel Display). Textul rămâne în HTML ca atare; pe
+ *   paginile EN rândul de sus are lang="ro" (denumire oficială, netradusă).
+ *
+ * - „gigant”: doar „bojan elena luminița”, pe toată lățimea containerului, aria-hidden (numele
+ *   apare ca text în altă parte a paginii). Mărimea vine din unități de container (cqi), cu
+ *   factorii măsurați din tokens.css (--wordmark-k); fără container queries, din --fs-wordmark.
+ *   Când pe un rând ar ieși sub 48 px (container sub 428 px, adică sub ~460 px viewport), se
+ *   rupe pe două rânduri, „bojan elena” / „luminița”, aliniat stânga.
  */
 import { cale, t, type Locale } from '../i18n';
 import type { Birou } from '../lib/continut';
 
-interface Props {
-  locale: Locale;
-  birou: Birou;
-}
+type Props =
+  | { varianta?: 'compact'; locale: Locale; birou: Birou }
+  | { varianta: 'gigant'; locale?: Locale; birou: Birou };
 
-const { locale, birou } = Astro.props;
+const { varianta = 'compact', locale = 'ro', birou } = Astro.props;
+/** „Bojan Elena Luminița” → „bojan elena luminița” (ordinea exactă din datele biroului). */
+const nume = birou.notar.toLocaleLowerCase('ro');
+const cuvinte = nume.split(/\s+/);
+const randSus = cuvinte.slice(0, -1).join(' ');
+const randJos = cuvinte.at(-1);
 ---
 
-<a class="wordmark" href={cale('acasa', locale)}>
-  <span class="wordmark__nume">{birou.notar}</span>
-  <span class="wordmark__profesie">{t(locale, 'wordmark.profesie')} · {birou.adresa.oras}</span>
-</a>
+{
+  varianta === 'compact' ? (
+    <a class="wordmark" href={cale('acasa', locale)}>
+      <span class="wordmark__birou" lang={locale === 'ro' ? undefined : 'ro'}>
+        {t(locale, 'wordmark.birou')}
+      </span>
+      <span class="wordmark__nume">{nume}</span>
+    </a>
+  ) : (
+    <div class="wordmark-gigant">
+      <p class="wordmark-gigant__text" aria-hidden="true">
+        <span class="wordmark-gigant__rand">{randSus}</span> <span class="wordmark-gigant__rand">{randJos}</span>
+      </p>
+    </div>
+  )
+}
 
 <style>
+  /* ---------------- compact ---------------- */
   .wordmark {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
+    gap: 0.125rem;
     min-height: 48px;
-    color: var(--c-wood-900);
+    color: var(--c-ink);
     text-decoration: none;
-    text-transform: uppercase;
-    line-height: 1.15;
+    line-height: 1.1;
   }
 
   .wordmark:hover {
-    color: var(--c-wood-900);
+    color: var(--c-ink);
+  }
+
+  .wordmark__birou {
+    /* 12 px, majuscule (excepția din CLAUDE.md §4); --c-ink-muted pe crem: 5.3:1. */
+    font-size: calc(var(--fs-sm) * 0.75);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-ink-muted);
   }
 
   .wordmark__nume {
-    font-size: var(--fs-sm);
-    font-weight: 700;
-  }
-
-  .wordmark__profesie {
-    /* 12 px (excepția din CLAUDE.md §4) */
-    font-size: calc(var(--fs-sm) * 0.75);
-    font-weight: 500;
-    color: var(--c-gray-600);
+    font-family: var(--font-wordmark);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 
   .wordmark:hover .wordmark__nume {
@@ -56,21 +85,58 @@ const { locale, birou } = Astro.props;
     text-underline-offset: 0.18em;
   }
 
-  /* Sub 480 px numele se poate rupe pe două rânduri; de acolo în sus rămâne pe unul. */
   @media (min-width: 30rem) {
     .wordmark {
       white-space: nowrap;
     }
+  }
 
-    .wordmark__nume {
-      font-size: var(--fs-lg);
+  /* ---------------- gigant ---------------- */
+  /* line-height 0.85 lasă descendentele (j, ț) să iasă din cutie: spațiul de dedesubt le cuprinde. */
+  .wordmark-gigant {
+    container-type: inline-size;
+  }
+
+  .wordmark-gigant__text {
+    max-width: none;
+    margin: 0;
+    font-family: var(--font-wordmark);
+    font-size: var(--fs-wordmark);
+    font-weight: 600;
+    line-height: var(--lh-wordmark);
+    letter-spacing: var(--ls-wordmark);
+    white-space: nowrap;
+    color: inherit;
+    padding-bottom: 0.2em;
+  }
+
+  @supports (width: 1cqi) {
+    .wordmark-gigant__text {
+      font-size: calc(100cqi / var(--wordmark-k));
+    }
+
+    /* Pe un rând ar ieși sub 48 px (48 × 8.917 = 428 px): două rânduri, aliniat stânga. */
+    @container (max-width: 428px) {
+      .wordmark-gigant__text {
+        font-size: calc(100cqi / var(--wordmark-k-2r));
+      }
+
+      .wordmark-gigant__rand {
+        display: block;
+      }
     }
   }
 
-  /* Pe desktop (≥ 67rem, pragul meniului complet din Header), 17 px. */
-  @media (min-width: 67rem) {
-    .wordmark__nume {
-      font-size: calc(var(--fs-sm) * 1.0625);
+  /* Fallback fără container queries: același prag, pe viewport (428 + 2 × 16 px). */
+  @supports not (width: 1cqi) {
+    @media (max-width: 460px) {
+      .wordmark-gigant__text {
+        font-size: var(--fs-wordmark-2r);
+      }
+
+      .wordmark-gigant__rand {
+        display: block;
+      }
     }
   }
 </style>
