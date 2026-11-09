@@ -22,9 +22,15 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-behavior: smooth;
   /* Header-ul e fix: ancorele și elementele focusate nu ajung sub el. */
   scroll-padding-top: calc(var(--header-h-sm) + var(--space-2));
+}
+
+/* Derularea lină la ancore, doar când utilizatorul nu a cerut mișcare redusă (CLAUDE.md §3.2). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* De la pragul meniului complet (Header.astro), header-ul are --header-h. */

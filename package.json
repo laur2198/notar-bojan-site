@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/verifica-continut.mjs && astro build",
-    "build:prod": "cross-env SITE_MODE=production node scripts/verifica-continut.mjs && cross-env SITE_MODE=production astro build && cross-env SITE_MODE=production node scripts/verifica-seo.mjs",
+    "build": "node scripts/verifica-continut.mjs && astro build && node scripts/verifica-csp.mjs",
+    "build:prod": "cross-env SITE_MODE=production node scripts/verifica-continut.mjs && cross-env SITE_MODE=production astro build && node scripts/verifica-csp.mjs && cross-env SITE_MODE=production node scripts/verifica-seo.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "verifica": "node scripts/verifica-continut.mjs",
@@ -17,7 +17,9 @@
     "test": "vitest run",
     "linkuri": "node scripts/verifica-linkuri.mjs",
     "verifica:en": "node scripts/verifica-engleza.mjs",
-    "verifica:seo": "node scripts/verifica-seo.mjs"
+    "verifica:seo": "node scripts/verifica-seo.mjs",
+    "verifica:csp": "node scripts/verifica-csp.mjs",
+    "test:e2e": "node --test \"scripts/e2e/*.test.mjs\""
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
