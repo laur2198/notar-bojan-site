@@ -33,6 +33,6 @@
   evenimente.forEach(function (e) {
     addEventListener(e, inchide, { capture: true, passive: true });
   });
-  // Dezvăluire 1.8 s, apoi fade 0.4 s (total ≤ 2.3 s de la primul frame).
-  dezvaluieSemnatura(semnatura, 1800, inchide);
+  // Desen 1.8 s, apoi fade 0.4 s (total ≤ 2.3 s de la primul frame).
+  deseneazaSemnatura(semnatura, 1800, inchide);
 })();

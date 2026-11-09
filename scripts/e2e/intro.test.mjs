@@ -49,15 +49,15 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/');
     assert.equal(await pagina.locator(STRAT).count(), 1);
+    assert.equal(await pagina.locator('svg.semnatura').count(), 2);
     assert.equal(await pagina.locator('circle, .semnatura__punct').count(), 0);
     const iduri = await pagina.evaluate(() => [...document.querySelectorAll('[id]')].map((e) => e.id));
     assert.equal(new Set(iduri).size, iduri.length, 'id-uri duplicate în pagină');
-    // Fiecare clip-path din semnături trimite la un clipPath din același SVG.
+    // Orice referință url(#…) din semnături trimite la un element din același SVG.
     const gresite = await pagina.evaluate(() =>
-      [...document.querySelectorAll('svg.semnatura [clip-path]')].filter((g) => {
-        const id = g.getAttribute('clip-path').match(/url\(#(.+)\)/)[1];
-        return document.getElementById(id)?.closest('svg') !== g.closest('svg');
-      }).length,
+      [...document.querySelectorAll('svg.semnatura *')].flatMap((el) =>
+        [...el.attributes].map((a) => a.value.match(/url\(#([^)]+)\)/)?.[1]).filter(Boolean).filter((id) => document.getElementById(id)?.closest('svg') !== el.closest('svg')),
+      ).length,
     );
     assert.equal(gresite, 0);
     await ctx.close();
@@ -134,26 +134,27 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     await ctx.close();
   });
 
-  test('după intro, semnătura din hero e complet vizibilă, fără animație (width = data-w)', async () => {
+  test('după intro, semnătura din hero e desenată complet, fără animație (dashoffset 0)', async () => {
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/');
     assert.equal(await pagina.evaluate(() => document.documentElement.classList.contains('intro-rulat')), true);
-    const latimi = () => pagina.locator('.hero [data-semnatura="hero"] rect.wipe').evaluateAll((r) => r.map((x) => [x.getAttribute('width'), x.getAttribute('data-w')]));
-    for (const [w, dw] of await latimi()) assert.equal(w, dw);
+    const offseturi = () => pagina.locator('.hero [data-semnatura="hero"] path[data-a]').evaluateAll((p) => p.map((x) => Number(getComputedStyle(x).strokeDashoffset.match(/-?[\d.]+/)[0])));
+    assert.ok((await offseturi()).every((o) => o === 0));
     await pagina.waitForTimeout(500);
-    for (const [w, dw] of await latimi()) assert.equal(w, dw);
+    assert.ok((await offseturi()).every((o) => o === 0));
     await ctx.close();
   });
 
-  test('intro-ul pornește de la zero (fără flash) și ajunge complet vizibil înainte de fade', async () => {
+  test('intro-ul pornește nedesenat (fără flash) și e desenat complet înainte de fade', async () => {
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/', { waitUntil: 'commit' });
     await pagina.locator(STRAT).waitFor({ state: 'attached' });
-    const suma = () => pagina.evaluate(() => [...document.querySelectorAll('html > .intro rect.wipe')].reduce((s, r) => s + parseFloat(r.getAttribute('width')), 0));
-    const total = await pagina.evaluate(() => [...document.querySelectorAll('html > .intro rect.wipe')].reduce((s, r) => s + parseFloat(r.getAttribute('data-w')), 0));
-    assert.ok((await suma()) < total * 0.2, 'la pornire semnătura e (aproape) ascunsă');
+    const offseturi = () => pagina.evaluate(() => [...document.querySelectorAll('html > .intro path[data-a]')].map((x) => Number(getComputedStyle(x).strokeDashoffset.match(/-?[\d.]+/)[0])));
+    const start = await offseturi();
+    assert.ok(start.length > 0);
+    assert.ok(start.reduce((s, o) => s + o, 0) > 80 * start.length, 'la pornire semnătura e (aproape) nedesenată');
     await pagina.waitForFunction(() => document.querySelector('html > .intro.intro--iese'), null, { timeout: 3000 });
-    assert.ok(Math.abs((await suma()) - total) < 0.5, 'complet dezvăluită la fade');
+    assert.ok((await offseturi()).every((o) => o < 0.01), 'desenată complet la fade');
     await ctx.close();
   });
 });

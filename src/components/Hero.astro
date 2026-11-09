@@ -16,7 +16,7 @@ import LinkExtern from './LinkExtern.astro';
 import LogoGoogle from './LogoGoogle.astro';
 import Semnatura from './Semnatura.astro';
 // Pornirea semnăturii: inline, imediat după SVG (înainte de primul paint); hash-ul în CSP.
-import scriptDezvaluire from '../scripts/dezvaluire-semnatura.js?raw';
+import scriptDesen from '../scripts/desen-semnatura.js?raw';
 import scriptSemnaturaHero from '../scripts/semnatura-hero.js?raw';
 import Stele from './Stele.astro';
 
@@ -92,7 +92,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   <div class="container hero__semnatura">
     <div class="hero__rand">
       <Semnatura varianta="hero" ton="inchis" linie />
-      <script is:inline set:html={`${scriptDezvaluire.trim()}\n${scriptSemnaturaHero.trim()}`} />
+      <script is:inline set:html={`${scriptDesen.trim()}\n${scriptSemnaturaHero.trim()}`} />
     </div>
   </div>
 
@@ -240,13 +240,14 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
    * Când hero-ul are înălțime minimă mai mare decât conținutul, conținutul se centrează peste
    * rândurile 1–2, ca înainte de semnătură, deci titlul și butoanele nu se mută; semnătura ocupă
    * spațiul liber de sub butoane. Asta încape:
-   *   - de la 64rem (hero = ecranul de sub header), dacă ecranul are cel puțin 45rem (720 px) înălțime;
-   *   - între 48 și 64rem (hero = 70svh), doar pe ecranele înalte (tabletă portret, ≥ 60rem).
+   *   - de la 64rem (hero = ecranul de sub header), dacă ecranul are cel puțin 50rem (800 px) înălțime;
+   *   - între 48 și 64rem (hero = 70svh), doar pe ecranele înalte (tabletă portret, ≥ 64rem).
    * În rest (mobil, ecrane joase) semnătura rămâne în flux, sub butoane, fără să le atingă.
-   * Verificat pe desen (nu doar pe cutia SVG-ului): 1280×720 → 19 px între butoane și semnătură;
-   * 1024×700, 1100×690, 1366×700 → în flux, fără suprapunere.
+   * Pragurile sunt măsurate pe desen (nu pe cutia SVG-ului), pentru semnătura de 680×178 la 600 px
+   * lățime: sub ele semnătura ar atinge butoanele (ex. 1280×720: −20 px). Dacă se schimbă desenul
+   * sau lățimea, se remăsoară.
    */
-  @media (min-width: 64rem) and (min-height: 45rem), (min-width: 48rem) and (min-height: 60rem) {
+  @media (min-width: 64rem) and (min-height: 50rem), (min-width: 48rem) and (min-height: 64rem) {
     .hero__continut {
       grid-row: 1 / 3;
       grid-column: 1;
