@@ -1,7 +1,7 @@
 ---
 /**
  * Antetul site-ului (CLAUDE.md §4, §5, §6): alb, fix sus (sticky), 80 px pe desktop,
- * 64 px pe mobil. Fără scroll: o linie gray-200 jos; după scroll: umbră fină (JS).
+ * 64 px pe mobil. Fără scroll: o linie line jos; după scroll: umbră fină (JS).
  *
  * - Desktop (≥ 67rem = 1072 px): wordmark | meniu | RO | EN | telefon | WhatsApp | „Programare”,
  *   în container (max. 1.200 px). Telefonul e doar iconiță (numărul în aria-label); emailul nu
@@ -168,15 +168,15 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     position: sticky;
     top: 0;
     z-index: 40;
-    background: var(--c-white);
-    color: var(--c-gray-900);
-    box-shadow: 0 1px 0 var(--c-gray-200);
+    background: var(--c-paper);
+    color: var(--c-ink);
+    box-shadow: 0 1px 0 var(--c-line);
     transition: box-shadow 150ms ease;
   }
 
   .antet[data-derulat] {
     box-shadow:
-      0 1px 0 var(--c-gray-200),
+      0 1px 0 var(--c-line),
       var(--shadow);
   }
 
@@ -213,9 +213,9 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     align-items: center;
     min-height: 48px;
     padding: 0 var(--space-1);
-    border: 1px solid var(--c-gray-200);
+    border: 1px solid var(--c-line);
     border-radius: var(--radius);
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
@@ -228,11 +228,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   .meniu-compact__buton:hover {
-    background: var(--c-gray-50);
+    background: var(--c-paper-2);
   }
 
   .meniu-compact__buton :global(.iconita) {
-    color: var(--c-wood-800);
+    color: var(--c-ink);
   }
 
   .meniu-compact__stare {
@@ -255,8 +255,8 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--c-white);
-    border-top: 1px solid var(--c-gray-200);
+    background: var(--c-paper);
+    border-top: 1px solid var(--c-line);
     box-shadow: var(--shadow);
   }
 
@@ -272,7 +272,7 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
 
   .meniu-compact__contacte {
     padding-block: var(--space-2) var(--space-3);
-    border-top: 1px solid var(--c-gray-200);
+    border-top: 1px solid var(--c-line);
   }
 
   /* Pe tabletă, contactele stau pe un rând (cât încap); pe telefon, unul sub altul. */
@@ -295,27 +295,27 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   .meniu-compact__lista li + li {
-    border-top: 1px solid var(--c-gray-200);
+    border-top: 1px solid var(--c-line);
   }
 
   .meniu-compact__lista a {
     display: flex;
     align-items: center;
     min-height: 56px;
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     font-size: var(--fs-lg);
     font-weight: 600;
     text-decoration: none;
   }
 
   .meniu-compact__lista a:hover {
-    color: var(--c-red-700);
+    color: var(--c-ink);
     text-decoration: underline;
   }
 
   .meniu-compact__lista a[aria-current] {
     text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
+    text-decoration-color: var(--c-ink);
     text-decoration-thickness: 3px;
     text-underline-offset: 0.3em;
   }
@@ -360,7 +360,7 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
       min-height: 48px;
       /* 16 px, 500, 12 px stânga–dreapta: meniul complet încape de la 1024 px. */
       padding: 0 calc(var(--space-1) * 1.5);
-      color: var(--c-gray-900);
+      color: var(--c-ink);
       font-size: var(--fs-sm);
       font-weight: 500;
       text-decoration: none;
@@ -368,12 +368,12 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     }
 
     .meniu a:hover {
-      color: var(--c-red-700);
+      color: var(--c-ink);
     }
 
     .meniu a[aria-current] {
       text-decoration: underline;
-      text-decoration-color: var(--c-red-700);
+      text-decoration-color: var(--c-ink);
       text-decoration-thickness: 3px;
       text-underline-offset: 0.4em;
     }

@@ -70,6 +70,11 @@ const date = JSON.stringify({
 </script>
 
 <style>
+  /*
+   * Starea se transmite prin text și prin forma iconiței, nu prin culoare (CLAUDE.md §5):
+   * deschis = disc plin, în culoarea textului (ink pe deschis); închis = cerc gol, în --c-muted
+   * (6.7:1 pe paper, 6.1:1 pe paper-2) sau --c-muted-dark pe fundal închis (7.9:1).
+   */
   .stare-program {
     display: inline-flex;
     align-items: baseline;
@@ -81,22 +86,25 @@ const date = JSON.stringify({
     display: none;
   }
 
-  /* Punctul colorat dublează textul; informația e în text, nu doar în culoare. */
   .stare-program::before {
     content: '';
     flex: none;
     width: 0.65em;
     height: 0.65em;
+    border: 0.12em solid currentColor;
     border-radius: 50%;
-    background: currentColor;
     transform: translateY(-0.05em);
   }
 
-  .stare-program[data-tip='deschis'] {
-    color: var(--c-ok);
+  .stare-program[data-tip='deschis']::before {
+    background: currentColor;
   }
 
   .stare-program[data-tip='inchis'] {
-    color: var(--c-closed);
+    color: var(--c-muted);
+  }
+
+  :global(.pe-inchis) .stare-program[data-tip='inchis'] {
+    color: var(--c-muted-dark);
   }
 </style>

@@ -1,7 +1,7 @@
 ---
 /**
  * Card de serviciu: alb, radius-lg, umbră. Sus imaginea 16:10 (dacă serviciul are una)
- * sau o bandă gray-50 cu o linie bordo de accent. Tot cardul e clicabil, cu un singur
+ * sau o bandă paper-2 cu o linie ink de accent. Tot cardul e clicabil, cu un singur
  * link real: titlul (pseudo-element întins peste card). „Vedeți serviciul →” e doar
  * vizual (aria-hidden), ca numele accesibil al linkului să fie numele serviciului.
  *
@@ -94,7 +94,7 @@ const Titlu = nivel;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--c-white);
+    background: var(--c-paper);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     transition: box-shadow 150ms ease;
@@ -103,18 +103,18 @@ const Titlu = nivel;
   .card-serviciu:not(.card-serviciu--static):hover {
     box-shadow:
       var(--shadow),
-      0 0 0 1px var(--c-gray-200);
+      0 0 0 1px var(--c-line);
   }
 
   .card-serviciu :global(.card-serviciu__imagine) {
     border-radius: 0;
   }
 
-  /* Bandă gray-50 de 8 px, cu o linie bordo de 40 px ca accent. */
+  /* Bandă paper-2 de 8 px, cu o linie ink de 40 px ca accent. */
   .card-serviciu__accent {
     position: relative;
     height: var(--space-1);
-    background: var(--c-gray-50);
+    background: var(--c-paper-2);
   }
 
   .card-serviciu__accent::before {
@@ -124,7 +124,7 @@ const Titlu = nivel;
     bottom: 0;
     width: calc(var(--space-4) * 1.25);
     height: 3px;
-    background: var(--c-red-700);
+    background: var(--c-ink);
   }
 
   .card-serviciu__corp {
@@ -142,7 +142,7 @@ const Titlu = nivel;
   }
 
   .card-serviciu__link {
-    color: var(--c-wood-900);
+    color: var(--c-ink);
     text-decoration: none;
   }
 
@@ -155,12 +155,12 @@ const Titlu = nivel;
   }
 
   .card-serviciu__link:hover {
-    color: var(--c-wood-900);
+    color: var(--c-ink);
   }
 
   .card-serviciu:hover .card-serviciu__link {
     text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
+    text-decoration-color: var(--c-ink);
   }
 
   /*
@@ -173,20 +173,20 @@ const Titlu = nivel;
   }
 
   .card-serviciu:has(.card-serviciu__link:focus-visible) {
-    outline: 3px solid var(--c-focus);
+    outline: 3px solid var(--c-ink);
     outline-offset: 3px;
   }
 
   @supports not selector(:has(*)) {
     .card-serviciu__link:focus-visible::after {
-      outline: 3px solid var(--c-focus);
+      outline: 3px solid var(--c-ink);
       outline-offset: -3px;
     }
   }
 
   .card-serviciu__rezumat {
     flex: 1;
-    color: var(--c-gray-600);
+    color: var(--c-muted);
     font-size: var(--fs-sm);
   }
 
@@ -195,14 +195,14 @@ const Titlu = nivel;
     align-items: flex-start;
     gap: var(--space-1);
     padding-top: var(--space-1);
-    border-top: 1px solid var(--c-gray-200);
-    color: var(--c-gray-900);
+    border-top: 1px solid var(--c-line);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
   }
 
   .card-serviciu__onorariu :global(.iconita) {
     margin-top: calc(var(--space-1) / 4);
-    color: var(--c-wood-800);
+    color: var(--c-ink);
   }
 
   .card-serviciu__onorariu-eticheta {
@@ -214,7 +214,7 @@ const Titlu = nivel;
     align-items: center;
     gap: calc(var(--space-1) * 0.75);
     margin-top: var(--space-1);
-    color: var(--c-wood-800);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 700;
   }
@@ -228,13 +228,13 @@ const Titlu = nivel;
     align-items: center;
     gap: calc(var(--space-1) * 0.75);
     min-height: 48px;
-    color: var(--c-wood-800);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 700;
   }
 
   .card-serviciu__detalii :global(.iconita) {
-    color: var(--c-red-700);
+    color: var(--c-ink);
   }
 
   /* Cardul are overflow: hidden; conturul de focus se desenează în interior, ca să nu fie tăiat. */
@@ -243,6 +243,6 @@ const Titlu = nivel;
   }
 
   .card-serviciu__mai-mult :global(.iconita) {
-    color: var(--c-red-700);
+    color: var(--c-ink);
   }
 </style>

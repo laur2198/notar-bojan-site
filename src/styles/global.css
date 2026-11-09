@@ -1,6 +1,6 @@
 /*
  * Stiluri globale (CLAUDE.md §4–5). Se importă o singură dată, din layout.
- * Ordine: tokens → fonturi → reset → tipografie → focus → utilitare → butoane.
+ * Ordine: tokens → fonturi → reset → tipografie → granulație → focus → utilitare → butoane.
  */
 @import './tokens.css';
 @import './fonturi.css';
@@ -64,6 +64,11 @@ button {
   cursor: pointer;
 }
 
+/* `hidden` câștigă întotdeauna, și peste clasele care setează display (ex. .btn). */
+[hidden] {
+  display: none !important;
+}
+
 p,
 h1,
 h2,
@@ -80,50 +85,61 @@ blockquote {
 }
 
 /* ---------------------------------------------------------------------------
-   Tipografie de bază: 18 px, line-height 1.6, rând de max. ~70 caractere
+   Tipografie de bază: 18 → 24 px (--fs-base), line-height 1.6, rând de max. ~70 caractere
    --------------------------------------------------------------------------- */
 
 body {
   font-family: var(--font-sans);
   font-size: var(--fs-base);
   line-height: 1.6;
-  color: var(--c-gray-900);
-  background-color: var(--c-white);
+  color: var(--c-ink);
+  background-color: var(--c-paper);
   /* Variabilele acoperă toate grosimile; doar italicul se poate sintetiza (nu e încărcat). */
   font-synthesis: style;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Un singur font (Inter); titlurile 700 (CLAUDE.md §5). */
+/*
+ * Titluri (CLAUDE.md §5): h1 și h2 în Funnel Display 500, cu spațiere negativă, ca în prototip;
+ * h3 și h4 în Geist 500. Culoarea vine din context (ink pe deschis, paper pe închis).
+ */
 h1,
 h2,
 h3,
 h4 {
   font-family: var(--font-sans);
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--c-wood-900);
+  font-weight: var(--fw-titlu);
+  line-height: 1.25;
+  color: inherit;
   text-wrap: balance;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
 }
 
 h1 {
   font-size: var(--fs-h1);
-  letter-spacing: -0.01em;
+  line-height: var(--lh-titlu-mare);
+  letter-spacing: var(--ls-titlu-mare);
 }
 
 h2 {
   font-size: var(--fs-h2);
-  line-height: 1.25;
+  line-height: var(--lh-h2);
+  letter-spacing: var(--ls-h2);
 }
 
 h3 {
   font-size: var(--fs-h3);
-  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 h4 {
-  font-size: var(--fs-lg);
+  font-size: var(--fs-base);
+  font-weight: 600;
 }
 
 p,
@@ -139,31 +155,51 @@ p {
 
 strong,
 b {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 small {
   font-size: var(--fs-sm);
 }
 
-/* Linkuri: text --c-wood-800 (12.35:1), sublinierea și hover-ul în accentul bordo (CLAUDE.md §5). */
+/* Linkuri: text --c-ink (19.4:1 pe alb), subliniate; la hover sublinierea se îngroașă (indiciu fără culoare). */
 a {
-  color: var(--c-wood-800);
+  color: var(--c-ink);
   text-decoration-line: underline;
-  text-decoration-color: var(--c-red-700);
+  text-decoration-color: var(--c-ink);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
   transition: color 150ms ease, text-decoration-thickness 150ms ease;
 }
 
 a:hover {
-  color: var(--c-red-700);
   text-decoration-thickness: 0.14em;
 }
 
 hr {
   border: 0;
-  border-top: 1px solid var(--c-gray-200);
+  border-top: 1px solid var(--c-line);
+}
+
+/* ---------------------------------------------------------------------------
+   Granulație statică (CLAUDE.md §5): strat fix peste pagină, din prototip, fără animație
+   (WCAG 2.2.2). pointer-events: none: nu blochează clicuri, selecția sau elementsFromPoint.
+   Nu apare la tipărire și în modul de contrast ridicat (forced-colors).
+   --------------------------------------------------------------------------- */
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background-image: var(--granulatie);
+}
+
+@media print, (forced-colors: active) {
+  body::after {
+    content: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -171,26 +207,22 @@ hr {
    --------------------------------------------------------------------------- */
 
 :focus-visible {
-  outline: 3px solid var(--c-focus);
+  outline: 3px solid var(--c-ink);
   outline-offset: 3px;
   border-radius: calc(var(--radius) / 3);
 }
 
 /*
- * Pe fundal deschis, focusul e --c-focus (wood-800): 12.35:1 pe alb, 11.32:1 pe gray-50.
- * Pe fundalurile wood (header, footer, CTA) wood-800 nu se vede, deci containerul închis
- * primește clasa `.pe-inchis`, iar focusul devine --c-focus-on-dark (wood-300):
- * 5.86:1 pe wood-800, 7.95:1 pe wood-900.
+ * Pe fundal deschis, focusul e --c-ink: 19.4:1 pe paper, 17.7:1 pe paper-2.
+ * Pe fundalul închis (--c-ink) ink nu se vede, deci containerul închis primește clasa
+ * `.pe-inchis`, iar focusul devine --c-paper: 19.4:1 pe ink.
  */
 .pe-inchis :focus-visible,
 .pe-inchis:focus-visible {
-  outline-color: var(--c-focus-on-dark);
+  outline-color: var(--c-paper);
 }
 
-/*
- * Pe fundal închis, linkurile (în afară de butoane) preiau culoarea deschisă a textului.
- * Bordo pe wood are doar 1.51–2.06:1, deci sublinierea preia și ea culoarea textului.
- */
+/* Pe fundal închis, linkurile (în afară de butoane) și sublinierea lor preiau culoarea textului. */
 .pe-inchis a:not(.btn),
 .pe-inchis a:not(.btn):hover {
   color: inherit;
@@ -227,28 +259,29 @@ hr {
 }
 
 /*
- * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-gray-900: 14.6:1.
+ * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-ink: 17.2:1. Singura culoare
+ * din afara paletei monocrome: e un semnal de lucru, nu apare în producție.
  * Conturul punctat îl face vizibil și fără a distinge culoarea.
  */
 mark.todo {
   background-color: #fff1b8;
-  color: var(--c-gray-900);
+  color: var(--c-ink);
   padding: 0 calc(var(--space-1) / 2);
   border-radius: calc(var(--radius) / 2);
-  outline: 1px dashed var(--c-gray-600);
+  outline: 1px dashed var(--c-muted);
   outline-offset: 1px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
 /* ---------------------------------------------------------------------------
-   Butoane (CLAUDE.md §5): min. 52 px înălțime
+   Butoane (CLAUDE.md §5): min. 48 px înălțime
    Culorile stau în variabile, ca starea hover să schimbe doar variabilele.
    --------------------------------------------------------------------------- */
 
 .btn {
   --btn-bg: transparent;
-  --btn-fg: var(--c-wood-800);
+  --btn-fg: var(--c-ink);
   --btn-border: transparent;
 
   display: inline-flex;
@@ -282,78 +315,77 @@ mark.todo {
   text-decoration-thickness: 0.08em;
 }
 
-/* Primar: fundal --c-wood-800, text alb (12.35:1); hover --c-wood-900 (16.75:1). Niciodată roșu. */
+/* Primar: fundal --c-ink, text --c-paper (19.4:1); hover --c-ink-2 (17.4:1) și subliniere. */
 .btn--primar {
-  --btn-bg: var(--c-wood-800);
-  --btn-fg: var(--c-white);
-  --btn-border: var(--c-wood-800);
+  --btn-bg: var(--c-ink);
+  --btn-fg: var(--c-paper);
+  --btn-border: var(--c-ink);
 }
 
 .btn--primar:hover {
-  --btn-bg: var(--c-wood-900);
-  --btn-border: var(--c-wood-900);
-  color: var(--c-white);
+  --btn-bg: var(--c-ink-2);
+  --btn-border: var(--c-ink-2);
+  color: var(--c-paper);
 }
 
 /*
- * Secundar: plin --c-gray-200, text --c-gray-900 (13.04:1), fără contur (CLAUDE.md §5).
- * Hover: un ton mai închis, derivat din gray-200 (text 11.2:1).
+ * Secundar (btn--contur din prototip): transparent, contur și text --c-ink (19.4:1).
+ * Hover: fundal --c-paper-2 (text 17.7:1) și subliniere.
  */
 .btn--secundar {
-  --btn-bg: var(--c-gray-200);
-  --btn-fg: var(--c-gray-900);
-  --btn-border: var(--c-gray-200);
+  --btn-bg: transparent;
+  --btn-fg: var(--c-ink);
+  --btn-border: var(--c-ink);
 }
 
 .btn--secundar:hover {
-  --btn-bg: color-mix(in srgb, var(--c-gray-200), var(--c-gray-900) 10%);
-  --btn-border: color-mix(in srgb, var(--c-gray-200), var(--c-gray-900) 10%);
-  color: var(--c-gray-900);
+  --btn-bg: var(--c-paper-2);
+  color: var(--c-ink);
 }
 
-/* Invers, pe secțiunile wood (header, secțiunea finală): fundal alb, text --c-wood-800 (12.35:1). */
+/* Invers, pe secțiunile închise: fundal --c-paper, text --c-ink (19.4:1); hover --c-paper-2 (17.7:1). */
 .btn--invers {
-  --btn-bg: var(--c-white);
-  --btn-fg: var(--c-wood-800);
-  --btn-border: var(--c-white);
+  --btn-bg: var(--c-paper);
+  --btn-fg: var(--c-ink);
+  --btn-border: var(--c-paper);
 }
 
 .btn--invers:hover {
-  --btn-bg: var(--c-gray-50);
-  --btn-border: var(--c-gray-50);
-  color: var(--c-wood-800);
+  --btn-bg: var(--c-paper-2);
+  --btn-border: var(--c-paper-2);
+  color: var(--c-ink);
 }
 
 /*
- * Contur alb, pe fundal închis (hero): butonul secundar de lângă unul inversat.
- * Text și contur alb pe wood-900 / overlay: 16.75:1; hover cu fundal alb 12%.
+ * Contur deschis, pe fundal închis (hero): butonul secundar de lângă unul inversat.
+ * Text și contur --c-paper pe ink / overlay: 19.4:1; hover cu fundal alb 12%.
  */
 .btn--contur-invers {
   --btn-bg: transparent;
-  --btn-fg: var(--c-white);
-  --btn-border: var(--c-white);
+  --btn-fg: var(--c-paper);
+  --btn-border: var(--c-paper);
 }
 
 .btn--contur-invers:hover {
   --btn-bg: rgb(255 255 255 / 0.12);
-  color: var(--c-white);
+  color: var(--c-paper);
 }
 
 /* Link fără destinație (date încă necompletate, doar în preview): vizibil, dar inactiv. */
 .btn[aria-disabled='true'] {
   --btn-bg: transparent;
-  --btn-fg: var(--c-gray-600);
-  --btn-border: var(--c-gray-600);
+  --btn-fg: var(--c-muted);
+  --btn-border: var(--c-muted);
   border-style: dashed;
   cursor: not-allowed;
   text-decoration-line: none;
 }
 
-/* Pe fundal închis, butonul inactiv rămâne lizibil: text gray-200 (12.8:1), contur wood-300 (7.9:1). */
+/* Pe fundal închis, butonul inactiv rămâne lizibil: text și contur --c-muted-dark (7.9:1). */
 .pe-inchis .btn[aria-disabled='true'] {
-  --btn-fg: var(--c-gray-200);
-  --btn-border: var(--c-wood-300);
-  color: var(--c-gray-200);
+  --btn-fg: var(--c-muted-dark);
+  --btn-border: var(--c-muted-dark);
+  color: var(--c-muted-dark);
 }
 
 /* ---------------------------------------------------------------------------
@@ -402,7 +434,7 @@ main:focus {
 
 .continut-articol strong {
   font-weight: 700;
-  color: var(--c-gray-900);
+  color: var(--c-ink);
 }
 
 .continut-articol ul {
@@ -412,19 +444,19 @@ main:focus {
 }
 
 .continut-articol ul li::marker {
-  color: var(--c-red-700);
+  color: var(--c-ink);
 }
 
-/* Nota de lucru de la începutul unor documente (ex. confidențialitate): fundal gri, linie bordo. */
+/* Nota de lucru de la începutul unor documente (ex. confidențialitate): fundal gri, linie ink. */
 .continut-articol blockquote {
   padding: var(--space-2) var(--space-3);
-  background: var(--c-gray-50);
-  border-left: 3px solid var(--c-red-700);
+  background: var(--c-paper-2);
+  border-left: 3px solid var(--c-ink);
   border-radius: var(--radius);
-  color: var(--c-gray-600);
+  color: var(--c-muted);
 }
 
-/* „Cum decurge”: pașii numerotați, în stilul PasiLucru (număr 700, bordo, în cerc subțire). */
+/* „Cum decurge”: pașii numerotați, în stilul PasiLucru (număr 600, ink, în cerc subțire). */
 .continut-articol ol {
   --cerc: var(--space-5);
 
@@ -453,8 +485,8 @@ main:focus {
   justify-content: center;
   width: var(--cerc);
   height: var(--cerc);
-  color: var(--c-red-700);
-  border: 1.5px solid var(--c-red-700);
+  color: var(--c-ink);
+  border: 1.5px solid var(--c-ink);
   border-radius: var(--radius-pill);
   font-size: var(--fs-lg);
   font-weight: 700;
@@ -469,7 +501,7 @@ main:focus {
   top: var(--cerc);
   bottom: calc(-1 * var(--space-3));
   width: 1px;
-  background: var(--c-red-700);
+  background: var(--c-ink);
 }
 
 /* ---------------------------------------------------------------------------

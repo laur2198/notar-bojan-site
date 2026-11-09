@@ -1,6 +1,6 @@
 ---
 /**
- * Banda de titlu a paginilor interioare: pe gray-50, cu breadcrumbs (opțional),
+ * Banda de titlu a paginilor interioare: pe paper-2, cu breadcrumbs (opțional),
  * slot pentru DraftBadge, h1 și lead. Conținutul paginii urmează pe alb.
  * Fără imagine mare în antet.
  */
@@ -30,8 +30,8 @@ const { locale, titlu, leadHtml, breadcrumbs } = Astro.props;
 <style>
   .banda-titlu {
     padding-block: var(--space-3) var(--section-y-sm);
-    background: var(--c-gray-50);
-    border-bottom: 1px solid var(--c-gray-200);
+    background: var(--c-paper-2);
+    border-bottom: 1px solid var(--c-line);
   }
 
   .banda-titlu__h1 {
@@ -40,7 +40,7 @@ const { locale, titlu, leadHtml, breadcrumbs } = Astro.props;
 
   .banda-titlu__lead {
     margin-top: var(--space-2);
-    color: var(--c-gray-600);
+    color: var(--c-muted);
     font-size: var(--fs-base);
   }
 </style>

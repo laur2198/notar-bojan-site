@@ -1,10 +1,10 @@
 ---
 /**
  * Subsolul (structură după referința aleasă de clientă): deschis la culoare, aerisit.
- * Fundal gray-50, linie gray-200 sus. Patru coloane pe desktop (2 pe tabletă, 1 pe mobil):
+ * Fundal paper-2, linie line sus. Patru coloane pe desktop (2 pe tabletă, 1 pe mobil):
  * wordmark + denumirea completă | Contact | Program | Linkuri. Dedesubt, după o linie,
  * „© an denumire” și „Politica de confidențialitate”.
- * Fundalul e deschis, deci focusul e --c-focus (fără `.pe-inchis`).
+ * Fundalul e deschis, deci focusul e --c-ink (fără `.pe-inchis`).
  */
 import { cale, esteInAltaLimba, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
 import { linkEmail, linkTelefon } from '../lib/contact';
@@ -139,9 +139,9 @@ const { strada, codPostal, oras, judet } = birou.adresa;
 <style>
   .subsol {
     padding-block: var(--section-y-sm);
-    background: var(--c-gray-50);
-    border-top: 1px solid var(--c-gray-200);
-    color: var(--c-gray-900);
+    background: var(--c-paper-2);
+    border-top: 1px solid var(--c-line);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
   }
 
@@ -169,14 +169,14 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   }
 
   .subsol__titlu {
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 700;
     line-height: 1.4;
   }
 
   .subsol__denumire {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
   .subsol__lista {
@@ -199,7 +199,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol__rand :global(.subsol__iconita) {
     flex: none;
     margin-top: calc(var(--space-1) * 0.75);
-    color: var(--c-wood-800);
+    color: var(--c-ink);
   }
 
   address {
@@ -213,20 +213,20 @@ const { strada, codPostal, oras, judet } = birou.adresa;
     min-height: 48px;
   }
 
-  /* Linkuri: 16 px, gray-900, subliniere bordo la hover. */
+  /* Linkuri: 16 px, ink, subliniere îngroșată la hover. */
   .subsol__link {
     display: inline-flex;
     align-items: center;
     min-width: 48px;
     min-height: 48px;
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     text-decoration: none;
   }
 
   .subsol__link:hover {
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
+    text-decoration-color: var(--c-ink);
     text-decoration-thickness: 2px;
     text-underline-offset: 0.2em;
   }
@@ -243,8 +243,8 @@ const { strada, codPostal, oras, judet } = birou.adresa;
     gap: 0 var(--space-3);
     margin-top: var(--space-5);
     padding-top: var(--space-2);
-    border-top: 1px solid var(--c-gray-200);
-    color: var(--c-gray-600);
+    border-top: 1px solid var(--c-line);
+    color: var(--c-muted);
   }
 
   .subsol__final p {
@@ -252,6 +252,6 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   }
 
   .subsol__final .subsol__link {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 </style>

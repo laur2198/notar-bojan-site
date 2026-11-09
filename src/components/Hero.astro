@@ -1,7 +1,7 @@
 ---
 /**
  * Hero-ul paginii Acasă, pe toată lățimea (structură după referința aleasă de clientă):
- * fotografie de fundal cu overlay închis sau, până vine fotografia, bloc wood-900 cu eticheta
+ * fotografie de fundal cu overlay închis sau, până vine fotografia, bloc ink cu eticheta
  * „Fotografie clădire/birou – de completat”. Centrat, alb: h1 cu numele notarului (majuscule
  * prin CSS) și „Notar public în Brașov”, apoi două butoane. Jos, o pastilă cu ratingul Google,
  * doar dacă `rating` și `numarRecenzii` sunt completate (nu se afișează niciodată un rating inventat).
@@ -65,7 +65,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     </h1>
     {subtitlu && <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />}
     <div class="hero__butoane">
-      {/* Pe fundal închis: primarul e inversat (fundal alb, text wood-800), secundarul are contur alb. */}
+      {/* Pe fundal închis: primarul e inversat (fundal alb, text ink), secundarul are contur alb. */}
       <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
       {
         telefon.valid ? (
@@ -108,8 +108,8 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     grid-template-rows: 1fr auto;
     /* ~70% din înălțimea ecranului pe mobil */
     min-height: 70svh;
-    color: var(--c-white);
-    background: var(--c-wood-900);
+    color: var(--c-paper);
+    background: var(--c-ink);
     overflow: hidden;
   }
 
@@ -132,7 +132,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     object-fit: cover;
   }
 
-  /* Overlay închis peste fotografie: textul alb trece AA (16.75:1 pe wood-900 opac). */
+  /* Overlay închis peste fotografie: textul alb trece AA (19.4:1 pe ink opac). */
   .hero__overlay {
     position: absolute;
     inset: 0;
@@ -144,9 +144,9 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     right: var(--gutter);
     top: var(--space-2);
     padding: calc(var(--space-1) / 2) var(--space-1);
-    border: 1px dashed var(--c-wood-300);
+    border: 1px dashed var(--c-muted-dark);
     border-radius: var(--radius);
-    color: var(--c-gray-200);
+    color: var(--c-muted-dark);
     font-size: var(--fs-sm);
     font-weight: 600;
   }
@@ -165,7 +165,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     display: grid;
     gap: var(--space-1);
     max-width: none;
-    color: var(--c-white);
+    color: var(--c-paper);
   }
 
   .hero__nume {
@@ -182,7 +182,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     text-transform: uppercase;
   }
 
-  /* 18 px, 400, alb 90% (pe wood-900: ~13:1), max. 40ch. */
+  /* 18 px, 400, alb 90% (pe ink: ~13:1), max. 40ch. */
   .hero__subtitlu {
     max-width: 40ch;
     margin-top: calc(-1 * var(--space-2));
@@ -231,8 +231,8 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     gap: var(--space-1);
     min-height: 48px;
     padding: var(--space-1) var(--space-2);
-    background: var(--c-white);
-    color: var(--c-gray-900);
+    background: var(--c-paper);
+    color: var(--c-ink);
     border-radius: var(--radius-pill);
     box-shadow: var(--shadow);
     font-size: var(--fs-sm);
@@ -241,9 +241,9 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   }
 
   .hero .hero__jos :global(a.hero__rating:hover) {
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
+    text-decoration-color: var(--c-ink);
   }
 
   .hero__rating-nota {

@@ -1,7 +1,7 @@
 ---
 /**
  * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): patru acțiuni egale, cu
- * iconiță (wood-800) și etichetă dedesubt: Sunați, WhatsApp (filă nouă), Programare și
+ * iconiță (ink) și etichetă dedesubt: Sunați, WhatsApp (filă nouă), Programare și
  * Locație (Google Maps). Programul rămâne pe Acasă, la ancora #program.
  * Respectă `env(safe-area-inset-bottom)`; spațiul de sub conținut e rezervat în
  * global.css (`--inaltime-bara`).
@@ -82,8 +82,8 @@ const actiuni: Actiune[] = [
     z-index: 30;
     padding: calc(var(--space-1) / 2) max(calc(var(--space-1) / 2), env(safe-area-inset-right, 0px))
       calc(var(--space-1) / 2 + env(safe-area-inset-bottom, 0px)) max(calc(var(--space-1) / 2), env(safe-area-inset-left, 0px));
-    background: var(--c-white);
-    border-top: 1px solid var(--c-gray-200);
+    background: var(--c-paper);
+    border-top: 1px solid var(--c-line);
   }
 
   ul {
@@ -104,20 +104,20 @@ const actiuni: Actiune[] = [
     justify-content: center;
     gap: calc(var(--space-1) / 2);
     min-height: 56px;
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     text-decoration: none;
     border-radius: var(--radius);
   }
 
   .bara-actiuni__link:hover {
-    color: var(--c-gray-900);
-    background: var(--c-gray-50);
+    color: var(--c-ink);
+    background: var(--c-paper-2);
   }
 
   .bara-actiuni__link :global(.iconita) {
     width: 24px;
     height: 24px;
-    color: var(--c-wood-800);
+    color: var(--c-ink);
   }
 
   .bara-actiuni__eticheta {
@@ -128,12 +128,12 @@ const actiuni: Actiune[] = [
   }
 
   .bara-actiuni__link[aria-disabled='true'] {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
     cursor: not-allowed;
   }
 
   .bara-actiuni__link[aria-disabled='true'] :global(.iconita) {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
     stroke-dasharray: 3 2;
   }
 

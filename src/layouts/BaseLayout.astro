@@ -16,6 +16,8 @@ import type { Locale } from '../i18n';
 import { getBirou } from '../lib/continut';
 import type { ImagineOg } from '../lib/og';
 import { culoare } from '../lib/tokens';
+// Preload doar pentru fontul de text, subsetul latin (folosit la primul paint de orice pagină).
+import fontTextLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { url } from '../lib/url';
 
 interface Props {
@@ -40,7 +42,8 @@ const birou = await getBirou();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content={culoare('c-wood-800')} />
+    <meta name="theme-color" content={culoare('c-ink')} />
+    <link rel="preload" href={fontTextLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <Seo
       locale={locale}

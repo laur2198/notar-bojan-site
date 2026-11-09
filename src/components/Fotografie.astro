@@ -27,7 +27,7 @@ interface Props {
   sizes?: string;
   /** Imaginea principală a paginii: încărcare imediată, prioritate mare. */
   prioritar?: boolean;
-  /** Placeholder pe fundal închis (wood-900), ex. în hero. */
+  /** Placeholder pe fundal închis (ink), ex. în hero. */
   inchis?: boolean;
   eticheta?: string;
   class?: string;
@@ -123,16 +123,16 @@ const clase = [`fotografie--r-${clasaRaport(raport)}`, `fotografie--m-${clasaRap
     align-items: center;
     justify-content: center;
     padding: var(--space-3);
-    background: var(--c-gray-50);
-    border: 1px dashed var(--c-gray-600);
-    color: var(--c-gray-600);
+    background: var(--c-paper-2);
+    border: 1px dashed var(--c-muted);
+    color: var(--c-muted);
     text-align: center;
   }
 
   .fotografie--inchis {
-    background: var(--c-wood-900);
-    border-color: var(--c-wood-300);
-    color: var(--c-gray-200);
+    background: var(--c-ink);
+    border-color: var(--c-muted-dark);
+    color: var(--c-muted-dark);
   }
 
   .fotografie__eticheta {

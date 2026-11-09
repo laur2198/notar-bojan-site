@@ -14,7 +14,8 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 - **Astro**, ultima versiune stabilă, `output: 'static'`. Content Layer API (`src/content.config.ts`, loader `glob`/`file`). Verifică documentația curentă Astro înainte de API-uri de care nu ești sigur.
 - **CSS propriu** cu custom properties (design tokens) în `src/styles/`. Fără Tailwind, fără framework UI, fără jQuery.
 - **JavaScript minim**, doar ca progressive enhancement (ex.: „Deschis acum / Închis”). Site-ul trebuie să funcționeze complet cu JS dezactivat.
-- **Font self-hosted** prin Fontsource: `@fontsource-variable/inter` (un singur font, pentru titluri și text), subseturile latin + latin-ext. Verifică randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ).
+- **Fonturi self-hosted** prin Fontsource (vezi §5): Geist (`@fontsource-variable/geist`) pentru text, butoane și h3–h4; Funnel Display (`@fontsource-variable/funnel-display`) pentru h1, h2, frazele mari și wordmark; Geist Mono (`@fontsource-variable/geist-mono`) pentru etichetele mono decorative. Doar subseturile latin + latin-ext, `font-display: swap`, preload doar pentru Geist latin. Verifică pentru orice font nou randarea corectă a diacriticelor românești cu virgulă: ș Ș ț Ț (U+0219, U+0218, U+021B, U+021A), nu cu sedilă (ş ţ), și ă â î. Un font fără ele nu se folosește.
+- **GSAP + ScrollTrigger** (`gsap`, din npm, niciodată din CDN): instalat pentru secțiunile paginii Acasă (V3); încă nefolosit. Până la V3 se aplică regulile de mișcare din §3.2 așa cum sunt.
 - **Pages CMS** (`.pages.yml` în rădăcină) pentru editarea conținutului. Documentație: https://pagescms.org/llms-full.txt
 - **Găzduire:** Cloudflare (static). Fără funcții server, fără bază de date.
 - **Node:** versiunea LTS curentă. Package manager: npm.
@@ -30,7 +31,7 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 ## 4. Accesibilitate (contractual – WCAG 2.1 AA)
 
-- Text de bază **18 px** (`1.125rem`), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
+- Text de bază **minim 18 px** (`--fs-base`: 18 → 24 px, fluid, în rem), `line-height` minim 1.6, lățime de rând max. ~70 caractere.
 - Sub 16 px sunt permise doar: etichetele de sub iconițele din bara de jos (14 px, 600) și rândul secundar din wordmark (12 px). Nicăieri altundeva.
 - Contrast AA: minim 4.5:1 text normal, 3:1 text mare și elemente UI. Verifică fiecare combinație nouă de culori.
 - Ținte de atingere minim **48×48 px**.
@@ -43,66 +44,61 @@ Citește integral acest fișier la începutul fiecărei sesiuni. Este sursa de a
 
 ## 5. Design
 
-**Direcție:** sobru, cald, de încredere. Structura homepage-ului urmează modelul notariatului Jesús Benavides (Barcelona) ales de clientă: imediat sub hero, o bandă cu informațiile practice (program, rating Google, adresă). Culoarea dominantă e maro-lemn închis, cu gri, alb și accente bordo, stabilite cu clienta. Nu se discută. Structură și ritm după notariatul Jesús Benavides: un singur font sans, raze mici, spațiere generoasă, header alb fix.
+**Direcție:** monocromă, minimalistă, tipografie mare, după prototipul paginii Acasă aprobat de client (vezi „Referința” mai jos). Paleta monocromă de mai jos înlocuiește lemnul și bordo-ul din versiunea clasică (care rămâne pe `main`). Culorile nu se discută: alte culori nu se adaugă. Un singur accent permis în afara paletei: galbenul marcajului «DE COMPLETAT», doar în preview.
+
+**Referința: prototipul.** `docs/design-v2/prototip-acasa.html` (HTML static, publicat pentru clientă) e SURSA valorilor, nu cod de copiat 1:1: culorile din `:root`, tipografia (textul de bază `clamp(18px, 1.25vw, 24px)`, mărimile titlurilor), granulația și metoda de desen a semnăturii. Prototipul încarcă GSAP, Lenis și fonturile din CDN-uri; în site rămân regulile din §3 (totul din npm sau self-hosted, fără Lenis, fără parallax etc.). Fișierul stă în `docs/` și nu se publică (nu ajunge în `dist/`). Corecturi față de prototip, aprobate: `line-height` 1.6 (nu 1.5), focus 3 px (nu 2 px), mărimile în rem (nu px), wordmark-ul gigant doar prin CSS (nu JS), granulația statică (nu animată).
 
 ### Tokens (în `src/styles/tokens.css`)
 
 ```css
 :root {
-  /* Culori */
-  --c-wood-900: #2A1A10;  /* titluri, fundalul hero-ului fără fotografie */
-  --c-wood-800: #4A2E1E;  /* culoarea de brand: butoane primare, secțiunea CTA finală */
-  --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
-  --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
-  --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
-  --c-gray-600: #5E5C59;  /* text secundar (6.7:1 pe alb, 6.1:1 pe gray-50) */
-  --c-gray-200: #E2E1DF;  /* borduri, separatoare (doar decorativ) */
-  --c-gray-50:  #F5F5F4;  /* fundal secțiuni alternante */
-  --c-white:    #FFFFFF;  /* fundal pagină */
-  --c-red-700:  #9B1C1C;  /* accent bordo: linii, numere de pași, iconițe, linkuri hover, „Închis” (8.2:1 pe alb, poate fi text) */
-  --c-red-800:  #7A1414;  /* hover pe elementele roșii */
-  --c-focus:    #4A2E1E;  /* contur focus pe fundal deschis, outline-offset 3px */
-  --c-focus-on-dark: #C9AE94; /* contur focus pe wood-800/900 */
-  --c-ok:       #2F6B3A;  /* „Deschis acum” */
-  --c-closed:   #9B1C1C;  /* „Închis” */
+  /* Culori: paleta monocromă din prototip */
+  --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header) */
+  --c-paper-2:    #F4F4F4;  /* fundal deschis alternant (secțiuni, footer) */
+  --c-ink:        #0F0F0F;  /* text pe deschis (19.4:1 pe alb); fundalul secțiunilor închise; butonul primar */
+  --c-ink-2:      #1A1A1A;  /* hover pe elementele ink */
+  --c-muted:      #5C5C5C;  /* text secundar pe deschis (6.7:1 pe alb, 6.1:1 pe paper-2) */
+  --c-muted-dark: #A3A3A3;  /* text secundar pe închis (7.9:1 pe ink) */
+  --c-line:       #E3E3E3;  /* borduri, separatoare pe deschis (doar decorativ) */
+  --c-line-dark:  #2C2C2C;  /* borduri, separatoare pe închis (doar decorativ) */
+  --granulatie: url("data:image/svg+xml,…feTurbulence…");   /* zgomot negru, opacitate .06 */
 
   /* Tipografie */
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
-  --fs-base: 1.125rem;   /* 18px */
-  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
-  --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
-  --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.25rem, 1.1rem + 0.4vw, 1.375rem);  /* max. 22px */
-  --fs-h2:   clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);    /* max. 28px */
-  --fs-h1:   clamp(2rem, 1.4rem + 1.8vw, 2.5rem);       /* max. 40px */
+  --font-sans:    'Geist Variable', system-ui, sans-serif;
+  --font-display: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif;
+  --font-mono:    'Geist Mono Variable', ui-monospace, monospace;
+  --fs-base: clamp(1.125rem, 1.25vw, 1.5rem);   /* 18 → 24 px */
+  --fs-sm:   1rem;       /* 16 px – minim pentru text; excepții doar cele din §4 */
+  --fs-xs:   0.875rem;   /* 14 px – doar etichetele barei de jos de pe mobil */
+  --fs-lg:        calc(1.15 * var(--fs-base));                          /* faq__btn, nav__logo */
+  --fs-h3:        var(--fs-lg);
+  --fs-h2:        clamp(1.5rem, calc(2 * var(--fs-base)), 3rem);        /* slogan__text, cta__text */
+  --fs-titlu:     clamp(1.75rem, calc(2.6 * var(--fs-base)), 4rem);     /* serv__titlu, pas__btn, faq__titlu */
+  --fs-h1:        clamp(1.6rem, calc(2.35 * var(--fs-base)), 3.6rem);   /* hero__h1; sub 768 px: 1.6 × base */
+  --fs-statement: clamp(1.75rem, calc(3.1 * var(--fs-base)), 4.6rem);   /* sticky-el */
+  --lh-titlu-mare: 1.08; --lh-titlu: 1.02; --lh-h2: 1.12;
+  --ls-titlu-mare: -0.035em; --ls-titlu: -0.04em; --ls-h2: -0.03em; --fw-titlu: 500;
+  --ls-wordmark: -0.055em; --lh-wordmark: 0.82; --fw-wordmark: 600;
+  --wordmark-k: 8.998;   /* lățimea textului wordmark-ului în em, măsurată (scripts/verifica-wordmark.mjs) */
+  --ease-out: cubic-bezier(0.625, 0.05, 0, 1);
 
-  /* Spațiere, raze, umbre */
-  --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
-  --space-5: 3rem;  --space-6: 4.5rem; --space-7: 6rem;
-  --section-y:    clamp(4rem, 2rem + 6vw, 6rem);   /* padding sus/jos al secțiunilor (max. 96px) */
-  --section-y-sm: clamp(3rem, 2rem + 3vw, 4rem);   /* banda de informații */
-  --radius: 4px; --radius-lg: 10px; --radius-pill: 999px;
-  --shadow: 0 4px 8px rgb(42 26 16 / .12);
-  --container: 75rem;
-  --gutter: 1.5rem;      /* padding lateral al containerului */
-  --gutter-sm: 1rem;     /* sub 480px */
-  --header-h: 72px;      /* header fix pe desktop */
-  --header-h-sm: 64px;   /* header fix pe mobil */
-  --measure: 68ch;
+  /* Spațiere, raze, umbre: neschimbate (vezi tokens.css) */
 }
 ```
 
-Verifică la implementare contrastul real al perechilor folosite (ex. alb pe `--c-wood-800`, `--c-gray-600` pe `--c-gray-50`) și ajustează valoarea, nu regula, dacă una pică AA.
+Valorile exacte sunt în `src/styles/tokens.css`; contrastele (inclusiv cazul cel mai defavorabil cu granulația) și mărimile în px la 375/1280/1920 px se calculează la build în ghidul `/stil/`, care eșuează dacă o pereche pică AA. Verifică orice combinație nouă și ajustează valoarea, nu regula.
 
-- Scara titlurilor e compactă (din tokeni): h1 max. 40 px, h2 max. 28 px, h3 max. 22 px; titlurile coloanelor din banda de informații folosesc `--fs-h3`. Subtitlul din hero și lead-urile de sub titluri: 18 px (lead-urile în `--c-gray-600`). Textul de bază rămâne 18 px.
-- Un singur font, Inter; titluri 700. Fără text justify. Fără majuscule integrale pe paragrafe (wordmark-ul și h1-ul din hero pot fi cu majuscule, prin CSS).
-- Roșul e doar accent: linii fine, numerele pașilor, iconițe, sublinierea/hover-ul linkurilor, starea „Închis”, max. 5–10% din suprafață. Nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.
-- Butoanele: 16 px, 600, înălțime min. 48 px, padding 12×20. Butonul primar: fundal `--c-wood-800`, text alb. Butonul secundar: fundal `--c-gray-200`, text `--c-gray-900`, fără contur, hover un ton mai închis. Butonul inversat (pe secțiuni wood): fundal alb, text `--c-wood-800`.
-- Fundaluri: alb pentru pagină și header (fix sus), `--c-gray-50` pentru secțiunile alternante și footer, `--c-wood-800` pentru secțiunea CTA finală, `--c-wood-900` sub fotografia din hero.
-- Fără texturi sau imagini de lemn; „lemnul” e doar culoarea.
-- `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-gray-900`).
-- `theme-color` devine `--c-wood-800`.
-- Fotografii: un singur raport de aspect per secțiune, `object-fit: cover`, componenta `<Image>` din Astro (AVIF/WebP, `width`/`height` explicite). Până vin fotografiile reale, folosește blocuri placeholder cu fundal `--c-gray-50` și eticheta „Fotografie – de completat”. Fără fotografii stock.
+- **Tipografie:** textul de bază crește fluid de la 18 la 24 px (`--fs-base`, în rem; max ≤ 2.5 × min, ca zoom-ul să ajungă la 200%). Titlurile sunt multipli ai lui (scara de mai sus). h1 și h2 în Funnel Display 500, cu spațiere negativă; h3 și h4 în Geist 500/600. `line-height` minim 1.6 pentru text. Fără text justify. Fără majuscule integrale pe paragrafe.
+- **Wordmark-ul gigant** (`WordmarkGigant.astro`): numele notarului pe un rând, Funnel Display 600, `-0.055em`, `line-height .82`, pe toată lățimea containerului, doar prin CSS (`100cqi / --wordmark-k`). Decorativ (`aria-hidden`). Abaterea față de lățimea containerului: max. 1% la 1280 și 1440 px, cu fontul încărcat (`node scripts/verifica-wordmark.mjs`). La schimbarea fontului sau a spațierii se remăsoară k.
+- **Granulația:** zgomotul `feTurbulence` din prototip, opacitate .06, strat fix peste pagină (`body::after`), `pointer-events: none`. **Statică**: fără animație, la nicio setare (WCAG 2.2.2). Nu apare la tipărire și în `forced-colors`.
+- **Semnătura** (`Semnatura.astro`, `src/assets/semnatura.svg`, licențe în `docs/licente.md`): o linie cu stroke, `currentColor`. Desenul: metoda din prototip (stroke-dashoffset, `pathLength="100"`, intervale proporționale cu lungimea, un singur progres pe tot gestul, `src/scripts/desen-semnatura.ts`). Starea din HTML e cea desenată; la `prefers-reduced-motion: reduce` și fără JS nu se animă.
+- **Starea „Deschis / Închis”** se transmite prin text și formă (disc plin / cerc gol), în ink / muted. Culoarea nu poartă informația.
+- **Butoanele:** 16 px, 600, înălțime min. 48 px, padding 12×20, rază 4 px. Primar: fundal `--c-ink`, text `--c-paper`, hover `--c-ink-2`. Secundar: transparent, contur și text `--c-ink`, hover fundal `--c-paper-2`. Inversat (pe închis): fundal `--c-paper`, text `--c-ink`. Hover-ul subliniază textul (indiciu care nu depinde de culoare).
+- **Fundaluri:** `--c-paper` pentru pagină și header (fix sus), `--c-paper-2` pentru secțiunile alternante și footer, `--c-ink` pentru secțiunile închise (CTA final, hero fără fotografie). Pe închis, containerul primește `.pe-inchis` (focus `--c-paper`).
+- **Linkuri:** text și subliniere `--c-ink`; la hover sublinierea se îngroașă.
+- `mark.todo` rămâne galben pal (`#FFF1B8` cu text `--c-ink`), doar în preview.
+- `theme-color` este `--c-ink`.
+- Fotografii: un singur raport de aspect per secțiune, `object-fit: cover`, componenta `<Image>` din Astro (AVIF/WebP, `width`/`height` explicite). Până vin fotografiile reale, folosește blocuri placeholder cu fundal `--c-paper-2` și eticheta „Fotografie – de completat”. Fără fotografii stock.
 
 ## 6. Limbi și rute
 

@@ -27,14 +27,14 @@ const { locale, birou } = Astro.props;
     flex-direction: column;
     justify-content: center;
     min-height: 48px;
-    color: var(--c-wood-900);
+    color: var(--c-ink);
     text-decoration: none;
     text-transform: uppercase;
     line-height: 1.15;
   }
 
   .wordmark:hover {
-    color: var(--c-wood-900);
+    color: var(--c-ink);
   }
 
   .wordmark__nume {
@@ -46,12 +46,12 @@ const { locale, birou } = Astro.props;
     /* 12 px (excepția din CLAUDE.md §4) */
     font-size: calc(var(--fs-sm) * 0.75);
     font-weight: 500;
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
   .wordmark:hover .wordmark__nume {
     text-decoration: underline;
-    text-decoration-color: var(--c-red-700);
+    text-decoration-color: var(--c-ink);
     text-decoration-thickness: 0.08em;
     text-underline-offset: 0.18em;
   }
