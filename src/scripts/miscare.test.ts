@@ -85,9 +85,9 @@ describe('miscare.ts', () => {
         const p = join(d, n);
         return statSync(p).isDirectory() ? fisiere(p) : /\.(ts|astro|js|mjs)$/.test(n) && !n.endsWith('.test.ts') ? [p] : [];
       });
-    // Excepția documentată în CLAUDE.md §3.2: intro-ul cu semnătura rulează inline înainte de primul
-    // paint (fără GSAP) și își verifică singur preferința de mișcare.
-    const exceptii = [join('scripts', 'miscare.ts'), join('scripts', 'intro-semnatura.js')];
+    // Excepția documentată în CLAUDE.md §3.2: scripturile semnăturii (intro și hero) rulează inline
+    // înainte de primul paint (fără GSAP) și își verifică singure preferința de mișcare.
+    const exceptii = [join('scripts', 'miscare.ts'), join('scripts', 'intro-semnatura.js'), join('scripts', 'semnatura-hero.js')];
     const abateri = fisiere(src)
       .filter((f) => !exceptii.some((e) => f.endsWith(e)))
       .filter((f) => {

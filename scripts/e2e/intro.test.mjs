@@ -45,11 +45,21 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     await ctx.close();
   });
 
-  test('în intro nu apare punctul bordo; în hero apare', async () => {
+  test('fără punct bordo; în timpul intro-ului (intro + hero în pagină) id-urile sunt unice', async () => {
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/');
-    assert.equal(await pagina.locator(`${STRAT} .semnatura__punct`).evaluate((c) => getComputedStyle(c).display), 'none');
-    assert.notEqual(await pagina.locator('.hero .semnatura__punct').evaluate((c) => getComputedStyle(c).display), 'none');
+    assert.equal(await pagina.locator(STRAT).count(), 1);
+    assert.equal(await pagina.locator('circle, .semnatura__punct').count(), 0);
+    const iduri = await pagina.evaluate(() => [...document.querySelectorAll('[id]')].map((e) => e.id));
+    assert.equal(new Set(iduri).size, iduri.length, 'id-uri duplicate în pagină');
+    // Fiecare clip-path din semnături trimite la un clipPath din același SVG.
+    const gresite = await pagina.evaluate(() =>
+      [...document.querySelectorAll('svg.semnatura [clip-path]')].filter((g) => {
+        const id = g.getAttribute('clip-path').match(/url\(#(.+)\)/)[1];
+        return document.getElementById(id)?.closest('svg') !== g.closest('svg');
+      }).length,
+    );
+    assert.equal(gresite, 0);
     await ctx.close();
   });
 
@@ -124,14 +134,26 @@ describe('Intro cu semnătura', { skip: playwright ? false : 'Playwright nu e di
     await ctx.close();
   });
 
-  test('după intro, semnătura din hero e desenată direct, fără tranziție', async () => {
+  test('după intro, semnătura din hero e complet vizibilă, fără animație (width = data-w)', async () => {
     const { ctx, pagina } = await context();
     await pagina.goto(server.url + '/');
-    const hero = pagina.locator('.hero [data-semnatura="hero"]');
-    await pagina.waitForFunction(() => document.querySelector('.hero [data-semnatura="hero"]')?.classList.contains('instant'));
-    const stiluri = await hero.locator('path').evaluateAll((p) => p.map((x) => ({ offset: Number(getComputedStyle(x).strokeDashoffset.match(/-?[\d.]+/)[0]), tranzitie: getComputedStyle(x).transitionDuration })));
-    assert.ok(stiluri.every((x) => x.offset === 0 && x.tranzitie === '0s'), JSON.stringify(stiluri[0]));
-    assert.equal(await hero.evaluate((s) => getComputedStyle(s).getPropertyValue('--progres').trim()), '1');
+    assert.equal(await pagina.evaluate(() => document.documentElement.classList.contains('intro-rulat')), true);
+    const latimi = () => pagina.locator('.hero [data-semnatura="hero"] rect.wipe').evaluateAll((r) => r.map((x) => [x.getAttribute('width'), x.getAttribute('data-w')]));
+    for (const [w, dw] of await latimi()) assert.equal(w, dw);
+    await pagina.waitForTimeout(500);
+    for (const [w, dw] of await latimi()) assert.equal(w, dw);
+    await ctx.close();
+  });
+
+  test('intro-ul pornește de la zero (fără flash) și ajunge complet vizibil înainte de fade', async () => {
+    const { ctx, pagina } = await context();
+    await pagina.goto(server.url + '/', { waitUntil: 'commit' });
+    await pagina.locator(STRAT).waitFor({ state: 'attached' });
+    const suma = () => pagina.evaluate(() => [...document.querySelectorAll('html > .intro rect.wipe')].reduce((s, r) => s + parseFloat(r.getAttribute('width')), 0));
+    const total = await pagina.evaluate(() => [...document.querySelectorAll('html > .intro rect.wipe')].reduce((s, r) => s + parseFloat(r.getAttribute('data-w')), 0));
+    assert.ok((await suma()) < total * 0.2, 'la pornire semnătura e (aproape) ascunsă');
+    await pagina.waitForFunction(() => document.querySelector('html > .intro.intro--iese'), null, { timeout: 3000 });
+    assert.ok(Math.abs((await suma()) - total) < 0.5, 'complet dezvăluită la fade');
     await ctx.close();
   });
 });

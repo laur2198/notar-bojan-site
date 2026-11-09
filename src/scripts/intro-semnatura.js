@@ -2,6 +2,7 @@
   var h = document.documentElement;
   try {
     if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.requestAnimationFrame) return;
     if (sessionStorage.getItem('intro-vazut')) return;
     sessionStorage.setItem('intro-vazut', '1');
   } catch (e) {
@@ -12,14 +13,13 @@
   if (!strat) return;
   strat = strat.cloneNode(true);
   var semnatura = strat.querySelector('svg');
-  if (!(window.CSS && CSS.registerProperty)) semnatura.classList.add('fara-property');
+  // Ascunsă înainte să intre în pagină: primul frame o arată deja de la zero.
+  pregatesteSemnatura(semnatura);
   var evenimente = ['click', 'touchstart', 'keydown', 'wheel'];
   var inchis = false;
-  var temporizator;
   function inchide() {
     if (inchis) return;
     inchis = true;
-    clearTimeout(temporizator);
     evenimente.forEach(function (e) {
       removeEventListener(e, inchide, true);
     });
@@ -33,11 +33,6 @@
   evenimente.forEach(function (e) {
     addEventListener(e, inchide, { capture: true, passive: true });
   });
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      if (inchis) return;
-      semnatura.classList.add('desenat');
-      temporizator = setTimeout(inchide, 1850);
-    });
-  });
+  // Dezvăluire 1.8 s, apoi fade 0.4 s (total ≤ 2.3 s de la primul frame).
+  dezvaluieSemnatura(semnatura, 1800, inchide);
 })();

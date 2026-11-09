@@ -1,52 +1,111 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { citesteIntervale, citesteSemnatura } from './semnatura';
+import { citesteSemnatura, prefixeazaId } from './semnatura';
 
 const asset = readFileSync(new URL('../assets/semnatura.svg', import.meta.url), 'utf8');
-const css = readFileSync(new URL('../styles/semnatura-segmente.css', import.meta.url), 'utf8');
-const DURATA_HERO = 3.5;
-const DURATA_INTRO = 1.8;
+const s = citesteSemnatura(asset);
 
-describe('semnătura generată (notar · mâini · bojan)', () => {
-  const s = citesteSemnatura(asset);
-  const trasee = [...s.interior.matchAll(/<path\b[^>]*>/g)].map((m) => m[0]);
+/** Funcțiile din scriptul livrat (script clasic, fără export), încărcate așa cum rulează în pagină. */
+const sursaDezvaluire = readFileSync(new URL('../scripts/dezvaluire-semnatura.js', import.meta.url), 'utf8');
+const { semnaturaEasing, semnaturaIntervale, semnaturaLatimi } = new Function(
+  `${sursaDezvaluire}; return { semnaturaEasing, semnaturaIntervale, semnaturaLatimi };`,
+)() as {
+  semnaturaEasing: (t: number) => number;
+  semnaturaIntervale: (lungimi: number[]) => [number, number][];
+  semnaturaLatimi: (P: number, intervale: [number, number][], latimi: number[]) => number[];
+};
 
-  it('are exact trei grupuri, în ordine: notar, mâini, bojan', () => {
-    expect(s.grupuri).toEqual(['notar', 'maini', 'bojan']);
-    expect(s.latime / s.inaltime).toBeGreaterThan(4);
+describe('semnatura.svg (fișierul manual)', () => {
+  it('are viewBox 929 × 181 și linia de dedesubt în interiorul lui', () => {
+    expect(s.viewBox).toBe('0 0 929 181');
+    expect(s.linieY).toBeGreaterThan(0);
+    expect(s.linieY).toBeLessThan(s.inaltime);
   });
 
-  it('toate path-urile au pathLength="100" și un data-segment unic, în ordine', () => {
-    expect(trasee.length).toBeGreaterThan(3);
-    for (const p of trasee) expect(p).toMatch(/\spathLength="100"/);
-    expect(trasee.map((p) => Number(p.match(/data-segment="(\d+)"/)?.[1]))).toEqual(trasee.map((_, i) => i));
+  // Numărul de segmente vine din fișier (data-segmente pe <svg>; 64 în versiunea curentă).
+  const N = s.segmenteDeclarate ?? s.segmente.length;
+
+  it('are numărul declarat de segmente (data-segmente): câte un clipPath cu rect.wipe și câte un <g data-segment clip-path>', () => {
+    expect(s.segmenteDeclarate).toBe(64);
+    expect(s.segmente).toHaveLength(N);
+    const grupuri = [...s.interior.matchAll(/<g\b[^>]*\sdata-segment="([^"]+)"[^>]*\sclip-path="url\(#([^)]+)\)"/g)];
+    expect(grupuri).toHaveLength(N);
+    expect(grupuri.map((g) => g[2])).toEqual(s.segmente.map((x) => x.id));
   });
 
-  it('mâinile sunt un singur path, iar comentariul de provizoriu e în SVG', () => {
-    expect(s.interior.match(/<g data-grup="maini">([\s\S]*?)<\/g>/)?.[1]?.match(/<path\b/g)).toHaveLength(1);
-    expect(asset).toContain('Mâinile – provizoriu, se pot înlocui cu un desen manual (un path, același viewBox).');
+  it('în repaus (fără JS, reduced-motion) fiecare rect are width = data-w', () => {
+    const rects = [...s.interior.matchAll(/<rect\b[^>]*class="wipe"[^>]*>/g)].map((m) => m[0]);
+    expect(rects).toHaveLength(N);
+    for (const r of rects) expect(r.match(/\swidth="([^"]+)"/)?.[1]).toBe(r.match(/\sdata-w="([^"]+)"/)?.[1]);
   });
 
-  it('intervalele sunt secvențiale, fără suprapunere, și însumează durata totală', () => {
-    const intervale = citesteIntervale(css);
-    expect(intervale.map((i) => i.segment)).toEqual(trasee.map((_, i) => i));
+  it('formele sunt umplute: niciun stroke în fișier', () => {
+    expect(s.interior).not.toMatch(/\sstroke=/);
+  });
+});
+
+describe('dezvăluirea (src/scripts/dezvaluire-semnatura.js)', () => {
+  const intervale = semnaturaIntervale(s.segmente.map((x) => x.len));
+  const latimi = s.segmente.map((x) => x.w);
+
+  it('intervalele sunt consecutive, proporționale cu data-len, iar suma lor este 1', () => {
+    const total = s.segmente.reduce((t, x) => t + x.len, 0);
     let cursor = 0;
-    for (const i of intervale) {
-      expect(i.delay).toBeCloseTo(cursor, 5);
-      expect(i.d).toBeGreaterThan(0);
-      cursor = i.delay + i.d;
-    }
-    const suma = intervale.reduce((t, i) => t + i.d, 0);
-    expect(suma).toBeCloseTo(1, 5);
-    expect(suma * DURATA_HERO).toBeCloseTo(DURATA_HERO, 4);
-    expect(suma * DURATA_INTRO).toBeCloseTo(DURATA_INTRO, 4);
+    intervale.forEach(([a, b], i) => {
+      expect(a).toBeCloseTo(cursor, 10);
+      expect(b - a).toBeCloseTo(s.segmente[i]!.len / total, 10);
+      cursor = b;
+    });
+    expect(intervale.reduce((t, [a, b]) => t + (b - a), 0)).toBeCloseTo(1, 10);
+    expect(intervale.at(-1)![1]).toBe(1);
   });
 
-  it('punctul de accent (r = 4) stă pe ultimul punct al ultimei trăsături', () => {
-    const ultimul = trasee.at(-1)!.match(/\sd="([^"]+)"/)![1]!.trim().split(/[\s,]+/).slice(-2).map(Number);
-    const cerc = s.interior.match(/<circle\b[^>]*>/)![0];
-    const atr = (n: string) => Number(cerc.match(new RegExp(`\\s${n}="([^"]+)"`))![1]);
-    expect([atr('cx'), atr('cy')]).toEqual(ultimul);
-    expect(atr('r')).toBe(4);
+  it('P = 0 → toate lățimile 0; P = 1 → toate egale cu data-w', () => {
+    expect(semnaturaLatimi(0, intervale, latimi).every((w) => w === 0)).toBe(true);
+    expect(semnaturaLatimi(1, intervale, latimi)).toEqual(latimi);
+  });
+
+  it('strict secvențial: la jumătatea gestului, segmentele de dinainte sunt complete, cele de după încă la 0', () => {
+    const w = semnaturaLatimi(0.5, intervale, latimi);
+    intervale.forEach(([a, b], i) => {
+      if (b <= 0.5) expect(w[i]).toBe(latimi[i]);
+      else if (a >= 0.5) expect(w[i]).toBe(0);
+      else expect(w[i]).toBeGreaterThan(0);
+    });
+  });
+
+  it('easing-ul cubic-bezier(0.77, 0, 0.175, 1): capete fixe, monoton, lent la început și la final', () => {
+    expect(semnaturaEasing(0)).toBe(0);
+    expect(semnaturaEasing(1)).toBe(1);
+    // Referință independentă: curba eșantionată dens, punctul cu x cel mai apropiat de t.
+    const bez = (u: number, p1: number, p2: number) => 3 * p1 * u * (1 - u) ** 2 + 3 * p2 * u * u * (1 - u) + u ** 3;
+    const referinta = (t: number) => {
+      let best = 0;
+      for (let i = 0; i <= 100000; i++) if (Math.abs(bez(i / 100000, 0.77, 0.175) - t) < Math.abs(bez(best, 0.77, 0.175) - t)) best = i / 100000;
+      return bez(best, 0, 1);
+    };
+    for (const t of [0.1, 0.25, 0.5, 0.75, 0.9]) expect(semnaturaEasing(t)).toBeCloseTo(referinta(t), 3);
+    let prev = 0;
+    for (let t = 0.01; t <= 1; t += 0.01) {
+      const v = semnaturaEasing(t);
+      expect(v).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = v;
+    }
+    expect(semnaturaEasing(0.1)).toBeLessThan(0.05);
+    expect(semnaturaEasing(0.9)).toBeGreaterThan(0.95);
+  });
+});
+
+describe('prefixeazaId', () => {
+  it('două instanțe (intro + hero) nu au id-uri comune, iar referințele urmează id-urile', () => {
+    const intro = prefixeazaId(s.interior, 'semnatura-intro-');
+    const hero = prefixeazaId(s.interior, 'semnatura-hero-');
+    const iduri = (t: string) => [...t.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!);
+    const [a, b] = [iduri(intro), iduri(hero)];
+    expect(a).toHaveLength(s.segmente.length);
+    expect(new Set([...a, ...b]).size).toBe(2 * s.segmente.length);
+    const referinte = [...hero.matchAll(/url\(#([^)]+)\)/g)].map((m) => m[1]!);
+    expect(referinte).toHaveLength(s.segmente.length);
+    for (const r of referinte) expect(b).toContain(r);
   });
 });

@@ -1,80 +1,79 @@
 ---
 /**
- * Semnătura desenată (decorativă): „notar” · mâini · „bojan”, generată static de
- * scripts/genereaza-semnatura.mjs în src/assets/semnatura.svg (trei grupuri, câte un <path> pe
- * trăsătură, fiecare cu pathLength="100") și src/styles/semnatura-segmente.css (intervalul
- * fiecărei trăsături: --delay, --d, fracțiuni din gestul total, proporționale cu lungimea).
+ * SVG provizoriu. Se înlocuiește cu desenul final al ilustratorului (un singur path cu stroke);
+ * atunci animația revine la stroke-dashoffset (helperul păstrat în src/lib/semnatura-stroke.ts).
  *
- * Animația: un singur element animat, variabila --progres (0 → 1, @property), cu easing-ul
- * cubic-bezier(0.77, 0, 0.175, 1) pe TOT gestul. Fiecare trăsătură își calculează dashoffset-ul
- * (dasharray 100 101, 100 → 0) din --progres, cu clamp pe intervalul ei: strict secvențial, stânga
- * → dreapta. Fără @property (clasa .fara-property, pusă din JS): tranziții lineare pe trăsături,
- * cu delay-uri, aceeași durată totală.
+ * Semnătura decorativă (aria-hidden): src/assets/semnatura.svg, făcut manual, inclus ca atare
+ * (nu se regenerează, nu se modifică). Forme UMPLUTE (fără stroke): literele din Lavishly Yours
+ * și mâinile din Canva (vezi docs/licente.md). Culoarea vine din token-uri, după fundal:
+ * `ton="deschis"` → --c-wood-800, `ton="inchis"` → --c-wood-300.
  *
- * Stări:
- *  - fără JS (html fără .js) sau prefers-reduced-motion: reduce → desenată complet, fără tranziție;
- *  - cu JS: nedesenată până la clasa .desenat; .instant = desenată fără tranziție.
- * La capăt, în hero, un punct bordo (accent) apare cu opacity 0 → 1 în 0.3 s, după desen (delay =
- * durata); în intro punctul nu apare.
- * Culori doar din token-uri: traseul wood-300 (hero-ul și intro-ul au fundal închis), punctul red-700.
+ * Animația: dezvăluire secvențială, nu stroke. Fiecare segment (<g data-segment clip-path>) are
+ * în clipPath un <rect class="wipe" data-len data-w>; un singur progres global P (0 → 1,
+ * cubic-bezier(0.77, 0, 0.175, 1) pe tot gestul) dă lățimea fiecărui dreptunghi, pe intervale
+ * consecutive proporționale cu data-len (src/scripts/dezvaluire-semnatura.js, requestAnimationFrame,
+ * fără librării). Hero: 3.5 s, pornit de IntersectionObserver (Hero.astro). Intro: 1.8 s
+ * (IntroSemnatura.astro).
  *
- * Componenta nu are script propriu (e randată și într-un <template>, unde un script n-ar rula):
- * varianta „hero” e pornită de Hero.astro (IntersectionObserver), varianta „intro” de scriptul din
- * <head> (src/scripts/intro-semnatura.js). Clasa `.js` o pune scriptul din <head> (BaseLayout).
+ * Starea din HTML e cea finală: toate dreptunghiurile au width = data-w. Fără JS și la
+ * prefers-reduced-motion semnătura e complet vizibilă; JS-ul le aduce la 0 doar când animația
+ * chiar rulează, înainte de primul paint (scripturi inline, fără flash).
+ *
+ * Id-urile clipPath-urilor se prefixează cu `semnatura-{varianta}-`, ca intro-ul și hero-ul să
+ * poată fi în pagină în același timp. Cu `linie`, se adaugă linia de dedesubt la data-linie-y,
+ * prelungită spre dreapta (Hero.astro o taie la lățimea containerului).
  */
 import svgSemnatura from '../assets/semnatura.svg?raw';
-import { citesteSemnatura } from '../lib/semnatura';
-import '../styles/semnatura-segmente.css';
+import { citesteSemnatura, prefixeazaId } from '../lib/semnatura';
 
 interface Props {
   varianta: 'hero' | 'intro';
+  /** Fundalul pe care stă semnătura. */
+  ton?: 'deschis' | 'inchis';
+  /** Linia de dedesubt, la data-linie-y, pe toată lățimea containerului. */
+  linie?: boolean;
 }
 
-const { varianta } = Astro.props;
-const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
+const { varianta, ton = 'deschis', linie = false } = Astro.props;
+const { viewBox, latime, inaltime, linieY, interior } = citesteSemnatura(svgSemnatura);
+const continut =
+  (linie
+    ? `<line class="semnatura__linie" x1="0" y1="${linieY}" x2="100000" y2="${linieY}" vector-effect="non-scaling-stroke"/>`
+    : '') + prefixeazaId(interior, `semnatura-${varianta}-`);
 ---
 
 <svg
-  class:list={['semnatura', `semnatura--${varianta}`]}
+  class:list={['semnatura', `semnatura--${varianta}`, `semnatura--${ton}`]}
   data-semnatura={varianta}
   xmlns="http://www.w3.org/2000/svg"
   viewBox={viewBox}
   width={latime}
   height={inaltime}
-  fill="none"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
   aria-hidden="true"
   focusable="false"
-  set:html={interior}
+  set:html={continut}
 />
 
 <style>
-  /* Progresul gestului: număr animabil (0 = nedesenată, 1 = desenată). */
-  @property --progres {
-    syntax: '<number>';
-    inherits: true;
-    initial-value: 1;
-  }
-
   .semnatura {
-    --semnatura-durata: 3.5s;
-    --progres: 1;
     display: block;
     height: auto;
     max-width: 100%;
     overflow: visible;
-    stroke: var(--c-wood-300);
+    fill: var(--c-wood-800);
+    stroke: none;
   }
 
-  /* 320 px pe mobil (375 px) → 600 px de la 1024 px, interpolat liniar; --semnatura-latime vine din Hero. */
+  .semnatura--inchis {
+    fill: var(--c-wood-300);
+  }
+
+  /* Lățimea în hero vine din Hero.astro (--semnatura-latime: 320 → 600 px). */
   .semnatura--hero {
     width: var(--semnatura-latime, 320px);
   }
 
   .semnatura--intro {
-    --semnatura-durata: 1.8s;
     width: 260px;
   }
 
@@ -84,61 +83,14 @@ const { viewBox, latime, inaltime, interior } = citesteSemnatura(svgSemnatura);
     }
   }
 
-  /*
-   * Fiecare trăsătură: desenată proporțional cu cât din intervalul ei [--delay, --delay + --d]
-   * a parcurs --progres. Starea finală (--progres: 1) e cea implicită: fără JS și la mișcare
-   * redusă semnătura apare desenată.
-   */
-  .semnatura :global(.semnatura__traseu) {
-    stroke-dasharray: 100 101;
-    stroke-dashoffset: calc(100 - 100 * clamp(0, (var(--progres) - var(--delay, 0)) / var(--d, 1), 1));
+  /* Linia de semnătură: 1 px, gri deschis atenuat (decorativă), pe fundal închis. */
+  .semnatura :global(.semnatura__linie) {
+    fill: none;
+    stroke: color-mix(in srgb, var(--c-gray-200) 40%, transparent);
+    stroke-width: 1px;
   }
 
-  .semnatura :global(.semnatura__punct) {
-    fill: var(--c-red-700);
-    stroke: none;
-    opacity: 1;
-  }
-
-  /* În intro nu apare punctul de accent (doar în hero). */
-  .semnatura--intro :global(.semnatura__punct) {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    :global(.js) .semnatura:not(.desenat) {
-      --progres: 0;
-    }
-
-    :global(.js) .semnatura:not(.desenat) :global(.semnatura__punct) {
-      opacity: 0;
-    }
-
-    .semnatura.desenat {
-      transition: --progres var(--semnatura-durata) cubic-bezier(0.77, 0, 0.175, 1);
-    }
-
-    .semnatura.desenat :global(.semnatura__punct) {
-      transition: opacity 0.3s ease var(--semnatura-durata);
-    }
-
-    /* Fallback fără @property: --progres nu se poate anima, deci trăsăturile au tranziții proprii. */
-    .semnatura.fara-property :global(.semnatura__traseu) {
-      stroke-dashoffset: 0;
-    }
-
-    :global(.js) .semnatura.fara-property:not(.desenat) :global(.semnatura__traseu) {
-      stroke-dashoffset: 100;
-    }
-
-    .semnatura.fara-property.desenat :global(.semnatura__traseu) {
-      transition: stroke-dashoffset calc(var(--d) * var(--semnatura-durata)) linear calc(var(--delay) * var(--semnatura-durata));
-    }
-
-    .semnatura.instant,
-    .semnatura.instant :global(.semnatura__traseu),
-    .semnatura.instant :global(.semnatura__punct) {
-      transition: none;
-    }
+  .semnatura--deschis :global(.semnatura__linie) {
+    stroke: var(--c-cream-2);
   }
 </style>
