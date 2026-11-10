@@ -15,6 +15,7 @@ import { cale, esteInAltaLimba, t, type CheieRuta, type CheieUI, type Locale } f
 import { linkEmail, linkExtern, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
 import ProgramSaptamana from './ProgramSaptamana.astro';
+import { imparteDenumirea } from '../lib/denumire';
 import WordmarkGigant from './WordmarkGigant.astro';
 
 interface Props {
@@ -147,7 +148,13 @@ const { strada, codPostal, oras, judet } = birou.adresa;
         {birou.cif && <p set:html={marcheazaPlaceholder(t(locale, 'subsol.cif', { cif: birou.cif }))} />}
       </div>
       <div class="subsol__linie" aria-hidden="true"></div>
-      <WordmarkGigant text={birou.notar} latime="62" class="subsol__wordmark" />
+      <WordmarkGigant
+        text={birou.notar}
+        sus={imparteDenumirea(birou.denumire, birou.notar).sus}
+        eticheta={birou.denumire}
+        latime="62"
+        class="subsol__wordmark"
+      />
     </div>
   </div>
   <div class="subsol__strat" data-footer-strat aria-hidden="true"></div>
@@ -257,7 +264,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
 
   /* Wordmark-ul gigant: spațiu dedesubt, ca descendentul lui „ț” să nu fie tăiat. */
   .subsol :global(.subsol__wordmark) {
-    padding-top: 0.1em;
+    --wordmark-sus-sus: 1.5em;
     padding-bottom: var(--space-3);
     color: var(--c-paper);
   }

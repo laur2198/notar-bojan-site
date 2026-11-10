@@ -47,6 +47,14 @@ const dataCalendaristica = z
     return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === text;
   }, 'Data nu există în calendar.');
 
+/**
+ * Fotografie provizorie (de stoc, ex. din src/assets/fotografii-provizorii/): permisă doar în
+ * preview, unde poartă eticheta „Fotografie provizorie”; build-ul de producție se oprește cât
+ * timp e bifată (scripts/verifica-continut.mjs, CLAUDE.md §5). Se debifează la înlocuirea cu o
+ * fotografie reală a biroului.
+ */
+const fotoProvizorie = z.boolean().optional();
+
 /** Câmp de imagine opțional: gol (`""`/`null`) sau o cale procesată de `image()`. */
 const imagineOptionala = (image: SchemaContext['image']) =>
   z.union([z.literal(''), image()]).nullish().transform((valoare) => valoare || undefined);
@@ -155,6 +163,7 @@ const acasa = defineCollection({
         imagine: imagineOptionala(image),
         /** Textul alternativ al fotografiei, obligatoriu, separat pe limbă. */
         imagineAlt: z.string().min(1, 'Textul alternativ al fotografiei din hero e obligatoriu.'),
+        fotoProvizorie,
       }),
       /** Frazele mari din secțiunea închisă de sub hero, care se succed la derulare: exact 3. */
       fraze: z
@@ -176,7 +185,21 @@ const acasa = defineCollection({
         titlu: z.string().min(1),
         /** Paragraful care „se aprinde” la derulare; un rând gol desparte paragrafele. */
         slogan: z.string().min(1),
-        lista: z.array(z.object({ titlu: z.string().min(1), text: z.string().min(1) })).min(1),
+        /**
+         * Pașii. Fotografia pasului apare în stânga, cât pasul e activ; se încarcă doar în pagina
+         * română (și /en/ o folosește pe aceeași, după poziție), textul alternativ e pe fiecare limbă.
+         */
+        lista: z
+          .array(
+            z.object({
+              titlu: z.string().min(1),
+              text: z.string().min(1),
+              imagine: imagineOptionala(image),
+              imagineAlt: z.string().optional(),
+              fotoProvizorie,
+            }),
+          )
+          .min(1),
       }),
       recenzii: z.object({
         titlu: z.string().min(1),
@@ -247,9 +270,10 @@ const servicii = defineCollection({
     subiectEmail: z.string().min(1),
     /** Opțional: etichete scurte afișate pe Acasă (ex. „Imobiliare”, „Carte funciară”). */
     etichete: z.array(z.string().min(1)).optional(),
-    /** Opțional: imaginea 16:10 de pe cardul serviciului. */
+    /** Opțional: fotografia 16:10 de pe cardul serviciului și din rândul de pe Acasă. */
     imagine: imagineOptionala(image),
     imagineAlt: z.string().optional(),
+    fotoProvizorie,
     validat,
   }),
 });
@@ -270,6 +294,8 @@ const serviciiEn = defineCollection({
           slugRo: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
           /** Opțional: etichete scurte afișate pe Acasă (EN). */
           etichete: z.array(z.string().min(1)).optional(),
+          /** Textul alternativ (EN) al fotografiei serviciului; fotografia vine din pagina română (slugRo). */
+          imagineAlt: z.string().optional(),
         }),
       )
       .min(1),

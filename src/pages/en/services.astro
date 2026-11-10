@@ -33,11 +33,16 @@ if (lipsa.length) {
   throw new Error(`servicii-en/servicii.yaml: slugRo fără pagină în src/content/servicii/ro/: ${lipsa.join(', ')}`);
 }
 
+// Fotografia cardului vine din serviciul românesc; textul alternativ e cel englez.
+const dateRo = new Map(serviciiRo.map((s) => [s.data.slug, s.data]));
 const carduri = serviciiEn.data.lista.map((s) => ({
   slug: s.slugRo,
   id: s.slugRo,
   titlu: s.titlu,
   rezumat: s.text,
+  imagine: dateRo.get(s.slugRo)?.imagine,
+  imagineAlt: s.imagineAlt ?? '',
+  fotoProvizorie: dateRo.get(s.slugRo)?.fotoProvizorie,
   linkRo: `${cale('servicii', 'ro')}${s.slugRo}/`,
 }));
 ---

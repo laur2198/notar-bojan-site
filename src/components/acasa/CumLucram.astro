@@ -1,7 +1,8 @@
 ---
 /**
  * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune deschisă (V3b). Stânga o imagine care se
- * schimbă după pasul activ (placeholder cald cu cifra mare bej, decorativă), dreapta pașii din CMS:
+ * schimbă după pasul activ (fotografia pasului din CMS sau, fără ea, placeholder cald cu cifra mare
+ * bej, decorativă; doar cadrul activ e în arborele de accesibilitate), dreapta pașii din CMS:
  * titluri mari, cele inactive la opacitate .6 (text mare: ≥ 3.5:1 pe alb), cel activ 1 și cu un
  * punct roșu de accent. Activarea la
  * hover (pointer fin), focus și clic: butoane cu aria-expanded care arată descrierea pasului activ.
@@ -11,13 +12,26 @@
  * (5.3:1) în --c-ink (src/scripts/miscare.ts, [data-aprinde]).
  */
 import { t, type Locale } from '../../i18n';
-import { marcheazaPlaceholder } from '../../lib/continut';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { marcheazaPlaceholder, textAlt } from '../../lib/continut';
+import FotoProvizorie from '../FotoProvizorie.astro';
 import Eticheta from './Eticheta.astro';
+
+interface Pas {
+  titlu: string;
+  text: string;
+  /** Fotografia pasului (4:3), din pagina română; fără ea, placeholder cu cifra mare. */
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+  /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
+  provizorie?: boolean;
+}
 
 interface Props {
   locale: Locale;
   titlu: string;
-  pasi: { titlu: string; text: string }[];
+  pasi: Pas[];
   slogan: string;
 }
 
@@ -31,11 +45,28 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   <div class="container">
     <Eticheta text={titlu} id="pasi-titlu" />
     <div class="pasi__grila">
-      <div class="pasi__img" aria-hidden="true">
+      <div class="pasi__img">
         {
-          pasi.map((_, i) => (
-            <div class:list={['pasi__cadru', { 'pasi__cadru--activ': i === 0 }]} data-pas-img={i}>
-              <span>{numar(i)}</span>
+          pasi.map((p, i) => (
+            <div
+              class:list={['pasi__cadru', { 'pasi__cadru--activ': i === 0 }]}
+              data-pas-img={i}
+              aria-hidden={i === 0 ? undefined : 'true'}
+            >
+              {p.imagine ? (
+                <>
+                  <Image
+                    class="pasi__foto"
+                    src={p.imagine}
+                    alt={textAlt(p.imagineAlt)}
+                    widths={[480, 720, 960, 1200].filter((w) => w <= p.imagine!.width)}
+                    sizes="(min-width: 62rem) 50vw, 100vw"
+                  />
+                  <FotoProvizorie locale={locale} provizorie={p.provizorie} />
+                </>
+              ) : (
+                <span aria-hidden="true">{numar(i)}</span>
+              )}
             </div>
           ))
         }
@@ -73,7 +104,13 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
         p.classList.toggle('pas--activ', activ);
         if (acordeon) p.querySelector('button')?.setAttribute('aria-expanded', String(activ));
       }
-      for (const im of imagini) im.classList.toggle('pasi__cadru--activ', im.dataset.pasImg === index);
+      // Doar fotografia pasului activ e vizibilă și în arborele de accesibilitate.
+      for (const im of imagini) {
+        const activa = im.dataset.pasImg === index;
+        im.classList.toggle('pasi__cadru--activ', activa);
+        if (activa) im.removeAttribute('aria-hidden');
+        else im.setAttribute('aria-hidden', 'true');
+      }
     };
     const pointerFin = matchMedia('(hover: hover) and (pointer: fine)');
     for (const p of pasi) {
@@ -126,6 +163,14 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
   .pasi__cadru--activ {
     opacity: 1;
+  }
+
+  .pasi__cadru :global(.pasi__foto) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Cifra mare: decorativă (aria-hidden), bej. */

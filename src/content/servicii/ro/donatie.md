@@ -15,6 +15,10 @@ acteNecesare:
   - "Pentru imobile: certificatul de atestare fiscală"
   - "Actele de stare civilă care dovedesc rudenia, dacă donația este între rude"
 subiectEmail: "Acte – Donație"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-donatie.jpg"
+imagineAlt: "«DE VALIDAT: Mână care întinde un set de chei»"
+fotoProvizorie: true
 validat: false
 ---
 

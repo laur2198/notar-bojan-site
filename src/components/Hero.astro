@@ -60,7 +60,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     {/* Slot: eticheta „Text propus – în curs de validare”, în preview. */}
     <slot />
     <h1 id="hero-titlu" class="hero__titlu">
-      <span class="hero__nume">{birou.notar}</span>
+      <span class="hero__nume">{birou.denumire}</span>
       <span class="hero__profesie" set:html={marcheazaPlaceholder(profesie)} />
     </h1>
     {subtitlu && <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />}

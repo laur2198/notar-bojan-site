@@ -14,6 +14,8 @@ export interface ServiciuCard {
   rezumat: string;
   imagine?: ImageMetadata;
   imagineAlt?: string;
+  /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
+  fotoProvizorie?: boolean;
   /**
    * Textul de onorariu din preturi/ro.yaml, afișat pe card doar pe /servicii/.
    * (Nu `onorariu`: acela e câmpul din fișierul serviciului, pentru caseta „Pregătiți dosarul”.)
@@ -52,6 +54,7 @@ const hrefServiciu = (slug: string) => `${cale('servicii', locale)}${slug}/`;
           rezumat={s.rezumat}
           imagine={s.imagine}
           imagineAlt={s.imagineAlt}
+          provizorie={s.fotoProvizorie}
           onorariu={s.textOnorariu}
           nivel={nivel}
         />

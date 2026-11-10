@@ -1,61 +1,90 @@
 ---
 /**
- * Semnătura decorativă (aria-hidden): src/assets/semnatura.svg, făcut manual, inclus ca atare
- * (nu se regenerează). O singură linie cu stroke: literele din Mr De Haviland și un gest abstract
- * pentru mâini (vezi docs/licente.md). Culoarea e currentColor: o dă textul containerului
- * (ink pe deschis, paper pe închis), ca în prototip.
+ * Semnătura decorativă „Notar 🤝 Bojan” (aria-hidden; numele biroului rămâne în h1).
+ * src/assets/semnatura.svg e pus de birou / designer și se include ca atare (?raw), fără să i se
+ * modifice geometria: literele (Imperial Script) și mâinile (Vecteezy) sunt contururi umplute
+ * cu currentColor, descoperite de măști (#m-notar, #m-maini, #m-bojan) ale căror path-uri .rev
+ * se desenează (licențe în docs/licente.md). Citirea și pregătirea: src/lib/semnatura.ts.
  *
- * Desenul: stroke-dashoffset 100 → 0 pe fiecare path (pathLength="100", dasharray 100 101),
- * strict secvențial de la stânga la dreapta, pe intervale consecutive proporționale cu data-len
- * (calculate la build cu src/lib/semnatura-stroke.ts, scrise pe path-uri ca data-a / data-b).
- * Scriptul de desen e src/scripts/desen-semnatura.ts; cine îl folosește decide când pornește.
+ * Două SVG-uri pe instanță, alese din CSS:
+ *   - ≥ 640 px: semnătura întreagă;
+ *   - < 640 px: doar mâinile (viewBox decupat pe ele), animate; fără litere.
+ * Id-urile măștilor primesc sufixul instanței (`id`), pentru că semnătura apare de două ori pe
+ * pagină (intro + hero).
  *
- * Starea din HTML e cea finală: dashoffset 0, semnătura completă. Fără JS și la
- * prefers-reduced-motion rămâne așa.
+ * Culoarea: currentColor, din `ton`: pe deschis maroul de brand (--c-brand, CLAUDE.md §5),
+ * pe închis alb (--c-paper).
  *
- * Id-urile din SVG (dacă desenul le are) se prefixează cu `semnatura-{id}-`, ca semnătura să
- * poată apărea de mai multe ori în aceeași pagină.
+ * Animația (src/scripts/desen-semnatura.ts): un progres global P 0 → 1, fiecare .rev în intervalul
+ * lui [data-a, data-b]. Starea din HTML e cea finală: stroke-dashoffset 0, semnătura completă.
+ * Fără JS și la prefers-reduced-motion rămâne așa; scriptul o ascunde (101) doar când chiar animă.
  */
 import svgSemnatura from '../assets/semnatura.svg?raw';
-import { adaugaIntervale, citesteSemnatura, prefixeazaId } from '../lib/semnatura';
-import { intervaleStroke } from '../lib/semnatura-stroke';
+import { randeazaSemnatura } from '../lib/semnatura';
 
 interface Props {
-  /** Identificator unic în pagină (prefixul id-urilor și valoarea lui data-semnatura). */
+  /** Identificator unic în pagină (sufixul id-urilor și valoarea lui data-semnatura). */
   id: string;
+  /** Fundalul pe care stă: deschis (maro) sau închis (alb). */
+  ton?: 'deschis' | 'inchis';
   class?: string;
 }
 
-const { id, class: clasa } = Astro.props;
-const { viewBox, latime, inaltime, grosime, interior, lungimi } = citesteSemnatura(svgSemnatura);
-const continut = prefixeazaId(adaugaIntervale(interior, intervaleStroke(lungimi)), `semnatura-${id}-`);
+const { id, ton = 'deschis', class: clasa } = Astro.props;
+const r = randeazaSemnatura(svgSemnatura, id);
 ---
 
-<svg
-  class:list={['semnatura', clasa]}
-  data-semnatura={id}
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox={viewBox}
-  width={latime}
-  height={inaltime}
-  fill="none"
-  stroke="currentColor"
-  stroke-width={grosime}
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  aria-hidden="true"
-  focusable="false"
-  set:html={continut}
-/>
+<div class:list={['semnatura', `semnatura--${ton}`, clasa]} data-semnatura={id} aria-hidden="true">
+  <svg
+    class="semnatura__intreaga"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox={r.viewBox}
+    width={r.latime}
+    height={r.inaltime}
+    focusable="false"
+    set:html={r.intreaga}
+  />
+  <svg
+    class="semnatura__maini"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox={r.viewBoxMaini}
+    width={r.viewBoxMaini.split(' ')[2]}
+    height={r.viewBoxMaini.split(' ')[3]}
+    focusable="false"
+    set:html={r.maini}
+  />
+</div>
 
 <style>
   .semnatura {
     display: block;
+    color: var(--c-brand);
+  }
+
+  .semnatura--inchis {
+    color: var(--c-paper);
+  }
+
+  .semnatura svg {
+    display: block;
     width: 100%;
     height: auto;
     overflow: visible;
-    fill: none;
-    stroke: currentColor;
+  }
+
+  .semnatura .semnatura__maini {
+    display: none;
+  }
+
+  /* < 640 px: doar mâinile. */
+  @media (max-width: 39.99rem) {
+    .semnatura .semnatura__intreaga {
+      display: none;
+    }
+
+    .semnatura .semnatura__maini {
+      display: block;
+    }
   }
 
   /* Starea din HTML: desenată complet. Scriptul pune dashoffset-ul la 101 doar când animă. */

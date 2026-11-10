@@ -11,6 +11,7 @@
 import type { ImageMetadata } from 'astro';
 import { t, type Locale } from '../i18n';
 import { marcheazaPlaceholder } from '../lib/continut';
+import FotoProvizorie from './FotoProvizorie.astro';
 import Fotografie from './Fotografie.astro';
 import Iconita from './Iconita.astro';
 
@@ -26,17 +27,20 @@ interface Props {
   rezumat: string;
   imagine?: ImageMetadata;
   imagineAlt?: string;
+  /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
+  provizorie?: boolean;
   /** Nivelul titlului: h3 sub un h2 de secțiune. */
   nivel?: 'h2' | 'h3';
   /** Textul de onorariu din preturi/ro.yaml (pe /servicii/). */
   onorariu?: string;
 }
 
-const { locale, titlu, href, id, linkRo, rezumat, imagine, imagineAlt, nivel = 'h3', onorariu } = Astro.props;
+const { locale, titlu, href, id, linkRo, rezumat, imagine, imagineAlt, provizorie = false, nivel = 'h3', onorariu } = Astro.props;
 const Titlu = nivel;
 ---
 
 <article id={id} class:list={['card-serviciu', { 'card-serviciu--static': !href }]}>
+  <FotoProvizorie locale={locale} provizorie={provizorie && !!imagine} />
   {
     imagine ? (
       <Fotografie

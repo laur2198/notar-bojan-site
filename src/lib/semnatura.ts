@@ -1,27 +1,44 @@
 /**
- * Citirea semnăturii (src/assets/semnatura.svg) la build. Fișierul e făcut manual și nu se
- * modifică din cod: o singură linie cu stroke (fill="none"), viewBox, `data-linie-y` (linia de
- * dedesubt, în unitățile viewBox-ului), `data-segmente` (numărul de path-uri) și path-urile, fiecare
- * cu pathLength="100" și data-len (lungimea reală, care dă durata lui în animație).
+ * Semnătura (src/assets/semnatura.svg), citită și pregătită la build. Fișierul îl pune biroul /
+ * designerul și nu se modifică din cod (nici geometria, nici ordinea).
+ *
+ * Structura fișierului:
+ *   - trei <mask> (#m-notar, #m-maini, #m-bojan) cu path-uri cu stroke alb, `class="rev"`,
+ *     `data-word`, `data-len` și `pathLength="100"`: linia centrală a fiecărei trăsături;
+ *   - literele (Imperial Script, contururi) și mâinile (contururi) sunt forme umplute,
+ *     `fill="currentColor"`, fiecare cu `mask="url(#m-…)"`: se văd doar cât le descoperă masca.
+ *
+ * Animația desenează path-urile .rev (stroke-dashoffset 100 → 0), în ordinea notar → maini →
+ * bojan, fiecare în intervalul lui [a, b] din gestul total, proporțional cu data-len.
+ *
+ * Pe ecranele înguste (< 640 px) semnătura întreagă devine prea mică: se arată doar mâinile
+ * (masca #m-maini și grupul lor, cu viewBox-ul decupat pe ele), fără litere (Semnatura.astro).
  */
+
+export const ORDINE_CUVINTE = ['notar', 'maini', 'bojan'] as const;
+export type Cuvant = (typeof ORDINE_CUVINTE)[number];
+
+export interface TraseuRev {
+  cuvant: Cuvant;
+  /** Lungimea reală, în unitățile viewBox-ului (dă durata trăsăturii în animație). */
+  len: number;
+}
 
 export interface DateSemnatura {
   viewBox: string;
   latime: number;
   inaltime: number;
-  /** Poziția liniei de dedesubt, în unitățile viewBox-ului. */
-  linieY: number;
-  /** Grosimea liniei din fișier (stroke-width pe <svg>), în px (vector-effect non-scaling-stroke). */
-  grosime: number;
   /** Conținutul <svg>-ului, fără comentarii. */
   interior: string;
-  /** data-len pentru fiecare <path>, în ordinea din fișier (stânga → dreapta). */
-  lungimi: number[];
-  /** Numărul de path-uri declarat în fișier (`data-segmente` pe <svg>). */
-  segmenteDeclarate: number;
+  /** Path-urile .rev, în ordinea din fișier. */
+  trasee: TraseuRev[];
 }
 
+/** Intervalul unei trăsături din gestul total: [a, b], fracțiuni din 1. */
+export type Interval = [a: number, b: number];
+
 const atribut = (tag: string, nume: string) => tag.match(new RegExp(`\\s${nume}="([^"]*)"`))?.[1];
+const REV = /<path\b[^>]*\sclass="rev"[^>]*>/g;
 
 export function citesteSemnatura(svg: string): DateSemnatura {
   const faraComentarii = svg.replace(/<!--[\s\S]*?-->/g, '');
@@ -30,38 +47,53 @@ export function citesteSemnatura(svg: string): DateSemnatura {
   if (!viewBox) throw new Error('semnatura.svg: lipsește viewBox pe <svg>.');
   const [, , latime, inaltime] = viewBox.split(/[\s,]+/).map(Number);
   if (!latime || !inaltime) throw new Error(`semnatura.svg: viewBox invalid „${viewBox}”.`);
-  const linieY = Number(atribut(radacina, 'data-linie-y'));
-  if (!Number.isFinite(linieY)) throw new Error('semnatura.svg: lipsește data-linie-y pe <svg>.');
-  const segmenteDeclarate = Number(atribut(radacina, 'data-segmente'));
-  if (!Number.isInteger(segmenteDeclarate)) throw new Error('semnatura.svg: lipsește data-segmente pe <svg>.');
-  const grosime = Number(atribut(radacina, 'stroke-width') ?? 2);
   const interior = faraComentarii.match(/<svg\b[^>]*>([\s\S]*)<\/svg>/)?.[1]?.trim() ?? '';
-  const trasee = [...interior.matchAll(/<path\b[^>]*>/g)].map((m) => m[0]);
-  if (trasee.length !== segmenteDeclarate) {
-    throw new Error(`semnatura.svg: data-segmente="${segmenteDeclarate}", dar fișierul are ${trasee.length} <path>.`);
+  for (const c of ORDINE_CUVINTE) {
+    if (!interior.includes(`<mask id="m-${c}"`)) throw new Error(`semnatura.svg: lipsește <mask id="m-${c}">.`);
+    if (!interior.includes(`mask="url(#m-${c})"`)) throw new Error(`semnatura.svg: nicio formă nu folosește masca #m-${c}.`);
   }
-  const lungimi = trasee.map((p, i) => {
-    if (atribut(p, 'pathLength') !== '100') throw new Error(`semnatura.svg: path-ul ${i} nu are pathLength="100".`);
+  const trasee = [...interior.matchAll(REV)].map(([p], i): TraseuRev => {
+    const cuvant = atribut(p, 'data-word') as Cuvant;
+    if (!ORDINE_CUVINTE.includes(cuvant)) throw new Error(`semnatura.svg: path-ul .rev ${i} are data-word „${cuvant}”.`);
+    if (atribut(p, 'pathLength') !== '100') throw new Error(`semnatura.svg: path-ul .rev ${i} nu are pathLength="100".`);
     const len = Number(atribut(p, 'data-len'));
-    if (!(len > 0)) throw new Error(`semnatura.svg: path-ul ${i} nu are data-len valid.`);
-    return len;
+    if (!(len > 0)) throw new Error(`semnatura.svg: path-ul .rev ${i} nu are data-len valid.`);
+    return { cuvant, len };
   });
-  return { viewBox, latime, inaltime, linieY, grosime, interior, lungimi, segmenteDeclarate };
+  if (!trasee.length) throw new Error('semnatura.svg: niciun path class="rev".');
+  return { viewBox, latime, inaltime, interior, trasee };
 }
 
 /**
- * Scrie pe fiecare <path>, în ordine, intervalul lui din gestul total: data-a (început) și
- * data-b (sfârșit), fracțiuni din 1.
+ * Intervalele trăsăturilor, în ordinea din fișier. Ordinea desenării: toate trăsăturile „notar”,
+ * apoi „maini”, apoi „bojan” (în cadrul unui cuvânt, ordinea din fișier); intervalele sunt
+ * consecutive în ordinea desenării, proporționale cu data-len, și acoperă exact [0, 1].
  */
-export function adaugaIntervale(interior: string, intervale: { delay: number; d: number }[]): string {
-  let i = 0;
-  const rezultat = interior.replace(/<path\b/g, (potrivire) => {
-    const interval = intervale[i++];
-    if (!interval) return potrivire;
-    const b = i === intervale.length ? 1 : interval.delay + interval.d;
-    return `${potrivire} data-a="${+interval.delay.toFixed(6)}" data-b="${+b.toFixed(6)}"`;
+export function intervaleSemnatura(trasee: readonly TraseuRev[]): Interval[] {
+  const total = trasee.reduce((s, t) => s + t.len, 0);
+  if (!(total > 0)) throw new Error('Lungimile trăsăturilor trebuie să fie pozitive.');
+  const ordine = trasee
+    .map((t, i) => ({ t, i }))
+    .sort((x, y) => ORDINE_CUVINTE.indexOf(x.t.cuvant) - ORDINE_CUVINTE.indexOf(y.t.cuvant) || x.i - y.i);
+  const rezultat: Interval[] = new Array(trasee.length);
+  let cumul = 0;
+  ordine.forEach(({ t, i }, k) => {
+    const a = cumul / total;
+    cumul += t.len;
+    rezultat[i] = [a, k === ordine.length - 1 ? 1 : cumul / total];
   });
-  if (i !== intervale.length) throw new Error(`semnatura.svg: ${i} path-uri, dar ${intervale.length} intervale.`);
+  return rezultat;
+}
+
+/** Scrie pe fiecare path .rev, în ordinea din fișier, intervalul lui: data-a și data-b. */
+export function adaugaIntervale(interior: string, intervale: readonly Interval[]): string {
+  let i = 0;
+  const rezultat = interior.replace(REV, (p) => {
+    const interval = intervale[i++];
+    if (!interval) return p;
+    return p.replace(/^<path\b/, `<path data-a="${+interval[0].toFixed(6)}" data-b="${+interval[1].toFixed(6)}"`);
+  });
+  if (i !== intervale.length) throw new Error(`semnatura.svg: ${i} path-uri .rev, dar ${intervale.length} intervale.`);
   return rezultat;
 }
 
@@ -74,4 +106,56 @@ export function prefixeazaId(interior: string, prefix: string): string {
     .replace(/(\sid=")([^"]+)"/g, (_, inceput: string, id: string) => `${inceput}${prefix}${id}"`)
     .replace(/url\(#([^)]+)\)/g, (_, id: string) => `url(#${prefix}${id})`)
     .replace(/(\s(?:xlink:)?href=")#([^"]+)"/g, (_, inceput: string, id: string) => `${inceput}#${prefix}${id}"`);
+}
+
+/** Doar mâinile: masca #m-maini și grupul de forme care o folosește. */
+export function extrageMaini(interior: string): string {
+  const masca = interior.match(/<mask id="m-maini"[\s\S]*?<\/mask>/)?.[0];
+  const deschidere = interior.match(/<g\b[^>]*\smask="url\(#m-maini\)"[^>]*>/);
+  if (!masca || !deschidere || deschidere.index === undefined) throw new Error('semnatura.svg: lipsesc masca sau grupul mâinilor.');
+  const sfarsit = interior.indexOf('</g>', deschidere.index);
+  if (sfarsit < 0) throw new Error('semnatura.svg: grupul mâinilor nu se închide.');
+  return `${masca}${interior.slice(deschidere.index, sfarsit + 4)}`;
+}
+
+/**
+ * viewBox-ul mâinilor: cutia contururilor lor (punctele din `d`, care sunt poligoane) plus o
+ * margine, ca vârfurile să nu fie tăiate.
+ */
+export function viewBoxMaini(interior: string, margine = 6): string {
+  const deschidere = interior.match(/<g\b[^>]*\smask="url\(#m-maini\)"[^>]*>/);
+  const grup = deschidere?.index === undefined ? '' : interior.slice(deschidere.index, interior.indexOf('</g>', deschidere.index));
+  const numere = [...grup.matchAll(/\sd="([^"]+)"/g)].flatMap((m) => (m[1]!.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number));
+  if (numere.length < 4 || numere.length % 2) throw new Error('semnatura.svg: contururile mâinilor nu sunt poligoane (x,y).');
+  const xs = numere.filter((_, i) => i % 2 === 0);
+  const ys = numere.filter((_, i) => i % 2 === 1);
+  const x = Math.floor(Math.min(...xs) - margine);
+  const y = Math.floor(Math.min(...ys) - margine);
+  const w = Math.ceil(Math.max(...xs) + margine) - x;
+  const h = Math.ceil(Math.max(...ys) + margine) - y;
+  return `${x} ${y} ${w} ${h}`;
+}
+
+export interface SemnaturaRandata {
+  viewBox: string;
+  latime: number;
+  inaltime: number;
+  /** Semnătura întreagă (ecrane ≥ 640 px), cu id-uri prefixate și intervale. */
+  intreaga: string;
+  /** Doar mâinile (ecrane < 640 px), cu id-uri prefixate separat și intervalele lor (0 → 1). */
+  maini: string;
+  viewBoxMaini: string;
+}
+
+/**
+ * Conținutul celor două SVG-uri ale unei instanțe. `sufix` e unic pe pagină (intro, hero…):
+ * id-urile măștilor devin `semnatura-{sufix}-m-…` (întreaga) și `semnatura-{sufix}-mobil-m-…`.
+ */
+export function randeazaSemnatura(svg: string, sufix: string): SemnaturaRandata {
+  const s = citesteSemnatura(svg);
+  const intreaga = prefixeazaId(adaugaIntervale(s.interior, intervaleSemnatura(s.trasee)), `semnatura-${sufix}-`);
+  const doarMaini = extrageMaini(s.interior);
+  const traseeMaini = s.trasee.filter((t) => t.cuvant === 'maini');
+  const maini = prefixeazaId(adaugaIntervale(doarMaini, intervaleSemnatura(traseeMaini)), `semnatura-${sufix}-mobil-`);
+  return { viewBox: s.viewBox, latime: s.latime, inaltime: s.inaltime, intreaga, maini, viewBoxMaini: viewBoxMaini(s.interior) };
 }

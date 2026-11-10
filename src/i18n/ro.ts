@@ -86,6 +86,7 @@ export const ro = {
   'acasa.fotoHero': 'Fotografie birou – urmează',
   'acasa.pasul': 'Pasul {n}',
   'cursor.serviciu': 'Vezi serviciul',
+  'foto.provizorie': 'Fotografie provizorie',
   'foto.deCompletat': 'Fotografie – de completat',
 
   // Banda de informații practice
@@ -117,14 +118,14 @@ export const ro = {
 
   // Servicii și prețuri
   'servicii.titlu': 'Servicii și prețuri',
-  'servicii.seoTitlu': 'Servicii și prețuri | Notar Bojan, Brașov',
+  'servicii.seoTitlu': 'Servicii și prețuri | {denumire}',
   'servicii.seoDescriere': 'Serviciile biroului notarial din Brașov, actele necesare pentru fiecare și onorariile orientative.',
   'servicii.onorariiTitlu': 'Onorarii orientative',
   'servicii.coloanaServiciu': 'Serviciu',
   'servicii.coloanaOnorariu': 'Onorariu orientativ',
   'servicii.onorariuCard': 'Onorariu:',
   'servicii.altele': 'Alte servicii',
-  'servicii.seoTitluPagina': '{titlu} | Notar Bojan, Brașov',
+  'servicii.seoTitluPagina': '{titlu} | {denumire}',
   'breadcrumbs.acasa': 'Acasă',
 
   // Caseta „Pregătiți dosarul”
@@ -147,7 +148,7 @@ export const ro = {
   'email.atasate': 'Am atașat următoarele documente:',
 
   // Pagini (etapa 5)
-  'pagina.seoTitlu': '{titlu} | Notar Bojan, Brașov',
+  'pagina.seoTitlu': '{titlu} | {denumire}',
   'programare.cardTitlu': 'Programare online',
   'programare.alegeti': 'Alegeți data și ora',
   'programare.nota': 'Programarea se face prin Google Calendar. Biroul vă confirmă programarea.',
@@ -158,7 +159,7 @@ export const ro = {
   'embed.titluIframe': 'Calendarul de programări',
   'faq.seoDescriere': 'Răspunsuri la întrebările frecvente despre programare, acte, onorarii și semnarea actelor la biroul notarial din Brașov.',
   'recenzii.titluPagina': 'Recenzii',
-  'recenzii.seoDescriere': 'Recenziile clienților Biroului Individual Notarial Bojan Elena Luminița din Brașov, publicate pe Google.',
+  'recenzii.seoDescriere': 'Recenziile clienților publicate pe Google pentru {denumire}, Brașov.',
   'recenzii.vedetiToate': 'Vedeți toate recenziile pe Google',
   'recenzii.goale': 'Recenziile clienților pot fi citite pe profilul Google al biroului.',
   'contact.emailActe': 'Email pentru acte',
@@ -176,7 +177,7 @@ export const ro = {
 
   // Imaginea de distribuire (Open Graph)
   'og.subtitlu': 'Notar public în Brașov',
-  'og.alt': '{notar}, notar public în Brașov',
+  'og.alt': '{denumire}, notar public în Brașov',
 
   // WhatsApp
   'whatsapp.nume': 'WhatsApp',

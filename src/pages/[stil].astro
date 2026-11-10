@@ -174,7 +174,7 @@ const fonturi = [
 
 <BaseLayout
   locale="ro"
-  title={`Ghid de stil (uz intern) – ${birou.notar}`}
+  title={`Ghid de stil (uz intern) – ${birou.denumire}`}
   description="Ghidul de stil intern al site-ului: tokenuri, tipografie, componente."
   noindex
   intro="manual"
@@ -380,17 +380,18 @@ const fonturi = [
       <section aria-labelledby="semnatura">
         <h2 id="semnatura">Semnătura</h2>
         <p>
-          O singură linie cu <code>stroke</code>, culoarea din text (<code>currentColor</code>). Desenul: fiecare traseu
-          are <code>pathLength="100"</code> și se desenează prin <code>stroke-dashoffset</code>, pe rând, de la stânga la
-          dreapta, cu un singur progres pe tot gestul (aceeași metodă ca în prototip). Fără JS și cu mișcare redusă,
-          semnătura apare direct desenată.
+          Literele (Imperial Script) și mâinile sunt forme umplute cu <code>currentColor</code> (prop-ul
+          <code>ton</code>: maro pe deschis, alb pe închis), descoperite de măști. Liniile centrale din măști au
+          <code>pathLength="100"</code> și se desenează prin <code>stroke-dashoffset</code>, în ordinea Notar → mâini →
+          Bojan, cu un singur progres pe tot gestul. Sub 640 px: doar mâinile. Fără JS
+          și cu mișcare redusă, semnătura apare direct desenată.
         </p>
         <div class="semnaturi">
           <div class="semnatura-panou">
             <Semnatura id="stil-deschis" />
           </div>
           <div class="semnatura-panou semnatura-panou--inchis pe-inchis" data-tema-sectiune="dark">
-            <Semnatura id="stil-inchis" />
+            <Semnatura id="stil-inchis" ton="inchis" />
           </div>
         </div>
         <Buton text="Redă desenul" varianta="contur" sageata={false} data-reda-semnatura hidden />
@@ -490,12 +491,12 @@ const fonturi = [
    * Semnăturile se desenează o dată, la prima intrare în ecran, și la „Redă desenul”. La mișcare
    * redusă nu se animă deloc (rămân desenate, starea din HTML) și butonul rămâne ascuns.
    */
-  const svguri = [...document.querySelectorAll<SVGSVGElement>('.semnaturi [data-semnatura]')];
+  const svguri = [...document.querySelectorAll('.semnaturi [data-semnatura]')];
   const buton = document.querySelector<HTMLButtonElement>('[data-reda-semnatura]');
   const miscareRedusa = matchMedia('(prefers-reduced-motion: reduce)');
-  const opriri = new Map<SVGSVGElement, () => void>();
+  const opriri = new Map<Element, () => void>();
 
-  const deseneaza = (svg: SVGSVGElement) => {
+  const deseneaza = (svg: Element) => {
     opriri.get(svg)?.();
     opriri.set(svg, deseneazaSemnatura(svg, 3500));
   };
@@ -507,7 +508,7 @@ const fonturi = [
         for (const intrare of intrari) {
           if (!intrare.isIntersecting) continue;
           observator.unobserve(intrare.target);
-          deseneaza(intrare.target as SVGSVGElement);
+          deseneaza(intrare.target);
         }
       },
       { threshold: 0.4 },
@@ -940,7 +941,7 @@ const fonturi = [
     color: var(--c-brand);
   }
 
-  .semnatura-panou > :global(svg) {
+  .semnatura-panou > :global(.semnatura) {
     width: min(100%, 26rem);
   }
 

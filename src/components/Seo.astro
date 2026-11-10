@@ -16,12 +16,12 @@ interface Props {
   numeSite: string;
   /** Pagini care nu se indexează în niciun mod (ex. 404): `noindex`, fără canonical. */
   noindex?: boolean;
-  /** Numele notarului, pentru textul alternativ al imaginii implicite. */
-  notar: string;
+  /** Denumirea oficială a biroului, pentru textul alternativ al imaginii implicite. */
+  denumire: string;
   imagine?: ImagineOg;
 }
 
-const { locale, title, description, numeSite, noindex = false, notar, imagine = imagineOgImplicita(locale, notar) } = Astro.props;
+const { locale, title, description, numeSite, noindex = false, denumire, imagine = imagineOgImplicita(locale, denumire) } = Astro.props;
 
 const site = Astro.site ?? new URL(Astro.url.origin);
 /** Calea logică (fără bază); adresele absolute o primesc înapoi prin `url()`. */

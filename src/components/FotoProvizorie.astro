@@ -1,0 +1,41 @@
+---
+/**
+ * Eticheta „Fotografie provizorie” peste o fotografie de stoc (CLAUDE.md §5): doar în preview,
+ * doar când fotografia e marcată `fotoProvizorie: true` în CMS. În producție nu apare, iar
+ * build-ul se oprește oricum cât timp există fotografii provizorii (scripts/verifica-continut.mjs).
+ * Părintele trebuie să aibă `position: relative`. Galben pal și contur punctat, ca marcajul
+ * «DE COMPLETAT»: semnal de lucru, nu parte din design.
+ */
+import { t, type Locale } from '../i18n';
+import { estePreview } from '../lib/continut';
+
+interface Props {
+  locale: Locale;
+  /** Fotografia e provizorie (câmpul `fotoProvizorie` din CMS). */
+  provizorie?: boolean;
+}
+
+const { locale, provizorie = false } = Astro.props;
+---
+
+{estePreview && provizorie && <span class="foto-provizorie">{t(locale, 'foto.provizorie')}</span>}
+
+<style>
+  /* Text --c-ink pe galben pal: 14.8:1. */
+  .foto-provizorie {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+    padding: 0.15em 0.55em;
+    border-radius: calc(var(--radius) / 2);
+    background: #fff1b8;
+    color: var(--c-ink);
+    outline: 1px dashed var(--c-muted);
+    outline-offset: 1px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+</style>

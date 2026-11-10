@@ -10,7 +10,7 @@
  * Orice click, tastă, rotiță sau atingere îl sare (semnătura apare completă și ecranul urcă).
  * Stratul e aria-hidden și inert: pagina de dedesubt rămâne accesibilă, focusul nu intră în el.
  */
-import { deseneazaSemnatura, pregatesteSemnatura } from './desen-semnatura';
+import { deseneazaLaVedere, pregatesteSemnatura } from './desen-semnatura';
 
 export const EVENIMENT_GATA = 'intro-gata';
 /** Emis după ce stratul a ieșit complet (ScrollTrigger își recalculează pozițiile). */
@@ -39,7 +39,7 @@ function anuntaGata() {
 export function ruleazaIntro(): boolean {
   const html = document.documentElement;
   const strat = document.querySelector<HTMLElement>('[data-intro]');
-  const svg = strat?.querySelector<SVGSVGElement>('svg[data-semnatura]');
+  const svg = strat?.querySelector('[data-semnatura]');
   if (inCurs || !strat || !svg || miscareRedusa()) {
     html.classList.remove('cu-intro');
     return false;
@@ -84,7 +84,7 @@ export function ruleazaIntro(): boolean {
     if (iesit) return;
     for (const e of EVENIMENTE_SARIRE) window.addEventListener(e, iese, { capture: true, passive: true });
   });
-  opresteDesen = deseneazaSemnatura(svg, DURATA_DESEN, () => {
+  opresteDesen = deseneazaLaVedere(svg, DURATA_DESEN, () => {
     opresteDesen = () => {};
     pauza = window.setTimeout(iese, PAUZA);
   });

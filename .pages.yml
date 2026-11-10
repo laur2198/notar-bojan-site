@@ -36,6 +36,10 @@ components:
     type: image
     label: Fotografie
     description: Fotografie reală (JPG, PNG sau WebP), de preferință de cel puțin 1600 px pe latura lungă. Fără fotografii de stoc.
+  fotoProvizorie:
+    type: boolean
+    label: Fotografie provizorie (de stoc)
+    description: Bifat = fotografie de stoc (din src/assets/fotografii-provizorii/), folosită doar pe site-ul de previzualizare, cu eticheta „Fotografie provizorie”. Site-ul public nu se poate publica până nu încărcați o fotografie reală a biroului și debifați.
   imagineAlt:
     type: string
     label: Descrierea fotografiei
@@ -246,7 +250,7 @@ content:
             label: Titlul paginii în Google
             type: string
             required: true
-            description: Cel mult 60 de caractere, ca să nu fie tăiat în rezultatele Google. Ex. „Notar public în Brașov – Bojan Elena Luminița”.
+            description: Cel mult 60 de caractere, ca să nu fie tăiat în rezultatele Google. Folosiți denumirea oficială completă, netradusă și pe pagina engleză, ex. „Birou Individual Notarial Bojan Elena Luminița, Brașov”.
             options:
               maxlength: 60
           - name: descriere
@@ -273,11 +277,13 @@ content:
             description: Apare în stânga; în dreapta apare automat adresa din „Setări birou”.
           - name: imagine
             component: imagine
-            description: Fotografia biroului, în dreapta titlului (pe telefon, sub el); e și imaginea afișată când pagina e distribuită. Se încarcă doar pe pagina în română; pagina în engleză o folosește pe aceeași. Cel puțin 1600 px pe latura lungă, fără fotografii de stoc.
+            description: Fotografia biroului, în dreapta titlului (pe telefon, sub el); e și imaginea afișată când pagina e distribuită. Se încarcă doar pe pagina în română; pagina în engleză o folosește pe aceeași. Cel puțin 1600 px pe latura lungă. Fotografiile de stoc sunt permise doar provizoriu (bifați „Fotografie provizorie”).
           - name: imagineAlt
             component: imagineAlt
             required: true
-            description: Obligatoriu, separat pe fiecare limbă (în engleză pe pagina engleză). Ce se vede în fotografie, ex. „Biroul notarial din Brașov, sala de semnare”.
+            description: Obligatoriu, separat pe fiecare limbă (în engleză pe pagina engleză). Ce se vede în fotografie, ex. „Biroul notarial din Brașov, sala de semnare”. Textele propuse de noi poartă «DE VALIDAT»; ștergeți marcajul după verificare.
+          - name: fotoProvizorie
+            component: fotoProvizorie
       - name: fraze
         label: Frazele mari de sub prima secțiune
         type: object
@@ -339,6 +345,14 @@ content:
                 label: Descriere
                 type: text
                 required: true
+              - name: imagine
+                component: imagine
+                description: Fotografia pasului (4:3), în stânga, cât pasul e activ. Se încarcă doar pe pagina în română; pagina în engleză o folosește pe aceeași, după poziție.
+              - name: imagineAlt
+                component: imagineAlt
+                description: Ce se vede în fotografie, separat pe fiecare limbă. Textele propuse de noi poartă «DE VALIDAT»; ștergeți marcajul după verificare.
+              - name: fotoProvizorie
+                component: fotoProvizorie
       - name: recenzii
         label: Secțiunea Recenzii
         type: object
@@ -488,9 +502,11 @@ content:
       - name: imagine
         component: imagine
         label: Fotografie pe card (opțional)
-        description: Apare sus pe cardul serviciului, în format lat (16:10). Fără fotografii de stoc. Dacă lipsește, cardul are doar o linie de accent.
+        description: Apare sus pe cardul serviciului și în rândul de pe pagina principală, în format lat (16:10). Fotografiile de stoc sunt permise doar provizoriu (bifați „Fotografie provizorie”). Dacă lipsește, cardul are doar o linie de accent.
       - name: imagineAlt
         component: imagineAlt
+      - name: fotoProvizorie
+        component: fotoProvizorie
       - name: validat
         component: validat
       - name: body
@@ -766,6 +782,10 @@ content:
                 pattern:
                   regex: "^[a-z0-9]+(-[a-z0-9]+)*$"
                   message: Doar litere mici fără diacritice, cifre și cratimă.
+              - name: imagineAlt
+                label: Photo description (EN)
+                type: string
+                description: Descrierea în engleză a fotografiei serviciului (fotografia se încarcă pe pagina serviciului în română). Textele propuse de noi poartă «DE VALIDAT».
               - name: etichete
                 label: Etichete pe pagina principală (EN)
                 type: string

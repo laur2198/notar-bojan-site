@@ -13,6 +13,10 @@ acteNecesare:
   - "Actul de identitate, pentru legalizarea semnăturii sau specimenul de semnătură"
   - "Înscrisul de semnat, nesemnat (se semnează în fața notarului)"
 subiectEmail: "Acte – Legalizare"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-legalizari.jpg"
+imagineAlt: "«DE VALIDAT: Ștampilă de lemn pe un document juridic deschis»"
+fotoProvizorie: true
 validat: false
 ---
 

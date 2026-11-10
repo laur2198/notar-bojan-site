@@ -3,7 +3,10 @@
  * Wordmark-ul gigant din prototip (docs/design-v2/prototip-acasa.html, `.wordmark`): numele
  * notarului pe un singur rând, pe toată lățimea cutiei lui: tot containerul părinte sau, cu
  * latime="62" (hero-ul și subsolul, V3b), 62% din el de la 768 px (pe mobil tot).
- * Decorativ (aria-hidden): numele apare ca text în altă parte a paginii.
+ * Cu `sus` (V3c, hero și subsol), deasupra apare forma juridică „Birou Individual Notarial”
+ * (Funnel Display 500, clamp(1.1rem, 1.6vw, 1.6rem)), în culoarea blocului (brand-900 pe deschis,
+ * alb pe închis), iar blocul e o imagine cu numele accesibil `eticheta` (denumirea oficială).
+ * Fără ele, decorativ (aria-hidden), ca pe /stil/.
  *
  * Doar CSS: părintele (.wordmark-gigant) e container de dimensiune (container-type: inline-size),
  * iar mărimea fontului = 100cqi / --wordmark-k, unde k e lățimea textului în em, măsurată cu
@@ -16,13 +19,23 @@ interface Props {
   text: string;
   /** Lățimea cutiei, în procente din container, de la 768 px în sus (pe mobil e mereu 100%). */
   latime?: '100' | '62';
+  /** Rândul de deasupra, ex. „Birou Individual Notarial” (forma juridică din denumirea oficială). */
+  sus?: string;
+  /** Numele accesibil al blocului (denumirea oficială completă); fără el, blocul e decorativ. */
+  eticheta?: string;
   class?: string;
 }
 
-const { text, latime = '100', class: clasa } = Astro.props;
+const { text, latime = '100', sus, eticheta, class: clasa } = Astro.props;
 ---
 
-<div class:list={['wordmark-gigant', { 'wordmark-gigant--62': latime === '62' }, clasa]} aria-hidden="true">
+<div
+  class:list={['wordmark-gigant', { 'wordmark-gigant--62': latime === '62' }, clasa]}
+  role={eticheta ? 'img' : undefined}
+  aria-label={eticheta}
+  aria-hidden={eticheta ? undefined : 'true'}
+>
+  {sus && <span class="wordmark-gigant__sus" data-wordmark-sus>{sus}</span>}
   <span class="wordmark-gigant__text" data-wordmark-gigant>{text}</span>
 </div>
 
@@ -38,6 +51,17 @@ const { text, latime = '100', class: clasa } = Astro.props;
     .wordmark-gigant--62 {
       --wordmark-fractie: 0.62;
     }
+  }
+
+  /* Rândul de sus (prototip, `.wordmark-sus`): lipit de wordmark, distanța de deasupra o dă locul (hero / subsol). */
+  .wordmark-gigant__sus {
+    display: block;
+    margin: var(--wordmark-sus-sus, 0) 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
   }
 
   .wordmark-gigant__text {
