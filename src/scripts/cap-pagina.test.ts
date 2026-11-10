@@ -60,6 +60,12 @@ describe('cap-pagina.js (înainte de primul paint)', () => {
     expect([...ruleaza({ redus: true, hash: '#intro' }).clase]).toEqual(['js']);
   });
 
+  it('intrarea cu o ancoră (ex. /#faq) sare intro-ul; #intro îl forțează', () => {
+    expect(ruleaza({ hash: '#faq' }).clase.has('cu-intro')).toBe(false);
+    expect(ruleaza({ hash: '#faq' }).clase.has('miscare')).toBe(true);
+    expect(ruleaza({ hash: '#intro', vazut: true }).clase.has('cu-intro')).toBe(true);
+  });
+
   it('fără sessionStorage (blocat): fără intro, dar mișcarea rămâne', () => {
     const { clase } = ruleaza({ sessionStorageAruncă: true });
     expect(clase.has('cu-intro')).toBe(false);

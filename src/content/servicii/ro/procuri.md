@@ -3,6 +3,7 @@ titlu: "Procuri"
 slug: "procuri"
 ordine: 4
 evidentiat: true
+etichete: ["Reprezentare", "Străinătate"]
 rezumat: "Procuri autentificate la notar în Brașov: pentru vânzări, succesiuni, bănci, autoturisme sau folosire în străinătate. Ce date pregătiți."
 pentruCine: "Pentru cei care împuternicesc o altă persoană să îi reprezinte la încheierea unui act sau în fața unei instituții."
 durata: "De regulă 15–30 de minute, dacă datele sunt trimise din timp."

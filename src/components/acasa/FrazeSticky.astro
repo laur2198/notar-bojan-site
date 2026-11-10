@@ -1,0 +1,130 @@
+---
+/**
+ * Secțiunea închisă cu frazele mari (prototip, `.sticky-wrap`; CLAUDE.md §3.2, §5).
+ * Cu mișcare permisă: ~340vh de derulare, cutia de 100vh rămâne lipită, iar cele 3 fraze din CMS
+ * se succed literă cu literă (apariție de la stânga, dispariție de la dreapta, legat de scroll;
+ * ultima rămâne). Mișcarea o face src/scripts/miscare.ts ([data-fraze]).
+ * Fără JS și la mișcare redusă (fără clasa `miscare` pe <html>): frazele una sub alta, statice.
+ *
+ * Fundalul: grila de puncte (0.125em la pas de 3em, albe la .16) e din CSS, deci există și fără
+ * JS; în jurul cursorului (rază 10 pași) punctele cresc și devin opace, printr-un canvas propriu,
+ * doar la pointer fin și fără mișcare redusă (src/scripts/puncte.ts).
+ */
+import { t, type Locale } from '../../i18n';
+import { marcheazaPlaceholder } from '../../lib/continut';
+
+interface Props {
+  locale: Locale;
+  fraze: { titlu: string; rand2?: string }[];
+}
+
+const { locale, fraze } = Astro.props;
+---
+
+<section class="fraze pe-inchis" data-tema-sectiune="dark" aria-label={t(locale, 'acasa.fraze')}>
+  <div class="fraze__derulare" data-fraze>
+    <div class="fraze__cutie" data-puncte-cutie>
+      <canvas class="fraze__canvas" data-puncte aria-hidden="true"></canvas>
+      <div class="fraze__interior">
+        {
+          fraze.map((f, i) => {
+            const Tag = i === 0 ? 'h2' : 'p';
+            return (
+              <Tag class="fraze__fraza" data-fraza>
+                <Fragment set:html={marcheazaPlaceholder(f.titlu)} />
+                {f.rand2 && (
+                  <>
+                    <br />
+                    <Fragment set:html={marcheazaPlaceholder(f.rand2)} />
+                  </>
+                )}
+              </Tag>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { pornestePuncte } from '../../scripts/puncte';
+
+  pornestePuncte();
+</script>
+
+<style>
+  .fraze {
+    position: relative;
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .fraze__cutie {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: var(--section-y);
+    /* Grila de puncte: 0.125em la pas de 3.125em (0.125 + 3), albe la .16. */
+    background-image: radial-gradient(circle, rgb(255 255 255 / 0.16) 0.0625em, transparent 0.07em);
+    background-size: 3.125em 3.125em;
+    background-position: center;
+  }
+
+  .fraze__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .fraze__interior {
+    position: relative;
+    display: grid;
+    gap: 2.5em;
+    width: 100%;
+    padding-inline: var(--gutter);
+  }
+
+  .fraze__fraza {
+    justify-self: center;
+    max-width: 17em;
+    margin: 0;
+    color: var(--c-paper);
+    font-family: var(--font-display);
+    font-size: var(--fs-statement);
+    font-weight: var(--fw-titlu);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* Cu mișcare (JS + fără reduced-motion): derularea lungă și cutia lipită, frazele suprapuse. */
+  :global(html.miscare) .fraze__derulare {
+    height: 340vh;
+  }
+
+  :global(html.miscare) .fraze__cutie {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    padding-block: 0;
+    overflow: hidden;
+  }
+
+  :global(html.miscare) .fraze__interior {
+    gap: 0;
+  }
+
+  :global(html.miscare) .fraze__fraza {
+    grid-area: 1 / 1;
+  }
+
+  /* Până pornește mișcarea, frazele suprapuse sunt ascunse (miscare.ts le arată literă cu literă). */
+  :global(html.miscare:not(.miscare-gata)) .fraze__fraza {
+    visibility: hidden;
+  }
+</style>

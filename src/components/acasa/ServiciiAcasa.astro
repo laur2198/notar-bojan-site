@@ -1,0 +1,272 @@
+---
+/**
+ * Serviciile de pe Acasă (prototip, `.servicii`): eticheta + linie, apoi câte un rând pe serviciu:
+ * fotografie mare (16:10, parallax în cadru; placeholder până vin fotografiile), numărul în mono,
+ * titlul mare cu săgeată, rezumatul și etichetele. Linkul e pe titlu (numele accesibil = titlul,
+ * WCAG 2.5.3), iar ::after-ul lui acoperă tot rândul, deci clicul oriunde pe rând funcționează;
+ * bula de cursor (data-cursor) e pe rând. La final, textul despre paginile serviciilor și Buton
+ * „Toate serviciile”. Shutter-ul acoperă secțiunea la ieșire.
+ */
+import type { ImageMetadata } from 'astro';
+import { cale, t, type Locale } from '../../i18n';
+import { marcheazaPlaceholder } from '../../lib/continut';
+import Buton from '../Buton.astro';
+import DraftBadge from '../DraftBadge.astro';
+import Fotografie from '../Fotografie.astro';
+import Shutter from '../Shutter.astro';
+import Eticheta from './Eticheta.astro';
+
+export interface ServiciuRand {
+  titlu: string;
+  rezumat: string;
+  href: string;
+  etichete?: string[];
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+}
+
+interface Props {
+  locale: Locale;
+  titlu: string;
+  text: string;
+  servicii: ServiciuRand[];
+  draft: boolean;
+}
+
+const { locale, titlu, text, servicii, draft } = Astro.props;
+const numar = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<section class="servicii" id="servicii" data-tema-sectiune="light" aria-labelledby="servicii-titlu">
+  <div class="container">
+    <Eticheta text={titlu} id="servicii-titlu" />
+    <DraftBadge locale={locale} draft={draft} />
+    <ul class="servicii__lista" role="list">
+      {
+        servicii.map((s, i) => (
+          <li class="serv" data-cursor={t(locale, 'cursor.serviciu')}>
+              <div class="serv__img">
+                <div class="serv__cadru" data-parallax="10">
+                  <Fotografie
+                    locale={locale}
+                    imagine={s.imagine}
+                    alt={s.imagineAlt ?? ''}
+                    raport="16 / 10"
+                    latimi={[640, 960, 1280]}
+                    sizes="(min-width: 48rem) 60vw, 100vw"
+                    class="serv__foto"
+                  />
+                </div>
+              </div>
+              <div class="serv__desc">
+                <div>
+                  <span class="serv__nr" aria-hidden="true">
+                    {numar(i)}
+                  </span>
+                  <h3 class="serv__titlu">
+                    <a class="serv__link" href={s.href} aria-describedby={`serv-${i}-rezumat`}>
+                      {s.titlu}
+                      <span class="serv__sageata" aria-hidden="true">
+                        ↗
+                      </span>
+                    </a>
+                  </h3>
+                  <p class="serv__rezumat" id={`serv-${i}-rezumat`} set:html={marcheazaPlaceholder(s.rezumat)} />
+                </div>
+                {s.etichete && s.etichete.length > 0 && (
+                  <ul class="serv__etichete" role="list" aria-label={t(locale, 'acasa.etichete')}>
+                    {s.etichete.map((e) => (
+                      <li>{e}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="servicii__toate">
+      <p set:html={marcheazaPlaceholder(text)} />
+      <Buton text={t(locale, 'acasa.toateServiciileScurt')} href={cale('servicii', locale)} />
+    </div>
+  </div>
+  <Shutter />
+</section>
+
+<style>
+  .servicii {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: calc(var(--section-y) * 1.4);
+    background: var(--c-paper);
+    color: var(--c-ink);
+  }
+
+  .servicii__lista {
+    padding: 0;
+    list-style: none;
+  }
+
+  .servicii__lista > li {
+    max-width: none;
+  }
+
+  .servicii__lista > li + li {
+    border-top: 1px solid var(--c-line);
+  }
+
+  .serv {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 3em;
+    padding-block: 2.2em;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .servicii__lista > .serv:first-child {
+    padding-top: 0;
+  }
+
+  .serv__img {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius);
+    background: var(--c-paper-2);
+  }
+
+  /* Cadrul e mai înalt decât fereastra imaginii, ca parallax-ul să nu lase margini goale. */
+  .serv__cadru {
+    position: absolute;
+    inset: -12% 0;
+  }
+
+  .serv__cadru :global(.serv__foto) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    transition: filter 0.2s ease;
+  }
+
+  .serv__cadru :global(.fotografie--placeholder) {
+    border: 0;
+    background:
+      radial-gradient(120% 90% at 20% 15%, #fafafa 0%, rgb(250 250 250 / 0) 55%),
+      linear-gradient(160deg, #e9e9e9 0%, #cfcfcf 100%);
+    /* --c-ink-hover (#333): ≥ 7:1 și pe zona cea mai închisă a gradientului. */
+    color: var(--c-ink-hover);
+  }
+
+  .serv:hover :global(.serv__foto) {
+    filter: brightness(0.94);
+  }
+
+  .serv__desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2em;
+  }
+
+  .serv__nr {
+    display: block;
+    color: var(--c-muted);
+    font-family: var(--font-mono);
+  }
+
+  .serv__titlu {
+    margin: 0.2em 0 0.45em;
+    font-family: var(--font-display);
+    font-size: var(--fs-titlu);
+    font-weight: var(--fw-titlu);
+    line-height: 1;
+    letter-spacing: var(--ls-titlu);
+  }
+
+  .serv__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Suprafața de clic: tot rândul. Focusul se desenează pe ea, nu doar pe titlu. */
+  .serv__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: calc(var(--radius) / 3);
+  }
+
+  .serv__link:focus-visible {
+    outline: none;
+  }
+
+  .serv__link:focus-visible::after {
+    outline: 3px solid var(--c-ink);
+    outline-offset: 3px;
+  }
+
+  .serv__sageata {
+    display: inline-block;
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .serv:is(:hover, :has(:focus-visible)) .serv__titlu {
+    text-decoration: underline;
+    text-decoration-thickness: 0.04em;
+    text-underline-offset: 0.12em;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .serv:hover .serv__sageata {
+      transform: translate(0.15em, -0.15em);
+    }
+  }
+
+  .serv__rezumat {
+    max-width: 26em;
+    margin: 0;
+    color: var(--c-muted);
+  }
+
+  .serv__etichete {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    padding: 0;
+    list-style: none;
+  }
+
+  .serv__etichete li {
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    color: var(--c-muted);
+  }
+
+  .servicii__toate {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding-top: 2.5em;
+    border-top: 1px solid var(--c-line);
+  }
+
+  .servicii__toate p {
+    max-width: 30em;
+    margin: 0;
+    color: var(--c-muted);
+  }
+
+  @media (max-width: 47.99rem) {
+    .serv {
+      grid-template-columns: 1fr;
+      gap: 1.25em;
+    }
+  }
+</style>

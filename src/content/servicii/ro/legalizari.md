@@ -3,6 +3,7 @@ titlu: "Legalizări"
 slug: "legalizari"
 ordine: 5
 evidentiat: true
+etichete: ["Copii conforme", "Semnătură"]
 rezumat: "Legalizări de copii după acte, de semnătură și specimen de semnătură la notar în Brașov."
 pentruCine: "Pentru cei care au nevoie de copii certificate după documente sau de confirmarea semnăturii pe un înscris."
 durata: "De regulă câteva minute pe document."

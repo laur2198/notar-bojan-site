@@ -257,41 +257,69 @@ content:
         type: object
         fields:
           - name: titlu
-            label: Titlul principal
-            type: string
-            required: true
-          - name: subtitlu
-            label: Subtitlu
+            label: Fraza principală
             type: text
             required: true
+            description: Titlul mare de sus. Fără superlative și fără promisiuni de rezultat sau de termen.
+          - name: subtitlu
+            label: Continuarea (în gri)
+            type: text
+            required: true
+            description: Continuă titlul, cu gri, ex. ce servicii oferă biroul.
+          - name: linie
+            label: Rândul de sub semnătură
+            type: string
+            required: true
+            description: Apare în stânga; în dreapta apare automat adresa din „Setări birou”.
           - name: imagine
             component: imagine
+            description: Nu apare în prima secțiune; e imaginea afișată când pagina e distribuită (Facebook, WhatsApp).
           - name: imagineAlt
             component: imagineAlt
+      - name: fraze
+        label: Frazele mari de sub prima secțiune
+        type: object
+        description: Exact trei fraze, care apar pe rând la derulare, pe fundal închis.
+        list:
+          min: 3
+          max: 3
+          collapsible:
+            collapsed: true
+            summary: "{index}. {titlu}"
+        fields:
+          - name: titlu
+            label: Fraza
+            type: string
+            required: true
+          - name: rand2
+            label: Al doilea rând (opțional)
+            type: string
       - name: servicii
         label: Secțiunea Servicii
         type: object
         fields:
           - name: titlu
-            label: Titlu
+            label: Eticheta secțiunii
             type: string
             required: true
           - name: intro
-            label: Text introductiv
+            label: Textul de sub listă
             type: text
             required: true
+            description: Apare după servicii, lângă butonul „Toate serviciile”.
       - name: pasi
         label: Secțiunea „Cum lucrăm”
         type: object
         fields:
           - name: titlu
-            label: Titlu
+            label: Eticheta secțiunii
             type: string
             required: true
-          - name: intro
-            label: Text introductiv
+          - name: slogan
+            label: Textul de sub pași
             type: text
             required: true
+            description: Se „aprinde” literă cu literă la derulare. Un rând gol desparte paragrafele.
           - name: lista
             label: Pași
             type: object
@@ -342,18 +370,31 @@ content:
         type: object
         fields:
           - name: titlu
-            label: Titlu
+            label: Titlul mare
             type: string
             required: true
           - name: numarAfisat
             label: Câte întrebări apar pe pagina principală
             type: number
             required: true
+            description: Apar întrebările bifate „Apare pe pagina principală” (altfel primele din listă).
             options:
               min: 0
               max: 10
+      - name: cta
+        label: Încheierea secțiunii de întrebări
+        type: object
+        fields:
+          - name: titlu
+            label: Titlu
+            type: string
+            required: true
+          - name: subtitlu
+            label: Subtitlu (în gri)
+            type: string
+            required: true
       - name: final
-        label: Secțiunea finală (fundal maro)
+        label: Secțiunea finală a celorlalte pagini (fundal închis)
         type: object
         fields:
           - name: titlu
@@ -404,6 +445,12 @@ content:
       - name: evidentiat
         label: Apare pe pagina principală
         type: boolean
+      - name: etichete
+        label: Etichete pe pagina principală
+        type: string
+        list:
+          max: 4
+        description: Cuvinte scurte afișate sub rezumat pe pagina principală, ex. „Imobiliare”, „Carte funciară”.
       - name: rezumat
         label: Rezumat
         type: text
@@ -513,6 +560,9 @@ content:
             label: Răspunsul
             type: text
             required: true
+          - name: evidentiat
+            label: Apare pe pagina principală
+            type: boolean
       - name: validat
         component: validat
 
@@ -714,6 +764,11 @@ content:
                 pattern:
                   regex: "^[a-z0-9]+(-[a-z0-9]+)*$"
                   message: Doar litere mici fără diacritice, cifre și cratimă.
+              - name: etichete
+                label: Etichete pe pagina principală (EN)
+                type: string
+                list:
+                  max: 4
           - name: fees
             label: Text despre onorarii (EN)
             type: text

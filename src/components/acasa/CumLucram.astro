@@ -1,0 +1,247 @@
+---
+/**
+ * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune închisă. Stânga o imagine care se schimbă
+ * după pasul activ (placeholder închis cu cifra mare), dreapta pașii din CMS: titluri mari, cele
+ * inactive la opacitate .4 (text mare: ≥ 3.8:1 pe ink), cel activ 1 și cu un punct. Activarea la
+ * hover (pointer fin), focus și clic: butoane cu aria-expanded care arată descrierea pasului activ.
+ * Fără JS și la mișcare redusă: toți pașii și toate descrierile vizibile (descrierile inactive se
+ * ascund doar sub html.miscare); acolo focusul și clicul schimbă doar imaginea, aria-expanded rămâne true.
+ * Sub pași, sloganul care „se aprinde” literă cu literă la derulare, de la opacitate .5 (≥ 5.3:1)
+ * la 1 (src/scripts/miscare.ts, [data-aprinde]).
+ */
+import { t, type Locale } from '../../i18n';
+import { marcheazaPlaceholder } from '../../lib/continut';
+import Eticheta from './Eticheta.astro';
+
+interface Props {
+  locale: Locale;
+  titlu: string;
+  pasi: { titlu: string; text: string }[];
+  slogan: string;
+}
+
+const { locale, titlu, pasi, slogan } = Astro.props;
+const numar = (i: number) => String(i + 1).padStart(2, '0');
+/** Paragrafele sloganului: un rând gol le desparte. */
+const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+---
+
+<section class="pasi pe-inchis" id="pasi" data-tema-sectiune="dark" aria-labelledby="pasi-titlu" data-pasi>
+  <div class="container">
+    <Eticheta text={titlu} id="pasi-titlu" />
+    <div class="pasi__grila">
+      <div class="pasi__img" aria-hidden="true">
+        {
+          pasi.map((_, i) => (
+            <div class:list={['pasi__cadru', { 'pasi__cadru--activ': i === 0 }]} data-pas-img={i}>
+              <span>{numar(i)}</span>
+            </div>
+          ))
+        }
+      </div>
+      <ol class="pasi__lista" role="list">
+        {
+          pasi.map((p, i) => (
+            <li class:list={['pas', { 'pas--activ': i === 0 }]} data-pas={i}>
+              <button class="pas__buton" type="button" aria-expanded="true" aria-controls={`pas-${i}`}>
+                <span class="sr-only">{t(locale, 'acasa.pasul', { n: i + 1 })}: </span>
+                <span set:html={marcheazaPlaceholder(p.titlu)} />
+              </button>
+              <p class="pas__text" id={`pas-${i}`} set:html={marcheazaPlaceholder(p.text)} />
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div class="pasi__slogan">
+      {paragrafe.map((p) => <p class="pasi__slogan-text" data-aprinde set:html={marcheazaPlaceholder(p)} />)}
+    </div>
+  </div>
+</section>
+
+<script>
+  /* Pasul activ: hover (pointer fin), focus și clic; un singur pas deschis. */
+  for (const sectiune of document.querySelectorAll<HTMLElement>('[data-pasi]')) {
+    const pasi = [...sectiune.querySelectorAll<HTMLElement>('[data-pas]')];
+    const imagini = [...sectiune.querySelectorAll<HTMLElement>('[data-pas-img]')];
+    // Acordeonul doar cu mișcare (html.miscare, pus de cap-pagina.js); altfel toate descrierile rămân deschise.
+    const acordeon = document.documentElement.classList.contains('miscare');
+    const activeaza = (index: string) => {
+      for (const p of pasi) {
+        const activ = p.dataset.pas === index;
+        p.classList.toggle('pas--activ', activ);
+        if (acordeon) p.querySelector('button')?.setAttribute('aria-expanded', String(activ));
+      }
+      for (const im of imagini) im.classList.toggle('pasi__cadru--activ', im.dataset.pasImg === index);
+    };
+    const pointerFin = matchMedia('(hover: hover) and (pointer: fine)');
+    for (const p of pasi) {
+      const buton = p.querySelector('button');
+      const index = p.dataset.pas ?? '0';
+      buton?.addEventListener('click', () => activeaza(index));
+      buton?.addEventListener('focus', () => activeaza(index));
+      buton?.addEventListener('mouseenter', () => {
+        if (pointerFin.matches) activeaza(index);
+      });
+    }
+    // În HTML toate descrierile sunt deschise (fără JS se văd toate); cu mișcare, doar primul pas.
+    activeaza('0');
+  }
+</script>
+
+<style>
+  .pasi {
+    position: relative;
+    padding-bottom: var(--section-y);
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .pasi__grila {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4em;
+    align-items: start;
+  }
+
+  .pasi__img {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+  }
+
+  .pasi__cadru {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(120% 90% at 75% 20%, #3a3a3a 0%, rgb(58 58 58 / 0) 60%),
+      linear-gradient(160deg, #262626 0%, #141414 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .pasi__cadru--activ {
+    opacity: 1;
+  }
+
+  /* Cifra mare: decorativă (aria-hidden). */
+  .pasi__cadru span {
+    color: #3a3a3a;
+    font-family: var(--font-display);
+    font-size: 8em;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .pasi__lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pasi__lista li {
+    max-width: none;
+  }
+
+  .pas {
+    padding: 0.4em 0 1.1em;
+  }
+
+  .pas__buton {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    width: 100%;
+    min-height: 48px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-family: var(--font-display);
+    font-size: var(--fs-titlu);
+    font-weight: var(--fw-titlu);
+    line-height: 1.05;
+    letter-spacing: var(--ls-titlu);
+    text-align: left;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+
+  .pas__buton::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.2em;
+    height: 0.2em;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+    /* Intră din stânga: spre dreapta ar ieși din ecran pe titlurile pe toată lățimea. */
+    transform: translateX(-0.5em);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .pas--activ .pas__buton {
+    opacity: 1;
+  }
+
+  .pas--activ .pas__buton::after {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Fără JS și la mișcare redusă, toți pașii sunt „activi” (opaci) și au descrierea vizibilă. */
+  :global(html:not(.miscare)) .pas__buton {
+    opacity: 1;
+    cursor: default;
+  }
+
+  .pas__text {
+    max-width: 24em;
+    margin: 0.5em 0 0;
+    color: var(--c-muted-dark);
+  }
+
+  :global(html.miscare) .pas:not(.pas--activ) .pas__text {
+    display: none;
+  }
+
+  .pasi__slogan {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.2em 0;
+    padding-top: var(--section-y);
+  }
+
+  .pasi__slogan-text {
+    grid-column: 2;
+    max-width: none;
+    margin: 0;
+    color: var(--c-paper);
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-titlu);
+    line-height: 1.15;
+    letter-spacing: var(--ls-h2);
+  }
+
+  @media (max-width: 61.99rem) {
+    .pasi__grila {
+      grid-template-columns: 1fr;
+      gap: 2em;
+    }
+
+    .pasi__slogan {
+      grid-template-columns: 1fr;
+    }
+
+    .pasi__slogan-text {
+      grid-column: 1;
+    }
+  }
+</style>

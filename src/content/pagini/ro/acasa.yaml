@@ -2,20 +2,31 @@ seo:
   titlu: "Notar public în Brașov – Bojan Elena Luminița"
   descriere: "Birou notarial în Brașov: vânzări, succesiuni, donații, procuri, legalizări, divorț. Programare online și trimiterea actelor înainte de întâlnire."
 
+# Textele de mai jos vin din prototipul design-v2 și sunt provizorii (validat: false).
 hero:
-  eticheta: "Birou Individual Notarial"
-  titlu: "Notar public în Brașov"
-  subtitlu: "Bojan Elena Luminița. Vă ajutăm să pregătiți actele din timp, ca la birou să veniți doar pentru semnare."
+  titlu: "Acte notariale pregătite din timp, ca drumul la birou să fie cât mai scurt."
+  subtitlu: "Birou Individual Notarial în Brașov: vânzări, succesiuni, donații, procuri, legalizări și divorț."
+  linie: "Notar public · Camera Notarilor Publici Brașov"
   imagine: ""          # fotografie a notarului sau a biroului – de încărcat din panou
   imagineAlt: "Notar public Bojan Elena Luminița în biroul notarial din Brașov"
 
+fraze:
+  - titlu: "De ce contează să pregătiți actele din timp?"
+  - titlu: "Un dosar complet înseamnă"
+    rand2: "mai puține drumuri la birou."
+  - titlu: "Actul autentic face deplină dovadă."
+    rand2: "De aceea îl redactăm cu atenție."
+
 servicii:
   titlu: "Servicii notariale"
-  intro: "Cele mai solicitate operațiuni. Pe pagina fiecărui serviciu găsiți actele de pregătit și cum decurge procedura."
+  intro: "Pe pagina fiecărui serviciu găsiți actele de pregătit și cum decurge procedura."
 
 pasi:
   titlu: "Cum lucrăm"
-  intro: "Pregătim dosarul înainte de programare, ca vizita la birou să fie cât mai scurtă."
+  slogan: |-
+    Pregătim dosarul înainte de programare, ca vizita la birou să fie cât mai scurtă.
+
+    Verificăm actele, vă spunem din timp ce lipsește și vă comunicăm onorariul înainte de semnare, ca să evitați drumurile inutile.
   lista:
     - titlu: "Trimiteți actele"
       text: "Pe email, din pagina serviciului de care aveți nevoie. Puteți atașa fotografii clare sau scanări ale documentelor."
@@ -35,8 +46,12 @@ despre:
   imagineAlt: "Sediul biroului notarial"
 
 faq:
-  titlu: "Întrebări frecvente"
-  numarAfisat: 4
+  titlu: "Răspunsuri la întrebările frecvente."
+  numarAfisat: 6
+
+cta:
+  titlu: "Aveți alte întrebări?"
+  subtitlu: "Scrieți-ne sau sunați."
 
 final:
   titlu: "Aveți nevoie de un act notarial?"

@@ -3,6 +3,7 @@ titlu: "Succesiune"
 slug: "succesiune"
 ordine: 2
 evidentiat: true
+etichete: ["Moștenire", "Certificat de moștenitor"]
 rezumat: "Dezbaterea succesiunii la notar în Brașov și eliberarea certificatului de moștenitor. Ce acte pregătiți și ce termene trebuie respectate."
 pentruCine: "Pentru moștenitorii unei persoane decedate care avea ultimul domiciliu în circumscripția biroului."
 durata: "Procedura are de regulă unul sau mai multe termene, în funcție de numărul moștenitorilor și de bunurile din masa succesorală."

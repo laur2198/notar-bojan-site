@@ -2,20 +2,31 @@ seo:
   titlu: "Notary Public in Brașov, Romania – Bojan Elena Luminița"
   descriere: "Notary office in Brașov, Romania: property sales, inheritance, powers of attorney, certified copies. Book online and send your documents in advance."
 
+# Translations of the design-v2 texts; provisional until validated (validat: false).
 hero:
-  eticheta: "Notary Office"
-  titlu: "Notary Public in Brașov"
-  subtitlu: "Bojan Elena Luminița. Send us your documents in advance, so your visit to the office is only for signing."
+  titlu: "Notarial acts prepared in advance, to keep your visit to the office short."
+  subtitlu: "Notary office in Brașov, Romania: property sales, inheritance, gifts, powers of attorney, certified copies and divorce."
+  linie: "Notary public · Brașov Chamber of Notaries Public"
   imagine: ""
   imagineAlt: "Notary public Bojan Elena Luminița in her office in Brașov"
 
+fraze:
+  - titlu: "Why prepare your documents in advance?"
+  - titlu: "A complete file means"
+    rand2: "fewer trips to the office."
+  - titlu: "An authentic act is full proof."
+    rand2: "That is why we draft it with care."
+
 servicii:
   titlu: "Notarial services"
-  intro: "The services most often requested by foreign clients. Contact us for any other notarial act."
+  intro: "Each service page lists the documents to prepare and how the procedure works."
 
 pasi:
   titlu: "How it works"
-  intro: "We prepare your file before the appointment, to keep your visit short."
+  slogan: |-
+    We prepare your file before the appointment, to keep your visit to the office short.
+
+    We check your documents, tell you in advance what is missing and give you the fees before signing, so you can avoid unnecessary trips.
   lista:
     - titlu: "Send your documents"
       text: "By email, as clear photos or scans. Tell us which act you need."
@@ -35,8 +46,12 @@ despre:
   imagineAlt: "The notary office building"
 
 faq:
-  titlu: "Frequently asked questions"
-  numarAfisat: 3
+  titlu: "Answers to frequently asked questions."
+  numarAfisat: 6
+
+cta:
+  titlu: "Any other questions?"
+  subtitlu: "Write to us or call us."
 
 final:
   titlu: "Need a notarial act?"

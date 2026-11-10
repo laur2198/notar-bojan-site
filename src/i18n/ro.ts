@@ -80,6 +80,11 @@ export const ro = {
   'acasa.toateServiciile': 'Vedeți toate serviciile și onorariile',
   'acasa.despreLink': 'Despre birou',
   'acasa.toateIntrebarile': 'Toate întrebările',
+  'acasa.toateServiciileScurt': 'Toate serviciile',
+  'acasa.etichete': 'Etichete',
+  'acasa.fraze': 'Despre actul notarial',
+  'acasa.pasul': 'Pasul {n}',
+  'cursor.serviciu': 'Vezi serviciul',
   'foto.deCompletat': 'Fotografie – de completat',
 
   // Banda de informații practice

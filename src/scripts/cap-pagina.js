@@ -8,7 +8,8 @@
  *                 redusă clasa nu există, deci totul e vizibil;
  *   - `cu-intro`  intro-ul cu semnătura (IntroSemnatura.astro), o dată pe sesiune, doar cu mișcare.
  *                 Atributul data-pornire-intro="manual" pe <script> îl dezactivează automat (ghidul /stil/
- *                 îl pornește din buton); `#intro` în adresă îl forțează.
+ *                 îl pornește din buton); `#intro` în adresă îl forțează. Intrarea cu altă
+ *                 ancoră (ex. /#faq) îl sare: vizitatorul vrea direct secțiunea, nu un ecran peste ea.
  * Plase de siguranță: dacă modulele nu pornesc (eroare de rețea), conținutul nu rămâne ascuns.
  * Fără import/export: se servește ca atare (`?url`), nu prin bundler.
  */
@@ -28,10 +29,15 @@
   } catch (e) {
     // Fără sessionStorage nu putem ține minte că a rulat: nu-l arătăm deloc.
   }
-  if (fortat || (automat && !vazut)) html.classList.add('cu-intro');
+  var ancora = location.hash.length > 1 && !fortat;
+  if (fortat || (automat && !vazut && !ancora)) html.classList.add('cu-intro');
+  // Saltul inițial la ancoră e instant: derularea lină ar fi anulată de refresh-ul ScrollTrigger.
+  // miscare.ts realiniază pagina după fonturi și refresh, apoi scoate clasa.
+  if (ancora) html.classList.add('ancora-initiala');
 
   setTimeout(function () {
     if (!html.classList.contains('miscare-gata')) html.classList.remove('miscare');
     if (!html.classList.contains('intro-pornit')) html.classList.remove('cu-intro');
+    if (!html.classList.contains('miscare-gata')) html.classList.remove('ancora-initiala');
   }, 4000);
 })();
