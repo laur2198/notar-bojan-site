@@ -1,61 +1,18 @@
 /**
  * Teste e2e pentru intro și mișcare, pe ghidul /stil/ (CLAUDE.md §3.2, §5), cu CSP-ul real din
- * public/_headers aplicat răspunsurilor HTML (`astro preview` nu citește _headers).
+ * public/_headers aplicat răspunsurilor HTML (util.mjs).
  *
  * Rulare (cu `npm run build` și `npm run preview` pornit; Playwright și Chromium sunt preinstalate
  * în mediul de lucru, nu sunt dependențe ale proiectului):
  *   E2E_URL=http://localhost:4321 npm run test:e2e
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { after, before, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
+import { BAZA, cuBrowser, pagina } from './util.mjs';
 
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
-
-const BAZA = (process.env.E2E_URL ?? 'http://localhost:4321').replace(/\/$/, '');
 const STIL = `${BAZA}/stil/`;
 
-/** CSP-ul din public/_headers pentru o cale (blocul /stil/* îl înlocuiește pe cel general). */
-function cspPentru(cale) {
-  const text = readFileSync(new URL('../../public/_headers', import.meta.url), 'utf8');
-  const blocuri = text.split(/\n(?=\S)/).filter((b) => !b.startsWith('#'));
-  let csp = null;
-  for (const bloc of blocuri) {
-    const [model] = bloc.split('\n');
-    const potrivire = new RegExp(`^${model.trim().replace(/\*/g, '.*')}$`).test(cale);
-    const linie = bloc.match(/^\s+Content-Security-Policy:\s*(.+)$/m);
-    if (potrivire && linie) csp = linie[1];
-  }
-  return csp;
-}
-
-let browser;
-before(async () => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser?.close();
-});
-
-async function pagina(optiuni = {}) {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...optiuni });
-  const p = await context.newPage();
-  const erori = [];
-  p.on('console', (m) => {
-    if (m.type() === 'error') erori.push(m.text());
-  });
-  p.on('pageerror', (e) => erori.push(e.message));
-  await p.route('**/*', async (route) => {
-    const cerere = route.request();
-    if (cerere.resourceType() !== 'document') return route.continue();
-    const raspuns = await route.fetch();
-    const csp = cspPentru(new URL(cerere.url()).pathname);
-    await route.fulfill({ response: raspuns, headers: { ...raspuns.headers(), ...(csp ? { 'content-security-policy': csp } : {}) } });
-  });
-  return { p, erori, context };
-}
+cuBrowser();
 
 describe('CSP', () => {
   for (const cale of ['/stil/', '/', '/servicii/succesiune/']) {

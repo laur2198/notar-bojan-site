@@ -1,17 +1,15 @@
 ---
 /**
- * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4): patru acțiuni egale, cu
- * iconiță (ink) și etichetă dedesubt: Sunați, WhatsApp (filă nouă), Programare și
- * Locație (Google Maps). Programul rămâne pe Acasă, la ancora #program.
- * Respectă `env(safe-area-inset-bottom)`; spațiul de sub conținut e rezervat în
- * global.css (`--inaltime-bara`).
- *
- * Linkurile încă necompletate (doar în preview) rămân vizibile, fără `href`,
- * cu `aria-disabled="true"`.
+ * Bara fixă de jos, doar sub 768 px (CLAUDE.md §4), monocromă: trei acțiuni cu iconiță și
+ * etichetă (Sunați, WhatsApp – filă nouă –, Locație – Google Maps) și Buton „Programare”, plin.
+ * Fundal paper, linie line sus; respectă `env(safe-area-inset-bottom)`; spațiul de sub conținut
+ * e rezervat în global.css (`--inaltime-bara`). Linkurile încă necompletate (doar în preview)
+ * rămân vizibile, fără `href`, cu `aria-disabled="true"`.
  */
 import { cale, t, type Locale } from '../i18n';
 import { linkExtern, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
 import type { Birou } from '../lib/continut';
+import Buton from './Buton.astro';
 import Iconita from './Iconita.astro';
 
 interface Props {
@@ -22,22 +20,15 @@ interface Props {
 const { locale, birou } = Astro.props;
 
 interface Actiune {
-  iconita: 'telefon' | 'whatsapp' | 'calendar' | 'pin';
+  iconita: 'telefon' | 'whatsapp' | 'pin';
   eticheta: string;
   link: LinkContact;
   extern?: boolean;
 }
 
-const intern = (href: string, text: string): LinkContact => ({ href, text, valid: true });
-
 const actiuni: Actiune[] = [
   { iconita: 'telefon', eticheta: t(locale, 'actiune.suna'), link: linkTelefon(birou) },
   { iconita: 'whatsapp', eticheta: t(locale, 'whatsapp.nume'), link: linkWhatsapp(birou, locale), extern: true },
-  {
-    iconita: 'calendar',
-    eticheta: t(locale, 'actiune.programareScurt'),
-    link: intern(cale('programare', locale), ''),
-  },
   {
     iconita: 'pin',
     eticheta: t(locale, 'bara.locatie'),
@@ -47,7 +38,7 @@ const actiuni: Actiune[] = [
 ];
 ---
 
-<nav class="bara-actiuni" aria-label={t(locale, 'actiune.bara')}>
+<nav class="bara-actiuni" aria-label={t(locale, 'actiune.bara')} data-tema="light">
   <ul role="list">
     {
       actiuni.map((a) => (
@@ -72,6 +63,9 @@ const actiuni: Actiune[] = [
         </li>
       ))
     }
+    <li class="bara-actiuni__programare">
+      <Buton text={t(locale, 'actiune.programareScurt')} href={cale('programare', locale)} sageata={false} tema="light" />
+    </li>
   </ul>
 </nav>
 
@@ -88,9 +82,17 @@ const actiuni: Actiune[] = [
 
   ul {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    align-items: center;
+    gap: calc(var(--space-1) / 2);
     padding: 0;
     list-style: none;
+  }
+
+  .bara-actiuni__programare :global(.buton) {
+    min-height: 48px;
+    padding-inline: 0.9em;
+    font-size: var(--fs-sm);
   }
 
   li {

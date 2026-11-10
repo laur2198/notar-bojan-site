@@ -65,6 +65,10 @@ content:
         label: Numele notarului public
         type: string
         required: true
+      - name: cif
+        label: Cod fiscal (CIF)
+        type: string
+        description: Apare în subsolul fiecărei pagini, ex. RO19608590.
       - name: adresa
         label: Adresa
         type: object

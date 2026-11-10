@@ -126,4 +126,19 @@ const contacte: Contact[] = [
     color: var(--c-ink);
     font-size: var(--fs-sm);
   }
+
+  /* Pe fundal închis (panoul meniului compact). */
+  :global(.pe-inchis) .contacte__rand :global(.contacte__iconita) {
+    color: var(--c-paper);
+  }
+
+  :global(.pe-inchis) .contacte__eticheta:not(.sr-only) {
+    color: var(--c-muted-dark);
+  }
+
+  :global(.pe-inchis) .contacte__nota {
+    border-left-color: var(--c-paper);
+    background: var(--c-ink-3);
+    color: var(--c-paper);
+  }
 </style>

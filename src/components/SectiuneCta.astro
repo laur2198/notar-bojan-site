@@ -1,11 +1,12 @@
 ---
 /**
- * Secțiunea finală (CLAUDE.md §5): fundal ink, text alb, butonul inversat
- * (fundal alb, text ink) și telefonul mare, clicabil. Fără accent colorat.
+ * Secțiunea finală (CLAUDE.md §5): fundal ink, text paper, Buton plin (pe închis: paper, text
+ * ink) și telefonul mare, clicabil. Fără accent colorat.
  */
 import { cale, t, type Locale } from '../i18n';
 import { linkTelefon } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Buton from './Buton.astro';
 import Sectiune from './Sectiune.astro';
 import TelefonLink from './TelefonLink.astro';
 
@@ -21,7 +22,7 @@ const { locale, birou, titlu, text } = Astro.props;
 
 <Sectiune id="final" ton="inchis" centrat titlu={titlu} introHtml={marcheazaPlaceholder(text)}>
   <div class="cta">
-    <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
+    <Buton text={t(locale, 'acasa.programare')} href={cale('programare', locale)} />
     <TelefonLink locale={locale} telefon={linkTelefon(birou)} class="cta__telefon" />
   </div>
 </Sectiune>

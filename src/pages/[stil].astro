@@ -13,14 +13,16 @@
  * dacă o pereche pică WCAG AA, inclusiv în cazul cel mai defavorabil al granulației.
  */
 import type { GetStaticPaths } from 'astro';
-import '../styles/global.css';
-import CapPagina from '../components/CapPagina.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Buton from '../components/Buton.astro';
 import IntroSemnatura from '../components/IntroSemnatura.astro';
 import Semnatura from '../components/Semnatura.astro';
+import Shutter from '../components/Shutter.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
 import { estePreview, getBirou } from '../lib/continut';
 import { culoare, culori, marimePx, numarToken } from '../lib/tokens';
+import { url } from '../lib/url';
 
 export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } }] : [])) satisfies GetStaticPaths;
 
@@ -155,18 +157,14 @@ const fonturi = [
 ];
 ---
 
-<!doctype html>
-<html lang="ro">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <CapPagina intro="manual" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Ghid de stil (uz intern) – {birou.notar}</title>
-  </head>
-  <body>
+<BaseLayout
+  locale="ro"
+  title={`Ghid de stil (uz intern) – ${birou.notar}`}
+  description="Ghidul de stil intern al site-ului: tokenuri, tipografie, componente."
+  noindex
+>
     <IntroSemnatura />
-    <main class="container stil">
+    <div class="container stil">
       <h1>Ghid de stil</h1>
       <p class="lead">
         Fundația vizuală a design-ului v2, după prototipul aprobat (<code>docs/design-v2/prototip-acasa.html</code>):
@@ -358,7 +356,7 @@ const fonturi = [
             <figcaption>Pe <code>--c-paper</code>, mărit 4×</figcaption>
           </figure>
           <figure class="granulatie-mostra">
-            <div class="granulatie-marita granulatie-marita--inchis" aria-hidden="true"></div>
+            <div class="granulatie-marita granulatie-marita--inchis" data-tema-sectiune="dark" aria-hidden="true"></div>
             <figcaption>Pe <code>--c-ink</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
           </figure>
         </div>
@@ -376,11 +374,11 @@ const fonturi = [
           <div class="semnatura-panou">
             <Semnatura id="stil-deschis" />
           </div>
-          <div class="semnatura-panou semnatura-panou--inchis pe-inchis">
+          <div class="semnatura-panou semnatura-panou--inchis pe-inchis" data-tema-sectiune="dark">
             <Semnatura id="stil-inchis" />
           </div>
         </div>
-        <button type="button" class="btn btn--secundar" data-reda-semnatura hidden>Redă desenul</button>
+        <Buton text="Redă desenul" varianta="contur" sageata={false} data-reda-semnatura hidden />
       </section>
 
       <section aria-labelledby="intro">
@@ -390,7 +388,7 @@ const fonturi = [
           0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
           mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
         </p>
-        <button type="button" class="btn btn--secundar" data-reda-intro hidden>Redă intro-ul</button>
+        <Buton text="Redă intro-ul" varianta="contur" sageata={false} data-reda-intro hidden />
         <p class="nota" data-stare-intro aria-live="polite"></p>
       </section>
 
@@ -418,9 +416,56 @@ const fonturi = [
           </div>
         </div>
       </section>
-    </main>
-  </body>
-</html>
+
+      <section aria-labelledby="butoane">
+        <h2 id="butoane">Butonul cu text dublat</h2>
+        <p>
+          <code>Buton.astro</code>: la hover și la focus de la tastatură, fundalul urcă rotit, literele urcă pe rând și
+          săgeata iese în dreapta-sus. Efectul apare doar cu mouse și fără mișcare redusă. Literele sunt împărțite la build;
+          numele accesibil e textul întreg. Culorile vin din tema secțiunii.
+        </p>
+        <div class="demo-butoane">
+          <Buton text="Programare" href={url('/programare/')} />
+          <Buton text="Toate serviciile" href={url('/servicii/')} varianta="contur" />
+          <Buton text="Trimiteți" type="button" sageata={false} />
+        </div>
+      </section>
+
+      <section aria-labelledby="cursor">
+        <h2 id="cursor">Cursorul cu bulă</h2>
+        <p>
+          Cu mouse și fără mișcare redusă, un punct urmărește cursorul cu întârziere; pe elementele cu
+          <code>data-cursor</code> apare bula cu textul atributului (lângă marginea dreaptă, în stânga cursorului). Cursorul
+          nativ rămâne.
+        </p>
+        <div class="demo-cursor-grila">
+          <a class="demo-cursor" href={url('/servicii/')} data-cursor="Vezi serviciul">Zona cu <code>data-cursor="Vezi serviciul"</code></a>
+          <a class="demo-cursor" href={url('/en/services/')} data-cursor="View service" hreflang="en">Zona cu <code>data-cursor="View service"</code></a>
+        </div>
+      </section>
+    </div>
+
+    <section class="demo-shutter" data-tema-sectiune="light" aria-labelledby="shutter">
+      <div class="container">
+        <h2 id="shutter">Tranziția shutter</h2>
+        <p>
+          Secțiune deschisă cu <code>Shutter.astro</code> la final: la derulare, benzi ink o acoperă de jos în sus (16 pe
+          desktop, 10 pe tabletă, 6 pe mobil). Fără mișcare redusă nu există deloc.
+        </p>
+      </div>
+      <Shutter />
+    </section>
+    <section class="demo-inchis pe-inchis" data-tema-sectiune="dark" aria-labelledby="sectiune-inchisa">
+      <div class="container">
+        <h2 id="sectiune-inchisa">Secțiune închisă</h2>
+        <p>Navbar-ul trece pe tema închisă deasupra ei. Butoanele se adaptează singure:</p>
+        <div class="demo-butoane">
+          <Buton text="Programare" href={url('/programare/')} />
+          <Buton text="WhatsApp" href={url('/contact/')} varianta="contur" />
+        </div>
+      </div>
+    </section>
+</BaseLayout>
 
 <script>
   import { deseneazaSemnatura, pregatesteSemnatura } from '../scripts/desen-semnatura';
@@ -467,10 +512,7 @@ const fonturi = [
 </script>
 
 <script>
-  import { pornesteMiscarea } from '../scripts/miscare';
   import { EVENIMENT_GATA, ruleazaIntro } from '../scripts/intro-semnatura';
-
-  pornesteMiscarea();
 
   // „Redă intro-ul”: vizibil doar cu mișcare permisă (la mișcare redusă intro-ul nu există).
   const butonIntro = document.querySelector<HTMLButtonElement>('[data-reda-intro]');
@@ -491,6 +533,49 @@ const fonturi = [
 </script>
 
 <style>
+  .demo-butoane {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .demo-cursor-grila {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-2);
+  }
+
+  .demo-cursor {
+    display: grid;
+    place-items: center;
+    min-height: 10rem;
+    padding: var(--space-2);
+    border: 1px dashed var(--c-muted);
+    border-radius: var(--radius);
+    color: var(--c-ink);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .demo-shutter {
+    position: relative;
+    margin-top: var(--space-7);
+    padding-block: var(--space-7) 70vh;
+    border-top: 1px solid var(--c-line);
+    overflow: hidden;
+  }
+
+  .demo-inchis {
+    padding-block: var(--space-7);
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .demo-inchis > .container > * + * {
+    margin-top: var(--space-2);
+  }
+
   .demo-miscare {
     display: grid;
     gap: var(--space-2);

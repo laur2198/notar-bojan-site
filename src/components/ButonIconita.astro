@@ -1,6 +1,7 @@
 ---
 /**
- * Buton-iconiță pătrat, 48×48 (CLAUDE.md §4): fundal alb, contur line, iconiță ink.
+ * Buton-iconiță pătrat (prototip, `.nav__wa`): min. 48×48 (CLAUDE.md §4), transparent, contur 1 px
+ * și iconiță în culoarea textului (tema navbar-ului). Hover: fundalul de hover al temei.
  * Numele accesibil vine din `eticheta` (aria-label), ex. „Sunați: 0268 123 456”.
  * Dacă linkul nu e gata (date «DE COMPLETAT», doar în preview), butonul rămâne vizibil,
  * fără `href` și cu `aria-disabled="true"`.
@@ -47,27 +48,36 @@ const indisponibil = `${eticheta} (${t(locale, 'link.indisponibil')})`;
     align-items: center;
     justify-content: center;
     flex: none;
-    width: 48px;
-    height: 48px;
-    background: var(--c-paper);
-    color: var(--c-ink);
-    border: 1px solid var(--c-line);
+    width: max(48px, 2.6em);
+    height: max(48px, 2.6em);
+    background: transparent;
+    color: inherit;
+    border: 1px solid currentColor;
     border-radius: var(--radius);
-    transition:
-      background-color 150ms ease,
-      border-color 150ms ease;
+    transition: background-color 0.2s ease;
+  }
+
+  .buton-iconita :global(.iconita) {
+    width: 1.15em;
+    height: 1.15em;
   }
 
   .buton-iconita:hover {
-    background: var(--c-paper-2);
-    border-color: var(--c-ink);
-    color: var(--c-ink);
+    background: var(--buton-contur-hover);
+    color: inherit;
+  }
+
+  .buton-iconita:focus-visible {
+    outline-color: var(--buton-focus);
   }
 
   .buton-iconita[aria-disabled='true'] {
-    color: var(--c-muted);
+    color: var(--buton-dezactivat);
     border-style: dashed;
-    border-color: var(--c-muted);
     cursor: not-allowed;
+  }
+
+  .buton-iconita[aria-disabled='true']:hover {
+    background: transparent;
   }
 </style>

@@ -18,7 +18,7 @@ interface Props {
 const { locale, titlu, leadHtml, breadcrumbs } = Astro.props;
 ---
 
-<div class="banda-titlu">
+<div class="banda-titlu" data-tema-sectiune="light">
   <div class="container">
     {breadcrumbs && <Breadcrumbs locale={locale} elemente={breadcrumbs} />}
     <slot />
@@ -29,7 +29,9 @@ const { locale, titlu, leadHtml, breadcrumbs } = Astro.props;
 
 <style>
   .banda-titlu {
-    padding-block: var(--space-3) var(--section-y-sm);
+    /* Urcă sub navbar-ul transparent (global.css, main). */
+    margin-top: calc(-1 * var(--h-antet));
+    padding-block: calc(var(--h-antet) + var(--space-3)) var(--section-y-sm);
     background: var(--c-paper-2);
     border-bottom: 1px solid var(--c-line);
   }

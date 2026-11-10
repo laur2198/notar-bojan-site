@@ -71,6 +71,10 @@ export const en: Record<keyof typeof ro, string> = {
   'subsol.contact': 'Contact',
   'subsol.linkuri': 'Links',
   'subsol.copyright': '© {an} {denumire}',
+  'subsol.navigare': 'Navigation',
+  'subsol.adresa': 'Address',
+  'subsol.cif': 'Tax ID (CIF) {cif}',
+  'wordmark.acasa': '{denumire} – home page',
 
   // Home page
   'acasa.programare': 'Request an appointment',
