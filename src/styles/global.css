@@ -505,6 +505,20 @@ main:focus {
 }
 
 /* ---------------------------------------------------------------------------
+   Starea inițială a dezvăluirilor (src/scripts/miscare.ts, CLAUDE.md §3.2): ascunsă DOAR
+   când src/scripts/cap-pagina.js a pus `miscare` pe <html> (JS activ, fără mișcare redusă)
+   și până pornește modulul (`miscare-gata`). Fără JS sau la mișcare redusă totul e vizibil.
+   --------------------------------------------------------------------------- */
+
+html.miscare:not(.miscare-gata) [data-reveal] {
+  visibility: hidden;
+}
+
+html.miscare:not(.miscare-gata) [data-divider] {
+  transform: scaleX(0);
+}
+
+/* ---------------------------------------------------------------------------
    Mișcare redusă: fără tranziții și fără scroll animat
    --------------------------------------------------------------------------- */
 

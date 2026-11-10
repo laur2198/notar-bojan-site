@@ -4,8 +4,9 @@
  * producție nu există (getStaticPaths întoarce o listă goală).
  *
  * Design v2, V1 (CLAUDE.md §5): arată DOAR fundația din prototip (docs/design-v2/prototip-acasa.html):
- * tokenurile de culoare cu contrastele lor, scara tipografică (cu wordmark-ul gigant), granulația
- * și semnătura. Secțiunile paginii Acasă nu se portează aici.
+ * tokenurile de culoare cu contrastele lor, scara tipografică (cu wordmark-ul gigant), granulația,
+ * semnătura, intro-ul (pornit doar din buton sau cu #intro) și helperii de mișcare.
+ * Secțiunile paginii Acasă nu se portează aici.
  *
  * Culorile și mărimile se citesc din src/styles/tokens.css (src/lib/tokens.ts), deci rapoartele de
  * contrast și mărimile în px sunt calculate din valorile reale, la fiecare build. Build-ul eșuează
@@ -13,6 +14,8 @@
  */
 import type { GetStaticPaths } from 'astro';
 import '../styles/global.css';
+import CapPagina from '../components/CapPagina.astro';
+import IntroSemnatura from '../components/IntroSemnatura.astro';
 import Semnatura from '../components/Semnatura.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
 import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
@@ -157,16 +160,18 @@ const fonturi = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <CapPagina intro="manual" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Ghid de stil (uz intern) – {birou.notar}</title>
   </head>
   <body>
+    <IntroSemnatura />
     <main class="container stil">
       <h1>Ghid de stil</h1>
       <p class="lead">
         Fundația vizuală a design-ului v2, după prototipul aprobat (<code>docs/design-v2/prototip-acasa.html</code>):
-        tokenurile, scara tipografică, granulația și semnătura. Pagină internă: nu este indexată și nu apare în
-        sitemap. Contrastele și mărimile sunt calculate la build din <code>src/styles/tokens.css</code>.
+        tokenurile, scara tipografică, granulația, semnătura, intro-ul și mișcarea la scroll. Pagină internă: nu este
+        indexată și nu apare în sitemap. Contrastele și mărimile sunt calculate la build din <code>src/styles/tokens.css</code>.
       </p>
 
       <section aria-labelledby="paleta">
@@ -377,6 +382,42 @@ const fonturi = [
         </div>
         <button type="button" class="btn btn--secundar" data-reda-semnatura hidden>Redă desenul</button>
       </section>
+
+      <section aria-labelledby="intro">
+        <h2 id="intro">Intro-ul</h2>
+        <p>
+          Ecran complet <code>--c-ink</code>, semnătura în <code>--c-paper</code> se desenează în 1,8 s; după o pauză de
+          0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
+          mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
+        </p>
+        <button type="button" class="btn btn--secundar" data-reda-intro hidden>Redă intro-ul</button>
+        <p class="nota" data-stare-intro aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="miscare">
+        <h2 id="miscare">Mișcarea la scroll</h2>
+        <p>
+          GSAP + ScrollTrigger + SplitText din npm, derulare nativă (fără Lenis). Helperii pe data-atribute, mai jos. Cu
+          mișcare redusă sau fără JS, totul e vizibil din prima, nemișcat.
+        </p>
+        <div class="demo-miscare">
+          <p class="nota"><code>data-reveal</code> pe un titlu (aria-label pe titlu, rândurile aria-hidden):</p>
+          <h3 class="demo-reveal" data-reveal>Acte notariale pregătite din timp, ca la birou să veniți doar pentru semnare.</h3>
+          <p class="nota"><code>data-reveal</code> pe un paragraf (copie sr-only a textului, rândurile aria-hidden):</p>
+          <p class="demo-reveal-p" data-reveal>
+            Pregătim dosarul înainte de programare, ca vizita la birou să fie cât mai scurtă. Verificăm actele și vă spunem
+            din timp ce lipsește.
+          </p>
+          <p class="nota"><code>data-divider</code>:</p>
+          <div class="demo-divider" data-divider aria-hidden="true"></div>
+          <p class="nota"><code>data-parallax="12"</code> (blocul gri se deplasează în cadrul lui la scroll):</p>
+          <div class="demo-parallax-cadru" aria-hidden="true">
+            <div class="demo-parallax" data-parallax="12">
+              <span>Fotografie – de completat</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   </body>
 </html>
@@ -388,7 +429,7 @@ const fonturi = [
    * Semnăturile se desenează o dată, la prima intrare în ecran, și la „Redă desenul”. La mișcare
    * redusă nu se animă deloc (rămân desenate, starea din HTML) și butonul rămâne ascuns.
    */
-  const svguri = [...document.querySelectorAll<SVGSVGElement>('[data-semnatura]')];
+  const svguri = [...document.querySelectorAll<SVGSVGElement>('.semnaturi [data-semnatura]')];
   const buton = document.querySelector<HTMLButtonElement>('[data-reda-semnatura]');
   const miscareRedusa = matchMedia('(prefers-reduced-motion: reduce)');
   const opriri = new Map<SVGSVGElement, () => void>();
@@ -425,7 +466,74 @@ const fonturi = [
   });
 </script>
 
+<script>
+  import { pornesteMiscarea } from '../scripts/miscare';
+  import { EVENIMENT_GATA, ruleazaIntro } from '../scripts/intro-semnatura';
+
+  pornesteMiscarea();
+
+  // „Redă intro-ul”: vizibil doar cu mișcare permisă (la mișcare redusă intro-ul nu există).
+  const butonIntro = document.querySelector<HTMLButtonElement>('[data-reda-intro]');
+  const stare = document.querySelector<HTMLElement>('[data-stare-intro]');
+  const redus = matchMedia('(prefers-reduced-motion: reduce)');
+  const actualizeazaButon = () => {
+    if (butonIntro) butonIntro.hidden = redus.matches;
+  };
+  actualizeazaButon();
+  redus.addEventListener('change', actualizeazaButon);
+  butonIntro?.addEventListener('click', () => {
+    if (stare) stare.textContent = '';
+    ruleazaIntro();
+  });
+  document.addEventListener(EVENIMENT_GATA, () => {
+    if (stare) stare.textContent = 'Evenimentul intro-gata a fost emis.';
+  });
+</script>
+
 <style>
+  .demo-miscare {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .demo-reveal {
+    font-family: var(--font-display);
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
+    max-width: 18em;
+  }
+
+  .demo-reveal-p {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+    max-width: 24em;
+  }
+
+  .demo-divider {
+    height: 1px;
+    background: var(--c-ink);
+  }
+
+  .demo-parallax-cadru {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 7;
+    border-radius: var(--radius);
+    background: var(--c-paper-2);
+  }
+
+  .demo-parallax {
+    position: absolute;
+    inset: -12% 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(160deg, #e9e9e9 0%, #cfcfcf 100%);
+    color: var(--c-ink);
+  }
+
   .stil {
     padding-block: var(--space-5) var(--space-7);
   }

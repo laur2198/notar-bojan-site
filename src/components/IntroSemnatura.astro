@@ -1,0 +1,56 @@
+---
+/**
+ * Intro-ul cu semnătura (CLAUDE.md §3.2, §5): ecran complet --c-ink, semnătura în --c-paper,
+ * centrată, min(78vw, 640px). Desfășurarea și regulile: src/scripts/intro-semnatura.ts.
+ *
+ * Stratul e în HTML, dar ascuns (display: none) până când src/scripts/cap-pagina.js pune pe
+ * <html> clasa `cu-intro`, înainte de primul paint. Fără JS și la prefers-reduced-motion clasa
+ * nu apare, deci intro-ul nu apare deloc. Cât e activ, derularea paginii e blocată.
+ * aria-hidden + inert: cititoarele de ecran și focusul trec direct la pagină.
+ *
+ * Se montează o singură dată pe pagină (în V3, din BaseLayout; acum doar pe /stil/), împreună
+ * cu <CapPagina /> în <head>.
+ */
+import Semnatura from './Semnatura.astro';
+---
+
+<div class="intro" data-intro aria-hidden="true" inert>
+  <Semnatura id="intro" class="intro__semnatura" />
+</div>
+
+<script>
+  import { initIntro } from '../scripts/intro-semnatura';
+
+  initIntro();
+</script>
+
+<style>
+  .intro {
+    display: none;
+  }
+
+  :global(html.cu-intro) {
+    overflow: hidden;
+  }
+
+  :global(html.cu-intro) .intro {
+    position: fixed;
+    inset: 0;
+    /* Peste header (40), bara de jos (30), skip link (100) și granulație (200). */
+    z-index: 250;
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .intro :global(.intro__semnatura) {
+    width: min(78vw, 640px);
+  }
+
+  /* Înainte să pornească scriptul, primul frame arată deja ecranul fără semnătură. */
+  :global(html.cu-intro:not(.intro-pornit)) .intro :global(path[data-a]) {
+    stroke-dashoffset: 101;
+  }
+</style>

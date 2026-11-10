@@ -17,7 +17,8 @@
     "test": "vitest run",
     "linkuri": "node scripts/verifica-linkuri.mjs",
     "verifica:en": "node scripts/verifica-engleza.mjs",
-    "verifica:seo": "node scripts/verifica-seo.mjs"
+    "verifica:seo": "node scripts/verifica-seo.mjs",
+    "test:e2e": "node --test \"scripts/e2e/*.test.mjs\""
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
