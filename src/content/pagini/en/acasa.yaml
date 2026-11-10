@@ -7,8 +7,8 @@ hero:
   titlu: "Notarial acts prepared in advance, to keep your visit to the office short."
   subtitlu: "Notary office in Brașov, Romania: property sales, inheritance, gifts, powers of attorney, certified copies and divorce."
   linie: "Notary public · Brașov Chamber of Notaries Public"
-  imagine: ""
-  imagineAlt: "Notary public Bojan Elena Luminița in her office in Brașov"
+  imagine: ""          # not used: /en/ shows the photo uploaded on the Romanian page
+  imagineAlt: "«DE COMPLETAT: description of the office photo, once uploaded»"
 
 fraze:
   - titlu: "Why prepare your documents in advance?"

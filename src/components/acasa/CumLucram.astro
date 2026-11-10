@@ -1,13 +1,14 @@
 ---
 /**
- * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune închisă. Stânga o imagine care se schimbă
- * după pasul activ (placeholder închis cu cifra mare), dreapta pașii din CMS: titluri mari, cele
- * inactive la opacitate .4 (text mare: ≥ 3.8:1 pe ink), cel activ 1 și cu un punct. Activarea la
+ * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune deschisă (V3b). Stânga o imagine care se
+ * schimbă după pasul activ (placeholder cald cu cifra mare bej, decorativă), dreapta pașii din CMS:
+ * titluri mari, cele inactive la opacitate .6 (text mare: ≥ 3.5:1 pe alb), cel activ 1 și cu un
+ * punct roșu de accent. Activarea la
  * hover (pointer fin), focus și clic: butoane cu aria-expanded care arată descrierea pasului activ.
  * Fără JS și la mișcare redusă: toți pașii și toate descrierile vizibile (descrierile inactive se
  * ascund doar sub html.miscare); acolo focusul și clicul schimbă doar imaginea, aria-expanded rămâne true.
- * Sub pași, sloganul care „se aprinde” literă cu literă la derulare, de la opacitate .5 (≥ 5.3:1)
- * la 1 (src/scripts/miscare.ts, [data-aprinde]).
+ * Sub pași, sloganul care „se aprinde” literă cu literă la derulare, din griul --c-slogan-stins
+ * (5.3:1) în --c-ink (src/scripts/miscare.ts, [data-aprinde]).
  */
 import { t, type Locale } from '../../i18n';
 import { marcheazaPlaceholder } from '../../lib/continut';
@@ -26,7 +27,7 @@ const numar = (i: number) => String(i + 1).padStart(2, '0');
 const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 ---
 
-<section class="pasi pe-inchis" id="pasi" data-tema-sectiune="dark" aria-labelledby="pasi-titlu" data-pasi>
+<section class="pasi" id="pasi" data-tema-sectiune="light" aria-labelledby="pasi-titlu" data-pasi>
   <div class="container">
     <Eticheta text={titlu} id="pasi-titlu" />
     <div class="pasi__grila">
@@ -93,8 +94,8 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   .pasi {
     position: relative;
     padding-bottom: var(--section-y);
-    background: var(--c-ink);
-    color: var(--c-paper);
+    background: var(--c-paper);
+    color: var(--c-ink);
   }
 
   .pasi__grila {
@@ -117,8 +118,8 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     display: grid;
     place-items: center;
     background:
-      radial-gradient(120% 90% at 75% 20%, #3a3a3a 0%, rgb(58 58 58 / 0) 60%),
-      linear-gradient(160deg, #262626 0%, #141414 100%);
+      radial-gradient(120% 90% at 75% 20%, #f5f5f4 0%, rgb(245 245 244 / 0) 60%),
+      linear-gradient(160deg, #ede6e0 0%, #e6ddd5 100%);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
@@ -127,9 +128,9 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     opacity: 1;
   }
 
-  /* Cifra mare: decorativă (aria-hidden). */
+  /* Cifra mare: decorativă (aria-hidden), bej. */
   .pasi__cadru span {
-    color: #3a3a3a;
+    color: var(--c-brand-300);
     font-family: var(--font-display);
     font-size: 8em;
     letter-spacing: -0.05em;
@@ -167,7 +168,7 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     letter-spacing: var(--ls-titlu);
     text-align: left;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.6;
     transition: opacity 0.2s ease;
   }
 
@@ -177,7 +178,8 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     width: 0.2em;
     height: 0.2em;
     border-radius: 50%;
-    background: currentColor;
+    /* Accentul roșu: doar punctul pasului activ. */
+    background: var(--c-accent);
     opacity: 0;
     /* Intră din stânga: spre dreapta ar ieși din ecran pe titlurile pe toată lățimea. */
     transform: translateX(-0.5em);
@@ -204,7 +206,7 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   .pas__text {
     max-width: 24em;
     margin: 0.5em 0 0;
-    color: var(--c-muted-dark);
+    color: var(--c-muted);
   }
 
   :global(html.miscare) .pas:not(.pas--activ) .pas__text {
@@ -222,7 +224,7 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     grid-column: 2;
     max-width: none;
     margin: 0;
-    color: var(--c-paper);
+    color: var(--c-ink);
     font-family: var(--font-display);
     font-size: var(--fs-h2);
     font-weight: var(--fw-titlu);

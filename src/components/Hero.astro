@@ -112,7 +112,7 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     margin-top: calc(-1 * var(--h-antet));
     padding-top: var(--h-antet);
     color: var(--c-paper);
-    background: var(--c-ink);
+    background: var(--c-brand-900);
     overflow: hidden;
   }
 
@@ -135,11 +135,11 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     object-fit: cover;
   }
 
-  /* Overlay închis peste fotografie: textul alb trece AA (19.4:1 pe ink opac). */
+  /* Overlay maro închis peste fotografie: textul alb trece AA (16.7:1 pe brand-900 opac). */
   .hero__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgb(15 15 15 / 0.55), rgb(15 15 15 / 0.55));
+    background: linear-gradient(rgb(42 26 16 / 0.6), rgb(42 26 16 / 0.6));
   }
 
   .hero__placeholder {
@@ -148,9 +148,9 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     /* Sub navbar-ul transparent. */
     top: calc(var(--h-antet) + var(--space-2));
     padding: calc(var(--space-1) / 2) var(--space-1);
-    border: 1px dashed var(--c-muted-dark);
+    border: 1px dashed var(--c-brand-300);
     border-radius: var(--radius);
-    color: var(--c-muted-dark);
+    color: var(--c-brand-300);
     font-size: var(--fs-sm);
     font-weight: 600;
   }
