@@ -273,13 +273,15 @@ content:
             description: Apare în stânga; în dreapta apare automat adresa din „Setări birou”.
           - name: imagine
             component: imagine
-            description: Nu apare în prima secțiune; e imaginea afișată când pagina e distribuită (Facebook, WhatsApp).
+            description: Fotografia biroului, în dreapta titlului (pe telefon, sub el); e și imaginea afișată când pagina e distribuită. Se încarcă doar pe pagina în română; pagina în engleză o folosește pe aceeași. Cel puțin 1600 px pe latura lungă, fără fotografii de stoc.
           - name: imagineAlt
             component: imagineAlt
+            required: true
+            description: Obligatoriu, separat pe fiecare limbă (în engleză pe pagina engleză). Ce se vede în fotografie, ex. „Biroul notarial din Brașov, sala de semnare”.
       - name: fraze
         label: Frazele mari de sub prima secțiune
         type: object
-        description: Exact trei fraze, care apar pe rând la derulare, pe fundal închis.
+        description: Exact trei fraze, care apar pe rând la derulare, pe fundal gri deschis.
         list:
           min: 3
           max: 3

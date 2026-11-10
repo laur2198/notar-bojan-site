@@ -103,7 +103,7 @@ const ore = (zi: ZiProgram) =>
     font-weight: 700;
   }
 
-  /* Varianta simplă: fără borduri, ziua bold stânga, orele dreapta, „Închis” în muted. */
+  /* Varianta simplă: fără borduri, ziua bold stânga, orele dreapta, „Închis” în muted (bej pe închis). */
   .program--simplu {
     max-width: none;
   }
@@ -120,6 +120,11 @@ const ore = (zi: ZiProgram) =>
   .program--simplu .program__inchis {
     color: var(--c-muted);
     font-weight: 600;
+  }
+
+  /* Pe închis (subsolul brand-900): bej, 7.9:1. */
+  :global(.pe-inchis) .program--simplu .program__inchis {
+    color: var(--c-brand-300);
   }
 
   tr[aria-current='date'] th {

@@ -5,20 +5,30 @@
  * (theme-color, ghidul /stil/, imaginea OG).
  */
 :root {
-  /* Culori: paleta monocromă din prototip. Contrastele sunt calculate în /stil/ (src/lib/contrast.ts). */
-  --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header) */
-  --c-paper-2:    #F4F4F4;  /* fundal deschis alternant (secțiuni, footer) */
-  --c-ink:        #0F0F0F;  /* text pe deschis (19.4:1 pe alb); fundalul secțiunilor închise; butonul primar */
-  --c-ink-2:      #1A1A1A;  /* hover pe elementele ink */
-  --c-muted:      #5C5C5C;  /* text secundar pe deschis (6.7:1 pe alb, 6.1:1 pe paper-2) */
-  --c-muted-dark: #A3A3A3;  /* text secundar pe închis (7.9:1 pe ink) */
-  --c-line:       #E3E3E3;  /* borduri, separatoare pe deschis (doar decorativ) */
-  --c-line-dark:  #2C2C2C;  /* borduri, separatoare pe închis (doar decorativ) */
+  /*
+   * Culori: paleta caldă (varianta luminoasă aprobată după feedbackul clientei, V3b). Alb și gri
+   * cald pentru suprafețe, maro închis pentru elementele de brand, roșu bordo doar ca accent
+   * punctual. Contrastele sunt calculate și verificate în /stil/ (src/lib/contrast.ts).
+   */
+  --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header, secțiuni) */
+  --c-paper-2:    #F5F5F4;  /* fundal deschis alternant (frazele mari, întrebări, banda de titlu) */
+  --c-ink:        #1F1E1D;  /* textul pe deschis, cald (16.6:1 pe alb, 15.2:1 pe paper-2) */
+  --c-ink-2:      #34322F;  /* hover pe elementele ink */
+  --c-muted:      #5E5C59;  /* text secundar pe deschis (6.6:1 pe alb, 6.1:1 pe paper-2) */
+  --c-line:       #E2E1DF;  /* borduri, separatoare pe deschis (doar decorativ) */
 
-  /* Fundalurile de hover ale butonului cu text dublat (prototip, .btn__bg). */
-  --c-ink-hover:   #333333;  /* butonul plin pe deschis (paper pe el: 12.6:1) */
-  --c-paper-hover: #D6D6D6;  /* butonul plin pe închis (ink pe el: 13.4:1) */
-  --c-ink-3:       #262626;  /* butonul contur pe închis (paper pe el: 15.1:1) */
+  /* Brand: maro închis (butoane, semnătură, wordmark, subsol). */
+  --c-brand:      #4A2E1E;  /* butonul plin, conturul butonului secundar, focusul pe deschis (12.4:1 pe alb) */
+  --c-brand-900:  #2A1A10;  /* hover pe brand; suprafețele închise: subsolul, meniul compact, CTA-ul final */
+  --c-brand-300:  #C9AE94;  /* text secundar pe brand-900 (7.9:1); cifrele mari decorative */
+  --c-brand-50:   #EFE7E0;  /* hover pe butonul contur (brand pe el: 10.1:1) și pe butonul alb de pe închis */
+  --c-line-dark:  #4A3527;  /* borduri, separatoare pe brand-900 (doar decorativ) */
+
+  /* Accent: roșu bordo, DOAR accente mici (numere, săgeți, iconițe, linia .sub). Niciodată suprafețe mari, butoane sau paragrafe. */
+  --c-accent:     #9B1C1C;  /* 8.1:1 pe alb, 7.5:1 pe paper-2 */
+
+  /* Sloganul care „se aprinde” pornește din acest gri (5.3:1 pe alb), nu din opacitate. */
+  --c-slogan-stins: #6B6B6B;
 
   /*
    * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
@@ -34,42 +44,43 @@
   --font-mono:    'Geist Mono Variable', ui-monospace, monospace;                  /* etichete mono decorative */
 
   /*
-   * Textul de bază crește fluid cu lățimea, ca în prototip (1.25vw ≈ 1/80 din lățime), între 18 și
-   * 24 px. În rem, ca să respecte mărimea de font aleasă de utilizator. Max ≤ 2.5 × min: textul
-   * ajunge la 200% prin zoom-ul browserului (WCAG 1.4.4) la orice lățime.
+   * Textul de bază: fix 18 px (19 px de la 1600 px lățime, blocul @media de la final), în rem, ca
+   * să respecte mărimea de font aleasă de utilizator și zoom-ul (WCAG 1.4.4). Nu mai crește cu
+   * lățimea ecranului (V3b: „scrisul prea mare”).
    */
-  --fs-base: clamp(1.125rem, 1.25vw, 1.5rem);   /* 18 → 24 px */
+  --fs-base: 1.125rem;   /* 18 px; 19 px de la 1600 px */
   --fs-sm:   1rem;       /* 16 px – minim pentru text; excepții doar cele din §4 */
   --fs-xs:   0.875rem;   /* 14 px – doar etichetele barei de jos de pe mobil */
 
   /*
-   * Scara titlurilor, ca multipli ai textului de bază (în prototip sunt em-uri din body).
-   * Între paranteze: clasa din prototip de unde vine valoarea.
+   * Scara titlurilor (V3b, varianta luminoasă): mai mică decât în V3, cu vw între plafoane în rem
+   * (max ≤ 2.5 × min, deci zoom-ul ajunge la 200%). Între paranteze: unde se folosește.
    */
-  --fs-lg:        calc(1.15 * var(--fs-base));                          /* 20.7 → 27.6 px (faq__btn, nav__logo) */
-  --fs-h3:        var(--fs-lg);                                         /* titluri de nivel 3 */
-  --fs-h2:        clamp(1.5rem, calc(2 * var(--fs-base)), 3rem);        /* 36 → 48 px (slogan__text, cta__text) */
-  --fs-titlu:     clamp(1.75rem, calc(2.6 * var(--fs-base)), 4rem);     /* 46.8 → 64 px (serv__titlu, pas__btn, faq__titlu) */
-  --fs-h1:        clamp(1.6rem, calc(2.35 * var(--fs-base)), 3.6rem);   /* 42.3 → 57.6 px (hero__h1); sub 768 px: 28.8 px */
-  --fs-statement: clamp(1.75rem, calc(3.1 * var(--fs-base)), 4.6rem);   /* 55.8 → 73.6 px (sticky-el) */
+  --fs-lg:        calc(1.15 * var(--fs-base));          /* 20.7 px (întrebările, wordmark-ul din navbar) */
+  --fs-h3:        var(--fs-lg);                         /* titluri de nivel 3 */
+  --fs-h2:        clamp(1.35rem, 1.9vw, 1.9rem);        /* 21.6 → 30.4 px (slogan, CTA, h2 pe paginile interioare) */
+  --fs-titlu:     clamp(1.5rem, 2.2vw, 2.25rem);        /* 24 → 36 px (titlurile serviciilor, pașii, titlul întrebărilor) */
+  --fs-h1:        clamp(1.55rem, 2.6vw, 2.6rem);        /* 24.8 → 41.6 px (h1 din hero) */
+  --fs-statement: clamp(1.5rem, 2.9vw, 2.9rem);         /* 24 → 46.4 px (frazele mari) */
 
-  --lh-titlu-mare: 1.08;   /* h1, frazele mari */
-  --lh-titlu:      1.02;   /* --fs-titlu */
-  --lh-h2:         1.12;
-  --ls-titlu-mare: -0.035em;
-  --ls-titlu:      -0.04em;
-  --ls-h2:         -0.03em;
+  --lh-titlu-mare: 1.15;   /* h1, frazele mari */
+  --lh-titlu:      1.1;    /* --fs-titlu */
+  --lh-h2:         1.15;
+  --ls-titlu-mare: -0.025em;
+  --ls-titlu:      -0.025em;
+  --ls-h2:         -0.02em;
   --fw-titlu:      500;
 
   /*
    * Wordmark-ul gigant (WordmarkGigant.astro): „Bojan Elena Luminița” pe un rând, pe toată
-   * lățimea containerului. Mărimea = lățimea containerului (100cqi) / --wordmark-k, unde k e
-   * lățimea textului în em, măsurată cu fontul încărcat (Funnel Display 600, -0.055em).
+   * lățimea cutiei lui (62% din container de la 768 px în hero și subsol, toată lățimea pe mobil).
+   * Mărimea = lățimea cutiei (100cqi) / --wordmark-k, unde k e lățimea textului în em, măsurată
+   * cu fontul încărcat (Funnel Display 600, -0.045em).
    */
-  --ls-wordmark: -0.055em;
+  --ls-wordmark: -0.045em;
   --lh-wordmark: 0.82;
   --fw-wordmark: 600;
-  --wordmark-k: 8.998;  /* măsurat cu scripts/verifica-wordmark.mjs (Chromium, fontul încărcat) */
+  --wordmark-k: 9.199;  /* măsurat cu scripts/verifica-wordmark.mjs (Chromium, fontul încărcat) */
 
   /* Mișcare (doar hover/focus în această versiune; max. 200 ms, CLAUDE.md §3.2) */
   --ease-out: cubic-bezier(0.625, 0.05, 0, 1);
@@ -90,9 +101,9 @@
   --measure: 68ch;
 }
 
-/* Hero-ul pe mobil: titlul principal scade la 1.6 × textul de bază (prototip, sub 768 px). */
-@media (max-width: 47.99rem) {
+/* Ecrane mari: textul de bază urcă la 19 px. */
+@media (min-width: 100rem) {
   :root {
-    --fs-h1: calc(1.6 * var(--fs-base));   /* 28.8 px */
+    --fs-base: 1.1875rem;   /* 19 px */
   }
 }

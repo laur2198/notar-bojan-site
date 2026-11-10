@@ -2,7 +2,7 @@
 /**
  * Eticheta unei secțiuni de pe Acasă (prototip, `.eticheta`): textul mic, apoi o linie fină pe
  * restul rândului, care se trage la intrarea în ecran (data-divider). Pe închis, textul e
- * --c-muted-dark și linia --c-line-dark (după tema secțiunii, .pe-inchis).
+ * --c-brand-300 și linia --c-line-dark (după tema secțiunii, .pe-inchis).
  */
 interface Props {
   text: string;
@@ -47,7 +47,7 @@ const Tag = nivel;
   }
 
   :global(.pe-inchis) .eticheta__text {
-    color: var(--c-muted-dark);
+    color: var(--c-brand-300);
   }
 
   :global(.pe-inchis) .eticheta__linie {

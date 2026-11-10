@@ -15,7 +15,7 @@
  *   (.sub); pagina curentă (aria-current) o are trasă permanent.
  * - Sub prag: wordmark | telefon | (Programare, de la 768 px: §4 cere butonul vizibil pe orice
  *   ecran, iar bara de jos apare doar sub 768 px) | „Meniu”.
- * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-ink:
+ * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-brand-900:
  *   linkurile mari (Funnel Display, rânduri din mască la deschidere, doar cu mișcare permisă),
  *   contactele (ListaContacte) și comutatorul de limbă. Cât e deschis, derularea paginii e
  *   blocată (CSS :has) și navbar-ul trece pe tema închisă. JS: Escape închide și readuce
@@ -220,11 +220,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     }
 
     .antet[data-derulat][data-tema='dark'] {
-      background-color: var(--c-ink);
+      background-color: var(--c-brand-900);
       box-shadow: inset 0 -1px 0 var(--c-line-dark);
     }
 
-    /* Meniul compact deschis: fundalul îl dă panoul (ink), ca până acum. */
+    /* Meniul compact deschis: fundalul îl dă panoul (brand-900). */
     .antet[data-derulat]:has(.meniu-compact[open]) {
       background-color: transparent;
       box-shadow: none;
@@ -248,19 +248,20 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   :global(html:not(.js)) .antet[data-tema='dark'] {
-    background: var(--c-ink);
+    background: var(--c-brand-900);
   }
 
   /* Meniul deschis: panoul e închis la culoare, deci navbar-ul trece pe tema închisă. */
   .antet:has(.meniu-compact[open]) {
     color: var(--c-paper);
     --buton-plin-bg: var(--c-paper);
-    --buton-plin-fg: var(--c-ink);
-    --buton-plin-hover: var(--c-paper-hover);
+    --buton-plin-fg: var(--c-brand-900);
+    --buton-plin-hover: var(--c-brand-50);
     --buton-contur-fg: var(--c-paper);
-    --buton-contur-hover: var(--c-ink-3);
+    --buton-contur-hover: var(--c-brand);
     --buton-focus: var(--c-paper);
-    --buton-dezactivat: var(--c-muted-dark);
+    --buton-dezactivat: var(--c-brand-300);
+    --sub-hover: currentColor;
   }
 
   .antet :focus-visible {
@@ -283,6 +284,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
 
   .antet__iconita {
     display: inline-flex;
+  }
+
+  /* Iconița WhatsApp în maro pe tema deschisă (12.4:1 pe alb); pe închis, culoarea textului. */
+  .antet:not([data-tema='dark']):not(:has(.meniu-compact[open])) .antet__whatsapp {
+    color: var(--c-brand);
   }
 
   /* Ce apare doar pe desktop. */
@@ -349,7 +355,7 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-top: var(--header-h-sm);
-    background: var(--c-ink);
+    background: var(--c-brand-900);
     color: var(--c-paper);
   }
 

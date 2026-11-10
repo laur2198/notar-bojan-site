@@ -1,6 +1,6 @@
 ---
 /**
- * Intro-ul cu semnătura (CLAUDE.md §3.2, §5): ecran complet --c-ink, semnătura în --c-paper,
+ * Intro-ul cu semnătura (CLAUDE.md §3.2, §5): ecran complet --c-paper, semnătura în --c-brand,
  * centrată, min(78vw, 640px). Desfășurarea și regulile: src/scripts/intro-semnatura.ts.
  *
  * Stratul e în HTML, dar ascuns (display: none) până când src/scripts/cap-pagina.js pune pe
@@ -41,8 +41,9 @@ import Semnatura from './Semnatura.astro';
     display: grid;
     place-items: center;
     padding: var(--gutter);
-    background: var(--c-ink);
-    color: var(--c-paper);
+    /* V3b: ecran luminos, semnătura în maroul de brand. */
+    background: var(--c-paper);
+    color: var(--c-brand);
   }
 
   .intro :global(.intro__semnatura) {

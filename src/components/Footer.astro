@@ -1,7 +1,8 @@
 ---
 /**
- * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5): fundal --c-paper, intră „de sub
- * conținut”: interiorul urcă (yPercent -25 → 0) și un strat --c-ink se estompează (0.5 → 0), cu
+ * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5; V3b): fundal --c-brand-900 (temă închisă),
+ * titlurile și rândul legal în --c-brand-300, linkurile în alb. Intră „de sub
+ * conținut”: interiorul urcă (yPercent -25 → 0) și un strat #120A05 se estompează (0.35 → 0), cu
  * scrub, pe intervalul clamp(top bottom) → clamp(top top). Mișcarea o face src/scripts/miscare.ts
  * ([data-footer]), doar cu mișcare permisă; altfel subsolul e static. Când s-a oprit, textul e fix.
  *
@@ -67,7 +68,7 @@ const confidentialitate = {
 const { strada, codPostal, oras, judet } = birou.adresa;
 ---
 
-<footer class="subsol" data-tema-sectiune="light" data-footer>
+<footer class="subsol pe-inchis" data-tema-sectiune="dark" data-footer>
   <div class="subsol__interior" data-footer-interior>
     <div class="container">
       <div class="subsol__coloane">
@@ -146,7 +147,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
         {birou.cif && <p set:html={marcheazaPlaceholder(t(locale, 'subsol.cif', { cif: birou.cif }))} />}
       </div>
       <div class="subsol__linie" aria-hidden="true"></div>
-      <WordmarkGigant text={birou.notar} class="subsol__wordmark" />
+      <WordmarkGigant text={birou.notar} latime="62" class="subsol__wordmark" />
     </div>
   </div>
   <div class="subsol__strat" data-footer-strat aria-hidden="true"></div>
@@ -156,8 +157,8 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol {
     position: relative;
     overflow: hidden;
-    background: var(--c-paper);
-    color: var(--c-ink);
+    background: var(--c-brand-900);
+    color: var(--c-paper);
   }
 
   .subsol__interior {
@@ -191,7 +192,8 @@ const { strada, codPostal, oras, judet } = birou.adresa;
 
   .subsol__titlu {
     margin-bottom: calc(var(--space-1) / 2);
-    color: var(--c-muted);
+    /* Bej pe maro închis: 7.9:1. */
+    color: var(--c-brand-300);
     font-family: var(--font-sans);
     font-size: var(--fs-base);
     font-weight: 400;
@@ -236,7 +238,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
     justify-content: space-between;
     gap: 0 var(--space-4);
     padding-bottom: 0.3em;
-    color: var(--c-muted);
+    color: var(--c-brand-300);
   }
 
   .subsol__legal p {
@@ -244,25 +246,26 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   }
 
   .subsol__legal .subsol__link {
-    color: var(--c-muted);
+    color: var(--c-brand-300);
     font-weight: 400;
   }
 
   .subsol__linie {
     height: 1px;
-    background: var(--c-ink);
+    background: var(--c-brand-300);
   }
 
   /* Wordmark-ul gigant: spațiu dedesubt, ca descendentul lui „ț” să nu fie tăiat. */
   .subsol :global(.subsol__wordmark) {
     padding-top: 0.1em;
     padding-bottom: var(--space-3);
+    color: var(--c-paper);
   }
 
   .subsol__strat {
     position: absolute;
     inset: 0;
-    background: var(--c-ink);
+    background: #120a05;
     opacity: 0;
     pointer-events: none;
   }

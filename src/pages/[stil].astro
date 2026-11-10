@@ -3,7 +3,7 @@
  * /stil/ – ghid de stil intern (noindex, exclus din sitemap), generat doar în preview: în
  * producție nu există (getStaticPaths întoarce o listă goală).
  *
- * Design v2, V1 (CLAUDE.md §5): arată DOAR fundația din prototip (docs/design-v2/prototip-acasa.html):
+ * Design v2 (CLAUDE.md §5; paleta caldă din V3b): arată DOAR fundația din prototip (docs/design-v2/prototip-acasa.html):
  * tokenurile de culoare cu contrastele lor, scara tipografică (cu wordmark-ul gigant), granulația,
  * semnătura, intro-ul (pornit doar din buton sau cu #intro) și helperii de mișcare.
  * Secțiunile paginii Acasă nu se portează aici.
@@ -46,14 +46,14 @@ const subGranulatie = (h: string) => amesteca(h, '#000000', GRANULATIE);
 const hex = (token: string) => {
   if (token === 'mark') return MARK_FUNDAL;
   // Alb 90% peste fundalul închis (subtitlul din hero).
-  if (token === 'hero-subtitlu') return amesteca(culoare('c-ink'), culoare('c-paper'), 0.9);
+  if (token === 'hero-subtitlu') return amesteca(culoare('c-brand-900'), culoare('c-paper'), 0.9);
   const tokenCuloare = culori[token];
   if (!tokenCuloare) throw new Error(`Tokenul --${token} lipsește din tokens.css.`);
   return tokenCuloare.hex;
 };
 
 const numeCuloare = (token: string) =>
-  token === 'mark' ? 'mark.todo' : token === 'hero-subtitlu' ? 'paper 90% pe ink' : `--${token}`;
+  token === 'mark' ? 'mark.todo' : token === 'hero-subtitlu' ? 'paper 90% pe brand-900' : `--${token}`;
 
 interface Pereche {
   fata: string;
@@ -64,20 +64,29 @@ interface Pereche {
 }
 
 const perechi: Pereche[] = [
-  { fata: 'c-ink', fundal: 'c-paper', uz: 'text', folosire: 'Text principal și titluri; linkuri; textul butonului secundar și al celui inversat' },
-  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'text', folosire: 'Text pe secțiunile alternante și în footer; butonul secundar și cel inversat la hover' },
+  { fata: 'c-ink', fundal: 'c-paper', uz: 'text', folosire: 'Text principal și titluri; linkuri' },
+  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'text', folosire: 'Text pe secțiunile alternante (frazele mari, întrebările, banda de titlu)' },
   { fata: 'c-muted', fundal: 'c-paper', uz: 'text', folosire: 'Text secundar, lead-uri, rezumate; „Închis” (cerc gol, nu culoare)' },
-  { fata: 'c-muted', fundal: 'c-paper-2', uz: 'text', folosire: 'Text secundar pe secțiunile alternante și în footer; „Închis” în bandă' },
-  { fata: 'c-paper', fundal: 'c-ink', uz: 'text', folosire: 'Text pe secțiunile închise; textul butonului primar' },
-  { fata: 'c-paper', fundal: 'c-ink-2', uz: 'text', folosire: 'Textul butonului primar la hover' },
-  { fata: 'hero-subtitlu', fundal: 'c-ink', uz: 'text', folosire: 'Subtitlul din hero' },
-  { fata: 'c-muted-dark', fundal: 'c-ink', uz: 'text', folosire: 'Text secundar („stins”) pe închis; „Închis” și butonul inactiv pe închis' },
+  { fata: 'c-muted', fundal: 'c-paper-2', uz: 'text', folosire: 'Text secundar pe secțiunile alternante' },
+  { fata: 'c-slogan-stins', fundal: 'c-paper', uz: 'text', folosire: 'Sloganul din „Cum lucrăm” înainte să „se aprindă” (trece în --c-ink)' },
+  { fata: 'c-brand', fundal: 'c-paper', uz: 'text', folosire: 'Textul butonului contur; wordmark-ul și semnătura (brand)' },
+  { fata: 'c-brand', fundal: 'c-paper-2', uz: 'text', folosire: 'Butonul contur pe secțiunile alternante' },
+  { fata: 'c-brand', fundal: 'c-brand-50', uz: 'text', folosire: 'Butonul contur la hover' },
+  { fata: 'c-paper', fundal: 'c-brand', uz: 'text', folosire: 'Textul butonului plin; bula cursorului' },
+  { fata: 'c-paper', fundal: 'c-brand-900', uz: 'text', folosire: 'Butonul plin la hover; text pe subsol, meniul compact, CTA-ul final' },
+  { fata: 'c-brand-900', fundal: 'c-paper', uz: 'text', folosire: 'Butonul alb de pe închis (navbar în tema închisă); wordmark-ul din hero' },
+  { fata: 'c-brand-900', fundal: 'c-brand-50', uz: 'text', folosire: 'Butonul alb de pe închis, la hover' },
+  { fata: 'c-brand-300', fundal: 'c-brand-900', uz: 'text', folosire: 'Text secundar pe închis: titlurile și rândul legal din subsol, butonul inactiv' },
+  { fata: 'hero-subtitlu', fundal: 'c-brand-900', uz: 'text', folosire: 'Subtitlul din hero-ul paginilor interioare' },
+  { fata: 'c-accent', fundal: 'c-paper', uz: 'text', folosire: 'Accent: numerele 01–0N de la servicii (mono, text mic)' },
+  { fata: 'c-accent', fundal: 'c-paper-2', uz: 'ui', folosire: 'Accent: iconița +/− din întrebări' },
   { fata: 'c-ink', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (doar în preview)' },
-  { fata: 'c-ink', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, conturul butonului secundar, iconițe' },
-  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus și iconițe pe secțiunile alternante' },
-  { fata: 'c-paper', fundal: 'c-ink', uz: 'ui', folosire: 'Contur de focus pe închis; conturul butonului cu contur deschis' },
+  { fata: 'c-brand', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, conturul butonului contur, iconița WhatsApp' },
+  { fata: 'c-brand', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
+  { fata: 'c-paper', fundal: 'c-brand-900', uz: 'ui', folosire: 'Contur de focus pe închis; conturul butonului contur pe închis' },
+  { fata: 'c-accent', fundal: 'c-paper', uz: 'ui', folosire: 'Accent: săgețile serviciilor, punctul pasului activ, linia .sub la hover' },
   { fata: 'c-muted', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul punctat al butonului inactiv și al marcajului' },
-  { fata: 'c-muted-dark', fundal: 'c-ink', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
+  { fata: 'c-brand-300', fundal: 'c-brand-900', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
   {
     fata: 'c-line',
     fundal: 'c-paper',
@@ -87,10 +96,17 @@ const perechi: Pereche[] = [
   },
   {
     fata: 'c-line-dark',
-    fundal: 'c-ink',
+    fundal: 'c-brand-900',
     uz: 'decorativ',
     folosire: 'Borduri și separatoare pe închis',
     nota: 'Doar decorativ.',
+  },
+  {
+    fata: 'c-brand-300',
+    fundal: 'c-paper',
+    uz: 'decorativ',
+    folosire: 'Cifrele mari din „Cum lucrăm” (aria-hidden)',
+    nota: 'Doar decorativ: pasul e anunțat în text.',
   },
 ];
 
@@ -132,7 +148,7 @@ interface TreaptaScara {
 }
 
 const scara: TreaptaScara[] = [
-  { nume: 'Frază mare', token: 'fs-statement', clasa: 'scara-statement', din: 'sticky-el', text: 'Un dosar complet înseamnă o singură vizită.' },
+  { nume: 'Frază mare', token: 'fs-statement', clasa: 'scara-statement', din: 'sticky-el', text: 'Un dosar complet înseamnă mai puține drumuri la birou.' },
   { nume: 'Titlu principal (h1)', token: 'fs-h1', clasa: 'scara-h1', din: 'hero__h1', text: 'Acte notariale pregătite din timp.' },
   { nume: 'Titlu de secțiune', token: 'fs-titlu', clasa: 'scara-titlu', din: 'serv__titlu, faq__titlu', text: 'Succesiune și moștenire' },
   { nume: 'Titlu h2', token: 'fs-h2', clasa: 'scara-h2', din: 'slogan__text, cta__text', text: 'Aveți alte întrebări? Scrieți-ne.' },
@@ -252,8 +268,8 @@ const fonturi = [
       <section aria-labelledby="tipografie">
         <h2 id="tipografie">Scara tipografică</h2>
         <p>
-          Textul de bază crește fluid cu lățimea ecranului, între 18 și 24 px (<code>--fs-base</code>, în rem: respectă
-          mărimea de font aleasă în browser). Titlurile sunt multipli ai lui, cu plafoanele din prototip.
+          Textul de bază e fix: 18 px, 19 px de la 1600 px lățime (<code>--fs-base</code>, în rem: respectă mărimea de
+          font aleasă în browser). Titlurile cresc cu lățimea între plafoane în rem (V3b, varianta luminoasă).
         </p>
 
         <h3>Fonturi</h3>
@@ -356,7 +372,7 @@ const fonturi = [
           </figure>
           <figure class="granulatie-mostra">
             <div class="granulatie-marita granulatie-marita--inchis" data-tema-sectiune="dark" aria-hidden="true"></div>
-            <figcaption>Pe <code>--c-ink</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
+            <figcaption>Pe <code>--c-brand-900</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
           </figure>
         </div>
       </section>
@@ -383,7 +399,7 @@ const fonturi = [
       <section aria-labelledby="intro">
         <h2 id="intro">Intro-ul</h2>
         <p>
-          Ecran complet <code>--c-ink</code>, semnătura în <code>--c-paper</code> se desenează în 1,8 s; după o pauză de
+          Ecran complet <code>--c-paper</code>, semnătura în <code>--c-brand</code> se desenează în 1,8 s; după o pauză de
           0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
           mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
         </p>
@@ -449,7 +465,8 @@ const fonturi = [
         <h2 id="shutter">Tranziția shutter</h2>
         <p>
           Secțiune deschisă cu <code>Shutter.astro</code> la final: la derulare, benzi ink o acoperă de jos în sus (16 pe
-          desktop, 10 pe tabletă, 6 pe mobil). Fără mișcare redusă nu există deloc.
+          desktop, 10 pe tabletă, 6 pe mobil). La mișcare redusă nu există deloc. Doar demo: din V3b nu mai apare pe
+          Acasă.
         </p>
       </div>
       <Shutter />
@@ -567,7 +584,7 @@ const fonturi = [
 
   .demo-inchis {
     padding-block: var(--space-7);
-    background: var(--c-ink);
+    background: var(--c-brand-900);
     color: var(--c-paper);
   }
 
@@ -897,7 +914,7 @@ const fonturi = [
   }
 
   .granulatie-marita--inchis {
-    background-color: var(--c-ink);
+    background-color: var(--c-brand-900);
     border-color: var(--c-line-dark);
   }
 
@@ -920,7 +937,7 @@ const fonturi = [
     border: 1px solid var(--c-line);
     border-radius: var(--radius);
     background: var(--c-paper);
-    color: var(--c-ink);
+    color: var(--c-brand);
   }
 
   .semnatura-panou > :global(svg) {
@@ -928,8 +945,8 @@ const fonturi = [
   }
 
   .semnatura-panou--inchis {
-    background: var(--c-ink);
+    background: var(--c-brand-900);
     color: var(--c-paper);
-    border-color: var(--c-ink);
+    border-color: var(--c-brand-900);
   }
 </style>

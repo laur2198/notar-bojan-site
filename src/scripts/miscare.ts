@@ -18,24 +18,26 @@
  *   [data-parallax="N"]    deplasare legată de scroll, yPercent N → −N pe durata vizibilității
  *                          (N negativ inversează sensul). Doar decorativ: fotografii, forme.
  *   [data-footer]          subsolul „intră de sub conținut” (Footer.astro): interiorul
- *                          ([data-footer-interior]) yPercent -25 → 0 și stratul ink
- *                          ([data-footer-strat]) opacitate 0.5 → 0, scrub, clamp(top bottom) →
+ *                          ([data-footer-interior]) yPercent -25 → 0 și stratul #120A05
+ *                          ([data-footer-strat]) opacitate 0.35 → 0, scrub, clamp(top bottom) →
  *                          clamp(top top). La capăt, textul e static.
- *   [data-shutter]         benzi ink care acoperă secțiunea la ieșire (Shutter.astro): scaleY 0 → 1
+ *   [data-shutter]         benzi ink (doar demo pe /stil/, V3b) care acoperă secțiunea la ieșire (Shutter.astro): scaleY 0 → 1
  *                          de jos, stagger 0.01 from end, scrub 2.3, „bottom 60%” → „bottom top”;
  *                          16 benzi pe desktop, 10 pe tabletă (≤ 991 px), 6 pe mobil (≤ 478 px).
  *                          Benzile se creează doar aici: la mișcare redusă nu există deloc.
  *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la `intro-gata` (sau imediat,
  *                          dacă a fost deja emis): h1 ([data-hero-titlu]) pe rânduri din mască,
  *                          linia ([data-hero-divider]) 0 → 100%, rândul de sub semnătură
- *                          ([data-hero-fade]) și wordmark-ul ([data-hero-wordmark]) apar, iar
+ *                          ([data-hero-fade]) și wordmark-ul ([data-hero-wordmark]) apar, fotografia
+ *                          ([data-hero-foto]) se descoperă de jos în sus (clip-path, 1 s, expo.out), iar
  *                          semnătura se desenează în 3.5 s. Până atunci CSS-ul le ascunde sub
  *                          `html.miscare:not(.hero-pornit)` (HeroAcasa.astro).
  *   [data-parallax-iesire="N"] deplasare yPercent 0 → N cât secțiunea iese din ecran
- *                          (top top → bottom top), scrub. Blocul de jos al hero-ului.
+ *                          (top top → bottom top), scrub. Blocul de jos al hero-ului (40) și
+ *                          interiorul fotografiei din hero (8).
  *   [data-fraze]           frazele mari ([data-fraza]) se succed literă cu literă, legat de scroll:
  *                          apar de la stânga, dispar de la dreapta, ultima rămâne (FrazeSticky.astro).
- *   [data-aprinde]         textul „se aprinde” literă cu literă la scroll, opacitate .5 → 1.
+ *   [data-aprinde]         textul „se aprinde” literă cu literă la scroll, culoarea --c-slogan-stins → --c-ink.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -118,7 +120,7 @@ function intrareFooter(footer: HTMLElement) {
     scrollTrigger: { trigger: footer, start: 'clamp(top bottom)', end: 'clamp(top top)', scrub: true },
   });
   tl.fromTo(interior, { yPercent: -25 }, { yPercent: 0, ease: 'none' });
-  if (strat) tl.fromTo(strat, { opacity: 0.5 }, { opacity: 0, ease: 'none' }, '<');
+  if (strat) tl.fromTo(strat, { opacity: 0.35 }, { opacity: 0, ease: 'none' }, '<');
 }
 
 function shutter(container: HTMLElement, n: number): () => void {
@@ -153,6 +155,7 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   const linie = hero.querySelector<HTMLElement>('[data-hero-divider]');
   const fade = [...hero.querySelectorAll<HTMLElement>('[data-hero-fade]')];
   const wordmark = hero.querySelector<HTMLElement>('[data-hero-wordmark]');
+  const foto = hero.querySelector<HTMLElement>('[data-hero-foto]');
   const semnatura = hero.querySelector<SVGSVGElement>('svg[data-semnatura]');
   let split: SplitText | null = null;
   let opresteDesen: (() => void) | null = null;
@@ -177,6 +180,14 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
       if (linie) gsap.fromTo(linie, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'power2.inOut' });
       if (fade.length) gsap.fromTo(fade, { autoAlpha: 0, y: '1em' }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.inOut', delay: 0.2 });
       if (wordmark) gsap.fromTo(wordmark, { autoAlpha: 0, y: '0.3em' }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.inOut', delay: 0.3 });
+      // Fotografia: mască de jos în sus (V3b).
+      if (foto) {
+        gsap.fromTo(
+          foto,
+          { clipPath: 'inset(100% 0% 0% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'expo.out', clearProps: 'clipPath' },
+        );
+      }
     });
     if (semnatura) {
       pregatesteSemnatura(semnatura);
@@ -229,12 +240,14 @@ function fraze(container: HTMLElement): () => void {
 
 function aprinde(el: HTMLElement): () => void {
   const { tinta, aria, revino } = pregatesteTextAccesibil(el);
+  // Din griul --c-slogan-stins (5.3:1 pe alb) în culoarea textului; nu din opacitate (V3b).
+  const stins = getComputedStyle(document.documentElement).getPropertyValue('--c-slogan-stins').trim() || '#6b6b6b';
   const split = SplitText.create(tinta, {
     type: 'words,chars',
     aria,
     autoSplit: true,
     onSplit: (s) =>
-      gsap.from(s.chars, { opacity: 0.5, stagger: 0.1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 90%', end: 'center 40%', scrub: true } }),
+      gsap.from(s.chars, { color: stins, stagger: 0.1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 90%', end: 'center 40%', scrub: true } }),
   });
   return () => {
     split.revert();

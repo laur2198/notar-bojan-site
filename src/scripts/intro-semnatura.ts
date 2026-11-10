@@ -1,6 +1,6 @@
 /**
  * Intro-ul cu semnătura (IntroSemnatura.astro), după prototip:
- *   ecran complet --c-ink, semnătura se desenează în 1.8 s; pauză 0.4 s; ecranul urcă
+ *   ecran complet --c-paper, semnătura (--c-brand) se desenează în 1.8 s; pauză 0.4 s; ecranul urcă
  *   (translateY(-101%), 1 s, cubic-bezier(0.85, 0, 0.15, 1)); la jumătatea urcării se emite
  *   `intro-gata` pe document (hero-ul se leagă de el în V3). Fără intro, `intro-gata` se emite
  *   la încărcare. Pe <html> rămâne clasa `intro-gata`, pentru cine ascultă prea târziu.

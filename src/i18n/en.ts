@@ -85,6 +85,7 @@ export const en: Record<keyof typeof ro, string> = {
   'acasa.toateServiciileScurt': 'All services',
   'acasa.etichete': 'Tags',
   'acasa.fraze': 'About notarial acts',
+  'acasa.fotoHero': 'Office photo – coming soon',
   'acasa.pasul': 'Step {n}',
   'cursor.serviciu': 'View service',
   'foto.deCompletat': 'Photo – to be added',

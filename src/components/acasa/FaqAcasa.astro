@@ -1,6 +1,7 @@
 ---
 /**
- * Întrebările frecvente pe Acasă (prototip, `.faq`; CLAUDE.md §4): secțiune închisă. Stânga titlul
+ * Întrebările frecvente pe Acasă (prototip, `.faq`; CLAUDE.md §4): secțiune deschisă, --c-paper-2
+ * (V3b); iconița +/− în roșul de accent. Stânga titlul
  * mare (rânduri din mască, data-reveal), dreapta acordeonul cu întrebările evidențiate din
  * faq/{limba}.yaml. Acordeonul e <details>/<summary> nativ (§4): `name` comun ține un singur
  * răspuns deschis, fără JS (Chrome 120+, Safari 17.2+, Firefox 130+; mai vechi: se pot deschide
@@ -26,7 +27,7 @@ const { locale, birou, titlu, intrebari, ctaTitlu, ctaSubtitlu } = Astro.props;
 const whatsapp = linkWhatsapp(birou, locale);
 ---
 
-<section class="faq pe-inchis" id="faq" data-tema-sectiune="dark" aria-labelledby="faq-titlu">
+<section class="faq" id="faq" data-tema-sectiune="light" aria-labelledby="faq-titlu">
   <div class="container">
     <Eticheta text={t(locale, 'nav.faq')} nivel="p" />
     <div class="faq__grila">
@@ -74,9 +75,8 @@ const whatsapp = linkWhatsapp(birou, locale);
   .faq {
     position: relative;
     padding-bottom: var(--section-y);
-    background: var(--c-ink);
-    color: var(--c-paper);
-    border-top: 1px solid var(--c-line-dark);
+    background: var(--c-paper-2);
+    color: var(--c-ink);
   }
 
   .faq__grila {
@@ -87,18 +87,18 @@ const whatsapp = linkWhatsapp(birou, locale);
 
   .faq__titlu {
     margin: 0;
-    color: var(--c-paper);
+    color: var(--c-ink);
     font-size: var(--fs-titlu);
     line-height: var(--lh-titlu);
     letter-spacing: var(--ls-titlu);
   }
 
   .faq__lista {
-    border-top: 1px solid var(--c-line-dark);
+    border-top: 1px solid var(--c-line);
   }
 
   .faq__item {
-    border-bottom: 1px solid var(--c-line-dark);
+    border-bottom: 1px solid var(--c-line);
   }
 
   .faq__intrebare {
@@ -131,6 +131,8 @@ const whatsapp = linkWhatsapp(birou, locale);
     flex-shrink: 0;
     width: 0.8em;
     height: 0.8em;
+    /* Accent: roșu bordo (7.5:1 pe paper-2). */
+    color: var(--c-accent);
   }
 
   .faq__iconita::before,
@@ -157,7 +159,7 @@ const whatsapp = linkWhatsapp(birou, locale);
     max-width: 34em;
     margin: 0;
     padding: 0 0 1.25em;
-    color: var(--c-muted-dark);
+    color: var(--c-muted);
   }
 
   /* Deschiderea animată (înălțimea răspunsului), doar unde browserul o permite. */
@@ -209,7 +211,7 @@ const whatsapp = linkWhatsapp(birou, locale);
 
   .faq__cta-sub {
     display: block;
-    color: var(--c-muted-dark);
+    color: var(--c-muted);
   }
 
   .faq__cta-butoane {

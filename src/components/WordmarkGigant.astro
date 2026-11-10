@@ -1,32 +1,43 @@
 ---
 /**
  * Wordmark-ul gigant din prototip (docs/design-v2/prototip-acasa.html, `.wordmark`): numele
- * notarului pe un singur rând, pe toată lățimea containerului părinte. Decorativ (aria-hidden):
- * numele apare ca text în altă parte a paginii.
+ * notarului pe un singur rând, pe toată lățimea cutiei lui: tot containerul părinte sau, cu
+ * latime="62" (hero-ul și subsolul, V3b), 62% din el de la 768 px (pe mobil tot).
+ * Decorativ (aria-hidden): numele apare ca text în altă parte a paginii.
  *
  * Doar CSS: părintele (.wordmark-gigant) e container de dimensiune (container-type: inline-size),
  * iar mărimea fontului = 100cqi / --wordmark-k, unde k e lățimea textului în em, măsurată cu
- * fontul încărcat (Funnel Display 600, letter-spacing -0.055em; tokens.css). Fără JS, fără
+ * fontul încărcat (Funnel Display 600, letter-spacing -0.045em; tokens.css). Fără JS, fără
  * salt de layout după încărcarea fontului (lățimea cutiei e fixă; se schimbă doar glifele).
  * Abaterea față de lățimea containerului se verifică în /stil/ (scripts/verifica-wordmark.mjs).
  */
 interface Props {
   /** Textul: numele notarului, din src/content/setari/birou.yaml. */
   text: string;
+  /** Lățimea cutiei, în procente din container, de la 768 px în sus (pe mobil e mereu 100%). */
+  latime?: '100' | '62';
   class?: string;
 }
 
-const { text, class: clasa } = Astro.props;
+const { text, latime = '100', class: clasa } = Astro.props;
 ---
 
-<div class:list={['wordmark-gigant', clasa]} aria-hidden="true">
+<div class:list={['wordmark-gigant', { 'wordmark-gigant--62': latime === '62' }, clasa]} aria-hidden="true">
   <span class="wordmark-gigant__text" data-wordmark-gigant>{text}</span>
 </div>
 
 <style>
   .wordmark-gigant {
+    --wordmark-fractie: 1;
+
     container-type: inline-size;
-    width: 100%;
+    width: calc(100% * var(--wordmark-fractie));
+  }
+
+  @media (min-width: 48rem) {
+    .wordmark-gigant--62 {
+      --wordmark-fractie: 0.62;
+    }
   }
 
   .wordmark-gigant__text {
@@ -35,7 +46,7 @@ const { text, class: clasa } = Astro.props;
     font-family: var(--font-display);
     font-weight: var(--fw-wordmark);
     /* Fără container queries: lățimea ferestrei minus marginile containerului (aproximare). */
-    font-size: calc((100vw - 2 * var(--gutter)) / var(--wordmark-k));
+    font-size: calc((100vw - 2 * var(--gutter)) * var(--wordmark-fractie) / var(--wordmark-k));
     line-height: var(--lh-wordmark);
     letter-spacing: var(--ls-wordmark);
     white-space: nowrap;

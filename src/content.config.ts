@@ -148,9 +148,13 @@ const acasa = defineCollection({
         subtitlu: z.string().min(1),
         /** Rândul din stânga de sub semnătură; în dreapta apare adresa din birou.yaml. */
         linie: z.string().min(1),
-        /** Fotografia din hero: folosită ca imagine de distribuire (og:image), nu se afișează în hero-ul v2. */
+        /**
+         * Fotografia biroului din hero (V3b), în dreapta titlului (pe mobil sub el); și imaginea de
+         * distribuire (og:image). Se încarcă doar în pagina română; /en/ o folosește pe aceeași.
+         */
         imagine: imagineOptionala(image),
-        imagineAlt: z.string(),
+        /** Textul alternativ al fotografiei, obligatoriu, separat pe limbă. */
+        imagineAlt: z.string().min(1, 'Textul alternativ al fotografiei din hero e obligatoriu.'),
       }),
       /** Frazele mari din secțiunea închisă de sub hero, care se succed la derulare: exact 3. */
       fraze: z

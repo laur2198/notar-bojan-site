@@ -160,3 +160,81 @@ describe('CSP pe Acasă EN', () => {
     await context.close();
   });
 });
+
+describe('Acasă V3b: fotografia din hero', () => {
+  const geometrie = (p) =>
+    p.evaluate(() => {
+      const r = (s) => {
+        const b = document.querySelector(s).getBoundingClientRect();
+        return { x: Math.round(b.left), y: Math.round(b.top), w: Math.round(b.width), h: Math.round(b.height), jos: Math.round(b.bottom) };
+      };
+      return {
+        titlu: r('[data-hero-titlu]'),
+        foto: r('[data-hero-foto]'),
+        semnatura: r('.hero__semnatura'),
+        wordmark: r('[data-hero] [data-wordmark-gigant]'),
+        vh: innerHeight,
+        clip: getComputedStyle(document.querySelector('[data-hero-foto]')).clipPath,
+      };
+    });
+
+  for (const [w, h] of [
+    [1280, 720],
+    [1440, 900],
+  ]) {
+    it(`desktop ${w}×${h}: titlu stânga, fotografie 4:5 dreapta, semnătura sub titlu, wordmark vizibil complet`, async () => {
+      const { p, context } = await pagina({ viewport: { width: w, height: h } });
+      await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+      await p.waitForTimeout(2500);
+      const g = await geometrie(p);
+      assert.ok(g.foto.x > g.titlu.x + g.titlu.w - 1, 'fotografia e în dreapta titlului');
+      assert.ok(g.titlu.w <= w * 0.52, `titlul ocupă max. ~50% (${g.titlu.w}px)`);
+      assert.ok(Math.abs(g.foto.w / g.foto.h - 0.8) < 0.02, `raport 4:5 (${g.foto.w}×${g.foto.h})`);
+      assert.ok(g.semnatura.y > g.titlu.jos - 1 && g.semnatura.x < g.foto.x, 'semnătura sub titlu, în stânga');
+      assert.ok(g.wordmark.jos <= g.vh, `wordmark-ul se termină la ${g.wordmark.jos}px (fereastra ${g.vh}px)`);
+      assert.equal(g.clip, 'none', 'după intrare, fotografia nu mai are mască');
+      await context.close();
+    });
+  }
+
+  it('mobil 390×844: titlu → fotografie 4:3 pe toată lățimea → semnătură', async () => {
+    const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
+    await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+    await p.waitForTimeout(2500);
+    const g = await geometrie(p);
+    assert.ok(g.foto.y > g.titlu.jos - 1, 'fotografia sub titlu');
+    assert.ok(g.semnatura.y > g.foto.jos - 1, 'semnătura sub fotografie');
+    assert.ok(g.foto.w >= 390 - 2 * 16 - 1, `fotografia pe toată lățimea (${g.foto.w}px)`);
+    assert.ok(Math.abs(g.foto.w / g.foto.h - 4 / 3) < 0.02, `raport 4:3 (${g.foto.w}×${g.foto.h})`);
+    await context.close();
+  });
+
+  it('la intro-gata: mască de jos în sus (clip-path), apoi vizibilă; înainte, acoperită', async () => {
+    const { p, context } = await pagina({ introVazut: false, viewport: { width: 1280, height: 720 } });
+    await p.goto(`${BAZA}/`, { waitUntil: 'domcontentloaded' });
+    const inainte = await p.evaluate(() => getComputedStyle(document.querySelector('[data-hero-foto]')).clipPath);
+    assert.match(inainte, /inset\(100%/);
+    await p.waitForTimeout(5000);
+    assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('[data-hero-foto]')).clipPath), 'none');
+    await context.close();
+  });
+
+  for (const [nume, optiuni] of [
+    ['fără JS', { javaScriptEnabled: false }],
+    ['prefers-reduced-motion: reduce', { reducedMotion: 'reduce' }],
+  ]) {
+    it(`${nume}: fotografia vizibilă direct, fără mască și fără parallax`, async () => {
+      const { p, context } = await pagina({ ...optiuni, viewport: { width: 1280, height: 720 } });
+      await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+      await p.evaluate(() => scrollTo({ top: 400, behavior: 'instant' }));
+      await p.waitForTimeout(500);
+      const r = await p.evaluate(() => ({
+        clip: getComputedStyle(document.querySelector('[data-hero-foto]')).clipPath,
+        transform: getComputedStyle(document.querySelector('.hero__foto-cadru')).transform,
+      }));
+      assert.equal(r.clip, 'none');
+      assert.equal(r.transform, 'none');
+      await context.close();
+    });
+  }
+});

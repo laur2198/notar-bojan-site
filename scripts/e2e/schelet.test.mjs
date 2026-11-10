@@ -65,8 +65,8 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
   it('fără JS: navbar-ul are fundal plin în tema de la încărcare (textul nu se pierde la derulare)', async () => {
     const { p, context } = await pagina({ javaScriptEnabled: false });
     for (const [cale, fundal, text] of [
-      ['/', 'rgb(255, 255, 255)', 'rgb(15, 15, 15)'],
-      ['/servicii/', 'rgb(255, 255, 255)', 'rgb(15, 15, 15)'],
+      ['/', 'rgb(255, 255, 255)', 'rgb(31, 30, 29)'],
+      ['/servicii/', 'rgb(255, 255, 255)', 'rgb(31, 30, 29)'],
     ]) {
       await p.goto(BAZA + cale, { waitUntil: 'load' });
       await p.evaluate(() => scrollTo(0, 1500));
@@ -79,15 +79,16 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
     await context.close();
   });
 
-  it('pe Acasă: deschisă peste hero, închisă peste frazele mari, deschisă peste servicii', async () => {
+  it('pe Acasă (V3b): deschisă peste toate secțiunile, închisă peste subsol', async () => {
     const { p, context } = await pagina();
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     await p.waitForTimeout(300);
     assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'light');
     for (const [selector, tema] of [
-      ['.fraze', 'dark'],
+      ['.fraze', 'light'],
       ['#servicii', 'light'],
-      ['#pasi', 'dark'],
+      ['#pasi', 'light'],
+      ['#faq', 'light'],
     ]) {
       await p.evaluate((s) => {
         const el = document.querySelector(s);
@@ -96,6 +97,11 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
       await p.waitForTimeout(300);
       assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), tema, selector);
     }
+    // Subsolul (brand-900): într-o fereastră mai scundă decât el, derulat până jos, navbar-ul e peste el.
+    await p.setViewportSize({ width: 1280, height: 400 });
+    await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await p.waitForTimeout(600);
+    assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'dark', 'footer');
     await context.close();
   });
 });
@@ -121,7 +127,7 @@ describe('Meniul compact', () => {
     assert.equal(deschis.open, true);
     assert.equal(deschis.overflow, 'hidden', 'derularea paginii e blocată');
     assert.equal(deschis.panou, 'fixed');
-    assert.equal(deschis.fundal, 'rgb(15, 15, 15)');
+    assert.equal(deschis.fundal, 'rgb(42, 26, 16)');
 
     // 25 de Tab-uri (mai multe decât elementele din panou): focusul nu iese din meniu.
     for (let i = 0; i < 25; i++) {
@@ -323,14 +329,14 @@ describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
   it('fundalul are culoarea temei și o linie de 1 px; pagina reîncărcată deja derulată pornește cu fundal', async () => {
     const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
-    // Peste frazele mari (temă închisă).
-    await p.evaluate(() => scrollTo({ top: document.querySelector('.fraze').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
+    // Peste subsol (temă închisă, brand-900).
+    await p.evaluate(() => scrollTo({ top: document.querySelector('footer').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
     await p.waitForTimeout(600);
     let s = await p.evaluate(() => {
       const c = getComputedStyle(document.querySelector('[data-navbar]'));
       return { fundal: c.backgroundColor, linie: c.boxShadow, tema: document.querySelector('[data-navbar]').dataset.tema };
     });
-    assert.deepEqual(s, { fundal: 'rgb(15, 15, 15)', linie: 'rgb(44, 44, 44) 0px -1px 0px 0px inset', tema: 'dark' });
+    assert.deepEqual(s, { fundal: 'rgb(42, 26, 16)', linie: 'rgb(74, 53, 39) 0px -1px 0px 0px inset', tema: 'dark' });
     // Reîncărcare la jumătatea paginii (temă deschisă): fundal plin imediat, fără tranziție.
     await p.evaluate(() => scrollTo({ top: document.querySelector('#servicii').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.reload({ waitUntil: 'load' });
@@ -339,11 +345,11 @@ describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
       const c = getComputedStyle(document.querySelector('[data-navbar]'));
       return { scroll: scrollY > 8, fundal: c.backgroundColor, linie: c.boxShadow };
     });
-    assert.deepEqual(s, { scroll: true, fundal: 'rgb(255, 255, 255)', linie: 'rgb(227, 227, 227) 0px -1px 0px 0px inset' });
+    assert.deepEqual(s, { scroll: true, fundal: 'rgb(255, 255, 255)', linie: 'rgb(226, 225, 223) 0px -1px 0px 0px inset' });
     await context.close();
   });
 
-  it('meniul compact deschis nu e afectat: panoul ink, navbar-ul fără fundal propriu', async () => {
+  it('meniul compact deschis nu e afectat: panoul brand-900, navbar-ul fără fundal propriu', async () => {
     const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
     await p.goto(`${BAZA}/contact/`, { waitUntil: 'load' });
     await p.evaluate(() => scrollTo({ top: 900, behavior: 'instant' }));
@@ -360,7 +366,7 @@ describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
         punct: antet.contains(document.elementFromPoint(r.width / 2, r.height / 2)),
       };
     });
-    assert.deepEqual(s, { fundal: 'rgba(0, 0, 0, 0)', text: 'rgb(255, 255, 255)', sub: 'rgb(15, 15, 15)', punct: true });
+    assert.deepEqual(s, { fundal: 'rgba(0, 0, 0, 0)', text: 'rgb(255, 255, 255)', sub: 'rgb(42, 26, 16)', punct: true });
     await context.close();
   });
 

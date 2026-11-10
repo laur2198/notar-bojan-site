@@ -83,6 +83,7 @@ export const ro = {
   'acasa.toateServiciileScurt': 'Toate serviciile',
   'acasa.etichete': 'Etichete',
   'acasa.fraze': 'Despre actul notarial',
+  'acasa.fotoHero': 'Fotografie birou – urmează',
   'acasa.pasul': 'Pasul {n}',
   'cursor.serviciu': 'Vezi serviciul',
   'foto.deCompletat': 'Fotografie – de completat',

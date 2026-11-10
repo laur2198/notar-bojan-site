@@ -36,6 +36,9 @@ if (!acasa || !birouIntrare || !faq) {
 }
 const birou = birouIntrare.data;
 const a = acasa.data;
+/** Fotografia din hero: una singură, din pagina română (și pentru /en/); textul alternativ e al fiecărei limbi. */
+const acasaRo = locale === 'ro' ? acasa : await getEntry('acasa', 'ro/acasa');
+const heroImagine = acasaRo?.data.hero.imagine;
 
 let servicii: ServiciuRand[];
 let serviciiDraft: boolean;
@@ -72,7 +75,15 @@ const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.notar), ...hero, 
 ---
 
 <BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg}>
-  <HeroAcasa locale={locale} birou={birou} titlu={a.hero.titlu} subtitlu={a.hero.subtitlu} linie={a.hero.linie}>
+  <HeroAcasa
+    locale={locale}
+    birou={birou}
+    titlu={a.hero.titlu}
+    subtitlu={a.hero.subtitlu}
+    linie={a.hero.linie}
+    imagine={heroImagine}
+    imagineAlt={a.hero.imagineAlt}
+  >
     <DraftBadge locale={locale} intrare={acasa} />
   </HeroAcasa>
   <FrazeSticky locale={locale} fraze={a.fraze} />
