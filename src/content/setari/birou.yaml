@@ -1,6 +1,7 @@
 # Datele biroului. Se editează din panoul de administrare (Pages CMS) → „Setări birou”.
 denumire: "Birou Individual Notarial Bojan Elena Luminița"
 notar: "Bojan Elena Luminița"
+cif: "RO19608590"                   # codul fiscal, ca în politica de confidențialitate
 adresa:
   strada: "Bulevardul Griviței nr. 64, bl. 5, ap. 3"
   oras: "Brașov"

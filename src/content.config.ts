@@ -86,6 +86,8 @@ const birou = defineCollection({
   schema: z.object({
     denumire: z.string().min(1),
     notar: z.string().min(1),
+    /** Codul de identificare fiscală, afișat în subsol (rândul legal). Gol: nu se afișează. */
+    cif: z.string().optional(),
     adresa: z.object({
       strada: z.string().min(1),
       oras: z.string().min(1),
