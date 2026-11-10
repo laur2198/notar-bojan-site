@@ -1,11 +1,13 @@
 /**
  * Imaginea Open Graph implicită (1200×630), generată la build, câte una pe limbă:
- * /og/ro.png și /og/en.png. Fundal ink, numele notarului cu majuscule (ca în wordmark),
- * alb, „Notar public în Brașov” dedesubt și denumirea biroului jos, în muted-dark.
+ * /og/ro.png și /og/en.png. Pe paleta monocromă (CLAUDE.md §5), în spiritul hero-ului din
+ * prototip: fundal ink; sus „Notar public în Brașov” (Geist, paper); jos denumirea biroului
+ * (Geist, muted-dark), o linie fină și numele notarului mare (Funnel Display 600, spațiere
+ * negativă, ca wordmark-ul), cât de mare încape pe lățime.
  *
  * Desenată cu `sharp` (vine cu Astro, e motorul lui de imagini; nu e o dependență nouă) și cu
- * fonturile Inter din src/assets/og/ (vezi README-ul de acolo). Pagina Acasă folosește
- * fotografia din hero, dacă există (src/lib/og.ts).
+ * fonturile din src/assets/og/ (TTF statice derivate din pachetele Fontsource, vezi README-ul de
+ * acolo). Pagina Acasă folosește fotografia din hero, dacă există (src/lib/og.ts).
  */
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -23,14 +25,27 @@ const FONTURI = resolve(process.cwd(), 'src/assets/og');
 /** Escapare pentru marcajul Pango (textul vine din conținut). */
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-/** Un rând de text, ca PNG transparent, cu fontul dat; se micșorează dacă depășește `latimeMax`. */
-async function rand(text: string, fisierFont: string, familie: string, marime: number, culoareText: string, latimeMax: number) {
+interface Font {
+  fisier: string;
+  familie: string;
+}
+
+const DISPLAY: Font = { fisier: 'FunnelDisplay-SemiBold.ttf', familie: 'Funnel Display OG SemiBold' };
+const TEXT: Font = { fisier: 'Geist-Regular.ttf', familie: 'Geist OG' };
+
+/**
+ * Un rând de text, ca PNG transparent; se micșorează (pas 4 px) până încape în `latimeMax`.
+ * `spatiere` e letter-spacing în em (negativ = mai strâns), ca în CSS.
+ */
+async function rand(text: string, font: Font, marime: number, culoareText: string, latimeMax: number, spatiere = 0) {
   for (let m = marime; m >= 24; m -= 4) {
+    // Pango: letter_spacing în 1/1024 dintr-un punct; la dpi 72, 1 pt = 1 px.
+    const ls = Math.round(spatiere * m * 1024);
     const { data, info } = await sharp({
       text: {
-        text: `<span foreground="${culoareText}">${escape(text)}</span>`,
-        font: `${familie} ${m}`,
-        fontfile: resolve(FONTURI, fisierFont),
+        text: `<span foreground="${culoareText}" letter_spacing="${ls}">${escape(text)}</span>`,
+        font: `${font.familie} ${m}`,
+        fontfile: resolve(FONTURI, font.fisier),
         rgba: true,
         dpi: 72,
       },
@@ -46,31 +61,25 @@ export const GET: APIRoute = async ({ params }) => {
   const locale = params.limba as Locale;
   const birou = await getBirou();
   // Fonturile trebuie să existe: fără ele, textul ar ieși cu pătrățele pe serverul de build.
-  await Promise.all(['Inter-Bold.otf', 'Inter-Regular.otf'].map((f) => readFile(resolve(FONTURI, f))));
+  await Promise.all([DISPLAY, TEXT].map((f) => readFile(resolve(FONTURI, f.fisier))));
 
-  const margine = 88;
+  const margine = 72;
   const latimeText = LATIME_OG - 2 * margine;
-  const alb = culoare('c-paper');
-  const nume = await rand(birou.notar.toLocaleUpperCase('ro'), 'Inter-Bold.otf', 'Inter Bold', 76, alb, latimeText);
-  const subtitlu = await rand(t(locale, 'og.subtitlu'), 'Inter-Regular.otf', 'Inter', 44, alb, latimeText);
-  const denumire = await rand(birou.denumire, 'Inter-Regular.otf', 'Inter', 28, culoare('c-muted-dark'), latimeText);
+  const subtitlu = await rand(t(locale, 'og.subtitlu'), TEXT, 40, culoare('c-paper'), latimeText);
+  const denumire = await rand(birou.denumire, TEXT, 28, culoare('c-muted-dark'), latimeText);
+  const nume = await rand(birou.notar, DISPLAY, 160, culoare('c-paper'), latimeText, -0.04);
 
-  // Bloc centrat vertical: linie de accent, nume, subtitlu; denumirea biroului jos.
-  const linie = { latime: 96, inaltime: 6 };
-  const spatiu = 28;
-  const inaltimeBloc = linie.inaltime + spatiu + nume.inaltime + 12 + subtitlu.inaltime;
-  let y = Math.round((INALTIME_OG - inaltimeBloc) / 2) - 24;
-  const straturi: OverlayOptions[] = [];
+  // Sus: subtitlul. Jos, de jos în sus: numele, linia fină, denumirea biroului.
+  const straturi: OverlayOptions[] = [{ input: subtitlu.data, top: margine, left: margine }];
+  const yNume = INALTIME_OG - margine - nume.inaltime + Math.round(nume.inaltime * 0.12);
+  const yLinie = yNume - 20;
+  straturi.push({ input: nume.data, top: yNume, left: margine - Math.round(nume.inaltime * 0.03) });
   straturi.push({
-    input: { create: { width: linie.latime, height: linie.inaltime, channels: 4, background: culoare('c-muted-dark') } },
-    top: y,
+    input: { create: { width: latimeText, height: 2, channels: 4, background: culoare('c-line-dark') } },
+    top: yLinie,
     left: margine,
   });
-  y += linie.inaltime + spatiu;
-  straturi.push({ input: nume.data, top: y, left: margine });
-  y += nume.inaltime + 12;
-  straturi.push({ input: subtitlu.data, top: y, left: margine });
-  straturi.push({ input: denumire.data, top: INALTIME_OG - margine + 20 - denumire.inaltime, left: margine });
+  straturi.push({ input: denumire.data, top: yLinie - 16 - denumire.inaltime, left: margine });
 
   const png = await sharp({ create: { width: LATIME_OG, height: INALTIME_OG, channels: 3, background: culoare('c-ink') } })
     .composite(straturi)
