@@ -1,7 +1,7 @@
 ---
 /**
- * Secțiunea finală (CLAUDE.md §5): fundal wood-800, text alb, butonul inversat
- * (fundal alb, text wood-800) și telefonul mare, clicabil. Fără roșu pe wood.
+ * Secțiunea finală (CLAUDE.md §5): fundal ink, text alb, butonul inversat
+ * (fundal alb, text ink) și telefonul mare, clicabil. Fără accent colorat.
  */
 import { cale, t, type Locale } from '../i18n';
 import { linkTelefon } from '../lib/contact';
@@ -19,7 +19,7 @@ interface Props {
 const { locale, birou, titlu, text } = Astro.props;
 ---
 
-<Sectiune id="final" ton="wood" centrat titlu={titlu} introHtml={marcheazaPlaceholder(text)}>
+<Sectiune id="final" ton="inchis" centrat titlu={titlu} introHtml={marcheazaPlaceholder(text)}>
   <div class="cta">
     <a class="btn btn--invers" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
     <TelefonLink locale={locale} telefon={linkTelefon(birou)} class="cta__telefon" />

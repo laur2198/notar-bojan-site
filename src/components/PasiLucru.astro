@@ -1,7 +1,7 @@
 ---
 /**
- * „Cum lucrăm”: pașii ca listă ordonată. Numerele 700, bordo, într-un cerc subțire bordo;
- * pe desktop, o linie bordo leagă cercurile (decorativă). Cercul are fundalul secțiunii
+ * „Cum lucrăm”: pașii ca listă ordonată. Numerele 700, ink, într-un cerc subțire ink;
+ * pe desktop, o linie ink leagă cercurile (decorativă). Cercul are fundalul secțiunii
  * (`fundal`), ca să acopere capătul liniei.
  */
 interface Props {
@@ -29,7 +29,7 @@ const { pasi, fundal = 'alb' } = Astro.props;
 <style>
   .pasi {
     --cerc: var(--space-5);
-    --pasi-fundal: var(--c-white);
+    --pasi-fundal: var(--c-paper);
 
     display: grid;
     gap: var(--space-5);
@@ -38,7 +38,7 @@ const { pasi, fundal = 'alb' } = Astro.props;
   }
 
   .pasi--gri {
-    --pasi-fundal: var(--c-gray-50);
+    --pasi-fundal: var(--c-paper-2);
   }
 
   @media (min-width: 64rem) {
@@ -65,8 +65,8 @@ const { pasi, fundal = 'alb' } = Astro.props;
     height: var(--cerc);
     margin-bottom: var(--space-1);
     background: var(--pasi-fundal);
-    color: var(--c-red-700);
-    border: 1.5px solid var(--c-red-700);
+    color: var(--c-ink);
+    border: 1.5px solid var(--c-ink);
     border-radius: var(--radius-pill);
     font-size: var(--fs-lg);
     font-weight: 700;
@@ -82,7 +82,7 @@ const { pasi, fundal = 'alb' } = Astro.props;
       left: calc(var(--cerc) + var(--space-2));
       right: calc(-1 * var(--space-4) + var(--space-2));
       height: 1px;
-      background: var(--c-red-700);
+      background: var(--c-ink);
     }
   }
 
@@ -91,6 +91,6 @@ const { pasi, fundal = 'alb' } = Astro.props;
   }
 
   .pas__text {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 </style>

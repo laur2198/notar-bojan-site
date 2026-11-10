@@ -1,7 +1,7 @@
 ---
 /**
- * Secțiune de pagină cu ritm vertical comun (CLAUDE.md §5): fundal alb, gri (gray-50)
- * sau wood (wood-800), padding sus/jos din `--section-y` (sau `--section-y-sm`).
+ * Secțiune de pagină cu ritm vertical comun (CLAUDE.md §5): fundal alb, gri (paper-2)
+ * sau închis (ink), padding sus/jos din `--section-y` (sau `--section-y-sm`).
  * Titlul e mereu `h2` (fără eyebrow deasupra). Totul se calibrează din tokens.css.
  */
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
   titluId?: string;
   /** Intro sub titlu, ca HTML sigur (deja trecut prin `marcheazaPlaceholder`). */
   introHtml?: string;
-  ton?: 'alb' | 'gri' | 'wood';
+  ton?: 'alb' | 'gri' | 'inchis';
   centrat?: boolean;
   compact?: boolean;
   /** Fără padding sus (secțiune care continuă vizual pe cea de deasupra). */
@@ -37,7 +37,7 @@ const {
   class:list={[
     'sectiune',
     `sectiune--${ton}`,
-    { 'sectiune--centrata': centrat, 'sectiune--compacta': compact, 'sectiune--continuare': continuare, 'pe-inchis': ton === 'wood' },
+    { 'sectiune--centrata': centrat, 'sectiune--compacta': compact, 'sectiune--continuare': continuare, 'pe-inchis': ton === 'inchis' },
     clasa,
   ]}
   aria-labelledby={titlu ? titluId : undefined}
@@ -69,20 +69,20 @@ const {
   }
 
   .sectiune--alb {
-    background: var(--c-white);
+    background: var(--c-paper);
   }
 
   .sectiune--gri {
-    background: var(--c-gray-50);
+    background: var(--c-paper-2);
   }
 
-  .sectiune--wood {
-    background: var(--c-wood-800);
-    color: var(--c-white);
+  .sectiune--inchis {
+    background: var(--c-ink);
+    color: var(--c-paper);
   }
 
-  .sectiune--wood :global(h2) {
-    color: var(--c-white);
+  .sectiune--inchis :global(h2) {
+    color: var(--c-paper);
   }
 
   .sectiune__antet {
@@ -94,11 +94,11 @@ const {
   }
 
   .sectiune__intro {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
-  .sectiune--wood .sectiune__intro {
-    color: var(--c-gray-200);
+  .sectiune--inchis .sectiune__intro {
+    color: var(--c-muted-dark);
   }
 
   .sectiune--centrata .sectiune__antet {

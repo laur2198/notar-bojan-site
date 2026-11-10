@@ -1,0 +1,51 @@
+---
+/**
+ * Wordmark-ul gigant din prototip (docs/design-v2/prototip-acasa.html, `.wordmark`): numele
+ * notarului pe un singur rând, pe toată lățimea containerului părinte. Decorativ (aria-hidden):
+ * numele apare ca text în altă parte a paginii.
+ *
+ * Doar CSS: părintele (.wordmark-gigant) e container de dimensiune (container-type: inline-size),
+ * iar mărimea fontului = 100cqi / --wordmark-k, unde k e lățimea textului în em, măsurată cu
+ * fontul încărcat (Funnel Display 600, letter-spacing -0.055em; tokens.css). Fără JS, fără
+ * salt de layout după încărcarea fontului (lățimea cutiei e fixă; se schimbă doar glifele).
+ * Abaterea față de lățimea containerului se verifică în /stil/ (scripts/verifica-wordmark.mjs).
+ */
+interface Props {
+  /** Textul: numele notarului, din src/content/setari/birou.yaml. */
+  text: string;
+  class?: string;
+}
+
+const { text, class: clasa } = Astro.props;
+---
+
+<div class:list={['wordmark-gigant', clasa]} aria-hidden="true">
+  <span class="wordmark-gigant__text" data-wordmark-gigant>{text}</span>
+</div>
+
+<style>
+  .wordmark-gigant {
+    container-type: inline-size;
+    width: 100%;
+  }
+
+  .wordmark-gigant__text {
+    display: block;
+    width: max-content;
+    font-family: var(--font-display);
+    font-weight: var(--fw-wordmark);
+    /* Fără container queries: lățimea ferestrei minus marginile containerului (aproximare). */
+    font-size: calc((100vw - 2 * var(--gutter)) / var(--wordmark-k));
+    line-height: var(--lh-wordmark);
+    letter-spacing: var(--ls-wordmark);
+    white-space: nowrap;
+    /* Spațiu sub linia de bază pentru descendente (ț, j), ca în prototip. */
+    padding-bottom: 0.12em;
+  }
+
+  @supports (width: 1cqi) {
+    .wordmark-gigant__text {
+      font-size: calc(100cqi / var(--wordmark-k));
+    }
+  }
+</style>

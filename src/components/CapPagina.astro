@@ -1,0 +1,18 @@
+---
+/**
+ * Scriptul sincron din <head> (src/scripts/cap-pagina.js): clasele `js`, `miscare` și
+ * `cu-intro` pe <html>, înainte de primul paint. Se pune în <head>, înaintea foilor de stil.
+ * Fișier extern servit din /_astro/ (CSP: script-src 'self'), nu inline și nu modul (modulele
+ * sunt amânate și ar rula după primul paint).
+ */
+import scriptCap from '../scripts/cap-pagina.js?url';
+
+interface Props {
+  /** `manual`: intro-ul nu pornește singur (doar din buton sau cu #intro în adresă). */
+  intro?: 'automat' | 'manual';
+}
+
+const { intro = 'automat' } = Astro.props;
+---
+
+<script is:inline src={scriptCap} data-pornire-intro={intro}></script>

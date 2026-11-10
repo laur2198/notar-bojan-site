@@ -14,7 +14,7 @@ interface Props {
   ton?: 'deschis' | 'inchis';
   /** Titlul tabelului vizibil (implicit doar pentru cititoare de ecran). */
   captionVizibil?: boolean;
-  /** Fără borduri, ziua bold, „Închis” în accentul bordo (banda de pe Acasă). */
+  /** Fără borduri, ziua bold, „Închis” în ink (banda de pe Acasă). */
   simplu?: boolean;
   /** Text de 16 px și rânduri mai strânse (footer). */
   compact?: boolean;
@@ -84,7 +84,7 @@ const ore = (zi: ZiProgram) =>
     padding: calc(var(--space-1) * 0.7) 0;
     text-align: left;
     font-weight: 400;
-    border-bottom: 1px solid var(--c-gray-200);
+    border-bottom: 1px solid var(--c-line);
   }
 
   td {
@@ -103,7 +103,7 @@ const ore = (zi: ZiProgram) =>
     font-weight: 700;
   }
 
-  /* Varianta simplă: fără borduri, ziua bold stânga, orele dreapta, „Închis” bordo (7.47:1 pe gray-50). */
+  /* Varianta simplă: fără borduri, ziua bold stânga, orele dreapta, „Închis” în muted. */
   .program--simplu {
     max-width: none;
   }
@@ -118,7 +118,7 @@ const ore = (zi: ZiProgram) =>
   }
 
   .program--simplu .program__inchis {
-    color: var(--c-red-700);
+    color: var(--c-muted);
     font-weight: 600;
   }
 

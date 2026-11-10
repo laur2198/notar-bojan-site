@@ -42,7 +42,7 @@ const { locale, titluId, randuri } = Astro.props;
   .onorarii {
     width: 100%;
     border-collapse: collapse;
-    background: var(--c-white);
+    background: var(--c-paper);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     overflow: hidden;
@@ -53,12 +53,12 @@ const { locale, titluId, randuri } = Astro.props;
     padding: var(--space-2) var(--space-3);
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid var(--c-gray-200);
+    border-bottom: 1px solid var(--c-line);
   }
 
   thead th {
-    background: var(--c-gray-50);
-    color: var(--c-gray-900);
+    background: var(--c-paper-2);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 700;
   }
@@ -78,7 +78,7 @@ const { locale, titluId, randuri } = Astro.props;
     align-items: center;
     min-height: 48px;
     margin-block: calc(-1 * var(--space-1));
-    color: var(--c-wood-900);
+    color: var(--c-ink);
   }
 
   /* Mobil: fiecare rând e o pereche, una sub alta; antetul rămâne pentru cititoarele de ecran. */
@@ -103,7 +103,7 @@ const { locale, titluId, randuri } = Astro.props;
 
     tbody tr {
       padding: var(--space-2);
-      border-bottom: 1px solid var(--c-gray-200);
+      border-bottom: 1px solid var(--c-line);
     }
 
     tbody tr:last-child {

@@ -2,7 +2,7 @@
 /**
  * Caseta „Pregătiți dosarul” de pe pagina de serviciu (CLAUDE.md §8): butonul „Trimiteți
  * actele pe email” (mailto: cu subiect și corp precompletat) sus, apoi durata, onorariul,
- * actele necesare (bife bordo, nu checkbox-uri), programarea și telefonul.
+ * actele necesare (bife ink, nu checkbox-uri), programarea și telefonul.
  * Card alb, radius-lg, umbră; sticky pe desktop (poziționarea o dă pagina).
  *
  * Dacă `emailActe` nu e completat (doar în preview), butonul rămâne vizibil, fără `href`,
@@ -104,7 +104,7 @@ const telefon = linkTelefon(birou);
     display: grid;
     gap: var(--space-2);
     padding: var(--space-3);
-    background: var(--c-white);
+    background: var(--c-paper);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
   }
@@ -123,20 +123,20 @@ const telefon = linkTelefon(birou);
     display: grid;
     gap: var(--space-2);
     padding-block: var(--space-2);
-    border-block: 1px solid var(--c-gray-200);
+    border-block: 1px solid var(--c-line);
   }
 
   .dosar__fapt dt {
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    color: var(--c-gray-900);
+    color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 700;
   }
 
   .dosar__fapt dt :global(.iconita) {
-    color: var(--c-wood-800);
+    color: var(--c-ink);
   }
 
   .dosar__fapt dd {
@@ -163,16 +163,16 @@ const telefon = linkTelefon(birou);
     max-width: none;
   }
 
-  /* Bifa bordo: decorativă, lista e o listă obișnuită (nu checkbox-uri). */
+  /* Bifa ink: decorativă, lista e o listă obișnuită (nu checkbox-uri). */
   .dosar__acte :global(.dosar__bifa) {
     margin-top: calc(var(--space-1) / 4);
-    color: var(--c-red-700);
+    color: var(--c-ink);
     stroke-width: 2.5;
   }
 
   .dosar__nota,
   .dosar__mic {
-    color: var(--c-gray-600);
+    color: var(--c-muted);
     font-size: var(--fs-sm);
   }
 
@@ -185,7 +185,7 @@ const telefon = linkTelefon(birou);
   .dosar__actiuni {
     margin-top: var(--space-1);
     padding-top: var(--space-2);
-    border-top: 1px solid var(--c-gray-200);
+    border-top: 1px solid var(--c-line);
   }
 
   .dosar__trimite .btn,

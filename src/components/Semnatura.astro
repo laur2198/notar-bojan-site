@@ -1,0 +1,66 @@
+---
+/**
+ * Semnătura decorativă (aria-hidden): src/assets/semnatura.svg, făcut manual, inclus ca atare
+ * (nu se regenerează). O singură linie cu stroke: literele din Mr De Haviland și un gest abstract
+ * pentru mâini (vezi docs/licente.md). Culoarea e currentColor: o dă textul containerului
+ * (ink pe deschis, paper pe închis), ca în prototip.
+ *
+ * Desenul: stroke-dashoffset 100 → 0 pe fiecare path (pathLength="100", dasharray 100 101),
+ * strict secvențial de la stânga la dreapta, pe intervale consecutive proporționale cu data-len
+ * (calculate la build cu src/lib/semnatura-stroke.ts, scrise pe path-uri ca data-a / data-b).
+ * Scriptul de desen e src/scripts/desen-semnatura.ts; cine îl folosește decide când pornește.
+ *
+ * Starea din HTML e cea finală: dashoffset 0, semnătura completă. Fără JS și la
+ * prefers-reduced-motion rămâne așa.
+ *
+ * Id-urile din SVG (dacă desenul le are) se prefixează cu `semnatura-{id}-`, ca semnătura să
+ * poată apărea de mai multe ori în aceeași pagină.
+ */
+import svgSemnatura from '../assets/semnatura.svg?raw';
+import { adaugaIntervale, citesteSemnatura, prefixeazaId } from '../lib/semnatura';
+import { intervaleStroke } from '../lib/semnatura-stroke';
+
+interface Props {
+  /** Identificator unic în pagină (prefixul id-urilor și valoarea lui data-semnatura). */
+  id: string;
+  class?: string;
+}
+
+const { id, class: clasa } = Astro.props;
+const { viewBox, latime, inaltime, grosime, interior, lungimi } = citesteSemnatura(svgSemnatura);
+const continut = prefixeazaId(adaugaIntervale(interior, intervaleStroke(lungimi)), `semnatura-${id}-`);
+---
+
+<svg
+  class:list={['semnatura', clasa]}
+  data-semnatura={id}
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={viewBox}
+  width={latime}
+  height={inaltime}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={grosime}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  set:html={continut}
+/>
+
+<style>
+  .semnatura {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+  }
+
+  /* Starea din HTML: desenată complet. Scriptul pune dashoffset-ul la 101 doar când animă. */
+  .semnatura :global(path[data-a]) {
+    stroke-dasharray: 100 101;
+    stroke-dashoffset: 0;
+  }
+</style>

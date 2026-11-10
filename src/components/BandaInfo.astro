@@ -1,7 +1,7 @@
 ---
 /**
  * Banda de informații practice (CLAUDE.md §5, elementul preluat de la referință):
- * pe gray-50, trei coloane egale (stivuite pe mobil). Fiecare coloană: titlu (h2 cu
+ * pe paper-2, trei coloane egale (stivuite pe mobil). Fiecare coloană: titlu (h2 cu
  * mărime de h3), conținut, iar dedesubt un buton secundar centrat.
  *
  * 1. Biroul notarial: textul despre locație, adresa, „Cum ajungeți” (Google Maps).
@@ -140,7 +140,7 @@ const dateZileLibere = JSON.stringify({
 <style>
   .banda {
     padding-block: var(--section-y-sm);
-    background: var(--c-gray-50);
+    background: var(--c-paper-2);
   }
 
   .banda__grila {
@@ -189,7 +189,7 @@ const dateZileLibere = JSON.stringify({
 
   .banda__adresa :global(.banda__iconita) {
     margin-top: calc(var(--space-1) / 4);
-    color: var(--c-red-700);
+    color: var(--c-ink);
   }
 
   .banda__continut :global(.banda__stare) {
@@ -200,8 +200,8 @@ const dateZileLibere = JSON.stringify({
     display: grid;
     gap: calc(var(--space-1) / 2);
     padding: var(--space-1) var(--space-2);
-    border-left: 3px solid var(--c-red-700);
-    background: var(--c-white);
+    border-left: 3px solid var(--c-ink);
+    background: var(--c-paper);
     border-radius: var(--radius);
     font-weight: 600;
   }
@@ -215,7 +215,7 @@ const dateZileLibere = JSON.stringify({
   }
 
   .banda--alb {
-    background: var(--c-white);
+    background: var(--c-paper);
   }
 
   .banda__adresa :global(address) {

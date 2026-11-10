@@ -1,22 +1,36 @@
 ---
 /**
  * /stil/ – ghid de stil intern (noindex, exclus din sitemap), generat doar în preview: în
- * producție nu există (getStaticPaths întoarce o listă goală), ca site-ul public să nu conțină
- * mostrele de marcaje și etichete.
- * Culorile se citesc din src/styles/tokens.css, deci rapoartele de contrast
- * sunt calculate din valorile reale, la fiecare build.
+ * producție nu există (getStaticPaths întoarce o listă goală).
+ *
+ * Design v2, V1 (CLAUDE.md §5): arată DOAR fundația din prototip (docs/design-v2/prototip-acasa.html):
+ * tokenurile de culoare cu contrastele lor, scara tipografică (cu wordmark-ul gigant), granulația,
+ * semnătura, intro-ul (pornit doar din buton sau cu #intro) și helperii de mișcare.
+ * Secțiunile paginii Acasă nu se portează aici.
+ *
+ * Culorile și mărimile se citesc din src/styles/tokens.css (src/lib/tokens.ts), deci rapoartele de
+ * contrast și mărimile în px sunt calculate din valorile reale, la fiecare build. Build-ul eșuează
+ * dacă o pereche pică WCAG AA, inclusiv în cazul cel mai defavorabil al granulației.
  */
 import type { GetStaticPaths } from 'astro';
 import '../styles/global.css';
+import CapPagina from '../components/CapPagina.astro';
+import IntroSemnatura from '../components/IntroSemnatura.astro';
+import Semnatura from '../components/Semnatura.astro';
+import WordmarkGigant from '../components/WordmarkGigant.astro';
+import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
+import { estePreview, getBirou } from '../lib/continut';
+import { culoare, culori, marimePx, numarToken } from '../lib/tokens';
 
 export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } }] : [])) satisfies GetStaticPaths;
-import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
-import { estePreview, marcheazaPlaceholder } from '../lib/continut';
-import { culoare, culori, marimeMaximaPx } from '../lib/tokens';
+
+const birou = await getBirou();
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
+/** Opacitatea granulației: zgomot negru, alfa maxim .06 (tokens.css, --granulatie). */
+const GRANULATIE = 0.06;
 
-/** Amestec sRGB, ca `color-mix(in srgb, a, b p%)` din CSS (hover-ul butonului secundar). */
+/** Amestec sRGB, ca `color-mix(in srgb, a, b p%)` din CSS. */
 const amesteca = (a: string, b: string, p: number) =>
   '#' +
   [1, 3, 5]
@@ -25,15 +39,20 @@ const amesteca = (a: string, b: string, p: number) =>
     .join('')
     .toUpperCase();
 
+/** O culoare sub pixelul cel mai închis al granulației (negru la opacitatea maximă). */
+const subGranulatie = (h: string) => amesteca(h, '#000000', GRANULATIE);
+
 const hex = (token: string) => {
   if (token === 'mark') return MARK_FUNDAL;
-  if (token === 'hover-secundar') return amesteca(culoare('c-gray-200'), culoare('c-gray-900'), 0.1);
-  // Alb 90% peste fundalul hero-ului (wood-900).
-  if (token === 'hero-subtitlu') return amesteca(culoare('c-wood-900'), culoare('c-white'), 0.9);
+  // Alb 90% peste fundalul închis (subtitlul din hero).
+  if (token === 'hero-subtitlu') return amesteca(culoare('c-ink'), culoare('c-paper'), 0.9);
   const tokenCuloare = culori[token];
   if (!tokenCuloare) throw new Error(`Tokenul --${token} lipsește din tokens.css.`);
   return tokenCuloare.hex;
 };
+
+const numeCuloare = (token: string) =>
+  token === 'mark' ? 'mark.todo' : token === 'hero-subtitlu' ? 'paper 90% pe ink' : `--${token}`;
 
 interface Pereche {
   fata: string;
@@ -44,73 +63,34 @@ interface Pereche {
 }
 
 const perechi: Pereche[] = [
-  { fata: 'c-gray-900', fundal: 'c-white', uz: 'text', folosire: 'Text principal pe fundalul paginii' },
-  { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Text principal pe secțiunile alternante' },
-  { fata: 'c-wood-900', fundal: 'c-white', uz: 'text', folosire: 'Titluri pe fundalul paginii' },
-  { fata: 'c-wood-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Titluri pe secțiunile alternante' },
-  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Text secundar pe fundalul paginii' },
-  { fata: 'c-gray-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Text secundar pe secțiunile alternante' },
-  { fata: 'c-wood-600', fundal: 'c-white', uz: 'text', folosire: 'Text secundar cald și iconițe' },
-  { fata: 'c-wood-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Text secundar cald și iconițe pe secțiunile alternante' },
-  { fata: 'c-wood-800', fundal: 'c-white', uz: 'text', folosire: 'Linkuri; textul și conturul butonului secundar; textul butonului inversat' },
-  { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'text', folosire: 'Butonul secundar la hover; textul butonului inversat la hover' },
-  { fata: 'c-white', fundal: 'c-wood-800', uz: 'text', folosire: 'Butonul primar; textul din header și din secțiunea finală' },
-  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Butonul primar la hover; titlul și textul din hero (fără fotografie)' },
-  { fata: 'c-gray-200', fundal: 'c-wood-800', uz: 'text', folosire: 'Text secundar din header („Notar public · Brașov”)' },
-  { fata: 'c-gray-200', fundal: 'c-wood-900', uz: 'text', folosire: 'Eticheta „Fotografie clădire/birou – de completat” din hero' },
-  { fata: 'hero-subtitlu', fundal: 'c-wood-900', uz: 'text', folosire: 'Subtitlul din hero (alb 90%)' },
+  { fata: 'c-ink', fundal: 'c-paper', uz: 'text', folosire: 'Text principal și titluri; linkuri; textul butonului secundar și al celui inversat' },
+  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'text', folosire: 'Text pe secțiunile alternante și în footer; butonul secundar și cel inversat la hover' },
+  { fata: 'c-muted', fundal: 'c-paper', uz: 'text', folosire: 'Text secundar, lead-uri, rezumate; „Închis” (cerc gol, nu culoare)' },
+  { fata: 'c-muted', fundal: 'c-paper-2', uz: 'text', folosire: 'Text secundar pe secțiunile alternante și în footer; „Închis” în bandă' },
+  { fata: 'c-paper', fundal: 'c-ink', uz: 'text', folosire: 'Text pe secțiunile închise; textul butonului primar' },
+  { fata: 'c-paper', fundal: 'c-ink-2', uz: 'text', folosire: 'Textul butonului primar la hover' },
+  { fata: 'hero-subtitlu', fundal: 'c-ink', uz: 'text', folosire: 'Subtitlul din hero' },
+  { fata: 'c-muted-dark', fundal: 'c-ink', uz: 'text', folosire: 'Text secundar („stins”) pe închis; „Închis” și butonul inactiv pe închis' },
+  { fata: 'c-ink', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (doar în preview)' },
+  { fata: 'c-ink', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, conturul butonului secundar, iconițe' },
+  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus și iconițe pe secțiunile alternante' },
+  { fata: 'c-paper', fundal: 'c-ink', uz: 'ui', folosire: 'Contur de focus pe închis; conturul butonului cu contur deschis' },
+  { fata: 'c-muted', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul punctat al butonului inactiv și al marcajului' },
+  { fata: 'c-muted-dark', fundal: 'c-ink', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
   {
-    fata: 'c-red-700',
-    fundal: 'c-white',
-    uz: 'text',
-    folosire: 'Accent bordo: linkuri la hover, sublinieri, numerele pașilor, iconițe, „Închis”',
-    nota: 'Doar accent (max. 5–10% din suprafață): nu pe butoane primare, nu ca fundal de secțiune, nu pe text lung.',
-  },
-  { fata: 'c-red-700', fundal: 'c-gray-50', uz: 'text', folosire: 'Accent bordo pe secțiunile alternante' },
-  { fata: 'c-red-800', fundal: 'c-white', uz: 'text', folosire: 'Hover pe elementele bordo' },
-  {
-    fata: 'c-red-700',
-    fundal: 'c-wood-800',
+    fata: 'c-line',
+    fundal: 'c-paper',
     uz: 'decorativ',
-    folosire: 'Bordo pe fundal wood',
-    nota: 'Nu se folosește: contrast prea mic. Pe hero și CTA, linkurile și sublinierile preiau culoarea textului.',
+    folosire: 'Borduri și separatoare pe deschis',
+    nota: 'Doar decorativ: nu delimitează câmpuri de formular sau butoane.',
   },
   {
-    fata: 'c-gray-200',
-    fundal: 'c-white',
+    fata: 'c-line-dark',
+    fundal: 'c-ink',
     uz: 'decorativ',
-    folosire: 'Borduri și separatoare',
-    nota: 'Doar separatoare decorative; nu delimitează câmpuri de formular sau butoane.',
+    folosire: 'Borduri și separatoare pe închis',
+    nota: 'Doar decorativ.',
   },
-  { fata: 'c-focus', fundal: 'c-white', uz: 'ui', folosire: 'Contur de focus pe fundalul paginii' },
-  { fata: 'c-focus', fundal: 'c-gray-50', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
-  { fata: 'c-focus-on-dark', fundal: 'c-wood-800', uz: 'ui', folosire: 'Contur de focus pe header și pe secțiunea finală' },
-  { fata: 'c-focus-on-dark', fundal: 'c-wood-900', uz: 'ui', folosire: 'Contur de focus în hero (fără fotografie)' },
-  {
-    fata: 'c-focus-on-dark',
-    fundal: 'c-white',
-    uz: 'decorativ',
-    folosire: 'wood-300 pe fundal deschis',
-    nota: 'Nu se folosește ca focus sau ca text pe fundal deschis: contrast prea mic. Acolo focusul e --c-focus.',
-  },
-  { fata: 'c-ok', fundal: 'c-white', uz: 'text', folosire: '„Deschis acum” pe fundalul paginii' },
-  { fata: 'c-ok', fundal: 'c-gray-50', uz: 'text', folosire: '„Deschis acum” pe secțiunile alternante' },
-  { fata: 'c-closed', fundal: 'c-white', uz: 'text', folosire: '„Închis” pe fundalul paginii' },
-  { fata: 'c-closed', fundal: 'c-gray-50', uz: 'text', folosire: '„Închis” pe secțiunile alternante' },
-  { fata: 'c-gray-900', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (mark.todo)' },
-  { fata: 'c-gray-900', fundal: 'c-gray-200', uz: 'text', folosire: 'Butonul secundar (fundal gray-200, fără contur)' },
-  { fata: 'c-gray-900', fundal: 'hover-secundar', uz: 'text', folosire: 'Butonul secundar la hover (gray-200 cu 10% gray-900)' },
-  { fata: 'c-gray-900', fundal: 'c-white', uz: 'text', folosire: 'Header-ul alb: meniul, wordmark-ul, telefonul; etichetele barei de jos (14 px, 600)' },
-  { fata: 'c-gray-900', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: titlurile coloanelor și linkurile (16 px)' },
-  { fata: 'c-gray-600', fundal: 'c-gray-50', uz: 'text', folosire: 'Footer-ul: denumirea completă, © și confidențialitatea (16 px)' },
-  { fata: 'c-wood-800', fundal: 'c-gray-50', uz: 'ui', folosire: 'Iconițele din footer (pin, telefon, email)' },
-  { fata: 'c-gray-600', fundal: 'c-white', uz: 'text', folosire: 'Rândul 2 al wordmark-ului (12 px, majuscule); rezumatul cardurilor de serviciu' },
-  { fata: 'c-wood-800', fundal: 'c-white', uz: 'ui', folosire: 'Iconițele line din header și din bara de jos' },
-  { fata: 'c-red-700', fundal: 'c-white', uz: 'ui', folosire: 'Stelele ratingului, cercul „+” din întrebări, linia de accent a cardurilor' },
-  { fata: 'c-red-700', fundal: 'c-gray-50', uz: 'ui', folosire: 'Cercurile și linia dintre pași; iconița adresei din bandă' },
-  { fata: 'c-white', fundal: 'c-wood-900', uz: 'text', folosire: 'Textul din hero (fără fotografie, pe wood-900; cu fotografie, peste overlay-ul wood-900 55%)' },
-  { fata: 'c-wood-300', fundal: 'c-wood-900', uz: 'ui', folosire: 'Conturul butonului primar din hero (ca forma să se vadă pe fundal închis)' },
-  { fata: 'c-gray-600', fundal: 'mark', uz: 'ui', folosire: 'Conturul punctat al marcajului' },
 ];
 
 const ETICHETA_UZ: Record<Uz, string> = {
@@ -120,35 +100,59 @@ const ETICHETA_UZ: Record<Uz, string> = {
   decorativ: 'Decorativ',
 };
 
+/*
+ * Cazul cel mai defavorabil al granulației: stratul închide cu până la 6% pixelii, independent,
+ * deci fie fundalul, fie culoarea din față poate fi mai închisă. Se ia raportul cel mai mic.
+ */
 const randuri = perechi.map((p) => {
-  const raport = raportContrast(hex(p.fata), hex(p.fundal));
-  return { ...p, raport, trece: treceAA(raport, p.uz) };
+  const fata = hex(p.fata);
+  const fundal = hex(p.fundal);
+  const raport = raportContrast(fata, fundal);
+  const cuGranulatie = Math.min(raport, raportContrast(subGranulatie(fata), fundal), raportContrast(fata, subGranulatie(fundal)));
+  return { ...p, raport, cuGranulatie, trece: treceAA(cuGranulatie, p.uz) };
 });
 
 const picate = randuri.filter((r) => !r.trece);
 if (picate.length > 0) {
   throw new Error(
-    `Perechi care pică WCAG AA: ${picate.map((r) => `${r.fata} pe ${r.fundal} (${r.raport.toFixed(2)})`).join(', ')}`,
+    `Perechi care pică WCAG AA: ${picate.map((r) => `${r.fata} pe ${r.fundal} (${r.cuGranulatie.toFixed(2)} cu granulație)`).join(', ')}`,
   );
 }
 
-const DIACRITICE = 'ăâîșțĂÂÎȘȚ';
-const virgula = ['ș', 'ț', 'Ș', 'Ț'].every((c) => DIACRITICE.includes(c));
-const fraSedila = !/[şţŞŢ]/.test(DIACRITICE);
-const coduri = [...'șȘțȚ'].map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`);
+/* Scara tipografică: mărimile evaluate din tokens.css la trei lățimi. */
+const LATIMI = [375, 1280, 1920] as const;
 
-const scara = [
-  { nume: `Titlu h1 (hero, majuscule; max. ${marimeMaximaPx('fs-h1')} px)`, variabila: '--fs-h1', clasa: 'scara-h1 scara-majuscule' },
-  { nume: `Titlu h2 (max. ${marimeMaximaPx('fs-h2')} px)`, variabila: '--fs-h2', clasa: 'scara-h2' },
-  { nume: `Titlu h3 / titluri de coloană (max. ${marimeMaximaPx('fs-h3')} px)`, variabila: '--fs-h3', clasa: 'scara-h3' },
-  { nume: 'Text mare', variabila: '--fs-lg', clasa: 'scara-lg' },
-  { nume: 'Text de bază (18 px)', variabila: '--fs-base', clasa: 'scara-base' },
-  { nume: 'Note, meniu, rezumate (16 px)', variabila: '--fs-sm', clasa: 'scara-sm' },
-  { nume: 'Etichetele barei de jos (14 px)', variabila: '--fs-xs', clasa: 'scara-xs' },
+interface TreaptaScara {
+  nume: string;
+  token: string;
+  clasa: string;
+  din: string;
+  text: string;
+}
+
+const scara: TreaptaScara[] = [
+  { nume: 'Frază mare', token: 'fs-statement', clasa: 'scara-statement', din: 'sticky-el', text: 'Un dosar complet înseamnă o singură vizită.' },
+  { nume: 'Titlu principal (h1)', token: 'fs-h1', clasa: 'scara-h1', din: 'hero__h1', text: 'Acte notariale pregătite din timp.' },
+  { nume: 'Titlu de secțiune', token: 'fs-titlu', clasa: 'scara-titlu', din: 'serv__titlu, faq__titlu', text: 'Succesiune și moștenire' },
+  { nume: 'Titlu h2', token: 'fs-h2', clasa: 'scara-h2', din: 'slogan__text, cta__text', text: 'Aveți alte întrebări? Scrieți-ne.' },
+  { nume: 'Titlu h3, text mare', token: 'fs-h3', clasa: 'scara-h3', din: 'faq__btn, nav__logo', text: 'Ce act de identitate trebuie să am la mine?' },
+  { nume: 'Text de bază', token: 'fs-base', clasa: 'scara-base', din: 'body', text: 'Știința își păstrează însemnătatea: ușa biroului din Brașov se deschide la nouă.' },
+  { nume: 'Note, meniu, butoane', token: 'fs-sm', clasa: 'scara-sm', din: '–', text: 'Lista finală v-o confirmăm după verificarea actelor.' },
+  { nume: 'Etichetele barei de jos (mobil)', token: 'fs-xs', clasa: 'scara-xs', din: '–', text: 'Sunați · Programare' },
 ];
 
-const exempluMarcaj =
-  'Biroul funcționează în Brașov din «DE COMPLETAT: anul». Telefon: «DE COMPLETAT». Textul <b>nu</b> se interpretează ca HTML.';
+const k = numarToken('wordmark-k');
+
+const DIACRITICE = 'ăâîșțĂÂÎȘȚ';
+const virgula = ['ș', 'ț', 'Ș', 'Ț'].every((c) => DIACRITICE.includes(c));
+const faraSedila = !/[şţŞŢ]/.test(DIACRITICE);
+const coduri = [...'șȘțȚ'].map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`);
+
+const fonturi = [
+  { nume: 'Funnel Display', variabila: '--font-display', clasa: 'font-display', uz: 'h1, h2, frazele mari, wordmark-ul', grosimi: [500, 600] },
+  { nume: 'Geist', variabila: '--font-sans', clasa: 'font-sans', uz: 'text, butoane, h3–h4', grosimi: [400, 500, 600] },
+  { nume: 'Geist Mono', variabila: '--font-mono', clasa: 'font-mono', uz: 'etichete mono decorative (numerotare, coduri)', grosimi: [400, 500] },
+];
 ---
 
 <!doctype html>
@@ -156,20 +160,26 @@ const exempluMarcaj =
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <CapPagina intro="manual" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Ghid de stil (uz intern) – Bojan Elena Luminița</title>
+    <title>Ghid de stil (uz intern) – {birou.notar}</title>
   </head>
   <body>
+    <IntroSemnatura />
     <main class="container stil">
       <h1>Ghid de stil</h1>
       <p class="lead">
-        Pagină internă pentru verificarea fundației vizuale. Nu este indexată și nu apare în sitemap. Rapoartele de
-        contrast sunt calculate la build din <code>src/styles/tokens.css</code>; build-ul eșuează dacă o pereche pică
-        WCAG AA.
+        Fundația vizuală a design-ului v2, după prototipul aprobat (<code>docs/design-v2/prototip-acasa.html</code>):
+        tokenurile, scara tipografică, granulația, semnătura, intro-ul și mișcarea la scroll. Pagină internă: nu este
+        indexată și nu apare în sitemap. Contrastele și mărimile sunt calculate la build din <code>src/styles/tokens.css</code>.
       </p>
 
       <section aria-labelledby="paleta">
         <h2 id="paleta">Paleta</h2>
+        <p>
+          Monocromă. Nicio informație nu e purtată doar de culoare: starea „Deschis / Închis” are text și formă
+          (disc plin / cerc gol). Singura culoare din afara paletei e galbenul marcajului «DE COMPLETAT», doar în preview.
+        </p>
         <ul class="paleta" role="list">
           {
             Object.entries(culori).map(([nume, { hex: valoare, comentariu }]) => (
@@ -190,8 +200,9 @@ const exempluMarcaj =
         <h2 id="contrast">Perechi text / fundal folosite</h2>
         <p>
           Praguri WCAG 2.1 AA: {PRAG_AA.text}:1 pentru text normal, {PRAG_AA['text-mare']}:1 pentru text mare și pentru
-          elemente de interfață (contururi, focus). Elementele decorative nu au prag, dar nu pot purta informație.
-          Rapoartele sunt trunchiate, nu rotunjite.
+          elemente de interfață. Coloana „Cu granulație” e cazul cel mai defavorabil: un pixel al stratului de zgomot
+          închide fundalul sau culoarea din față cu {GRANULATIE * 100}%. Pragul se aplică acestei coloane. Rapoartele sunt
+          trunchiate, nu rotunjite.
         </p>
         <div class="tabel-wrap" role="region" aria-labelledby="titlu-tabel-contrast" tabindex="0">
           <table>
@@ -205,6 +216,7 @@ const exempluMarcaj =
                 <th scope="col">Folosire</th>
                 <th scope="col">Uz</th>
                 <th scope="col">Raport</th>
+                <th scope="col">Cu granulație</th>
                 <th scope="col">AA</th>
               </tr>
             </thead>
@@ -213,10 +225,7 @@ const exempluMarcaj =
                 randuri.map((r) => (
                   <tr>
                     <td>
-                      <span
-                        class="exemplu"
-                        style={`color: ${hex(r.fata)}; background-color: ${hex(r.fundal)}`}
-                      >
+                      <span class="exemplu" style={`color: ${hex(r.fata)}; background-color: ${hex(r.fundal)}`}>
                         {r.uz === 'decorativ' || r.uz === 'ui' ? (
                           <span class="exemplu-linie" style={`background-color: ${hex(r.fata)}`} aria-hidden="true" />
                         ) : (
@@ -225,8 +234,7 @@ const exempluMarcaj =
                       </span>
                     </td>
                     <td>
-                      <code>{r.fata === 'hero-subtitlu' ? 'alb 90%' : `--${r.fata}`}</code> pe{' '}
-                      <code>{r.fundal === 'mark' ? 'mark.todo' : r.fundal === 'hover-secundar' ? 'hover (color-mix)' : `--${r.fundal}`}</code>
+                      <code>{numeCuloare(r.fata)}</code> pe <code>{numeCuloare(r.fundal)}</code>
                     </td>
                     <td>
                       {r.folosire}
@@ -234,6 +242,7 @@ const exempluMarcaj =
                     </td>
                     <td>{ETICHETA_UZ[r.uz]}</td>
                     <td class="numar">{formateazaRaport(r.raport)}</td>
+                    <td class="numar">{formateazaRaport(r.cuGranulatie)}</td>
                     <td>{r.uz === 'decorativ' ? 'Fără prag' : r.trece ? 'Trece' : 'Pică'}</td>
                   </tr>
                 ))
@@ -245,93 +254,286 @@ const exempluMarcaj =
 
       <section aria-labelledby="tipografie">
         <h2 id="tipografie">Scara tipografică</h2>
-        <p>Un singur font: Inter (variabil, self-hosted). Titlurile 700. Dimensiunile titlurilor cresc fluid cu lățimea ecranului.</p>
+        <p>
+          Textul de bază crește fluid cu lățimea ecranului, între 18 și 24 px (<code>--fs-base</code>, în rem: respectă
+          mărimea de font aleasă în browser). Titlurile sunt multipli ai lui, cu plafoanele din prototip.
+        </p>
+
+        <h3>Fonturi</h3>
+        <ul class="fonturi" role="list">
+          {
+            fonturi.map((f) => (
+              <li class="font">
+                <p class="font__nume">
+                  {f.nume} <code>{f.variabila}</code>
+                </p>
+                <p class="nota">{f.uz}</p>
+                <p class:list={['font__mostra', f.clasa]}>
+                  {f.grosimi.map((g) => (
+                    <span style={`font-weight: ${g}`}>
+                      {g} Șțăâî ȘȚĂÂÎ
+                    </span>
+                  ))}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h3>Trepte</h3>
+        <div class="tabel-wrap" role="region" aria-labelledby="titlu-tabel-scara" tabindex="0">
+          <table>
+            <caption id="titlu-tabel-scara" class="sr-only">Mărimile tokenurilor de font, în px, la trei lățimi de ecran</caption>
+            <thead>
+              <tr>
+                <th scope="col">Treaptă</th>
+                <th scope="col">Token</th>
+                <th scope="col">Din prototip</th>
+                {LATIMI.map((l) => <th scope="col">{l} px</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                scara.map((s) => (
+                  <tr>
+                    <td>{s.nume}</td>
+                    <td>
+                      <code>--{s.token}</code>
+                    </td>
+                    <td>
+                      <code>{s.din}</code>
+                    </td>
+                    {LATIMI.map((l) => (
+                      <td class="numar">{marimePx(s.token, l)}</td>
+                    ))}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
         <dl class="scara">
           {
             scara.map((s) => (
               <div class="scara-rand">
                 <dt>
-                  {s.nume} <code>{s.variabila}</code>
+                  {s.nume} <code>--{s.token}</code>
                 </dt>
-                <dd class={s.clasa}>Notar public în Brașov</dd>
+                <dd class={s.clasa}>{s.text}</dd>
               </div>
             ))
           }
         </dl>
-        <h3>Grosimi</h3>
-        <p class="grosimi">
-          <span style="font-weight: 400">Normal 400</span>
-          <span style="font-weight: 600">Semibold 600</span>
-          <span style="font-weight: 700">Bold 700</span>
-          <span style="font-weight: 500">Medium 500 (rândul 2 din wordmark)</span>
-        </p>
-      </section>
 
-      <section aria-labelledby="butoane">
-        <h2 id="butoane">Butoane</h2>
+        <h3>Wordmark-ul gigant</h3>
         <p>
-          16 px, 600, înălțime minimă 48 px, padding 12×20. Butoanele din primul rând sunt reale: treceți cu mouse-ul peste ele sau navigați cu
-          tasta Tab. Rândurile următoare arată static stările hover și focus.
+          Funnel Display 600, <code>letter-spacing: -0.055em</code>, <code>line-height: .82</code>. Mărimea = lățimea
+          containerului / {k} (<code>--wordmark-k</code>, lățimea textului în em, măsurată cu fontul încărcat). Doar
+          CSS, prin container queries.
         </p>
-        <h3>Normal</h3>
-        <div class="butoane">
-          <button type="button" class="btn btn--primar">Solicitați o programare</button>
-          <button type="button" class="btn btn--secundar">Sunați: 0268 000 000</button>
+        <div class="wordmark-demo" data-wordmark-container>
+          <WordmarkGigant text={birou.notar} />
         </div>
-        <h3>Hover</h3>
-        <div class="butoane" aria-hidden="true">
-          <span class="btn btn--primar demo-hover-primar">Solicitați o programare</span>
-          <span class="btn btn--secundar demo-hover-secundar">Sunați: 0268 000 000</span>
-        </div>
-        <h3>Focus (tastatură)</h3>
-        <div class="butoane" aria-hidden="true">
-          <span class="btn btn--primar demo-focus">Solicitați o programare</span>
-          <span class="btn btn--secundar demo-focus">Sunați: 0268 000 000</span>
-        </div>
-        <h3>Butonul inversat și focusul pe fundal închis</h3>
-        <div class="panou-inchis pe-inchis">
-          <p>
-            Pe secțiunea finală și în hero (fundaluri wood), conturul de focus devine wood-300
-            (<code>--c-focus-on-dark</code>):
-          </p>
-          <div class="butoane">
-            <button type="button" class="btn btn--invers">Solicitați o programare</button>
-          </div>
-          <div class="butoane" aria-hidden="true">
-            <span class="link-demo demo-focus">Politica de confidențialitate</span>
-            <span class="btn btn--invers demo-focus">Solicitați o programare</span>
-          </div>
-        </div>
-      </section>
 
-      <section aria-labelledby="diacritice">
-        <h2 id="diacritice">Diacritice</h2>
-        <p class="diacritice diacritice--bold">{DIACRITICE}</p>
+        <h3>Diacritice</h3>
+        <p class="diacritice font-display">{DIACRITICE}</p>
         <p class="diacritice">{DIACRITICE}</p>
-        <p class="diacritice diacritice--majuscule">bojan elena luminița · brașov</p>
-        <p>
-          Știința își păstrează însemnătatea: ȘTIINȚĂ, ȚARĂ, ÎNSEMNĂTATE. Ușa biroului din Brașov se deschide la
-          nouă; actele se semnează în fața notarului.
-        </p>
         <p class="nota">
-          Verificare la build: {virgula && fraSedila ? 'ș și ț sunt cu virgulă' : 'EROARE: diacritice cu sedilă'} (
-          {coduri.join(', ')}), nu cu sedilă (U+015F, U+0163).
+          Verificare la build: {virgula && faraSedila ? 'ș și ț sunt cu virgulă' : 'EROARE: diacritice cu sedilă'} (
+          {coduri.join(', ')}), nu cu sedilă (U+015F, U+0163). Toate trei fonturile au aceste glife (latin-ext).
         </p>
       </section>
 
-      <section aria-labelledby="marcaj">
-        <h2 id="marcaj">Marcaj «DE COMPLETAT»</h2>
+      <section aria-labelledby="granulatie">
+        <h2 id="granulatie">Granulația</h2>
         <p>
-          În preview, textele care așteaptă date de la birou apar evidențiate. Exemplu generat cu
-          <code>marcheazaPlaceholder()</code>:
+          Zgomot <code>feTurbulence</code> din prototip, opacitate .06, ca strat fix peste toată pagina, inclusiv peste
+          aceasta. Static: fără animație, la nicio setare (WCAG 2.2.2). Nu interceptează clicuri și nu apare la
+          tipărire sau în modul de contrast ridicat. Mostrele de mai jos sunt mărite de 4 ori, ca textura să se vadă.
         </p>
-        <p class="exemplu-marcaj" set:html={marcheazaPlaceholder(exempluMarcaj)} />
+        <div class="granulatie-mostre">
+          <figure class="granulatie-mostra">
+            <div class="granulatie-marita" aria-hidden="true"></div>
+            <figcaption>Pe <code>--c-paper</code>, mărit 4×</figcaption>
+          </figure>
+          <figure class="granulatie-mostra">
+            <div class="granulatie-marita granulatie-marita--inchis" aria-hidden="true"></div>
+            <figcaption>Pe <code>--c-ink</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section aria-labelledby="semnatura">
+        <h2 id="semnatura">Semnătura</h2>
+        <p>
+          O singură linie cu <code>stroke</code>, culoarea din text (<code>currentColor</code>). Desenul: fiecare traseu
+          are <code>pathLength="100"</code> și se desenează prin <code>stroke-dashoffset</code>, pe rând, de la stânga la
+          dreapta, cu un singur progres pe tot gestul (aceeași metodă ca în prototip). Fără JS și cu mișcare redusă,
+          semnătura apare direct desenată.
+        </p>
+        <div class="semnaturi">
+          <div class="semnatura-panou">
+            <Semnatura id="stil-deschis" />
+          </div>
+          <div class="semnatura-panou semnatura-panou--inchis pe-inchis">
+            <Semnatura id="stil-inchis" />
+          </div>
+        </div>
+        <button type="button" class="btn btn--secundar" data-reda-semnatura hidden>Redă desenul</button>
+      </section>
+
+      <section aria-labelledby="intro">
+        <h2 id="intro">Intro-ul</h2>
+        <p>
+          Ecran complet <code>--c-ink</code>, semnătura în <code>--c-paper</code> se desenează în 1,8 s; după o pauză de
+          0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
+          mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
+        </p>
+        <button type="button" class="btn btn--secundar" data-reda-intro hidden>Redă intro-ul</button>
+        <p class="nota" data-stare-intro aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="miscare">
+        <h2 id="miscare">Mișcarea la scroll</h2>
+        <p>
+          GSAP + ScrollTrigger + SplitText din npm, derulare nativă (fără Lenis). Helperii pe data-atribute, mai jos. Cu
+          mișcare redusă sau fără JS, totul e vizibil din prima, nemișcat.
+        </p>
+        <div class="demo-miscare">
+          <p class="nota"><code>data-reveal</code> pe un titlu (aria-label pe titlu, rândurile aria-hidden):</p>
+          <h3 class="demo-reveal" data-reveal>Acte notariale pregătite din timp, ca la birou să veniți doar pentru semnare.</h3>
+          <p class="nota"><code>data-reveal</code> pe un paragraf (copie sr-only a textului, rândurile aria-hidden):</p>
+          <p class="demo-reveal-p" data-reveal>
+            Pregătim dosarul înainte de programare, ca vizita la birou să fie cât mai scurtă. Verificăm actele și vă spunem
+            din timp ce lipsește.
+          </p>
+          <p class="nota"><code>data-divider</code>:</p>
+          <div class="demo-divider" data-divider aria-hidden="true"></div>
+          <p class="nota"><code>data-parallax="12"</code> (blocul gri se deplasează în cadrul lui la scroll):</p>
+          <div class="demo-parallax-cadru" aria-hidden="true">
+            <div class="demo-parallax" data-parallax="12">
+              <span>Fotografie – de completat</span>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </body>
 </html>
 
+<script>
+  import { deseneazaSemnatura, pregatesteSemnatura } from '../scripts/desen-semnatura';
+
+  /*
+   * Semnăturile se desenează o dată, la prima intrare în ecran, și la „Redă desenul”. La mișcare
+   * redusă nu se animă deloc (rămân desenate, starea din HTML) și butonul rămâne ascuns.
+   */
+  const svguri = [...document.querySelectorAll<SVGSVGElement>('.semnaturi [data-semnatura]')];
+  const buton = document.querySelector<HTMLButtonElement>('[data-reda-semnatura]');
+  const miscareRedusa = matchMedia('(prefers-reduced-motion: reduce)');
+  const opriri = new Map<SVGSVGElement, () => void>();
+
+  const deseneaza = (svg: SVGSVGElement) => {
+    opriri.get(svg)?.();
+    opriri.set(svg, deseneazaSemnatura(svg, 3500));
+  };
+
+  if (!miscareRedusa.matches && 'IntersectionObserver' in window) {
+    for (const svg of svguri) pregatesteSemnatura(svg);
+    const observator = new IntersectionObserver(
+      (intrari) => {
+        for (const intrare of intrari) {
+          if (!intrare.isIntersecting) continue;
+          observator.unobserve(intrare.target);
+          deseneaza(intrare.target as SVGSVGElement);
+        }
+      },
+      { threshold: 0.4 },
+    );
+    for (const svg of svguri) observator.observe(svg);
+    if (buton) {
+      buton.hidden = false;
+      buton.addEventListener('click', () => svguri.forEach(deseneaza));
+    }
+  }
+
+  // Dacă utilizatorul activează mișcarea redusă cât pagina e deschisă: totul desenat, fără buton.
+  miscareRedusa.addEventListener('change', (e) => {
+    if (!e.matches) return;
+    opriri.forEach((opreste) => opreste());
+    if (buton) buton.hidden = true;
+  });
+</script>
+
+<script>
+  import { pornesteMiscarea } from '../scripts/miscare';
+  import { EVENIMENT_GATA, ruleazaIntro } from '../scripts/intro-semnatura';
+
+  pornesteMiscarea();
+
+  // „Redă intro-ul”: vizibil doar cu mișcare permisă (la mișcare redusă intro-ul nu există).
+  const butonIntro = document.querySelector<HTMLButtonElement>('[data-reda-intro]');
+  const stare = document.querySelector<HTMLElement>('[data-stare-intro]');
+  const redus = matchMedia('(prefers-reduced-motion: reduce)');
+  const actualizeazaButon = () => {
+    if (butonIntro) butonIntro.hidden = redus.matches;
+  };
+  actualizeazaButon();
+  redus.addEventListener('change', actualizeazaButon);
+  butonIntro?.addEventListener('click', () => {
+    if (stare) stare.textContent = '';
+    ruleazaIntro();
+  });
+  document.addEventListener(EVENIMENT_GATA, () => {
+    if (stare) stare.textContent = 'Evenimentul intro-gata a fost emis.';
+  });
+</script>
+
 <style>
+  .demo-miscare {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .demo-reveal {
+    font-family: var(--font-display);
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
+    max-width: 18em;
+  }
+
+  .demo-reveal-p {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+    max-width: 24em;
+  }
+
+  .demo-divider {
+    height: 1px;
+    background: var(--c-ink);
+  }
+
+  .demo-parallax-cadru {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 7;
+    border-radius: var(--radius);
+    background: var(--c-paper-2);
+  }
+
+  .demo-parallax {
+    position: absolute;
+    inset: -12% 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(160deg, #e9e9e9 0%, #cfcfcf 100%);
+    color: var(--c-ink);
+  }
+
   .stil {
     padding-block: var(--space-5) var(--space-7);
   }
@@ -342,7 +544,7 @@ const exempluMarcaj =
 
   section {
     padding-top: var(--space-5);
-    border-top: 1px solid var(--c-gray-200);
+    border-top: 1px solid var(--c-line);
     margin-top: var(--space-5);
   }
 
@@ -355,31 +557,30 @@ const exempluMarcaj =
   }
 
   .lead {
-    font-size: var(--fs-lg);
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
   code {
-    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 0.9em;
   }
 
   .nota {
     display: block;
     font-size: var(--fs-sm);
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
   .nota--atentie {
     margin-top: 0.25rem;
-    color: var(--c-wood-800);
+    color: var(--c-ink);
     font-weight: 600;
   }
 
   /* Paleta */
   .paleta {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
     gap: var(--space-2);
     padding: 0;
     list-style: none;
@@ -391,9 +592,9 @@ const exempluMarcaj =
     align-items: flex-start;
     max-width: none;
     padding: var(--space-2);
-    background: var(--c-white);
-    border: 1px solid var(--c-gray-200);
-    border-radius: var(--radius-lg);
+    background: var(--c-paper);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
   }
 
   .mostra {
@@ -401,7 +602,7 @@ const exempluMarcaj =
     width: 3.5rem;
     height: 3.5rem;
     border-radius: var(--radius);
-    box-shadow: inset 0 0 0 1px rgb(43 27 18 / 0.15);
+    box-shadow: inset 0 0 0 1px rgb(15 15 15 / 0.15);
   }
 
   .culoare-text {
@@ -409,10 +610,10 @@ const exempluMarcaj =
   }
 
   .hex {
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
   }
 
-  /* Tabel de contrast */
+  /* Tabele */
   .tabel-wrap {
     overflow-x: auto;
   }
@@ -428,11 +629,11 @@ const exempluMarcaj =
     padding: 0.6rem 0.75rem;
     text-align: left;
     vertical-align: top;
-    border-bottom: 1px solid var(--c-gray-200);
+    border-bottom: 1px solid var(--c-line);
   }
 
   thead th {
-    border-bottom: 2px solid var(--c-wood-800);
+    border-bottom: 2px solid var(--c-ink);
   }
 
   .numar {
@@ -448,7 +649,7 @@ const exempluMarcaj =
     min-height: 2.5rem;
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius);
-    box-shadow: inset 0 0 0 1px rgb(43 27 18 / 0.15);
+    box-shadow: inset 0 0 0 1px rgb(15 15 15 / 0.15);
     font-weight: 600;
     font-size: var(--fs-base);
   }
@@ -460,10 +661,49 @@ const exempluMarcaj =
     border-radius: 2px;
   }
 
-  /* Scara tipografică */
-  .scara {
+  /* Fonturi */
+  .fonturi {
     display: grid;
     gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .font {
+    max-width: none;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .font__nume {
+    font-weight: 600;
+  }
+
+  .font__mostra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    font-size: var(--fs-h3);
+    max-width: none;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Scara tipografică: aceleași familii, grosimi și spațieri ca în prototip */
+  .scara {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
   }
 
   .scara-rand {
@@ -473,53 +713,53 @@ const exempluMarcaj =
 
   .scara dt {
     font-size: var(--fs-sm);
-    color: var(--c-gray-600);
+    color: var(--c-muted);
   }
 
   .scara dd {
     margin: 0;
     max-width: none;
-    line-height: 1.2;
   }
 
-  .diacritice--bold {
-    font-weight: 700;
+  .scara-statement,
+  .scara-h1,
+  .scara-titlu,
+  .scara-h2 {
+    font-family: var(--font-display);
+    font-weight: var(--fw-titlu);
+    text-wrap: balance;
   }
 
-  .diacritice--majuscule {
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .scara-majuscule {
-    text-transform: uppercase;
-  }
-
-  .scara-xs {
-    font-size: var(--fs-xs);
-    line-height: 1.6;
-  }
-
-
-  .font-sans {
-    font-family: var(--font-sans);
+  .scara-statement {
+    font-size: var(--fs-statement);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+    max-width: 17em;
   }
 
   .scara-h1 {
     font-size: var(--fs-h1);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+  }
+
+  .scara-titlu {
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
   }
 
   .scara-h2 {
     font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
   }
 
   .scara-h3 {
     font-size: var(--fs-h3);
-  }
-
-  .scara-lg {
-    font-size: var(--fs-lg);
-    line-height: 1.6;
+    font-weight: var(--fw-titlu);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
   }
 
   .scara-base {
@@ -532,73 +772,80 @@ const exempluMarcaj =
     line-height: 1.6;
   }
 
-  .grosimi {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
+  .scara-xs {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    line-height: 1.6;
   }
 
-  /* Butoane */
-  .butoane {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    align-items: center;
+  .wordmark-demo {
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-top: 1px solid var(--c-ink);
   }
 
-  .demo-hover-primar {
-    --btn-bg: var(--c-wood-900);
-    --btn-border: var(--c-wood-900);
-    text-decoration-line: underline;
-    text-decoration-thickness: 0.08em;
-  }
-
-  .demo-hover-secundar {
-    --btn-bg: var(--c-gray-50);
-    text-decoration-line: underline;
-    text-decoration-thickness: 0.08em;
-  }
-
-  .demo-focus {
-    outline: 3px solid var(--c-focus);
-    outline-offset: 3px;
-  }
-
-  .panou-inchis {
-    padding: var(--space-3);
-    background: var(--c-wood-800);
-    color: var(--c-white);
-    border-radius: var(--radius-lg);
-  }
-
-  .panou-inchis > * + * {
-    margin-top: var(--space-2);
-  }
-
-  .panou-inchis code {
-    color: var(--c-gray-50);
-  }
-
-  .link-demo {
-    color: var(--c-white);
-    text-decoration: underline;
-    text-underline-offset: 0.18em;
-  }
-
-  .pe-inchis .demo-focus {
-    outline-color: var(--c-focus-on-dark);
-  }
-
-  /* Diacritice */
   .diacritice {
     font-size: var(--fs-h2);
     letter-spacing: 0.05em;
   }
 
-  .exemplu-marcaj {
-    padding: var(--space-2);
-    background: var(--c-white);
-    border: 1px solid var(--c-gray-200);
+  /* Granulația, mărită */
+  .granulatie-mostre {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .granulatie-mostra {
+    margin: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .granulatie-marita {
+    height: 12rem;
+    border: 1px solid var(--c-line);
     border-radius: var(--radius);
+    background-color: var(--c-paper);
+    background-image: var(--granulatie);
+    background-size: 640px 640px;
+    image-rendering: pixelated;
+  }
+
+  .granulatie-marita--inchis {
+    background-color: var(--c-ink);
+    border-color: var(--c-line-dark);
+  }
+
+  .granulatie-mostra figcaption {
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  /* Semnătura: aceeași lățime ca în hero-ul din prototip (min(28vw, 26rem)), pe deschis și pe închis */
+  .semnaturi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .semnatura-panou {
+    display: grid;
+    place-items: center;
+    padding: var(--space-4) var(--space-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    background: var(--c-paper);
+    color: var(--c-ink);
+  }
+
+  .semnatura-panou > :global(svg) {
+    width: min(100%, 26rem);
+  }
+
+  .semnatura-panou--inchis {
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-color: var(--c-ink);
   }
 </style>

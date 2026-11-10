@@ -1,31 +1,73 @@
-/* Design tokens – copiate exact din CLAUDE.md §5. Nu se modifică aici fără a modifica CLAUDE.md. */
+/*
+ * Design tokens (CLAUDE.md §5). Sursa valorilor: prototipul aprobat,
+ * docs/design-v2/prototip-acasa.html (:root și mărimile titlurilor). Nu se modifică aici fără a
+ * modifica CLAUDE.md. Culorile trebuie scrise în hex: src/lib/tokens.ts le citește de aici
+ * (theme-color, ghidul /stil/, imaginea OG).
+ */
 :root {
-  /* Culori */
-  --c-wood-900: #2A1A10;  /* titluri, fundalul hero-ului fără fotografie */
-  --c-wood-800: #4A2E1E;  /* culoarea de brand: butoane primare, secțiunea CTA finală */
-  --c-wood-600: #7A5236;  /* text secundar cald, iconițe (6.8:1 pe alb) */
-  --c-wood-300: #C9AE94;  /* decorativ și focus pe fundal închis (5.9:1 pe wood-800) */
-  --c-gray-900: #1F1E1D;  /* text principal (16.6:1 pe alb) */
-  --c-gray-600: #5E5C59;  /* text secundar (6.7:1 pe alb, 6.1:1 pe gray-50) */
-  --c-gray-200: #E2E1DF;  /* borduri, separatoare (doar decorativ) */
-  --c-gray-50:  #F5F5F4;  /* fundal secțiuni alternante */
-  --c-white:    #FFFFFF;  /* fundal pagină */
-  --c-red-700:  #9B1C1C;  /* accent bordo: linii, numere de pași, iconițe, linkuri hover, „Închis” (8.2:1 pe alb, poate fi text) */
-  --c-red-800:  #7A1414;  /* hover pe elementele roșii */
-  --c-focus:    #4A2E1E;  /* contur focus pe fundal deschis, outline-offset 3px */
-  --c-focus-on-dark: #C9AE94; /* contur focus pe wood-800/900 */
-  --c-ok:       #2F6B3A;  /* „Deschis acum” */
-  --c-closed:   #9B1C1C;  /* „Închis” */
+  /* Culori: paleta monocromă din prototip. Contrastele sunt calculate în /stil/ (src/lib/contrast.ts). */
+  --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header) */
+  --c-paper-2:    #F4F4F4;  /* fundal deschis alternant (secțiuni, footer) */
+  --c-ink:        #0F0F0F;  /* text pe deschis (19.4:1 pe alb); fundalul secțiunilor închise; butonul primar */
+  --c-ink-2:      #1A1A1A;  /* hover pe elementele ink */
+  --c-muted:      #5C5C5C;  /* text secundar pe deschis (6.7:1 pe alb, 6.1:1 pe paper-2) */
+  --c-muted-dark: #A3A3A3;  /* text secundar pe închis (7.9:1 pe ink) */
+  --c-line:       #E3E3E3;  /* borduri, separatoare pe deschis (doar decorativ) */
+  --c-line-dark:  #2C2C2C;  /* borduri, separatoare pe închis (doar decorativ) */
 
-  /* Tipografie */
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
-  --fs-base: 1.125rem;   /* 18px */
-  --fs-sm:   1rem;       /* 16px – minim pentru text; excepții doar cele din §4 */
-  --fs-xs:   0.875rem;   /* 14px – doar etichetele barei de jos de pe mobil */
-  --fs-lg:   1.25rem;
-  --fs-h3:   clamp(1.25rem, 1.1rem + 0.4vw, 1.375rem);  /* max. 22px */
-  --fs-h2:   clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);    /* max. 28px */
-  --fs-h1:   clamp(2rem, 1.4rem + 1.8vw, 2.5rem);       /* max. 40px */
+  /*
+   * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
+   * prototip, negru cu alfa = zgomotul, opacitate .06. Stă ca strat fix peste pagină
+   * (body::after, global.css), fără evenimente de pointer. Închide local culorile cu cel mult
+   * 6%; contrastul în cazul cel mai defavorabil e în /stil/. Data URI: CSP-ul permite img-src data:.
+   */
+  --granulatie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+
+  /* Tipografie: fonturi self-hosted (fonturi.css) */
+  --font-sans:    'Geist Variable', system-ui, sans-serif;                         /* text, butoane, h3–h4 */
+  --font-display: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif; /* h1, h2, frazele mari, wordmark */
+  --font-mono:    'Geist Mono Variable', ui-monospace, monospace;                  /* etichete mono decorative */
+
+  /*
+   * Textul de bază crește fluid cu lățimea, ca în prototip (1.25vw ≈ 1/80 din lățime), între 18 și
+   * 24 px. În rem, ca să respecte mărimea de font aleasă de utilizator. Max ≤ 2.5 × min: textul
+   * ajunge la 200% prin zoom-ul browserului (WCAG 1.4.4) la orice lățime.
+   */
+  --fs-base: clamp(1.125rem, 1.25vw, 1.5rem);   /* 18 → 24 px */
+  --fs-sm:   1rem;       /* 16 px – minim pentru text; excepții doar cele din §4 */
+  --fs-xs:   0.875rem;   /* 14 px – doar etichetele barei de jos de pe mobil */
+
+  /*
+   * Scara titlurilor, ca multipli ai textului de bază (în prototip sunt em-uri din body).
+   * Între paranteze: clasa din prototip de unde vine valoarea.
+   */
+  --fs-lg:        calc(1.15 * var(--fs-base));                          /* 20.7 → 27.6 px (faq__btn, nav__logo) */
+  --fs-h3:        var(--fs-lg);                                         /* titluri de nivel 3 */
+  --fs-h2:        clamp(1.5rem, calc(2 * var(--fs-base)), 3rem);        /* 36 → 48 px (slogan__text, cta__text) */
+  --fs-titlu:     clamp(1.75rem, calc(2.6 * var(--fs-base)), 4rem);     /* 46.8 → 64 px (serv__titlu, pas__btn, faq__titlu) */
+  --fs-h1:        clamp(1.6rem, calc(2.35 * var(--fs-base)), 3.6rem);   /* 42.3 → 57.6 px (hero__h1); sub 768 px: 28.8 px */
+  --fs-statement: clamp(1.75rem, calc(3.1 * var(--fs-base)), 4.6rem);   /* 55.8 → 73.6 px (sticky-el) */
+
+  --lh-titlu-mare: 1.08;   /* h1, frazele mari */
+  --lh-titlu:      1.02;   /* --fs-titlu */
+  --lh-h2:         1.12;
+  --ls-titlu-mare: -0.035em;
+  --ls-titlu:      -0.04em;
+  --ls-h2:         -0.03em;
+  --fw-titlu:      500;
+
+  /*
+   * Wordmark-ul gigant (WordmarkGigant.astro): „Bojan Elena Luminița” pe un rând, pe toată
+   * lățimea containerului. Mărimea = lățimea containerului (100cqi) / --wordmark-k, unde k e
+   * lățimea textului în em, măsurată cu fontul încărcat (Funnel Display 600, -0.055em).
+   */
+  --ls-wordmark: -0.055em;
+  --lh-wordmark: 0.82;
+  --fw-wordmark: 600;
+  --wordmark-k: 8.998;  /* măsurat cu scripts/verifica-wordmark.mjs (Chromium, fontul încărcat) */
+
+  /* Mișcare (doar hover/focus în această versiune; max. 200 ms, CLAUDE.md §3.2) */
+  --ease-out: cubic-bezier(0.625, 0.05, 0, 1);
 
   /* Spațiere, raze, umbre */
   --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
@@ -33,11 +75,18 @@
   --section-y:    clamp(4rem, 2rem + 6vw, 6rem);   /* padding sus/jos al secțiunilor (max. 96px) */
   --section-y-sm: clamp(3rem, 2rem + 3vw, 4rem);   /* banda de informații */
   --radius: 4px; --radius-lg: 10px; --radius-pill: 999px;
-  --shadow: 0 4px 8px rgb(42 26 16 / .12);
+  --shadow: 0 4px 8px rgb(15 15 15 / .12);
   --container: 75rem;
   --gutter: 1.5rem;      /* padding lateral al containerului */
   --gutter-sm: 1rem;     /* sub 480px */
   --header-h: 72px;      /* header fix pe desktop */
   --header-h-sm: 64px;   /* header fix pe mobil */
   --measure: 68ch;
+}
+
+/* Hero-ul pe mobil: titlul principal scade la 1.6 × textul de bază (prototip, sub 768 px). */
+@media (max-width: 47.99rem) {
+  :root {
+    --fs-h1: calc(1.6 * var(--fs-base));   /* 28.8 px */
+  }
 }
