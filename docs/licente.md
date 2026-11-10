@@ -7,16 +7,13 @@ Fișierul e pus de birou / designer și se folosește ca atare (geometria nu se 
 | Element | Sursă | Licență / condiții | Cum e folosit |
 |---|---|---|---|
 | Literele „Notar” și „Bojan” | fontul **Imperial Script** (© 2008 The Imperial Script Project Authors, https://github.com/googlefonts/imperial-script) | **SIL Open Font License 1.1** – folosire, modificare și includere în produse permise, inclusiv comercial; fontul nu se vinde separat; numele rezervat al fontului nu se folosește pentru versiuni modificate. Text: https://openfontlicense.org | Doar în SVG: contururile glifelor, convertite în path-uri și descoperite prin mască. Fișierul fontului nu se încarcă pe site și nu e în build. |
-| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Pro Standard License** – fără atribuire, folosire ca parte din logo permisă pentru conținut vectorial (de confirmat factura/ID-ul licenței). | Contururi umplute, descoperite prin mască, parte decorativă a semnăturii (aria-hidden). Pe ecrane < 640 px apar doar mâinile. Fără atribuire pe site. |
+| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Free License** – atribuire obligatorie (în subsol). Ilustrația e folosită doar decorativ pe site (intro și hero), NU ca logo sau element de identitate: nu intră în favicon, imaginea OG, manualul de brand, antet sau ștampilă. Pentru orice astfel de folosire se trece întâi pe Pro Standard sau se înlocuiește cu un desen propriu. | Contururi umplute, descoperite prin mască, parte decorativă a semnăturii (aria-hidden). Pe ecrane < 640 px apar doar mâinile. Atribuirea: în rândul legal din subsolul fiecărei pagini, „Ilustrație: Vecteezy.com” (EN: „Illustration: Vecteezy.com”), cu link spre https://www.vecteezy.com. |
 
 Istoric: versiunile provizorii anterioare foloseau fontul Lavishly Yours (SIL OFL), apoi Mr De Haviland
-(SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite. Între timp, mâinile au fost
-folosite sub licența Vecteezy Free, cu atribuire în subsol; atribuirea s-a scos odată cu trecerea la
-Pro Standard.
+(SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite.
 
 Note:
-- Factura și ID-ul licenței Pro Standard Vecteezy pentru ilustrația 79569313 se păstrează la birou;
-  până la confirmarea lor, licența e trecută ca „de confirmat”.
+- Atribuirea Vecteezy din subsol nu se scoate cât timp mâinile sunt pe site (condiția licenței Free).
 - Dacă semnătura se înlocuiește cu desenul unui ilustrator, se actualizează acest tabel cu
   licența / cesiunea de drepturi a ilustratorului.
 

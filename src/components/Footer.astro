@@ -146,6 +146,13 @@ const { strada, codPostal, oras, judet } = birou.adresa;
           </a>
         </p>
         {birou.cif && <p set:html={marcheazaPlaceholder(t(locale, 'subsol.cif', { cif: birou.cif }))} />}
+        {/* Atribuirea cerută de licența Vecteezy Free pentru mâinile din semnătură (docs/licente.md). */}
+        <p>
+          {t(locale, 'subsol.atribuire')}{' '}
+          <a class="sub subsol__link" href="https://www.vecteezy.com" target="_blank" rel="noopener noreferrer">
+            Vecteezy.com<span class="sr-only"> {t(locale, 'link.filaNoua')}</span>
+          </a>
+        </p>
       </div>
       <div class="subsol__linie" aria-hidden="true"></div>
       <WordmarkGigant
