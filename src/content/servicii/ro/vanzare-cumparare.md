@@ -3,6 +3,7 @@ titlu: "Vânzare-cumpărare"
 slug: "vanzare-cumparare"
 ordine: 1
 evidentiat: true
+etichete: ["Imobiliare", "Carte funciară"]
 rezumat: "Contract de vânzare-cumpărare pentru apartamente, case și terenuri în Brașov. Ce acte pregătiți și cum decurge semnarea la notar."
 pentruCine: "Pentru vânzătorii și cumpărătorii de apartamente, case, terenuri sau alte imobile."
 durata: "Semnarea durează de regulă 1–2 ore, după ce dosarul este complet."

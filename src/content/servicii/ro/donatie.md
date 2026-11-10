@@ -3,6 +3,7 @@ titlu: "Donație"
 slug: "donatie"
 ordine: 3
 evidentiat: true
+etichete: ["Imobile", "Bunuri mobile"]
 rezumat: "Contract de donație autentificat la notar în Brașov, pentru imobile și alte bunuri. Acte necesare și pașii procedurii."
 pentruCine: "Pentru cei care doresc să transmită gratuit un bun, de regulă către membrii familiei."
 durata: "Semnarea durează de regulă aproximativ o oră, după ce dosarul este complet."

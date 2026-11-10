@@ -1,14 +1,20 @@
 intrebari:
   - intrebare: "I don't speak Romanian. Can I still sign a notarial act?"
+    evidentiat: true
     raspuns: "Yes. Notarial acts in Romania are drawn up in Romanian, so an authorised interpreter must assist you when you sign. Let us know in advance and we will tell you what to arrange."
   - intrebare: "Which ID do I need?"
+    evidentiat: true
     raspuns: "A valid passport or national ID card. If you live in Romania, also bring your residence permit."
   - intrebare: "Do I need an appointment?"
+    evidentiat: true
     raspuns: "For most acts, yes. Send an appointment request from the Appointments page or call us, and the office will confirm it."
   - intrebare: "How much does it cost?"
+    evidentiat: true
     raspuns: "Notary fees are set according to the regulations in force and depend on the type of act and, for some acts, on the value of the property. Taxes may be added. We give you the exact amount after checking your documents."
   - intrebare: "Can a power of attorney signed here be used abroad?"
+    evidentiat: true
     raspuns: "Usually yes, but it may need an apostille or a translation. Tell us in which country you will use it and we will advise you."
   - intrebare: "Can I send my documents in advance?"
+    evidentiat: true
     raspuns: "Yes. Email clear photos or scans of your documents. We check them and tell you if anything is missing. Bring the originals when you come to sign."
 validat: false

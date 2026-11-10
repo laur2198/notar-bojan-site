@@ -82,6 +82,11 @@ export const en: Record<keyof typeof ro, string> = {
   'acasa.toateServiciile': 'See all services and fees',
   'acasa.despreLink': 'About the office (in Romanian)',
   'acasa.toateIntrebarile': 'All questions',
+  'acasa.toateServiciileScurt': 'All services',
+  'acasa.etichete': 'Tags',
+  'acasa.fraze': 'About notarial acts',
+  'acasa.pasul': 'Step {n}',
+  'cursor.serviciu': 'View service',
   'foto.deCompletat': 'Photo – to be added',
 
   // Practical information band

@@ -3,6 +3,7 @@ titlu: "Divorț pe cale notarială"
 slug: "divort"
 ordine: 6
 evidentiat: true
+etichete: ["Acordul soților", "Copii minori"]
 rezumat: "Divorț la notar în Brașov, prin acordul soților, cu sau fără copii minori. Condiții, acte necesare și termenul de reflecție."
 pentruCine: "Pentru soții care sunt de acord să divorțeze și, dacă au copii minori, asupra tuturor aspectelor privind copiii."
 durata: "Două prezențe la birou, la un interval de cel puțin 30 de zile."

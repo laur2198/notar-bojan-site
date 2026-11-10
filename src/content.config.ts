@@ -142,18 +142,36 @@ const acasa = defineCollection({
       hero: z.object({
         /** Nu se mai afișează (structura calibrată după referință); păstrat opțional pentru fișierele existente. */
         eticheta: z.string().optional(),
+        /** Fraza principală (h1), după prototipul design-v2. */
         titlu: z.string().min(1),
+        /** Continuarea titlului, în gri (tot în h1). */
         subtitlu: z.string().min(1),
+        /** Rândul din stânga de sub semnătură; în dreapta apare adresa din birou.yaml. */
+        linie: z.string().min(1),
+        /** Fotografia din hero: folosită ca imagine de distribuire (og:image), nu se afișează în hero-ul v2. */
         imagine: imagineOptionala(image),
         imagineAlt: z.string(),
       }),
+      /** Frazele mari din secțiunea închisă de sub hero, care se succed la derulare: exact 3. */
+      fraze: z
+        .array(
+          z.object({
+            titlu: z.string().min(1),
+            /** Al doilea rând, opțional. */
+            rand2: z.string().optional(),
+          }),
+        )
+        .length(3, 'Sunt exact 3 fraze.'),
       servicii: z.object({
+        /** Eticheta secțiunii. */
         titlu: z.string().min(1),
+        /** Textul de după listă, lângă butonul „Toate serviciile”. */
         intro: z.string().min(1),
       }),
       pasi: z.object({
         titlu: z.string().min(1),
-        intro: z.string().min(1),
+        /** Paragraful care „se aprinde” la derulare; un rând gol desparte paragrafele. */
+        slogan: z.string().min(1),
         lista: z.array(z.object({ titlu: z.string().min(1), text: z.string().min(1) })).min(1),
       }),
       recenzii: z.object({
@@ -167,8 +185,15 @@ const acasa = defineCollection({
         imagineAlt: z.string(),
       }),
       faq: z.object({
+        /** Titlul mare din stânga acordeonului. */
         titlu: z.string().min(1),
+        /** Câte întrebări apar pe Acasă: cele marcate „evidentiat” în faq/*.yaml, altfel primele. */
         numarAfisat: z.number().int().min(0),
+      }),
+      /** Încheierea secțiunii de întrebări: titlu și subtitlu (în gri), lângă WhatsApp și Programare. */
+      cta: z.object({
+        titlu: z.string().min(1),
+        subtitlu: z.string().min(1),
       }),
       final: z.object({
         titlu: z.string().min(1),
@@ -216,6 +241,8 @@ const servicii = defineCollection({
     onorariu: z.string().min(1),
     acteNecesare: z.array(z.string().min(1)).min(1),
     subiectEmail: z.string().min(1),
+    /** Opțional: etichete scurte afișate pe Acasă (ex. „Imobiliare”, „Carte funciară”). */
+    etichete: z.array(z.string().min(1)).optional(),
     /** Opțional: imaginea 16:10 de pe cardul serviciului. */
     imagine: imagineOptionala(image),
     imagineAlt: z.string().optional(),
@@ -237,6 +264,8 @@ const serviciiEn = defineCollection({
           titlu: z.string().min(1),
           text: z.string().min(1),
           slugRo: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+          /** Opțional: etichete scurte afișate pe Acasă (EN). */
+          etichete: z.array(z.string().min(1)).optional(),
         }),
       )
       .min(1),
@@ -276,6 +305,8 @@ const faq = defineCollection({
         z.object({
           intrebare: z.string().min(1),
           raspuns: z.string().min(1),
+          /** Apare pe pagina Acasă (până la „numarAfisat” din pagini/{limba}/acasa.yaml). */
+          evidentiat: z.boolean().optional(),
         }),
       )
       .min(1),
