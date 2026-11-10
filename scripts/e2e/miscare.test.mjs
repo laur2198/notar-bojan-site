@@ -91,7 +91,7 @@ describe('Mișcare redusă și fără JS: totul vizibil, niciun intro', () => {
 });
 
 describe('Intro-ul', () => {
-  it('#intro: ecran ink, desen, urcare, intro-gata la jumătatea urcării, apoi pagina liberă', async () => {
+  it('#intro: ecran alb (V3b), desen, urcare, intro-gata la jumătatea urcării, apoi pagina liberă', async () => {
     const { p, erori, context } = await pagina();
     await p.addInitScript(() => {
       window.__gata = null;
@@ -108,7 +108,7 @@ describe('Intro-ul', () => {
     }));
     assert.equal(start.cuIntro, true);
     assert.equal(start.overflow, 'hidden');
-    assert.equal(start.fundal, 'rgb(15, 15, 15)');
+    assert.equal(start.fundal, 'rgb(255, 255, 255)');
     assert.equal(start.aria, 'true');
     assert.equal(start.inert, true);
 
