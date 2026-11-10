@@ -42,7 +42,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
-import { deseneazaSemnatura, pregatesteSemnatura } from './desen-semnatura';
+import { deseneazaLaVedere } from './desen-semnatura';
 import { EVENIMENT_GATA, EVENIMENT_TERMINAT } from './intro-semnatura';
 import { INTEROGARE_MISCARE } from './miscare-interogare';
 import { EVENIMENT_TEMA } from './tema-navbar';
@@ -156,7 +156,7 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   const fade = [...hero.querySelectorAll<HTMLElement>('[data-hero-fade]')];
   const wordmark = hero.querySelector<HTMLElement>('[data-hero-wordmark]');
   const foto = hero.querySelector<HTMLElement>('[data-hero-foto]');
-  const semnatura = hero.querySelector<SVGSVGElement>('svg[data-semnatura]');
+  const semnatura = hero.querySelector('[data-semnatura]');
   let split: SplitText | null = null;
   let opresteDesen: (() => void) | null = null;
   let pornit = false;
@@ -189,10 +189,8 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
         );
       }
     });
-    if (semnatura) {
-      pregatesteSemnatura(semnatura);
-      opresteDesen = deseneazaSemnatura(semnatura, 3500);
-    }
+    // Semnătura: 3.5 s, pornită când e în ecran (pe mobil poate fi sub fotografie).
+    if (semnatura) opresteDesen = deseneazaLaVedere(semnatura, 3500);
     html.classList.add('hero-pornit');
   };
 

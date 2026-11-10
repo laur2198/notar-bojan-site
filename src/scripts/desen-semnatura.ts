@@ -1,15 +1,16 @@
 /**
- * Desenul semnăturii prin stroke-dashoffset (fără librării): aceeași metodă ca în prototip
- * (docs/design-v2/prototip-acasa.html) și pe PR #13.
+ * Desenul semnăturii prin stroke-dashoffset, fără librării (Semnatura.astro).
  *
- * Fiecare <path> are pathLength="100" (dasharray 100 101 din CSS) și intervalul lui [data-a,
- * data-b] din gestul total, calculat la build și proporțional cu data-len (Semnatura.astro).
- * Un singur progres P (0 → 1, easing cubic-bezier(0.77, 0, 0.175, 1) pe tot gestul) dă
- * dashoffset-ul fiecărui path: 100 − 100 × clamp((P − a) / (b − a), 0, 1). Path-urile se
- * desenează strict pe rând, de la stânga la dreapta.
+ * Path-urile care se desenează sunt liniile centrale din măștile semnăturii (`path.rev`, cu
+ * pathLength="100", dasharray 100 101 din CSS); fiecare are intervalul lui [data-a, data-b] din
+ * gestul total, calculat la build, proporțional cu data-len, în ordinea notar → maini → bojan
+ * (src/lib/semnatura.ts). Un singur progres P (0 → 1, easing cubic-bezier(0.77, 0, 0.175, 1)
+ * pe tot gestul) dă dashoffset-ul fiecărui path: 100 × (1 − clamp((P − a) / (b − a), 0, 1)).
+ * Un element [data-semnatura] are două SVG-uri (întreaga și, pe mobil, doar mâinile), fiecare cu
+ * intervalele lui; se animă amândouă cu același P, se vede doar cel afișat.
  *
- * Starea din HTML e cea finală (dashoffset 0, semnătura completă). Cine apelează decide dacă
- * animă: la prefers-reduced-motion: reduce nu se apelează deloc (CLAUDE.md §3.2).
+ * Starea din HTML e cea finală (dashoffset 0, semnătura completă). La prefers-reduced-motion:
+ * reduce nu se animă nimic (CLAUDE.md §3.2): deseneazaLaVedere lasă starea din HTML.
  *
  * Modul ES, încărcat din /_astro/ (CSP: script-src 'self', fără scripturi inline).
  */
@@ -46,7 +47,7 @@ export function semnaturaOffseturi(P: number, intervale: readonly Interval[]): n
   });
 }
 
-function trasee(svg: SVGSVGElement) {
+function trasee(svg: Element) {
   const p = [...svg.querySelectorAll<SVGPathElement>('path[data-a]')];
   return {
     p,
@@ -55,12 +56,12 @@ function trasee(svg: SVGSVGElement) {
 }
 
 /** Ascunde semnătura (dashoffset 101 pe toate path-urile), înainte de desen. */
-export function pregatesteSemnatura(svg: SVGSVGElement): void {
+export function pregatesteSemnatura(svg: Element): void {
   for (const p of trasee(svg).p) p.style.strokeDashoffset = String(SEMNATURA_ASCUNS);
 }
 
 /** Readuce starea din HTML: semnătura desenată complet. */
-export function finalizeazaSemnatura(svg: SVGSVGElement): void {
+export function finalizeazaSemnatura(svg: Element): void {
   for (const p of trasee(svg).p) p.style.removeProperty('stroke-dashoffset');
 }
 
@@ -68,7 +69,7 @@ export function finalizeazaSemnatura(svg: SVGSVGElement): void {
  * Desenează semnătura în `durata` ms. Întoarce o funcție care oprește desenul și lasă
  * semnătura completă (de ex. la o a doua apăsare pe „Redă desenul”).
  */
-export function deseneazaSemnatura(svg: SVGSVGElement, durata: number, gata?: () => void): () => void {
+export function deseneazaSemnatura(svg: Element, durata: number, gata?: () => void): () => void {
   const s = trasee(svg);
   let start: number | null = null;
   let cerere = 0;
@@ -88,5 +89,41 @@ export function deseneazaSemnatura(svg: SVGSVGElement, durata: number, gata?: ()
   return () => {
     cancelAnimationFrame(cerere);
     finalizeazaSemnatura(svg);
+  };
+}
+
+const miscareRedusa = () => typeof matchMedia !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Desenează semnătura când intră în ecran (IntersectionObserver, cel puțin 30% vizibilă), în
+ * `durata` ms (3500 în hero, 1800 la intro). Până atunci e ascunsă (dashoffset 101). La mișcare
+ * redusă nu atinge nimic: rămâne starea din HTML, desenată complet. Fără IntersectionObserver
+ * desenează imediat. Întoarce o funcție care oprește totul și lasă semnătura completă.
+ */
+export function deseneazaLaVedere(el: Element, durata: number, gata?: () => void): () => void {
+  if (miscareRedusa()) {
+    finalizeazaSemnatura(el);
+    gata?.();
+    return () => {};
+  }
+  pregatesteSemnatura(el);
+  let opreste: (() => void) | null = null;
+  if (typeof IntersectionObserver !== 'function') {
+    opreste = deseneazaSemnatura(el, durata, gata);
+    return () => opreste?.();
+  }
+  const observator = new IntersectionObserver(
+    (intrari) => {
+      if (!intrari.some((i) => i.isIntersecting)) return;
+      observator.disconnect();
+      opreste = deseneazaSemnatura(el, durata, gata);
+    },
+    { threshold: 0.3 },
+  );
+  observator.observe(el);
+  return () => {
+    observator.disconnect();
+    if (opreste) opreste();
+    else finalizeazaSemnatura(el);
   };
 }
