@@ -1,5 +1,5 @@
 seo:
-  titlu: "Notar public în Brașov – Bojan Elena Luminița"
+  titlu: "Birou Individual Notarial Bojan Elena Luminița, Brașov"
   descriere: "Birou notarial în Brașov: vânzări, succesiuni, donații, procuri, legalizări, divorț. Programare online și trimiterea actelor înainte de întâlnire."
 
 # Textele de mai jos vin din prototipul design-v2 și sunt provizorii (validat: false).
@@ -7,8 +7,10 @@ hero:
   titlu: "Acte notariale pregătite din timp, ca drumul la birou să fie cât mai scurt."
   subtitlu: "Birou Individual Notarial în Brașov: vânzări, succesiuni, donații, procuri, legalizări și divorț."
   linie: "Notar public · Camera Notarilor Publici Brașov"
-  imagine: ""          # fotografia biroului (apare în hero, RO și EN) – de încărcat din panou
-  imagineAlt: "«DE COMPLETAT: descrierea fotografiei biroului, după ce e încărcată»"
+  # PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+  imagine: "../../../assets/fotografii-provizorii/acasa-hero.jpg"
+  imagineAlt: "«DE VALIDAT: Lampă cu abajur pe un birou de lemn lustruit, într-o încăpere cu pereți ornamentați»"
+  fotoProvizorie: true
 
 fraze:
   - titlu: "De ce contează să pregătiți actele din timp?"
@@ -28,12 +30,22 @@ pasi:
 
     Verificăm actele, vă spunem din timp ce lipsește și vă comunicăm onorariul înainte de semnare, ca să evitați drumurile inutile.
   lista:
+    # Fotografiile pașilor: PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
     - titlu: "Trimiteți actele"
       text: "Pe email, din pagina serviciului de care aveți nevoie. Puteți atașa fotografii clare sau scanări ale documentelor."
+      imagine: "../../../assets/fotografii-provizorii/pas-1-trimiteti-actele.jpg"
+      imagineAlt: "«DE VALIDAT: Laptop deschis, acte și un pix pe un birou de lemn»"
+      fotoProvizorie: true
     - titlu: "Verificăm dosarul"
       text: "Vă spunem ce mai este necesar și vă comunicăm onorariul și taxele estimate."
+      imagine: "../../../assets/fotografii-provizorii/pas-2-verificam-dosarul.jpg"
+      imagineAlt: "«DE VALIDAT: Două persoane care citesc împreună un document, la o masă»"
+      fotoProvizorie: true
     - titlu: "Semnați la birou"
       text: "Stabilim împreună data. La birou veniți cu actele originale, pentru semnare."
+      imagine: "../../../assets/fotografii-provizorii/pas-3-semnati-la-birou.jpg"
+      imagineAlt: "«DE VALIDAT: Mână care semnează un document pe o masă de lemn»"
+      fotoProvizorie: true
 
 recenzii:
   titlu: "Ce spun clienții"

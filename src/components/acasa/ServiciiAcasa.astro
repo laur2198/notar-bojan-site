@@ -12,6 +12,7 @@ import { cale, t, type Locale } from '../../i18n';
 import { marcheazaPlaceholder } from '../../lib/continut';
 import Buton from '../Buton.astro';
 import DraftBadge from '../DraftBadge.astro';
+import FotoProvizorie from '../FotoProvizorie.astro';
 import Fotografie from '../Fotografie.astro';
 import Eticheta from './Eticheta.astro';
 
@@ -22,6 +23,8 @@ export interface ServiciuRand {
   etichete?: string[];
   imagine?: ImageMetadata;
   imagineAlt?: string;
+  /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
+  provizorie?: boolean;
 }
 
 interface Props {
@@ -45,6 +48,7 @@ const numar = (i: number) => String(i + 1).padStart(2, '0');
         servicii.map((s, i) => (
           <li class="serv" data-cursor={t(locale, 'cursor.serviciu')}>
               <div class="serv__img">
+                <FotoProvizorie locale={locale} provizorie={s.provizorie && !!s.imagine} />
                 <div class="serv__cadru" data-parallax="10">
                   <Fotografie
                     locale={locale}

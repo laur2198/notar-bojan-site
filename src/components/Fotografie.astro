@@ -10,6 +10,7 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import { t, type Locale } from '../i18n';
+import { textAlt } from '../lib/continut';
 
 /** Rapoartele de aspect folosite pe site (fiecare are o clasă în stilurile de mai jos). */
 export type Raport = '2 / 3' | '4 / 3' | '4 / 5' | '16 / 10';
@@ -55,7 +56,7 @@ const clase = [`fotografie--r-${clasaRaport(raport)}`, `fotografie--m-${clasaRap
     <Image
       class:list={['fotografie', ...clase, clasa]}
       src={imagine}
-      alt={alt}
+      alt={textAlt(alt)}
       widths={latimi.filter((w) => w <= imagine.width)}
       sizes={sizes}
       loading={prioritar ? 'eager' : 'lazy'}

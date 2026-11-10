@@ -88,6 +88,7 @@ export const en: Record<keyof typeof ro, string> = {
   'acasa.fotoHero': 'Office photo – coming soon',
   'acasa.pasul': 'Step {n}',
   'cursor.serviciu': 'View service',
+  'foto.provizorie': 'Provisional photo',
   'foto.deCompletat': 'Photo – to be added',
 
   // Practical information band
@@ -119,14 +120,14 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Services and fees
   'servicii.titlu': 'Services and fees',
-  'servicii.seoTitlu': 'Services and fees | Notary Bojan, Brasov',
+  'servicii.seoTitlu': 'Services and fees | {denumire}',
   'servicii.seoDescriere': 'Notarial services at the office in Brasov, Romania: property sales, inheritance, powers of attorney, certified copies and signatures.',
   'servicii.onorariiTitlu': 'Indicative fees',
   'servicii.coloanaServiciu': 'Service',
   'servicii.coloanaOnorariu': 'Indicative fee',
   'servicii.onorariuCard': 'Fee:',
   'servicii.altele': 'Other services',
-  'servicii.seoTitluPagina': '{titlu} | Notary Bojan, Brasov',
+  'servicii.seoTitluPagina': '{titlu} | {denumire}',
   'breadcrumbs.acasa': 'Home',
 
   // "Prepare your file" box
@@ -149,7 +150,7 @@ export const en: Record<keyof typeof ro, string> = {
   'email.atasate': 'I have attached the following documents:',
 
   // Pages (stage 5)
-  'pagina.seoTitlu': '{titlu} | Notary Bojan, Brasov',
+  'pagina.seoTitlu': '{titlu} | {denumire}',
   'programare.cardTitlu': 'Online appointment',
   'programare.alegeti': 'Choose a date and time',
   'programare.nota': 'Appointments are made through Google Calendar. The office will confirm your appointment.',
@@ -160,7 +161,7 @@ export const en: Record<keyof typeof ro, string> = {
   'embed.titluIframe': 'Appointment calendar',
   'faq.seoDescriere': 'Answers to frequently asked questions about appointments, documents, fees and signing notarial acts at the notary office in Brasov.',
   'recenzii.titluPagina': 'Reviews',
-  'recenzii.seoDescriere': 'Reviews of the notary office of Bojan Elena Luminita in Brasov, published by clients on Google.',
+  'recenzii.seoDescriere': 'Reviews of {denumire}, notary office in Brasov, published by clients on Google.',
   'recenzii.vedetiToate': 'See all reviews on Google',
   'recenzii.goale': 'You can read client reviews on the office Google profile.',
   'contact.emailActe': 'Email for documents',
@@ -178,7 +179,7 @@ export const en: Record<keyof typeof ro, string> = {
 
   // Share image (Open Graph)
   'og.subtitlu': 'Notary public in Brasov',
-  'og.alt': '{notar}, notary public in Brasov',
+  'og.alt': '{denumire}, notary public in Brasov',
 
   // WhatsApp
   'whatsapp.nume': 'WhatsApp',

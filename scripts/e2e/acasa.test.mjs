@@ -238,3 +238,26 @@ describe('Acasă V3b: fotografia din hero', () => {
     });
   }
 });
+
+describe('Fotografiile provizorii (doar în preview)', () => {
+  for (const cale of ['/', '/en/', '/servicii/', '/en/services/']) {
+    it(`${cale}: fiecare fotografie de stoc are eticheta „Fotografie provizorie”; alt fără marcaje`, async () => {
+      const { p, context } = await pagina({ viewport: { width: 1280, height: 900 } });
+      await p.goto(BAZA + cale, { waitUntil: 'load' });
+      const r = await p.evaluate(() => {
+        const imagini = [...document.querySelectorAll('img[src*="fotografii-provizorii"], img[src*="acasa-hero"], img[src*="serviciu-"], img[src*="pas-"]')];
+        return {
+          imagini: imagini.length,
+          etichete: document.querySelectorAll('.foto-provizorie').length,
+          altCuMarcaj: imagini.map((i) => i.alt).filter((a) => a.includes('«')),
+          altGol: imagini.filter((i) => !i.alt.trim()).length,
+        };
+      });
+      assert.ok(r.imagini > 0, 'pagina are fotografii provizorii');
+      assert.ok(r.etichete > 0, 'eticheta apare');
+      assert.deepEqual(r.altCuMarcaj, []);
+      assert.equal(r.altGol, 0, 'fiecare fotografie are text alternativ');
+      await context.close();
+    });
+  }
+});

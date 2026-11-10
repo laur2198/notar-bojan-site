@@ -1,6 +1,6 @@
 ---
 titlu: "Appointments"
-seoDescriere: "Request an appointment online at the notary office of Bojan Elena Luminița in Brașov, Romania. The office will confirm it."
+seoDescriere: "Request an appointment online at Birou Individual Notarial Bojan Elena Luminița in Brașov, Romania. The office will confirm it."
 validat: false
 ---
 

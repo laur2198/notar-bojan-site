@@ -50,6 +50,8 @@ interface Props {
 
 const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light', intro = 'automat' } = Astro.props;
 const birou = await getBirou();
+/** Denumirea oficială (birou.yaml) în titlu și descriere: niciodată forma scurtă, netradusă în EN. */
+const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumire);
 ---
 
 <!doctype html>
@@ -63,10 +65,10 @@ const birou = await getBirou();
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <Seo
       locale={locale}
-      title={title}
-      description={description}
+      title={cuDenumire(title)}
+      description={cuDenumire(description)}
       numeSite={birou.denumire}
-      notar={birou.notar}
+      denumire={birou.denumire}
       noindex={noindex}
       imagine={imagineOg}
     />

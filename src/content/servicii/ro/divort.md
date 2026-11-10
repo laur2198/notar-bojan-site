@@ -14,6 +14,10 @@ acteNecesare:
   - "Certificatele de naștere ale copiilor minori, dacă există"
   - "Dovada ultimei locuințe comune, dacă este cazul"
 subiectEmail: "Acte – Divorț pe cale notarială"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-divort.jpg"
+imagineAlt: "«DE VALIDAT: Plantă suculentă în ghiveci alb, un pix și o tastatură pe un birou alb»"
+fotoProvizorie: true
 validat: false
 ---
 

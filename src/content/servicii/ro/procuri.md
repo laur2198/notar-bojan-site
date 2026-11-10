@@ -13,6 +13,10 @@ acteNecesare:
   - "Datele complete ale persoanei împuternicite: nume, CNP, domiciliu, act de identitate"
   - "Datele bunului sau ale operațiunii (ex. adresa și cartea funciară a imobilului, datele autoturismului)"
 subiectEmail: "Acte – Procură"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-procuri.jpg"
+imagineAlt: "«DE VALIDAT: Stilou negru pe o foaie scrisă de mână»"
+fotoProvizorie: true
 validat: false
 ---
 

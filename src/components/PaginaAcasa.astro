@@ -39,18 +39,31 @@ const a = acasa.data;
 /** Fotografia din hero: una singură, din pagina română (și pentru /en/); textul alternativ e al fiecărei limbi. */
 const acasaRo = locale === 'ro' ? acasa : await getEntry('acasa', 'ro/acasa');
 const heroImagine = acasaRo?.data.hero.imagine;
+/** Fotografiile pașilor: tot din pagina română, după poziție; textul alternativ e al fiecărei limbi. */
+const pasi = a.pasi.lista.map((p, i) => {
+  const ro = acasaRo?.data.pasi.lista[i];
+  return { ...p, imagine: ro?.imagine, imagineAlt: p.imagineAlt ?? '', provizorie: ro?.fotoProvizorie };
+});
 
 let servicii: ServiciuRand[];
 let serviciiDraft: boolean;
 if (locale === 'en') {
   const serviciiEn = await getEntry('serviciiEn', 'servicii');
   if (!serviciiEn) throw new Error('Lipsește src/content/servicii-en/servicii.yaml.');
-  servicii = serviciiEn.data.lista.map((s) => ({
-    titlu: s.titlu,
-    rezumat: s.text,
-    etichete: s.etichete,
-    href: `${cale('servicii', 'en')}#${s.slugRo}`,
-  }));
+  // Fotografiile vin din serviciile românești (după slug); textul alternativ e cel englez.
+  const serviciiRo = new Map((await getCollection('servicii')).map((s) => [s.data.slug, s.data]));
+  servicii = serviciiEn.data.lista.map((s) => {
+    const ro = serviciiRo.get(s.slugRo);
+    return {
+      titlu: s.titlu,
+      rezumat: s.text,
+      etichete: s.etichete,
+      imagine: ro?.imagine,
+      imagineAlt: s.imagineAlt ?? '',
+      provizorie: ro?.fotoProvizorie,
+      href: `${cale('servicii', 'en')}#${s.slugRo}`,
+    };
+  });
   serviciiDraft = esteDraft(serviciiEn);
 } else {
   const lista = (await getCollection('servicii', (s) => s.data.evidentiat)).sort((x, y) => x.data.ordine - y.data.ordine);
@@ -60,6 +73,7 @@ if (locale === 'en') {
     etichete: s.data.etichete,
     imagine: s.data.imagine,
     imagineAlt: s.data.imagineAlt,
+    provizorie: s.data.fotoProvizorie,
     href: `${cale('servicii', 'ro')}${s.data.slug}/`,
   }));
   serviciiDraft = lista.some((s) => esteDraft(s));
@@ -71,7 +85,7 @@ const intrebari = (evidentiate.length > 0 ? evidentiate : faq.data.intrebari).sl
 
 // og:image: fotografia din hero, dacă există; altfel imaginea implicită a limbii.
 const hero = await imagineOgHero(locale);
-const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.notar), ...hero, alt: hero.alt ?? imagineOgImplicita(locale, birou.notar).alt } : undefined;
+const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.denumire), ...hero, alt: hero.alt ?? imagineOgImplicita(locale, birou.denumire).alt } : undefined;
 ---
 
 <BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg}>
@@ -83,12 +97,13 @@ const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.notar), ...hero, 
     linie={a.hero.linie}
     imagine={heroImagine}
     imagineAlt={a.hero.imagineAlt}
+    provizorie={acasaRo?.data.hero.fotoProvizorie}
   >
     <DraftBadge locale={locale} intrare={acasa} />
   </HeroAcasa>
   <FrazeSticky locale={locale} fraze={a.fraze} />
   <ServiciiAcasa locale={locale} titlu={a.servicii.titlu} text={a.servicii.intro} servicii={servicii} draft={serviciiDraft} />
-  <CumLucram locale={locale} titlu={a.pasi.titlu} pasi={a.pasi.lista} slogan={a.pasi.slogan} />
+  <CumLucram locale={locale} titlu={a.pasi.titlu} pasi={pasi} slogan={a.pasi.slogan} />
   <FaqAcasa
     locale={locale}
     birou={birou}

@@ -16,6 +16,10 @@ acteNecesare:
   - "Certificatul de atestare fiscală pe numele persoanei decedate"
   - "Testamentul, dacă există"
 subiectEmail: "Acte – Succesiune"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-succesiune.jpg"
+imagineAlt: "«DE VALIDAT: Teanc de scrisori vechi legate cu sfoară, fotografii alb-negru și un toc»"
+fotoProvizorie: true
 validat: false
 ---
 

@@ -347,6 +347,29 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: inline-flex;
   }
 
+  /*
+   * Mobil (V3c): denumirea oficială pe două rânduri are nevoie de loc. Butonul își păstrează
+   * cuvântul („Meniu” / „Închide”, important pentru vârstnici), dar pierde iconița; spațiile se
+   * strâng. Ținta rămâne de min. 48 × 48 px.
+   */
+  @media (max-width: 30rem) {
+    .meniu-compact__buton {
+      padding: 0 0.65em;
+    }
+
+    .meniu-compact__stare :global(svg) {
+      display: none;
+    }
+
+    .antet__bara {
+      gap: var(--space-1);
+    }
+
+    .antet__dreapta {
+      gap: 0.4em;
+    }
+  }
+
   /* Panoul: tot ecranul, sub bara navbar-ului (care rămâne deasupra, cu „Închide”). */
   .meniu-compact__panou {
     position: fixed;

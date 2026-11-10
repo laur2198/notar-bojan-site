@@ -1,12 +1,20 @@
 ---
 /**
- * Wordmark-ul text din navbar (prototip, `.nav__logo`): numele notarului cu minuscule,
- * Funnel Display 600, spațiere -0.03em, 1.15 × textul de bază. E linkul spre pagina principală;
- * numele accesibil e denumirea oficială a biroului (aria-label), nu forma stilizată.
- * Culoarea vine din tema navbar-ului (currentColor). Sub 25rem numele se poate rupe pe două rânduri.
+ * Wordmark-ul text din navbar (prototip, `.nav__logo-sus` / `.nav__logo-jos`; V3c): denumirea
+ * oficială pe două rânduri, sus forma juridică „Birou Individual Notarial” (Geist 500, 0.78em,
+ * opacitate .8), jos numele „Bojan Elena Luminița” (Funnel Display 600). Niciodată doar numele
+ * persoanei. E linkul spre pagina principală; numele accesibil e denumirea completă (aria-label),
+ * care conține tot textul vizibil (WCAG 2.5.3). Culoarea vine din tema navbar-ului (currentColor).
+ *
+ * Mărimi: rândul de sus nu scade sub 16 px (CLAUDE.md §4): 0.78 × 20.7 px pe ecrane late,
+ * 1rem fix pe mobil, unde rândul de jos e la textul de bază (18 px). Fiecare rând stă pe o
+ * singură linie de la ~360 px (măsurat: 179 px sus, 171 px jos); sub, rândul de sus se poate
+ * rupe în două (3 rânduri în total, tot în înălțimea navbar-ului), iar sub 336 px ambele
+ * rânduri sunt la 16 px. „Meniu” își pierde iconița sub 30rem (Header.astro).
  */
 import { cale, t, type Locale } from '../i18n';
 import type { Birou } from '../lib/continut';
+import { imparteDenumirea } from '../lib/denumire';
 
 interface Props {
   locale: Locale;
@@ -14,29 +22,46 @@ interface Props {
 }
 
 const { locale, birou } = Astro.props;
+const { sus, jos } = imparteDenumirea(birou.denumire, birou.notar);
 ---
 
 <a class="wordmark" href={cale('acasa', locale)} aria-label={t(locale, 'wordmark.acasa', { denumire: birou.denumire })}>
-  {birou.notar.toLocaleLowerCase('ro')}
+  {sus && <span class="wordmark__sus">{sus}</span>}
+  <span class="wordmark__jos">{jos}</span>
 </a>
 
 <style>
   .wordmark {
     display: inline-flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.12em;
     min-height: 48px;
     color: inherit;
-    font-family: var(--font-display);
     font-size: var(--fs-lg);
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1;
+    line-height: 1.1;
     text-decoration: none;
-    white-space: nowrap;
   }
 
   .wordmark:hover {
     color: inherit;
+  }
+
+  .wordmark__sus {
+    font-family: var(--font-sans);
+    /* 0.78 × 20.7 px = 16.1 px: nu sub minimul de 16 px. */
+    font-size: max(1rem, 0.78em);
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+
+  .wordmark__jos {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
   }
 
   @media (max-width: 30rem) {
@@ -45,10 +70,17 @@ const { locale, birou } = Astro.props;
     }
   }
 
-  @media (max-width: 25rem) {
-    .wordmark {
+  /* Ecrane foarte înguste: rândul de sus se poate rupe, ca navbar-ul să nu depășească. */
+  @media (max-width: 22.4rem) {
+    .wordmark__sus {
       white-space: normal;
-      max-width: 9.5em;
+    }
+  }
+
+  /* Sub 336 px (ex. 320 px): ambele rânduri la 16 px, minimul din §4. */
+  @media (max-width: 21rem) {
+    .wordmark {
+      font-size: 1rem;
     }
   }
 </style>

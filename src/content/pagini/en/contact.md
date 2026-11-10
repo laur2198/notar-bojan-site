@@ -1,6 +1,6 @@
 ---
 titlu: "Contact"
-seoDescriere: "Address, opening hours and contact details of the notary office of Bojan Elena Luminița in Brașov, Romania."
+seoDescriere: "Address, opening hours and contact details of Birou Individual Notarial Bojan Elena Luminița, a notary office in Brașov, Romania."
 validat: false
 ---
 

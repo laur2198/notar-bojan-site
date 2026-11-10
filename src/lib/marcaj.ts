@@ -1,9 +1,23 @@
 /**
- * Marcajele «DE COMPLETAT» (CLAUDE.md §3.5, §7). Funcții pure, fără dependențe
- * de Astro, ca să poată fi testate cu Vitest.
+ * Marcajele «DE COMPLETAT» (CLAUDE.md §3.5, §7) și «DE VALIDAT» (texte propuse de noi, de
+ * aprobat de birou, ex. textele alternative ale fotografiilor provizorii). Funcții pure, fără
+ * dependențe de Astro, ca să poată fi testate cu Vitest.
  */
 
 export const MARCAJ = '«DE COMPLETAT';
+export const MARCAJ_VALIDARE = '«DE VALIDAT';
+
+/**
+ * Textul alternativ al unei imagini, fără marcaje (atributul alt nu poate conține HTML):
+ * `«DE VALIDAT: Biroul…»` → `Biroul…`; `«DE COMPLETAT»` singur → șir gol.
+ */
+export function textAlt(text: string | null | undefined): string {
+  if (!text) return '';
+  return text
+    .replace(/«DE (?:COMPLETAT|VALIDAT):?\s*([^»]*)»?/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 export function areMarcaj(text: string | null | undefined): boolean {
   return typeof text === 'string' && text.includes(MARCAJ);
@@ -56,9 +70,11 @@ export function marcheazaInHtml(html: string): string {
 }
 
 function contineMarcaj(valoare: unknown): boolean {
-  if (typeof valoare === 'string') return valoare.includes(MARCAJ);
+  if (typeof valoare === 'string') return valoare.includes(MARCAJ) || valoare.includes(MARCAJ_VALIDARE);
   if (Array.isArray(valoare)) return valoare.some(contineMarcaj);
   if (valoare !== null && typeof valoare === 'object' && !(valoare instanceof Date)) {
+    // O fotografie provizorie (de stoc, CLAUDE.md §5) face și ea intrarea nefinalizată.
+    if ((valoare as { fotoProvizorie?: unknown }).fotoProvizorie === true) return true;
     return Object.values(valoare).some(contineMarcaj);
   }
   return false;
@@ -70,8 +86,9 @@ export interface IntrareContinut {
 }
 
 /**
- * `true` dacă intrarea nu e aprobată de birou: `validat === false`, sau orice
- * câmp text (inclusiv corpul Markdown) conține `«DE COMPLETAT`.
+ * `true` dacă intrarea nu e aprobată de birou: `validat === false`, orice câmp text
+ * (inclusiv corpul Markdown) conține `«DE COMPLETAT` sau `«DE VALIDAT`, ori are o
+ * fotografie provizorie (`fotoProvizorie: true`).
  */
 export function esteDraft(intrare: IntrareContinut): boolean {
   const date = intrare.data as { validat?: unknown } | null;

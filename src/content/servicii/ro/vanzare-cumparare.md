@@ -17,6 +17,10 @@ acteNecesare:
   - "Pentru apartamente: adeverința de la asociația de proprietari"
   - "Certificatul de căsătorie, dacă vânzătorul sau cumpărătorul este căsătorit"
 subiectEmail: "Acte – Vânzare-cumpărare"
+# PROVIZORIE: fotografie de stoc (Unsplash, vezi docs/licente.md), doar pentru preview. Se înlocuiește cu o fotografie reală a biroului; apoi debifați „Fotografie provizorie”.
+imagine: "../../../assets/fotografii-provizorii/serviciu-vanzare-cumparare.jpg"
+imagineAlt: "«DE VALIDAT: Casă în miniatură, cu acoperiș gri și pereți roșii, lângă o cheie, pe o masă de lemn»"
+fotoProvizorie: true
 validat: false
 ---
 

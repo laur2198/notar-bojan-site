@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { esteDraft, marcheazaInHtml, marcheazaPlaceholder } from './marcaj';
+import { esteDraft, marcheazaInHtml, marcheazaPlaceholder, textAlt } from './marcaj';
 
 describe('marcheazaPlaceholder', () => {
   it('escapează HTML-ul și marchează toate formele de marcaj', () => {
@@ -36,4 +36,21 @@ describe('marcheazaInHtml', () => {
     expect(marcheazaInHtml('<p>Text <strong>normal</strong></p>')).toBe('<p>Text <strong>normal</strong></p>');
     expect(marcheazaInHtml('<li>«DE COMPLETAT: alte</li><li>x»</li>')).toBe('<li><mark class="todo">«DE COMPLETAT: alte</mark></li><li>x»</li>');
   });
+});
+
+describe('textAlt', () => {
+  it('scoate marcajele «DE VALIDAT: …» și «DE COMPLETAT: …», păstrează textul', () => {
+    expect(textAlt('«DE VALIDAT: Lampă pe un birou de lemn»')).toBe('Lampă pe un birou de lemn');
+    expect(textAlt('«DE COMPLETAT: descrierea fotografiei»')).toBe('descrierea fotografiei');
+    expect(textAlt('«DE COMPLETAT»')).toBe('');
+    expect(textAlt('Text fără marcaj')).toBe('Text fără marcaj');
+    expect(textAlt(undefined)).toBe('');
+  });
+});
+
+describe('esteDraft: «DE VALIDAT» și fotografiile provizorii', () => {
+  it('«DE VALIDAT» într-un câmp', () => expect(esteDraft({ data: { validat: true, alt: '«DE VALIDAT: x»' } })).toBe(true));
+  it('fotoProvizorie: true, oricât de adânc', () =>
+    expect(esteDraft({ data: { validat: true, pasi: { lista: [{ fotoProvizorie: true }] } } })).toBe(true));
+  it('fotoProvizorie: false nu contează', () => expect(esteDraft({ data: { validat: true, fotoProvizorie: false } })).toBe(false));
 });
