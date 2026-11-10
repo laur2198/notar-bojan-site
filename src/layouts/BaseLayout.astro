@@ -1,11 +1,17 @@
 ---
 /**
  * Carcasa comună a tuturor paginilor (CLAUDE.md §4, §6, §9).
- * Ordinea: SkipLink → Header → <main id="continut"> → Footer → BaraActiuni.
+ * Ordinea: SkipLink → Header (navbar fix, transparent) → <main id="continut"> → Footer →
+ * BaraActiuni → Cursor. În <head>, CapPagina pune clasele de mișcare înainte de primul paint.
+ * <main> și <footer> au data-tema-sectiune="light"; secțiunile închise din pagini își declară
+ * tema (Hero, Sectiune ton="inchis"), ca navbar-ul să-și schimbe culoarea deasupra lor.
+ * Intro-ul (IntroSemnatura) se montează în V3; până atunci CapPagina e în modul „manual”.
  */
 import '../styles/global.css';
 import Breadcrumbs, { type Firimitura } from '../components/Breadcrumbs.astro';
 import BaraActiuni from '../components/BaraActiuni.astro';
+import CapPagina from '../components/CapPagina.astro';
+import Cursor from '../components/Cursor.astro';
 import DraftBadge from '../components/DraftBadge.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -31,9 +37,14 @@ interface Props {
   noindex?: boolean;
   /** og:image, dacă nu e cea implicită (ex. fotografia din hero pe Acasă). */
   imagineOg?: ImagineOg;
+  /**
+   * Tema navbar-ului la încărcare: cea a secțiunii de sus a paginii (ex. „dark” pe Acasă, peste
+   * hero). Corectă de la primul paint, fără să aștepte JS; apoi o actualizează tema-navbar.ts.
+   */
+  temaNavbar?: 'light' | 'dark';
 }
 
-const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg } = Astro.props;
+const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light' } = Astro.props;
 const birou = await getBirou();
 ---
 
@@ -42,6 +53,7 @@ const birou = await getBirou();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <CapPagina intro="manual" />
     <meta name="theme-color" content={culoare('c-ink')} />
     <link rel="preload" href={fontTextLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
@@ -60,8 +72,8 @@ const birou = await getBirou();
   </head>
   <body>
     <SkipLink locale={locale} />
-    <Header locale={locale} birou={birou} />
-    <main id="continut" tabindex="-1">
+    <Header locale={locale} birou={birou} tema={temaNavbar} />
+    <main id="continut" tabindex="-1" data-tema-sectiune="light">
       {
         (breadcrumbs || draft) && (
           <div class="container carcasa__sus">
@@ -74,5 +86,24 @@ const birou = await getBirou();
     </main>
     <Footer locale={locale} birou={birou} />
     <BaraActiuni locale={locale} birou={birou} />
+    <Cursor />
   </body>
 </html>
+
+<script>
+  import { INTEROGARE_MISCARE } from '../scripts/miscare-interogare';
+
+  /*
+   * Mișcarea (GSAP) se încarcă doar când e permisă: la mișcare redusă nu se descarcă deloc.
+   * Dacă preferința se schimbă cu pagina deschisă, se încarcă atunci.
+   */
+  const miscare = matchMedia(INTEROGARE_MISCARE);
+  let incarcata = false;
+  const incarca = () => {
+    if (incarcata || !miscare.matches) return;
+    incarcata = true;
+    void import('../scripts/miscare').then((m) => m.pornesteMiscarea());
+  };
+  incarca();
+  miscare.addEventListener('change', incarca);
+</script>

@@ -1,9 +1,9 @@
 ---
 /**
- * Wordmark-ul text (logo-ul grafic vine mai târziu), folosit în header și în footer:
- * numele notarului (700) și dedesubt „Notar public · Brașov” (13 px, 500), ambele cu
- * majuscule prin CSS (textul rămâne normal pentru cititoarele de ecran).
- * Rândul de 13 px e una dintre cele două excepții sub 16 px permise de CLAUDE.md §4.
+ * Wordmark-ul text din navbar (prototip, `.nav__logo`): numele notarului cu minuscule,
+ * Funnel Display 600, spațiere -0.03em, 1.15 × textul de bază. E linkul spre pagina principală;
+ * numele accesibil e denumirea oficială a biroului (aria-label), nu forma stilizată.
+ * Culoarea vine din tema navbar-ului (currentColor). Sub 25rem numele se poate rupe pe două rânduri.
  */
 import { cale, t, type Locale } from '../i18n';
 import type { Birou } from '../lib/continut';
@@ -16,61 +16,39 @@ interface Props {
 const { locale, birou } = Astro.props;
 ---
 
-<a class="wordmark" href={cale('acasa', locale)}>
-  <span class="wordmark__nume">{birou.notar}</span>
-  <span class="wordmark__profesie">{t(locale, 'wordmark.profesie')} · {birou.adresa.oras}</span>
+<a class="wordmark" href={cale('acasa', locale)} aria-label={t(locale, 'wordmark.acasa', { denumire: birou.denumire })}>
+  {birou.notar.toLocaleLowerCase('ro')}
 </a>
 
 <style>
   .wordmark {
     display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
     min-height: 48px;
-    color: var(--c-ink);
+    color: inherit;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
     text-decoration: none;
-    text-transform: uppercase;
-    line-height: 1.15;
+    white-space: nowrap;
   }
 
   .wordmark:hover {
-    color: var(--c-ink);
+    color: inherit;
   }
 
-  .wordmark__nume {
-    font-size: var(--fs-sm);
-    font-weight: 700;
-  }
-
-  .wordmark__profesie {
-    /* 12 px (excepția din CLAUDE.md §4) */
-    font-size: calc(var(--fs-sm) * 0.75);
-    font-weight: 500;
-    color: var(--c-muted);
-  }
-
-  .wordmark:hover .wordmark__nume {
-    text-decoration: underline;
-    text-decoration-color: var(--c-ink);
-    text-decoration-thickness: 0.08em;
-    text-underline-offset: 0.18em;
-  }
-
-  /* Sub 480 px numele se poate rupe pe două rânduri; de acolo în sus rămâne pe unul. */
-  @media (min-width: 30rem) {
+  @media (max-width: 30rem) {
     .wordmark {
-      white-space: nowrap;
-    }
-
-    .wordmark__nume {
-      font-size: var(--fs-lg);
+      font-size: var(--fs-base);
     }
   }
 
-  /* Pe desktop (≥ 67rem, pragul meniului complet din Header), 17 px. */
-  @media (min-width: 67rem) {
-    .wordmark__nume {
-      font-size: calc(var(--fs-sm) * 1.0625);
+  @media (max-width: 25rem) {
+    .wordmark {
+      white-space: normal;
+      max-width: 9.5em;
     }
   }
 </style>

@@ -4,7 +4,7 @@ import { culoare, culori, marimePx, numarToken } from './tokens';
 describe('culorile din tokens.css', () => {
   it('sunt paleta monocromă din prototip, fără lemn, bordo sau culori de stare', () => {
     expect(Object.keys(culori).sort()).toEqual(
-      ['c-ink', 'c-ink-2', 'c-line', 'c-line-dark', 'c-muted', 'c-muted-dark', 'c-paper', 'c-paper-2'].sort(),
+      ['c-ink', 'c-ink-2', 'c-ink-3', 'c-ink-hover', 'c-line', 'c-line-dark', 'c-muted', 'c-muted-dark', 'c-paper', 'c-paper-2', 'c-paper-hover'].sort(),
     );
     expect(culoare('c-paper')).toBe('#FFFFFF');
     expect(culoare('c-ink')).toBe('#0F0F0F');

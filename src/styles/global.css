@@ -28,10 +28,23 @@ html {
 }
 
 /* De la pragul meniului complet (Header.astro), header-ul are --header-h. */
-@media (min-width: 67rem) {
+@media (min-width: 74rem) {
+  :root {
+    --h-antet: var(--header-h);
+  }
+
   html {
     scroll-padding-top: calc(var(--header-h) + var(--space-2));
   }
+}
+
+/*
+ * Navbar-ul e fix și transparent (Header.astro): conținutul începe sub el. Benzile de pe toată
+ * lățimea care deschid pagina (Hero, BandaTitlu) urcă sub navbar (margin-top negativ și
+ * --h-antet în padding-top), ca fundalul lor să se vadă și în spatele lui.
+ */
+main {
+  padding-top: var(--h-antet);
 }
 
 body {
@@ -222,9 +235,85 @@ body::after {
   outline-color: var(--c-paper);
 }
 
+/*
+ * Tema locală (deschis / închis), moștenită de la cel mai apropiat container: secțiunile cu
+ * data-tema-sectiune, .pe-inchis, navbar-ul și Buton-ul cu tema explicită (data-tema).
+ * Butonul (Buton.astro) și focusul își iau culorile de aici.
+ */
+:root,
+[data-tema-sectiune='light'],
+[data-tema='light'] {
+  --buton-plin-bg: var(--c-ink);
+  --buton-plin-fg: var(--c-paper);
+  --buton-plin-hover: var(--c-ink-hover);
+  --buton-contur-fg: var(--c-ink);
+  --buton-contur-hover: var(--c-paper-2);
+  --buton-focus: var(--c-ink);
+  --buton-dezactivat: var(--c-muted);
+}
+
+.pe-inchis,
+[data-tema-sectiune='dark'],
+[data-tema='dark'] {
+  --buton-plin-bg: var(--c-paper);
+  --buton-plin-fg: var(--c-ink);
+  --buton-plin-hover: var(--c-paper-hover);
+  --buton-contur-fg: var(--c-paper);
+  --buton-contur-hover: var(--c-ink-3);
+  --buton-focus: var(--c-paper);
+  --buton-dezactivat: var(--c-muted-dark);
+}
+
+[data-tema-sectiune='dark'] :focus-visible,
+[data-tema-sectiune='dark']:focus-visible {
+  outline-color: var(--c-paper);
+}
+
+[data-tema-sectiune='light'] :focus-visible {
+  outline-color: var(--c-ink);
+}
+
+/*
+ * Link cu linia care se trage la hover (prototip, `.sub`): fără subliniere, o linie de 1/16 em
+ * care crește de la stânga la hover / focus și se retrage spre dreapta. Pagina curentă
+ * (aria-current) o are trasă permanent: indiciu care nu depinde de culoare.
+ */
+.sub {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+
+.sub::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0.4em;
+  width: 100%;
+  height: max(1px, 0.0625em);
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.735s var(--ease-out);
+}
+
+.sub:hover {
+  color: inherit;
+}
+
+.sub:is(:hover, :focus-visible)::before,
+.sub[aria-current]::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.sub[aria-current]::before {
+  height: max(2px, 0.1em);
+}
+
 /* Pe fundal închis, linkurile (în afară de butoane) și sublinierea lor preiau culoarea textului. */
-.pe-inchis a:not(.btn),
-.pe-inchis a:not(.btn):hover {
+.pe-inchis a:not(.btn, .buton),
+.pe-inchis a:not(.btn, .buton):hover {
   color: inherit;
   text-decoration-color: currentColor;
 }

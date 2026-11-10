@@ -34,7 +34,7 @@ const areRating = birou.rating !== null && birou.numarRecenzii !== null;
 const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 ---
 
-<section class="hero pe-inchis" aria-labelledby="hero-titlu">
+<section class="hero pe-inchis" data-tema-sectiune="dark" aria-labelledby="hero-titlu">
   <div class="hero__fundal">
     {
       imagine ? (
@@ -107,7 +107,10 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
     display: grid;
     grid-template-rows: 1fr auto;
     /* ~70% din înălțimea ecranului pe mobil */
-    min-height: 70svh;
+    min-height: calc(70svh + var(--h-antet));
+    /* Urcă sub navbar-ul transparent (global.css, main). */
+    margin-top: calc(-1 * var(--h-antet));
+    padding-top: var(--h-antet);
     color: var(--c-paper);
     background: var(--c-ink);
     overflow: hidden;
@@ -115,8 +118,8 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
 
   @media (min-width: 64rem) {
     .hero {
-      /* Tot ecranul de sub header, dar nu mai mult de 800 px. */
-      min-height: min(calc(100svh - var(--header-h)), 800px);
+      /* Tot ecranul (navbar-ul e deasupra, transparent), dar nu mai mult de 800 px sub el. */
+      min-height: min(100svh, calc(800px + var(--h-antet)));
     }
   }
 
@@ -136,13 +139,14 @@ const profilGoogle = linkExtern(birou.googleProfilUrl, '');
   .hero__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgb(42 26 16 / 0.55), rgb(42 26 16 / 0.55));
+    background: linear-gradient(rgb(15 15 15 / 0.55), rgb(15 15 15 / 0.55));
   }
 
   .hero__placeholder {
     position: absolute;
     right: var(--gutter);
-    top: var(--space-2);
+    /* Sub navbar-ul transparent. */
+    top: calc(var(--h-antet) + var(--space-2));
     padding: calc(var(--space-1) / 2) var(--space-1);
     border: 1px dashed var(--c-muted-dark);
     border-radius: var(--radius);

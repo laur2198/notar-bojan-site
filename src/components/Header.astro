@@ -1,26 +1,25 @@
 ---
 /**
- * Antetul site-ului (CLAUDE.md §4, §5, §6): alb, fix sus (sticky), 80 px pe desktop,
- * 64 px pe mobil. Fără scroll: o linie line jos; după scroll: umbră fină (JS).
+ * Navbar-ul (prototip, `.nav`; CLAUDE.md §4, §5, §6): fix sus, TRANSPARENT, fără umbră și fără
+ * linie. Culoarea vine din data-tema (light / dark), pusă de src/scripts/tema-navbar.ts după
+ * secțiunea de sub el ([data-tema-sectiune]), cu tranziție de 0.4 s. Excepție aprobată de la
+ * „header plin” (CLAUDE.md §5): textul paginii poate trece pe sub navbar la derulare.
  *
- * - Desktop (≥ 67rem = 1072 px): wordmark | meniu | RO | EN | telefon | WhatsApp | „Programare”,
- *   în container (max. 1.200 px). Telefonul e doar iconiță (numărul în aria-label); emailul nu
- *   apare pe desktop (e în /contact/, în footer și în meniul compact).
- *   Pragul e măsurat: header-ul RO cere 1.012 px de conținut, deci încape de la 1.069 px de ecran
- *   (EN, cu meniul mai scurt, de la 1.024 px). Sub prag: varianta compactă.
- * - 768 px – 67rem: wordmark | telefon | „Programare” | comutator | „Meniu”
- *   (bara de jos apare doar sub 768 px, iar telefonul trebuie să fie vizibil pe orice ecran).
- * - < 768 px: wordmark | comutator | „Meniu”; telefonul și „Programare” stau în bara de jos.
- *
- * Meniul compact are, după linkuri, contactele directe (telefon, WhatsApp, email) și nota
- * despre WhatsApp (ListaContacte).
- *
- * Meniul compact e un `<details>`: se deschide și fără JS. JS adaugă închiderea la
- * Escape (cu focus înapoi pe buton), la click în afara meniului și umbra după scroll.
+ * - Desktop (≥ PRAG, vezi stilurile): wordmark | Servicii · Programare · Întrebări · Contact |
+ *   RO|EN · telefon · WhatsApp · Buton „Programare”. Linkurile au linia care se trage la hover
+ *   (.sub); pagina curentă (aria-current) o are trasă permanent.
+ * - Sub prag: wordmark | telefon | (Programare, de la 768 px: §4 cere butonul vizibil pe orice
+ *   ecran, iar bara de jos apare doar sub 768 px) | „Meniu”.
+ * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-ink:
+ *   linkurile mari (Funnel Display, rânduri din mască la deschidere, doar cu mișcare permisă),
+ *   contactele (ListaContacte) și comutatorul de limbă. Cât e deschis, derularea paginii e
+ *   blocată (CSS :has) și navbar-ul trece pe tema închisă. JS: Escape închide și readuce
+ *   focusul pe buton, Tab rămâne în panou, trecerea la desktop închide meniul.
  */
 import { ariaCurent, cale, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
 import { linkTelefon, linkWhatsapp } from '../lib/contact';
 import type { Birou } from '../lib/continut';
+import Buton from './Buton.astro';
 import ButonIconita from './ButonIconita.astro';
 import ComutatorLimba from './ComutatorLimba.astro';
 import Iconita from './Iconita.astro';
@@ -30,33 +29,49 @@ import Wordmark from './Wordmark.astro';
 interface Props {
   locale: Locale;
   birou: Birou;
+  /** Tema la încărcare (secțiunea de sus a paginii); apoi o actualizează tema-navbar.ts. */
+  tema?: 'light' | 'dark';
 }
 
-const { locale, birou } = Astro.props;
+const { locale, birou, tema = 'light' } = Astro.props;
 const pathname = Astro.url.pathname;
 const telefon = linkTelefon(birou);
 const whatsapp = linkWhatsapp(birou, locale);
 
-/** `scurt`: eticheta din meniul de desktop, unde spațiul e limitat (ex. „Întrebări”). */
-const MENIU: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI; scurt?: CheieUI }[]> = {
+interface Legatura {
+  cheie: CheieRuta;
+  eticheta: CheieUI;
+  /** Eticheta din bara de desktop, unde spațiul e limitat. */
+  scurt?: CheieUI;
+  /** Doar în meniul compact (pe desktop e în subsol). */
+  doarCompact?: boolean;
+}
+
+const MENIU: Record<Locale, Legatura[]> = {
   ro: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
     { cheie: 'programare', eticheta: 'nav.programare' },
     { cheie: 'faq', eticheta: 'nav.faq', scurt: 'nav.faqScurt' },
-    { cheie: 'despre', eticheta: 'nav.despre' },
+    { cheie: 'despre', eticheta: 'nav.despre', doarCompact: true },
     { cheie: 'contact', eticheta: 'nav.contact' },
   ],
   en: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
     { cheie: 'programare', eticheta: 'nav.programare' },
-    { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'faq', eticheta: 'nav.faq', scurt: 'nav.faqScurt' },
     { cheie: 'contact', eticheta: 'nav.contact' },
   ],
 };
 
-const linkuri = MENIU[locale].map(({ cheie, eticheta, scurt }) => {
+const linkuri = MENIU[locale].map(({ cheie, eticheta, scurt, doarCompact }) => {
   const href = cale(cheie, locale);
-  return { href, text: t(locale, eticheta), textScurt: t(locale, scurt ?? eticheta), curent: ariaCurent(href, pathname) };
+  return {
+    href,
+    text: t(locale, eticheta),
+    textScurt: t(locale, scurt ?? eticheta),
+    doarCompact: !!doarCompact,
+    curent: ariaCurent(href, pathname),
+  };
 });
 
 const hrefProgramare = cale('programare', locale);
@@ -64,42 +79,41 @@ const programareCurenta = ariaCurent(hrefProgramare, pathname) === 'page' ? 'pag
 const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
 ---
 
-<header class="antet" data-antet>
-  <div class="container antet__interior">
+<header class="antet" data-navbar data-tema={tema}>
+  <div class="container antet__bara">
     <Wordmark locale={locale} birou={birou} />
 
-    {/* Desktop */}
-    <div class="antet__desktop">
-      <nav aria-label={t(locale, 'nav.principal')}>
-        <ul class="meniu" role="list">
-          {
-            linkuri.map((l) => (
+    <nav class="antet__linkuri" aria-label={t(locale, 'nav.principal')}>
+      <ul role="list">
+        {
+          linkuri
+            .filter((l) => !l.doarCompact)
+            .map((l) => (
               <li>
-                <a href={l.href} aria-current={l.curent}>
+                <a class="sub" href={l.href} aria-current={l.curent}>
                   {l.textScurt}
                 </a>
               </li>
             ))
-          }
-        </ul>
-      </nav>
-      <ComutatorLimba locale={locale} />
-      <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
-      <ButonIconita locale={locale} iconita="whatsapp" link={whatsapp} eticheta={t(locale, 'whatsapp.scrieti')} extern />
-      <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
-        {t(locale, 'actiune.programare')}
-      </a>
-    </div>
+        }
+      </ul>
+    </nav>
 
-    {/* Compact */}
-    <div class="antet__compact">
-      <div class="antet__tableta">
+    <div class="antet__dreapta">
+      <ComutatorLimba locale={locale} class="antet__limba" compact />
+      <span class="antet__iconita">
         <ButonIconita locale={locale} iconita="telefon" link={telefon} eticheta={etichetaTelefon} />
-        <a class="btn btn--primar" href={hrefProgramare} aria-current={programareCurenta}>
-          {t(locale, 'actiune.programare')}
-        </a>
-      </div>
-      <ComutatorLimba locale={locale} compact />
+      </span>
+      <span class="antet__iconita antet__whatsapp">
+        <ButonIconita locale={locale} iconita="whatsapp" link={whatsapp} eticheta={t(locale, 'whatsapp.scrieti')} extern />
+      </span>
+      <Buton
+        class="antet__programare"
+        text={t(locale, 'actiune.programareScurt')}
+        href={hrefProgramare}
+        aria-current={programareCurenta}
+      />
+
       <details class="meniu-compact" data-meniu-compact>
         <summary class="meniu-compact__buton">
           <span class="meniu-compact__stare meniu-compact__stare--inchis">
@@ -111,22 +125,25 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
             {t(locale, 'meniu.inchide')}
           </span>
         </summary>
-        <div class="meniu-compact__panou">
-          <nav class="container" aria-label={t(locale, 'nav.principal')}>
-            <ul class="meniu-compact__lista" role="list">
-              {
-                linkuri.map((l) => (
-                  <li>
-                    <a href={l.href} aria-current={l.curent}>
-                      {l.text}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </nav>
-          <div class="container meniu-compact__contacte">
-            <ListaContacte locale={locale} birou={birou} />
+        <div class="meniu-compact__panou pe-inchis" data-tema-sectiune="dark">
+          <div class="container meniu-compact__interior">
+            <nav aria-label={t(locale, 'nav.principal')}>
+              <ul class="meniu-compact__lista" role="list">
+                {
+                  linkuri.map((l) => (
+                    <li>
+                      <a href={l.href} aria-current={l.curent}>
+                        <span class="meniu-compact__rand">{l.text}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </nav>
+            <div class="meniu-compact__contacte">
+              <ListaContacte locale={locale} birou={birou} />
+              <ComutatorLimba locale={locale} />
+            </div>
           </div>
         </div>
       </details>
@@ -135,29 +152,41 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
 </header>
 
 <script>
-  const antet = document.querySelector<HTMLElement>('[data-antet]');
-  if (antet) {
-    const actualizeaza = () => antet.toggleAttribute('data-derulat', window.scrollY > 0);
-    actualizeaza();
-    window.addEventListener('scroll', actualizeaza, { passive: true });
-  }
+  import { pornesteTemaNavbar } from '../scripts/tema-navbar';
+
+  pornesteTemaNavbar();
+
+  const SELECTOR_FOCALIZABIL = 'a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
   for (const meniu of document.querySelectorAll<HTMLDetailsElement>('[data-meniu-compact]')) {
     const buton = meniu.querySelector('summary');
 
     meniu.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && meniu.open) {
+      if (!meniu.open) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
         meniu.open = false;
         buton?.focus();
+        return;
+      }
+      // Focusul rămâne în panou: Tab de pe ultimul element revine la „Închide” și invers.
+      if (e.key !== 'Tab') return;
+      const elemente = [...meniu.querySelectorAll<HTMLElement>(SELECTOR_FOCALIZABIL)].filter((el) => el.getClientRects().length > 0);
+      const primul = elemente[0];
+      const ultimul = elemente[elemente.length - 1];
+      if (!primul || !ultimul) return;
+      if (e.shiftKey && document.activeElement === primul) {
+        e.preventDefault();
+        ultimul.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimul) {
+        e.preventDefault();
+        primul.focus();
       }
     });
 
-    document.addEventListener('click', (e) => {
-      if (meniu.open && e.target instanceof Node && !meniu.contains(e.target)) meniu.open = false;
-    });
-
     // Trecerea la desktop închide meniul compact (ar rămâne deschis, ascuns).
-    window.matchMedia('(min-width: 67rem)').addEventListener('change', (e) => {
+    const desktop = window.matchMedia('(min-width: 74rem)');
+    desktop.addEventListener('change', (e) => {
       if (e.matches) meniu.open = false;
     });
   }
@@ -165,22 +194,50 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
 
 <style>
   .antet {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    inset: 0 0 auto 0;
     z-index: 40;
-    background: var(--c-paper);
     color: var(--c-ink);
-    box-shadow: 0 1px 0 var(--c-line);
-    transition: box-shadow 150ms ease;
+    transition: color 0.4s ease;
   }
 
-  .antet[data-derulat] {
-    box-shadow:
-      0 1px 0 var(--c-line),
-      var(--shadow);
+  .antet[data-tema='dark'] {
+    color: var(--c-paper);
   }
 
-  .antet__interior {
+  .antet[data-fara-tranzitie] {
+    transition: none;
+  }
+
+  /*
+   * Fără JS, tema nu se poate actualiza la derulare: navbar-ul primește fundal plin, în tema
+   * de la încărcare, ca textul să nu ajungă niciodată pe un fundal de aceeași culoare.
+   */
+  :global(html:not(.js)) .antet {
+    background: var(--c-paper);
+  }
+
+  :global(html:not(.js)) .antet[data-tema='dark'] {
+    background: var(--c-ink);
+  }
+
+  /* Meniul deschis: panoul e închis la culoare, deci navbar-ul trece pe tema închisă. */
+  .antet:has(.meniu-compact[open]) {
+    color: var(--c-paper);
+    --buton-plin-bg: var(--c-paper);
+    --buton-plin-fg: var(--c-ink);
+    --buton-plin-hover: var(--c-paper-hover);
+    --buton-contur-fg: var(--c-paper);
+    --buton-contur-hover: var(--c-ink-3);
+    --buton-focus: var(--c-paper);
+    --buton-dezactivat: var(--c-muted-dark);
+  }
+
+  .antet :focus-visible {
+    outline-color: var(--buton-focus);
+  }
+
+  .antet__bara {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -188,39 +245,47 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     min-height: var(--header-h-sm);
   }
 
-  /* --- Compact (< 67rem) --- */
-  .antet__compact {
+  .antet__dreapta {
     display: flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: 0.6em;
   }
 
-  .antet__tableta {
+  .antet__iconita {
+    display: inline-flex;
+  }
+
+  /* Ce apare doar pe desktop. */
+  .antet__linkuri,
+  .antet__dreapta :global(.antet__limba),
+  .antet__whatsapp {
+    display: none;
+  }
+
+  /* Programare: de la 768 px (sub, e în bara de jos). */
+  .antet__dreapta :global(.antet__programare) {
     display: none;
   }
 
   @media (min-width: 48rem) {
-    .antet__tableta {
-      display: flex;
-      align-items: center;
-      gap: var(--space-1);
-      margin-right: var(--space-1);
+    .antet__dreapta :global(.antet__programare) {
+      display: inline-flex;
     }
   }
 
+  /* --- Meniul compact --- */
   .meniu-compact__buton {
     display: inline-flex;
     align-items: center;
-    min-height: 48px;
-    padding: 0 var(--space-1);
-    border: 1px solid var(--c-line);
+    min-height: max(48px, 2.6em);
+    padding: 0 0.8em;
+    border: 1px solid currentColor;
     border-radius: var(--radius);
-    color: var(--c-ink);
-    font-size: var(--fs-sm);
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     list-style: none;
     user-select: none;
+    transition: background-color 0.2s ease;
   }
 
   .meniu-compact__buton::-webkit-details-marker {
@@ -228,17 +293,13 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   .meniu-compact__buton:hover {
-    background: var(--c-paper-2);
-  }
-
-  .meniu-compact__buton :global(.iconita) {
-    color: var(--c-ink);
+    background: var(--buton-contur-hover);
   }
 
   .meniu-compact__stare {
     display: inline-flex;
     align-items: center;
-    gap: calc(var(--space-1) * 0.75);
+    gap: 0.4em;
   }
 
   .meniu-compact__stare--deschis,
@@ -250,133 +311,151 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: inline-flex;
   }
 
+  /* Panoul: tot ecranul, sub bara navbar-ului (care rămâne deasupra, cu „Închide”). */
   .meniu-compact__panou {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--c-paper);
-    border-top: 1px solid var(--c-line);
-    box-shadow: var(--shadow);
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: var(--header-h-sm);
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  :global(html:has(.meniu-compact[open])) {
+    overflow: hidden;
+  }
+
+  .meniu-compact__interior {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
   }
 
   .meniu-compact__lista {
     display: grid;
-    padding: var(--space-1) 0 var(--space-2);
+    padding: 0;
     list-style: none;
+    border-top: 1px solid var(--c-line-dark);
   }
 
   .meniu-compact__lista li {
     max-width: none;
-  }
-
-  .meniu-compact__contacte {
-    padding-block: var(--space-2) var(--space-3);
-    border-top: 1px solid var(--c-line);
-  }
-
-  /* Pe tabletă, contactele stau pe un rând (cât încap); pe telefon, unul sub altul. */
-  @media (min-width: 48rem) {
-    .meniu-compact__contacte :global(.contacte__lista) {
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: var(--space-4);
-    }
-
-    .meniu-compact__contacte :global(.contacte__link) {
-      overflow-wrap: normal;
-    }
-  }
-
-  /* Meniul compact derulează dacă nu încape (telefon în poziție orizontală). */
-  .meniu-compact__panou {
-    max-height: calc(100svh - var(--header-h-sm));
-    overflow-y: auto;
-  }
-
-  .meniu-compact__lista li + li {
-    border-top: 1px solid var(--c-line);
+    border-bottom: 1px solid var(--c-line-dark);
   }
 
   .meniu-compact__lista a {
-    display: flex;
-    align-items: center;
-    min-height: 56px;
-    color: var(--c-ink);
-    font-size: var(--fs-lg);
-    font-weight: 600;
+    display: block;
+    overflow: hidden;
+    padding-block: 0.25em;
+    color: var(--c-paper);
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-titlu);
+    letter-spacing: var(--ls-h2);
+    line-height: 1.2;
     text-decoration: none;
   }
 
-  .meniu-compact__lista a:hover {
-    color: var(--c-ink);
+  .meniu-compact__rand {
+    display: inline-block;
+  }
+
+  .meniu-compact__lista a:hover .meniu-compact__rand,
+  .meniu-compact__lista a[aria-current] .meniu-compact__rand {
     text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.15em;
   }
 
-  .meniu-compact__lista a[aria-current] {
-    text-decoration: underline;
-    text-decoration-color: var(--c-ink);
-    text-decoration-thickness: 3px;
-    text-underline-offset: 0.3em;
+  .meniu-compact__lista a[aria-current] .meniu-compact__rand {
+    text-decoration-thickness: 0.1em;
   }
 
-  /* --- Desktop (≥ 67rem) --- */
-
-  .antet__desktop {
-    display: none;
+  .meniu-compact__contacte {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
   }
 
-  @media (min-width: 67rem) {
-    .antet__interior {
+  /* Rânduri din mască la deschidere, doar cu mișcare permisă. */
+  @media (prefers-reduced-motion: no-preference) {
+    .meniu-compact[open] .meniu-compact__rand {
+      animation: meniu-rand 0.8s var(--ease-out) both;
+    }
+
+    .meniu-compact[open] li:nth-child(2) .meniu-compact__rand {
+      animation-delay: 80ms;
+    }
+
+    .meniu-compact[open] li:nth-child(3) .meniu-compact__rand {
+      animation-delay: 160ms;
+    }
+
+    .meniu-compact[open] li:nth-child(4) .meniu-compact__rand {
+      animation-delay: 240ms;
+    }
+
+    .meniu-compact[open] li:nth-child(5) .meniu-compact__rand {
+      animation-delay: 320ms;
+    }
+  }
+
+  @keyframes meniu-rand {
+    from {
+      transform: translateY(110%);
+    }
+  }
+
+  /*
+   * --- Desktop (≥ 74rem = 1184 px) ---
+   * Pragul e măsurat cu fonturile încărcate, la textul de bază de 18 px (grila 1fr auto 1fr cere
+   * 2 × max(stânga, dreapta) + centru + spații): RO are nevoie de ~1.151 px, EN de ~1.035 px.
+   * Peste 1440 px totul crește proporțional cu textul de bază, deci încape și acolo. 1184 px lasă
+   * o marjă de ~16 px pe fiecare parte; laptopurile de 1280 px au meniul complet.
+   */
+  @media (min-width: 74rem) {
+    .antet__bara {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       min-height: var(--header-h);
-      gap: var(--space-2);
     }
 
-    .antet__compact {
-      display: none;
+    .antet__linkuri {
+      display: block;
     }
 
-    .antet__desktop {
+    .antet__linkuri ul {
       display: flex;
-      align-items: center;
-      gap: var(--space-1);
-    }
-
-    .meniu {
-      display: flex;
+      gap: 2em;
       padding: 0;
       list-style: none;
     }
 
-    .meniu li {
+    .antet__linkuri li {
       max-width: none;
     }
 
-    .meniu a {
+    .antet__linkuri a {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-width: 48px;
       min-height: 48px;
-      /* 16 px, 500, 12 px stânga–dreapta: meniul complet încape de la 1024 px. */
-      padding: 0 calc(var(--space-1) * 1.5);
-      color: var(--c-ink);
-      font-size: var(--fs-sm);
-      font-weight: 500;
-      text-decoration: none;
+      color: inherit;
       white-space: nowrap;
     }
 
-    .meniu a:hover {
-      color: var(--c-ink);
+    .antet__dreapta {
+      justify-self: end;
     }
 
-    .meniu a[aria-current] {
-      text-decoration: underline;
-      text-decoration-color: var(--c-ink);
-      text-decoration-thickness: 3px;
-      text-underline-offset: 0.4em;
+    .antet__dreapta :global(.antet__limba),
+    .antet__whatsapp {
+      display: inline-flex;
+    }
+
+    .meniu-compact {
+      display: none;
     }
   }
-
 </style>

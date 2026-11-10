@@ -1,17 +1,20 @@
 ---
 /**
- * Subsolul (structură după referința aleasă de clientă): deschis la culoare, aerisit.
- * Fundal paper-2, linie line sus. Patru coloane pe desktop (2 pe tabletă, 1 pe mobil):
- * wordmark + denumirea completă | Contact | Program | Linkuri. Dedesubt, după o linie,
- * „© an denumire” și „Politica de confidențialitate”.
- * Fundalul e deschis, deci focusul e --c-ink (fără `.pe-inchis`).
+ * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5): fundal --c-paper, intră „de sub
+ * conținut”: interiorul urcă (yPercent -25 → 0) și un strat --c-ink se estompează (0.5 → 0), cu
+ * scrub, pe intervalul clamp(top bottom) → clamp(top top). Mișcarea o face src/scripts/miscare.ts
+ * ([data-footer]), doar cu mișcare permisă; altfel subsolul e static. Când s-a oprit, textul e fix.
+ *
+ * Patru coloane (2 pe tabletă, 1 pe mobil): Navigare | Contact | Adresă | Program, cu datele din
+ * src/content/setari/birou.yaml; marcajele «DE COMPLETAT» rămân marcate (doar în preview).
+ * Rândul legal: © an + denumirea oficială, Politica de confidențialitate, CIF. Apoi o linie și
+ * wordmark-ul gigant (decorativ), cu spațiu dedesubt pentru descendentul lui „ț”.
  */
 import { cale, esteInAltaLimba, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
-import { linkEmail, linkTelefon } from '../lib/contact';
+import { linkEmail, linkExtern, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
-import Iconita from './Iconita.astro';
 import ProgramSaptamana from './ProgramSaptamana.astro';
-import Wordmark from './Wordmark.astro';
+import WordmarkGigant from './WordmarkGigant.astro';
 
 interface Props {
   locale: Locale;
@@ -19,17 +22,16 @@ interface Props {
 }
 
 const { locale, birou } = Astro.props;
-const telefon = linkTelefon(birou);
-const email = linkEmail(birou.email);
 const an = new Date().getFullYear();
 
-/** Recenziile nu au pagină EN (CLAUDE.md §6), deci nu apar în subsolul EN. */
-const LINKURI: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
+/** Recenziile și „Despre” nu au pagină EN (CLAUDE.md §6), deci nu apar în subsolul EN. */
+const NAVIGARE: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ro: [
     { cheie: 'servicii', eticheta: 'nav.servicii' },
     { cheie: 'programare', eticheta: 'nav.programare' },
-    { cheie: 'recenzii', eticheta: 'nav.recenzii' },
     { cheie: 'faq', eticheta: 'nav.faq' },
+    { cheie: 'recenzii', eticheta: 'nav.recenzii' },
+    { cheie: 'despre', eticheta: 'nav.despre' },
     { cheie: 'contact', eticheta: 'nav.contact' },
   ],
   en: [
@@ -40,7 +42,23 @@ const LINKURI: Record<Locale, { cheie: CheieRuta; eticheta: CheieUI }[]> = {
   ],
 };
 
-const linkuri = LINKURI[locale].map(({ cheie, eticheta }) => ({ href: cale(cheie, locale), text: t(locale, eticheta) }));
+const navigare = NAVIGARE[locale].map(({ cheie, eticheta }) => ({ href: cale(cheie, locale), text: t(locale, eticheta) }));
+
+interface Contact {
+  eticheta: string;
+  link: LinkContact;
+  /** Textul vizibil; implicit cel al linkului. */
+  text?: string;
+  extern?: boolean;
+}
+
+const contacte: Contact[] = [
+  { eticheta: t(locale, 'contact.telefon'), link: linkTelefon(birou) },
+  { eticheta: t(locale, 'contact.email'), link: linkEmail(birou.email) },
+  { eticheta: t(locale, 'whatsapp.nume'), link: linkWhatsapp(birou, locale), text: t(locale, 'whatsapp.nume'), extern: true },
+];
+
+const harta = linkExtern(birou.googleMapsUrl, t(locale, 'harta.deschide'));
 const confidentialitate = {
   href: cale('confidentialitate', locale),
   text: t(locale, 'nav.confidentialitate'),
@@ -49,115 +67,118 @@ const confidentialitate = {
 const { strada, codPostal, oras, judet } = birou.adresa;
 ---
 
-<footer class="subsol">
-  <div class="container">
-    <div class="subsol__grila">
-      <div class="subsol__coloana">
-        <Wordmark locale={locale} birou={birou} />
-        <p class="subsol__denumire">{birou.denumire}</p>
+<footer class="subsol" data-tema-sectiune="light" data-footer>
+  <div class="subsol__interior" data-footer-interior>
+    <div class="container">
+      <div class="subsol__coloane">
+        <nav class="subsol__coloana" aria-labelledby="subsol-navigare">
+          <h2 id="subsol-navigare" class="subsol__titlu">{t(locale, 'subsol.navigare')}</h2>
+          <ul class="subsol__lista" role="list">
+            {
+              navigare.map((l) => (
+                <li>
+                  <a class="sub subsol__link" href={l.href}>
+                    {l.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <section class="subsol__coloana" aria-labelledby="subsol-contact">
+          <h2 id="subsol-contact" class="subsol__titlu">{t(locale, 'subsol.contact')}</h2>
+          <ul class="subsol__lista" role="list">
+            {
+              contacte.map((c) => (
+                <li>
+                  {c.link.valid ? (
+                    <a
+                      class="sub subsol__link subsol__rupe"
+                      href={c.link.href}
+                      {...(c.extern && { target: '_blank', rel: 'noopener noreferrer' })}
+                    >
+                      <span class="sr-only">{c.eticheta}: </span>
+                      {c.text ?? c.link.text}
+                      {c.extern && <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>}
+                    </a>
+                  ) : (
+                    <span class="subsol__text subsol__rupe">
+                      {c.eticheta}: <Fragment set:html={marcheazaPlaceholder(c.link.text)} />
+                    </span>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="subsol__coloana" aria-labelledby="subsol-adresa">
+          <h2 id="subsol-adresa" class="subsol__titlu">{t(locale, 'subsol.adresa')}</h2>
+          <address class="subsol__adresa">
+            <span set:html={marcheazaPlaceholder(strada)} /><br />
+            <span set:html={marcheazaPlaceholder(codPostal)} />
+            {oras}, {t(locale, 'contact.judet', { judet })}
+          </address>
+          {
+            harta.valid && (
+              <a class="sub subsol__link" href={harta.href} target="_blank" rel="noopener noreferrer">
+                {harta.text}
+                <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>
+              </a>
+            )
+          }
+        </section>
+
+        <section class="subsol__coloana" aria-labelledby="subsol-program">
+          <h2 id="subsol-program" class="subsol__titlu">{t(locale, 'program.titlu')}</h2>
+          <ProgramSaptamana locale={locale} program={birou.program} simplu compact />
+        </section>
       </div>
 
-      <section class="subsol__coloana" aria-labelledby="subsol-contact">
-        <h2 id="subsol-contact" class="subsol__titlu">{t(locale, 'subsol.contact')}</h2>
-        <ul class="subsol__lista" role="list">
-          <li class="subsol__rand">
-            <Iconita nume="pin" class="subsol__iconita" />
-            <address>
-              <span class="sr-only">{t(locale, 'contact.adresa')}: </span>
-              <span set:html={marcheazaPlaceholder(strada)} /><br />
-              <span set:html={marcheazaPlaceholder(codPostal)} />
-              {oras}, {t(locale, 'contact.judet', { judet })}
-            </address>
-          </li>
-          <li class="subsol__rand">
-            <Iconita nume="telefon" class="subsol__iconita" />
-            {
-              telefon.valid ? (
-                <a class="subsol__link" href={telefon.href}>
-                  <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
-                  {telefon.text}
-                </a>
-              ) : (
-                <span>
-                  <span class="sr-only">{t(locale, 'contact.telefon')}: </span>
-                  <Fragment set:html={marcheazaPlaceholder(telefon.text)} />
-                </span>
-              )
-            }
-          </li>
-          <li class="subsol__rand">
-            <Iconita nume="email" class="subsol__iconita" />
-            {
-              email.valid ? (
-                <a class="subsol__link subsol__email" href={email.href}>
-                  <span class="sr-only">{t(locale, 'contact.email')}: </span>
-                  {email.text}
-                </a>
-              ) : (
-                <span class="subsol__email">
-                  <span class="sr-only">{t(locale, 'contact.email')}: </span>
-                  <Fragment set:html={marcheazaPlaceholder(email.text)} />
-                </span>
-              )
-            }
-          </li>
-        </ul>
-      </section>
-
-      <section class="subsol__coloana" aria-labelledby="subsol-program">
-        <h2 id="subsol-program" class="subsol__titlu">{t(locale, 'program.titlu')}</h2>
-        <ProgramSaptamana locale={locale} program={birou.program} simplu compact />
-      </section>
-
-      <nav class="subsol__coloana" aria-labelledby="subsol-linkuri">
-        <h2 id="subsol-linkuri" class="subsol__titlu">{t(locale, 'subsol.linkuri')}</h2>
-        <ul class="subsol__lista" role="list">
-          {
-            linkuri.map((l) => (
-              <li>
-                <a class="subsol__link" href={l.href}>
-                  {l.text}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </div>
-
-    <div class="subsol__final">
-      <p>{t(locale, 'subsol.copyright', { an, denumire: birou.denumire })}</p>
-      <p>
-        <a class="subsol__link" href={confidentialitate.href} hreflang={confidentialitate.altaLimba ? 'ro' : undefined}>
-          {confidentialitate.text}
-        </a>
-      </p>
+      <div class="subsol__legal">
+        <p>{t(locale, 'subsol.copyright', { an, denumire: birou.denumire })}</p>
+        <p>
+          <a class="sub subsol__link" href={confidentialitate.href} hreflang={confidentialitate.altaLimba ? 'ro' : undefined}>
+            {confidentialitate.text}
+          </a>
+        </p>
+        {birou.cif && <p set:html={marcheazaPlaceholder(t(locale, 'subsol.cif', { cif: birou.cif }))} />}
+      </div>
+      <div class="subsol__linie" aria-hidden="true"></div>
+      <WordmarkGigant text={birou.notar} class="subsol__wordmark" />
     </div>
   </div>
+  <div class="subsol__strat" data-footer-strat aria-hidden="true"></div>
 </footer>
 
 <style>
   .subsol {
-    padding-block: var(--section-y-sm);
-    background: var(--c-paper-2);
-    border-top: 1px solid var(--c-line);
+    position: relative;
+    overflow: hidden;
+    background: var(--c-paper);
     color: var(--c-ink);
-    font-size: var(--fs-sm);
   }
 
-  .subsol__grila {
+  .subsol__interior {
+    position: relative;
+    padding-top: var(--section-y);
+  }
+
+  .subsol__coloane {
     display: grid;
     gap: var(--space-4);
+    padding-bottom: var(--space-6);
   }
 
-  @media (min-width: 48rem) {
-    .subsol__grila {
+  @media (min-width: 40rem) {
+    .subsol__coloane {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 64rem) {
-    .subsol__grila {
+  @media (min-width: 62rem) {
+    .subsol__coloane {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
@@ -165,23 +186,21 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol__coloana {
     display: grid;
     align-content: start;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   .subsol__titlu {
-    color: var(--c-ink);
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    line-height: 1.4;
-  }
-
-  .subsol__denumire {
+    margin-bottom: calc(var(--space-1) / 2);
     color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.4;
   }
 
   .subsol__lista {
     display: grid;
-    gap: calc(var(--space-1) / 2);
     padding: 0;
     list-style: none;
   }
@@ -190,68 +209,61 @@ const { strada, codPostal, oras, judet } = birou.adresa;
     max-width: none;
   }
 
-  .subsol__rand {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-1);
-  }
-
-  .subsol__rand :global(.subsol__iconita) {
-    flex: none;
-    margin-top: calc(var(--space-1) * 0.75);
-    color: var(--c-ink);
-  }
-
-  address {
-    font-style: normal;
-    padding-block: calc(var(--space-1) / 2);
-  }
-
-  .subsol__rand > span {
-    display: inline-flex;
-    align-items: center;
-    min-height: 48px;
-  }
-
-  /* Linkuri: 16 px, ink, subliniere îngroșată la hover. */
   .subsol__link {
     display: inline-flex;
     align-items: center;
-    min-width: 48px;
     min-height: 48px;
-    color: var(--c-ink);
-    text-decoration: none;
+    font-weight: 500;
   }
 
-  .subsol__link:hover {
-    color: var(--c-ink);
-    text-decoration: underline;
-    text-decoration-color: var(--c-ink);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.2em;
+  .subsol__text {
+    display: inline-block;
+    padding-block: calc(var(--space-1) * 0.75);
   }
 
-  .subsol__email {
+  .subsol__rupe {
     overflow-wrap: anywhere;
   }
 
-  .subsol__final {
+  .subsol__adresa {
+    font-style: normal;
+  }
+
+  .subsol__legal {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0 var(--space-3);
-    margin-top: var(--space-5);
-    padding-top: var(--space-2);
-    border-top: 1px solid var(--c-line);
+    gap: 0 var(--space-4);
+    padding-bottom: 0.3em;
     color: var(--c-muted);
   }
 
-  .subsol__final p {
+  .subsol__legal p {
     max-width: none;
   }
 
-  .subsol__final .subsol__link {
+  .subsol__legal .subsol__link {
     color: var(--c-muted);
+    font-weight: 400;
+  }
+
+  .subsol__linie {
+    height: 1px;
+    background: var(--c-ink);
+  }
+
+  /* Wordmark-ul gigant: spațiu dedesubt, ca descendentul lui „ț” să nu fie tăiat. */
+  .subsol :global(.subsol__wordmark) {
+    padding-top: 0.1em;
+    padding-bottom: var(--space-3);
+  }
+
+  .subsol__strat {
+    position: absolute;
+    inset: 0;
+    background: var(--c-ink);
+    opacity: 0;
+    pointer-events: none;
   }
 </style>

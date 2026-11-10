@@ -13,8 +13,18 @@ describe('temaLaY', () => {
     expect(temaLaY(150, sectiuni)).toBe('dark');
   });
 
-  it('la granița exactă câștigă prima secțiune din document', () => {
-    expect(temaLaY(100, sectiuni)).toBe('light');
+  it('la granița exactă câștigă secțiunea care începe acolo', () => {
+    expect(temaLaY(100, sectiuni)).toBe('dark');
+  });
+
+  it('secțiunile imbricate: câștigă cea mai interioară (ultima în document)', () => {
+    const imbricate: ZonaSectiune[] = [
+      { top: -500, bottom: 3000, tema: 'light' }, // <main>
+      { top: 0, bottom: 600, tema: 'dark' }, // hero
+      { top: 600, bottom: 1400, tema: 'light' },
+    ];
+    expect(temaLaY(36, imbricate)).toBe('dark');
+    expect(temaLaY(36, [imbricate[0]!, { top: 200, bottom: 600, tema: 'dark' }])).toBe('light');
   });
 
   it('fără secțiune sub linie: null (navbar-ul își păstrează tema)', () => {

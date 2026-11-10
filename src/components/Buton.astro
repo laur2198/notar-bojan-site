@@ -1,0 +1,287 @@
+---
+/**
+ * Butonul cu text dublat (CLAUDE.md §5), scris după comportamentul din prototip
+ * (docs/design-v2/prototip-acasa.html, `.btn`):
+ *   - la hover / focus-visible, fundalul urcă rotit (translate 0 175% rotate 15° → 0), literele
+ *     urcă pe rând (stagger 20 ms; dublura de dedesubt e umbra `text-shadow: 0 1.5em`), săgeata
+ *     iese în dreapta-sus și intră alta din stânga-jos; 0.525 s, cubic-bezier(0.625, 0.05, 0, 1);
+ *   - efectul rulează doar la (hover: hover) and (pointer: fine) și fără mișcare redusă; altfel
+ *     hover-ul e doar schimbarea fundalului.
+ *
+ * Variante: `plin` (ink pe deschis, paper pe închis) și `contur`. Culorile vin din variabilele
+ * --buton-* puse în global.css pe cel mai apropiat [data-tema-sectiune] / .pe-inchis / [data-tema];
+ * prop-ul `tema` le fixează explicit.
+ *
+ * Accesibilitate: numele accesibil e textul întreg (un .sr-only); literele, fundalul și săgeata
+ * sunt aria-hidden. Împărțirea pe litere se face aici, la build (fără JS la runtime). Ținta are
+ * minim 48 px. Fără `href` e <button>; cu `dezactivat` e un link inactiv (date necompletate,
+ * doar în preview): vizibil, fără href, aria-disabled.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props {
+  text: string;
+  href?: string;
+  varianta?: 'plin' | 'contur';
+  tema?: 'light' | 'dark';
+  /** Săgeata din dreapta (implicit da, ca în prototip). */
+  sageata?: boolean;
+  type?: 'button' | 'submit';
+  dezactivat?: boolean;
+  /** Text adăugat doar pentru cititoarele de ecran (ex. „(se deschide într-o filă nouă)”). */
+  textSr?: string;
+  class?: string;
+  'aria-current'?: HTMLAttributes<'a'>['aria-current'];
+  target?: string;
+  rel?: string;
+  hreflang?: string;
+  /** Ascuns la încărcare (ex. arătat din JS doar cu mișcare permisă). */
+  hidden?: boolean;
+  [key: `data-${string}`]: string | boolean | undefined;
+}
+
+const {
+  text,
+  href,
+  varianta = 'plin',
+  tema,
+  sageata = true,
+  type = 'button',
+  dezactivat = false,
+  textSr,
+  class: clasa,
+  ...rest
+} = Astro.props;
+
+/** Literele, ca grafeme (diacriticele rămân întregi); spațiul devine nedespărțitor. */
+const litere = [...new Intl.Segmenter('ro', { granularity: 'grapheme' }).segment(text)].map((s) =>
+  s.segment === ' ' ? ' ' : s.segment,
+);
+
+const clase = ['buton', `buton--${varianta}`, { 'buton--fara-sageata': !sageata, 'buton--dezactivat': dezactivat }, clasa];
+const Tag = href || dezactivat ? 'a' : 'button';
+/** Atributele elementului (<a> cu href, <a> inactiv sau <button>). */
+const atribute: Record<string, unknown> = dezactivat
+  ? { role: 'link', 'aria-disabled': 'true' }
+  : href
+    ? { href, ...rest }
+    : { type, ...rest };
+---
+
+<Tag class:list={clase} data-tema={tema} {...atribute}>
+  <span class="buton__fundal" aria-hidden="true"></span>
+  <span class="sr-only">{text}{textSr && ` ${textSr}`}</span>
+  <span class="buton__masca" aria-hidden="true">
+    <span class="buton__text">{litere.map((l) => <span>{l}</span>)}</span>
+  </span>
+  {
+    sageata && (
+      <span class="buton__sageata" aria-hidden="true">
+        <svg viewBox="0 0 11 11" fill="none" focusable="false">
+          <path d="M1.25 10.52 0 9.27 7.5 1.77H.62V0h9.9v9.9H8.75V3.02L1.25 10.52Z" fill="currentColor" />
+        </svg>
+        <svg viewBox="0 0 11 11" fill="none" focusable="false">
+          <path d="M1.25 10.52 0 9.27 7.5 1.77H.62V0h9.9v9.9H8.75V3.02L1.25 10.52Z" fill="currentColor" />
+        </svg>
+      </span>
+    )
+  }
+</Tag>
+
+<style>
+  .buton {
+    --buton-ease: var(--ease-out);
+    --buton-durata: 0.525s;
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    min-height: max(48px, 2.6em);
+    padding: 0.35em 0.45em 0.35em 0.9em;
+    border: 0;
+    border-radius: var(--radius);
+    font: inherit;
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.5;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .buton--fara-sageata {
+    padding-right: 0.9em;
+  }
+
+  /* Plin: ink pe deschis, paper pe închis (variabilele din global.css). */
+  .buton--plin {
+    background: var(--buton-plin-bg);
+    color: var(--buton-plin-fg);
+  }
+
+  .buton--plin .buton__fundal {
+    background: var(--buton-plin-hover);
+  }
+
+  /* Contur: transparent, contur 1 px în culoarea textului. */
+  .buton--contur {
+    background: transparent;
+    color: var(--buton-contur-fg);
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+
+  .buton--contur .buton__fundal {
+    background: var(--buton-contur-hover);
+  }
+
+  .buton:focus-visible {
+    outline: 3px solid var(--buton-focus);
+    outline-offset: 3px;
+  }
+
+  .buton__fundal {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translate3d(0, 175%, 0) rotate(15deg);
+    transition: transform var(--buton-durata) var(--buton-ease);
+  }
+
+  .buton__masca {
+    display: block;
+    overflow: hidden;
+    height: 1.5em;
+  }
+
+  .buton__text {
+    display: block;
+  }
+
+  .buton__text > span {
+    display: inline-block;
+    text-shadow: 0 1.5em currentColor;
+    transition: transform var(--buton-durata) var(--buton-ease);
+  }
+
+  .buton__sageata {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.9em;
+    height: 1.9em;
+    overflow: hidden;
+  }
+
+  .buton__sageata svg {
+    width: 0.62em;
+    height: 0.62em;
+    transition: transform 0.9s var(--buton-ease);
+  }
+
+  .buton__sageata svg + svg {
+    position: absolute;
+    transform: translate3d(-1.4em, 1.4em, 0);
+  }
+
+  /* Hover simplu (ecrane tactile, mișcare redusă): doar fundalul, fără rulare. */
+  .buton--plin:hover {
+    background: var(--buton-plin-hover);
+  }
+
+  .buton--contur:hover {
+    background: var(--buton-contur-hover);
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .buton--plin:hover {
+      background: var(--buton-plin-bg);
+    }
+
+    .buton--contur:hover {
+      background: transparent;
+    }
+
+    .buton:is(:hover, :focus-visible) .buton__fundal {
+      transform: translate3d(0, 0, 0) rotate(0);
+    }
+
+    .buton:is(:hover, :focus-visible) .buton__text > span {
+      transform: translateY(-1.5em);
+    }
+
+    .buton:is(:hover, :focus-visible) .buton__sageata svg:first-child {
+      transform: translate3d(1.4em, -1.4em, 0);
+    }
+
+    .buton:is(:hover, :focus-visible) .buton__sageata svg + svg {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* Literele urcă pe rând: 20 ms între ele (fără style inline: CSP style-src 'self'). */
+  .buton__text > :nth-child(2) { transition-delay: 20ms; }
+  .buton__text > :nth-child(3) { transition-delay: 40ms; }
+  .buton__text > :nth-child(4) { transition-delay: 60ms; }
+  .buton__text > :nth-child(5) { transition-delay: 80ms; }
+  .buton__text > :nth-child(6) { transition-delay: 100ms; }
+  .buton__text > :nth-child(7) { transition-delay: 120ms; }
+  .buton__text > :nth-child(8) { transition-delay: 140ms; }
+  .buton__text > :nth-child(9) { transition-delay: 160ms; }
+  .buton__text > :nth-child(10) { transition-delay: 180ms; }
+  .buton__text > :nth-child(11) { transition-delay: 200ms; }
+  .buton__text > :nth-child(12) { transition-delay: 220ms; }
+  .buton__text > :nth-child(13) { transition-delay: 240ms; }
+  .buton__text > :nth-child(14) { transition-delay: 260ms; }
+  .buton__text > :nth-child(15) { transition-delay: 280ms; }
+  .buton__text > :nth-child(16) { transition-delay: 300ms; }
+  .buton__text > :nth-child(17) { transition-delay: 320ms; }
+  .buton__text > :nth-child(18) { transition-delay: 340ms; }
+  .buton__text > :nth-child(19) { transition-delay: 360ms; }
+  .buton__text > :nth-child(20) { transition-delay: 380ms; }
+  .buton__text > :nth-child(21) { transition-delay: 400ms; }
+  .buton__text > :nth-child(22) { transition-delay: 420ms; }
+  .buton__text > :nth-child(23) { transition-delay: 440ms; }
+  .buton__text > :nth-child(24) { transition-delay: 460ms; }
+  .buton__text > :nth-child(25) { transition-delay: 480ms; }
+  .buton__text > :nth-child(26) { transition-delay: 500ms; }
+  .buton__text > :nth-child(27) { transition-delay: 520ms; }
+  .buton__text > :nth-child(28) { transition-delay: 540ms; }
+  .buton__text > :nth-child(29) { transition-delay: 560ms; }
+  .buton__text > :nth-child(30) { transition-delay: 580ms; }
+  .buton__text > :nth-child(n + 31) { transition-delay: 600ms; }
+
+  /* Link inactiv (date necompletate, doar în preview): contur punctat, fără efect. */
+  .buton--dezactivat,
+  .buton--dezactivat:hover {
+    background: transparent;
+    color: var(--buton-dezactivat);
+    box-shadow: inset 0 0 0 1px currentColor;
+    outline: 1px dashed currentColor;
+    outline-offset: -1px;
+    cursor: not-allowed;
+  }
+
+  .buton--dezactivat .buton__fundal {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .buton--dezactivat:is(:hover, :focus-visible) .buton__text > span,
+    .buton--dezactivat:is(:hover, :focus-visible) .buton__sageata svg {
+      transform: none;
+    }
+
+    .buton--dezactivat:is(:hover, :focus-visible) .buton__sageata svg + svg {
+      transform: translate3d(-1.4em, 1.4em, 0);
+    }
+  }
+</style>

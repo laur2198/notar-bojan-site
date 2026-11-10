@@ -15,6 +15,11 @@
   --c-line:       #E3E3E3;  /* borduri, separatoare pe deschis (doar decorativ) */
   --c-line-dark:  #2C2C2C;  /* borduri, separatoare pe închis (doar decorativ) */
 
+  /* Fundalurile de hover ale butonului cu text dublat (prototip, .btn__bg). */
+  --c-ink-hover:   #333333;  /* butonul plin pe deschis (paper pe el: 12.6:1) */
+  --c-paper-hover: #D6D6D6;  /* butonul plin pe închis (ink pe el: 13.4:1) */
+  --c-ink-3:       #262626;  /* butonul contur pe închis (paper pe el: 15.1:1) */
+
   /*
    * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
    * prototip, negru cu alfa = zgomotul, opacitate .06. Stă ca strat fix peste pagină
@@ -79,8 +84,9 @@
   --container: 75rem;
   --gutter: 1.5rem;      /* padding lateral al containerului */
   --gutter-sm: 1rem;     /* sub 480px */
-  --header-h: 72px;      /* header fix pe desktop */
-  --header-h-sm: 64px;   /* header fix pe mobil */
+  --header-h: 80px;      /* navbar-ul fix, transparent, de la pragul de desktop (Header.astro) */
+  --header-h-sm: 72px;   /* navbar-ul sub prag */
+  --h-antet: var(--header-h-sm);   /* înălțimea curentă a navbar-ului (se schimbă la prag, global.css) */
   --measure: 68ch;
 }
 

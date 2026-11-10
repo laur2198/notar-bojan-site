@@ -17,13 +17,23 @@
  *   [data-divider]         scaleX 0 → 1, 1.1 s, power2.inOut, la `top 90%`.
  *   [data-parallax="N"]    deplasare legată de scroll, yPercent N → −N pe durata vizibilității
  *                          (N negativ inversează sensul). Doar decorativ: fotografii, forme.
+ *   [data-footer]          subsolul „intră de sub conținut” (Footer.astro): interiorul
+ *                          ([data-footer-interior]) yPercent -25 → 0 și stratul ink
+ *                          ([data-footer-strat]) opacitate 0.5 → 0, scrub, clamp(top bottom) →
+ *                          clamp(top top). La capăt, textul e static.
+ *   [data-shutter]         benzi ink care acoperă secțiunea la ieșire (Shutter.astro): scaleY 0 → 1
+ *                          de jos, stagger 0.01 from end, scrub 2.3, „bottom 60%” → „bottom top”;
+ *                          16 benzi pe desktop, 10 pe tabletă (≤ 991 px), 6 pe mobil (≤ 478 px).
+ *                          Benzile se creează doar aici: la mișcare redusă nu există deloc.
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { EVENIMENT_TERMINAT } from './intro-semnatura';
 
-export const INTEROGARE_MISCARE = '(prefers-reduced-motion: no-preference)';
+import { INTEROGARE_MISCARE } from './miscare-interogare';
+
+export { INTEROGARE_MISCARE };
 
 const TITLURI = /^H[1-6]$/;
 
@@ -88,6 +98,33 @@ function parallax(el: HTMLElement) {
   );
 }
 
+function intrareFooter(footer: HTMLElement) {
+  const interior = footer.querySelector<HTMLElement>('[data-footer-interior]');
+  const strat = footer.querySelector<HTMLElement>('[data-footer-strat]');
+  if (!interior) return;
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: footer, start: 'clamp(top bottom)', end: 'clamp(top top)', scrub: true },
+  });
+  tl.fromTo(interior, { yPercent: -25 }, { yPercent: 0, ease: 'none' });
+  if (strat) tl.fromTo(strat, { opacity: 0.5 }, { opacity: 0, ease: 'none' }, '<');
+}
+
+function shutter(container: HTMLElement, n: number): () => void {
+  const sectiune = container.parentElement ?? container;
+  const benzi = Array.from({ length: n }, () => document.createElement('i'));
+  container.replaceChildren(...benzi);
+  const tl = gsap
+    .timeline({
+      scrollTrigger: { trigger: sectiune, start: 'bottom 60%', end: 'bottom top', scrub: 2.3, invalidateOnRefresh: true },
+    })
+    .fromTo(benzi, { scaleY: 0 }, { scaleY: 1, duration: 0.1, stagger: { each: 0.01, from: 'end' }, ease: 'none' });
+  return () => {
+    tl.scrollTrigger?.kill();
+    tl.kill();
+    container.replaceChildren();
+  };
+}
+
 let pornita: gsap.MatchMedia | null = null;
 
 /** Pornește mișcarea pe pagină (o singură dată). */
@@ -101,6 +138,7 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
     const curatari = [...radacina.querySelectorAll<HTMLElement>('[data-reveal]')].map(reveal);
     radacina.querySelectorAll<HTMLElement>('[data-divider]').forEach(divider);
     radacina.querySelectorAll<HTMLElement>('[data-parallax]').forEach(parallax);
+    radacina.querySelectorAll<HTMLElement>('[data-footer]').forEach(intrareFooter);
     const reimprospateaza = () => ScrollTrigger.refresh();
     document.addEventListener(EVENIMENT_TERMINAT, reimprospateaza);
     document.fonts?.ready.then(reimprospateaza);
@@ -111,6 +149,20 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
       html.classList.remove('miscare');
     };
   });
+  // Shutter-ul: numărul de benzi depinde de lățime; gsap refă benzile la trecerea pragurilor.
+  pornita.add(
+    {
+      mobil: `${INTEROGARE_MISCARE} and (max-width: 478px)`,
+      tableta: `${INTEROGARE_MISCARE} and (min-width: 479px) and (max-width: 991px)`,
+      desktop: `${INTEROGARE_MISCARE} and (min-width: 992px)`,
+    },
+    (ctx) => {
+      const { mobil, tableta } = ctx.conditions as Record<string, boolean>;
+      const n = mobil ? 6 : tableta ? 10 : 16;
+      const curatari = [...radacina.querySelectorAll<HTMLElement>('[data-shutter]')].map((c) => shutter(c, n));
+      return () => curatari.forEach((c) => c());
+    },
+  );
   // Fără mișcare (reduce sau preferința schimbată): starea finală, vizibilă.
   if (!matchMedia(INTEROGARE_MISCARE).matches) html.classList.remove('miscare');
   return pornita;

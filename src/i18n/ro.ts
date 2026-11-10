@@ -69,6 +69,10 @@ export const ro = {
   'subsol.contact': 'Contact',
   'subsol.linkuri': 'Linkuri',
   'subsol.copyright': '© {an} {denumire}',
+  'subsol.navigare': 'Navigare',
+  'subsol.adresa': 'Adresă',
+  'subsol.cif': 'CIF {cif}',
+  'wordmark.acasa': '{denumire} – pagina principală',
 
   // Pagina Acasă
   'acasa.programare': 'Solicitați o programare',
