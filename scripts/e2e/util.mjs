@@ -38,9 +38,14 @@ export function cuBrowser() {
   });
 }
 
-/** O pagină nouă (context propriu), cu CSP aplicat și erorile din consolă colectate. */
-export async function pagina(optiuni = {}) {
+/**
+ * O pagină nouă (context propriu), cu CSP aplicat și erorile din consolă colectate. Intro-ul
+ * automat (o dată pe sesiune, pe orice pagină de intrare) e marcat ca văzut, ca ecranul lui să nu
+ * acopere pagina testată; `introVazut: false` îl lasă să ruleze (`#intro` îl forțează oricum).
+ */
+export async function pagina({ introVazut = true, ...optiuni } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...optiuni });
+  if (introVazut) await context.addInitScript(() => sessionStorage.setItem('intro-vazut', '1'));
   const p = await context.newPage();
   const erori = [];
   p.on('console', (m) => {

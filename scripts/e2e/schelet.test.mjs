@@ -65,7 +65,7 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
   it('fără JS: navbar-ul are fundal plin în tema de la încărcare (textul nu se pierde la derulare)', async () => {
     const { p, context } = await pagina({ javaScriptEnabled: false });
     for (const [cale, fundal, text] of [
-      ['/', 'rgb(15, 15, 15)', 'rgb(255, 255, 255)'],
+      ['/', 'rgb(255, 255, 255)', 'rgb(15, 15, 15)'],
       ['/servicii/', 'rgb(255, 255, 255)', 'rgb(15, 15, 15)'],
     ]) {
       await p.goto(BAZA + cale, { waitUntil: 'load' });
@@ -79,14 +79,23 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
     await context.close();
   });
 
-  it('pe Acasă: tema închisă peste hero, deschisă după el', async () => {
+  it('pe Acasă: deschisă peste hero, închisă peste frazele mari, deschisă peste servicii', async () => {
     const { p, context } = await pagina();
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     await p.waitForTimeout(300);
-    assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'dark');
-    await p.evaluate(() => scrollTo(0, document.querySelector('.hero').offsetHeight + 200));
-    await p.waitForTimeout(300);
     assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'light');
+    for (const [selector, tema] of [
+      ['.fraze', 'dark'],
+      ['#servicii', 'light'],
+      ['#pasi', 'dark'],
+    ]) {
+      await p.evaluate((s) => {
+        const el = document.querySelector(s);
+        scrollTo({ top: el.getBoundingClientRect().top + scrollY + 200, behavior: 'instant' });
+      }, selector);
+      await p.waitForTimeout(300);
+      assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), tema, selector);
+    }
     await context.close();
   });
 });
@@ -314,8 +323,8 @@ describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
   it('fundalul are culoarea temei și o linie de 1 px; pagina reîncărcată deja derulată pornește cu fundal', async () => {
     const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
-    // Peste hero (temă închisă), derulat puțin.
-    await p.evaluate(() => scrollTo({ top: 60, behavior: 'instant' }));
+    // Peste frazele mari (temă închisă).
+    await p.evaluate(() => scrollTo({ top: document.querySelector('.fraze').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
     await p.waitForTimeout(600);
     let s = await p.evaluate(() => {
       const c = getComputedStyle(document.querySelector('[data-navbar]'));
@@ -323,7 +332,7 @@ describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
     });
     assert.deepEqual(s, { fundal: 'rgb(15, 15, 15)', linie: 'rgb(44, 44, 44) 0px -1px 0px 0px inset', tema: 'dark' });
     // Reîncărcare la jumătatea paginii (temă deschisă): fundal plin imediat, fără tranziție.
-    await p.evaluate(() => scrollTo({ top: 2500, behavior: 'instant' }));
+    await p.evaluate(() => scrollTo({ top: document.querySelector('#servicii').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.reload({ waitUntil: 'load' });
     await p.waitForTimeout(50);
     s = await p.evaluate(() => {
