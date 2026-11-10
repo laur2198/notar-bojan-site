@@ -1,0 +1,203 @@
+---
+/**
+ * Hero-ul paginii Acasă (prototip, `.hero`; CLAUDE.md §5): deschis, pe tot ecranul de la încărcare.
+ *   - sus: h1 = titlu + subtitlu (în --c-muted), cu rânduri din mască pornite la `intro-gata`;
+ *   - jos: semnătura (desen 3.5 s la `intro-gata`; dreapta pe desktop, stânga pe mobil), rândul de
+ *     sub ea (stânga din CMS, dreapta adresa din birou.yaml), linia care se trage și wordmark-ul
+ *     gigant. Blocul de jos are parallax la ieșirea din ecran (yPercent 0 → 40).
+ *   - fundal: trei pete radiale gri, estompate, STATICE (WCAG 2.2.2, CLAUDE.md §5).
+ * Fără butoane: telefonul și „Programare” sunt în navbar și în bara de jos (§4).
+ * Mișcarea o pornește src/scripts/miscare.ts ([data-hero]); fără JS și la mișcare redusă totul
+ * e vizibil, semnătura desenată. Shutter-ul acoperă hero-ul la ieșire.
+ */
+import type { Locale } from '../../i18n';
+import { marcheazaPlaceholder, type Birou } from '../../lib/continut';
+import Semnatura from '../Semnatura.astro';
+import Shutter from '../Shutter.astro';
+import WordmarkGigant from '../WordmarkGigant.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  titlu: string;
+  subtitlu: string;
+  linie: string;
+}
+
+const { birou, titlu, subtitlu, linie } = Astro.props;
+const { strada, oras } = birou.adresa;
+---
+
+<section class="hero" id="sus" data-hero data-tema-sectiune="light" aria-labelledby="hero-titlu">
+  <div class="hero__pete" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="container hero__interior">
+    <div class="hero__sus">
+      <slot />
+      <h1 class="hero__titlu" id="hero-titlu" data-hero-titlu>
+        <Fragment set:html={marcheazaPlaceholder(titlu)} />
+        <span class="hero__subtitlu"><Fragment set:html={marcheazaPlaceholder(subtitlu)} /></span>
+      </h1>
+    </div>
+    <div class="hero__jos" data-parallax-iesire="40">
+      <div class="hero__semnatura">
+        <Semnatura id="hero" />
+      </div>
+      <p class="hero__linie" data-hero-fade>
+        <span set:html={marcheazaPlaceholder(linie)} />
+        <span class="hero__adresa"><Fragment set:html={marcheazaPlaceholder(strada)} />, {oras}</span>
+      </p>
+      <div class="hero__divider" data-hero-divider aria-hidden="true"></div>
+      <div data-hero-wordmark>
+        <WordmarkGigant text={birou.notar} class="hero__wordmark" />
+      </div>
+    </div>
+  </div>
+  <Shutter />
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    /* Urcă sub navbar-ul transparent (global.css, main). */
+    margin-top: calc(-1 * var(--h-antet));
+    background: var(--c-paper);
+    color: var(--c-ink);
+  }
+
+  /* Petele: radiale, estompate, statice (prototip, .hero__gradient, fără animație). */
+  .hero__pete {
+    position: absolute;
+    inset: -10%;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(60px);
+    opacity: 0.9;
+  }
+
+  .hero__pete i {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .hero__pete i:nth-child(1) {
+    left: 50%;
+    top: -15%;
+    width: 55vw;
+    height: 55vw;
+    background: radial-gradient(circle, #e4e4e4 0%, rgb(228 228 228 / 0) 70%);
+  }
+
+  .hero__pete i:nth-child(2) {
+    left: -10%;
+    top: 35%;
+    width: 45vw;
+    height: 45vw;
+    background: radial-gradient(circle, #ededed 0%, rgb(237 237 237 / 0) 70%);
+  }
+
+  .hero__pete i:nth-child(3) {
+    left: 30%;
+    top: 55%;
+    width: 35vw;
+    height: 35vw;
+    background: radial-gradient(circle, #dcdcdc 0%, rgb(220 220 220 / 0) 70%);
+  }
+
+  .hero__interior {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-4);
+    /* Tot ecranul; pe mobil fără bara de jos, ca wordmark-ul să fie vizibil la încărcare. */
+    min-height: calc(100svh - var(--inaltime-bara) - env(safe-area-inset-bottom, 0px));
+    padding-top: calc(var(--h-antet) + var(--space-3));
+    padding-bottom: 0.5em;
+  }
+
+  @media (min-width: 48rem) {
+    .hero__interior {
+      min-height: 100svh;
+    }
+  }
+
+  .hero__sus {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+  }
+
+  .hero__titlu {
+    max-width: 21em;
+    margin: 0;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+    text-wrap: pretty;
+  }
+
+  .hero__subtitlu {
+    color: var(--c-muted);
+  }
+
+  .hero__jos {
+    position: relative;
+  }
+
+  .hero__semnatura {
+    width: min(28vw, 26rem);
+    margin: 0 0 1em auto;
+    color: var(--c-ink);
+  }
+
+  .hero__linie {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    max-width: none;
+    margin: 0;
+    padding-bottom: 0.55em;
+    color: var(--c-muted);
+  }
+
+  .hero__divider {
+    height: 1px;
+    background: var(--c-ink);
+    transform-origin: left center;
+  }
+
+  .hero :global(.hero__wordmark) {
+    margin-top: 0.1em;
+  }
+
+  /*
+   * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts la
+   * `intro-gata`): titlul, rândul de sub semnătură și wordmark-ul ascunse, linia la 0, semnătura
+   * nedesenată. Plasa de siguranță din cap-pagina.js scoate `miscare` dacă modulele nu pornesc.
+   */
+  :global(html.miscare:not(.hero-pornit)) :is([data-hero-titlu], [data-hero-fade], [data-hero-wordmark]) {
+    visibility: hidden;
+  }
+
+  :global(html.miscare:not(.hero-pornit)) [data-hero-divider] {
+    transform: scaleX(0);
+  }
+
+  :global(html.miscare:not(.hero-pornit)) .hero__semnatura :global(path[data-a]) {
+    stroke-dashoffset: 101;
+  }
+
+  @media (max-width: 47.99rem) {
+    .hero__semnatura {
+      width: min(80vw, 22rem);
+      margin: 0 0 1.25em;
+    }
+
+    /* Pe mobil, adresa e în subsol și în bara de jos (Locație), ca în prototip. */
+    .hero__adresa {
+      display: none;
+    }
+  }
+</style>

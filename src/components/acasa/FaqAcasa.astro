@@ -1,0 +1,231 @@
+---
+/**
+ * Întrebările frecvente pe Acasă (prototip, `.faq`; CLAUDE.md §4): secțiune închisă. Stânga titlul
+ * mare (rânduri din mască, data-reveal), dreapta acordeonul cu întrebările evidențiate din
+ * faq/{limba}.yaml. Acordeonul e <details>/<summary> nativ (§4): `name` comun ține un singur
+ * răspuns deschis, fără JS (Chrome 120+, Safari 17.2+, Firefox 130+; mai vechi: se pot deschide
+ * mai multe). Deschiderea animată doar unde browserul o permite și fără mișcare redusă.
+ * Apoi încheierea: titlu și subtitlu (gri) + Buton contur WhatsApp și Buton plin „Programare”.
+ */
+import { cale, t, type Locale } from '../../i18n';
+import { linkWhatsapp } from '../../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../../lib/continut';
+import Buton from '../Buton.astro';
+import Eticheta from './Eticheta.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  titlu: string;
+  intrebari: { intrebare: string; raspuns: string }[];
+  ctaTitlu: string;
+  ctaSubtitlu: string;
+}
+
+const { locale, birou, titlu, intrebari, ctaTitlu, ctaSubtitlu } = Astro.props;
+const whatsapp = linkWhatsapp(birou, locale);
+---
+
+<section class="faq pe-inchis" id="faq" data-tema-sectiune="dark" aria-labelledby="faq-titlu">
+  <div class="container">
+    <Eticheta text={t(locale, 'nav.faq')} nivel="p" />
+    <div class="faq__grila">
+      <h2 class="faq__titlu" id="faq-titlu" data-reveal set:html={marcheazaPlaceholder(titlu)} />
+      <div class="faq__lista">
+        {
+          intrebari.map((q) => (
+            <details class="faq__item" name="faq-acasa">
+              <summary class="faq__intrebare">
+                <span set:html={marcheazaPlaceholder(q.intrebare)} />
+                <span class="faq__iconita" aria-hidden="true" />
+              </summary>
+              <div class="faq__raspuns">
+                <p set:html={marcheazaPlaceholder(q.raspuns)} />
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+    <div class="faq__cta">
+      <div class="faq__cta-interior">
+      <p class="faq__cta-text">
+        <span set:html={marcheazaPlaceholder(ctaTitlu)} />
+        <span class="faq__cta-sub" set:html={marcheazaPlaceholder(ctaSubtitlu)} />
+      </p>
+      <div class="faq__cta-butoane">
+        <Buton
+          text={t(locale, 'whatsapp.nume')}
+          href={whatsapp.href}
+          varianta="contur"
+          dezactivat={!whatsapp.valid}
+          target={whatsapp.valid ? '_blank' : undefined}
+          rel={whatsapp.valid ? 'noopener noreferrer' : undefined}
+          textSr={whatsapp.valid ? t(locale, 'link.filaNoua') : `(${t(locale, 'link.indisponibil')})`}
+        />
+        <Buton text={t(locale, 'actiune.programare')} href={cale('programare', locale)} />
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    position: relative;
+    padding-bottom: var(--section-y);
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-top: 1px solid var(--c-line-dark);
+  }
+
+  .faq__grila {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 3em;
+  }
+
+  .faq__titlu {
+    margin: 0;
+    color: var(--c-paper);
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
+  }
+
+  .faq__lista {
+    border-top: 1px solid var(--c-line-dark);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--c-line-dark);
+  }
+
+  .faq__intrebare {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    min-height: 48px;
+    padding: 1.05em 0;
+    font-size: var(--fs-lg);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__intrebare::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__intrebare:hover > span:first-child {
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.15em;
+  }
+
+  /* Iconița +/−: linia verticală se rotește în orizontală la deschidere. */
+  .faq__iconita {
+    position: relative;
+    flex-shrink: 0;
+    width: 0.8em;
+    height: 0.8em;
+  }
+
+  .faq__iconita::before,
+  .faq__iconita::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .faq__iconita::after {
+    transform: rotate(90deg);
+  }
+
+  .faq__item[open] .faq__iconita::after {
+    transform: rotate(0);
+  }
+
+  .faq__raspuns p {
+    max-width: 34em;
+    margin: 0;
+    padding: 0 0 1.25em;
+    color: var(--c-muted-dark);
+  }
+
+  /* Deschiderea animată (înălțimea răspunsului), doar unde browserul o permite. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (interpolate-size: allow-keywords) {
+      .faq__item {
+        interpolate-size: allow-keywords;
+      }
+
+      .faq__item::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size 0.5s var(--ease-out),
+          content-visibility 0.5s allow-discrete;
+      }
+
+      .faq__item[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+
+  .faq__cta {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 3em;
+    padding-top: var(--section-y);
+  }
+
+  .faq__cta-interior {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5em;
+  }
+
+  .faq__cta-text {
+    max-width: none;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-titlu);
+    line-height: 1.1;
+    letter-spacing: var(--ls-h2);
+  }
+
+  .faq__cta-sub {
+    display: block;
+    color: var(--c-muted-dark);
+  }
+
+  .faq__cta-butoane {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+  }
+
+  @media (max-width: 61.99rem) {
+    .faq__grila,
+    .faq__cta {
+      grid-template-columns: 1fr;
+    }
+
+    .faq__cta-interior {
+      grid-column: 1;
+    }
+  }
+</style>

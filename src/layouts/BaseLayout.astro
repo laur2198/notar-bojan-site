@@ -5,13 +5,15 @@
  * BaraActiuni → Cursor. În <head>, CapPagina pune clasele de mișcare înainte de primul paint.
  * <main> și <footer> au data-tema-sectiune="light"; secțiunile închise din pagini își declară
  * tema (Hero, Sectiune ton="inchis"), ca navbar-ul să-și schimbe culoarea deasupra lor.
- * Intro-ul (IntroSemnatura) se montează în V3; până atunci CapPagina e în modul „manual”.
+ * Intro-ul cu semnătura (IntroSemnatura) apare o dată pe sesiune, pe orice pagină de intrare
+ * (CapPagina în modul „automat”; /stil/ folosește „manual”). Fără JS și la mișcare redusă nu apare.
  */
 import '../styles/global.css';
 import Breadcrumbs, { type Firimitura } from '../components/Breadcrumbs.astro';
 import BaraActiuni from '../components/BaraActiuni.astro';
 import CapPagina from '../components/CapPagina.astro';
 import Cursor from '../components/Cursor.astro';
+import IntroSemnatura from '../components/IntroSemnatura.astro';
 import DraftBadge from '../components/DraftBadge.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -42,9 +44,11 @@ interface Props {
    * hero). Corectă de la primul paint, fără să aștepte JS; apoi o actualizează tema-navbar.ts.
    */
   temaNavbar?: 'light' | 'dark';
+  /** Pornirea intro-ului: o dată pe sesiune (implicit) sau doar manual (ghidul /stil/). */
+  intro?: 'automat' | 'manual';
 }
 
-const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light' } = Astro.props;
+const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light', intro = 'automat' } = Astro.props;
 const birou = await getBirou();
 ---
 
@@ -53,7 +57,7 @@ const birou = await getBirou();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <CapPagina intro="manual" />
+    <CapPagina intro={intro} />
     <meta name="theme-color" content={culoare('c-ink')} />
     <link rel="preload" href={fontTextLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
@@ -71,6 +75,7 @@ const birou = await getBirou();
     <slot name="head" />
   </head>
   <body>
+    <IntroSemnatura />
     <SkipLink locale={locale} />
     <Header locale={locale} birou={birou} tema={temaNavbar} />
     <main id="continut" tabindex="-1" data-tema-sectiune="light">

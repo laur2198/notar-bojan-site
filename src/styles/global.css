@@ -27,6 +27,11 @@ html {
   scroll-padding-top: calc(var(--header-h-sm) + var(--space-2));
 }
 
+/* Intrarea cu #ancoră: saltul inițial e instant (cap-pagina.js, miscare.ts). */
+html.ancora-initiala {
+  scroll-behavior: auto;
+}
+
 /* De la pragul meniului complet (Header.astro), header-ul are --header-h. */
 @media (min-width: 74rem) {
   :root {

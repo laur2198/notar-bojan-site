@@ -15,7 +15,6 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Buton from '../components/Buton.astro';
-import IntroSemnatura from '../components/IntroSemnatura.astro';
 import Semnatura from '../components/Semnatura.astro';
 import Shutter from '../components/Shutter.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
@@ -162,8 +161,8 @@ const fonturi = [
   title={`Ghid de stil (uz intern) – ${birou.notar}`}
   description="Ghidul de stil intern al site-ului: tokenuri, tipografie, componente."
   noindex
+  intro="manual"
 >
-    <IntroSemnatura />
     <div class="container stil">
       <h1>Ghid de stil</h1>
       <p class="lead">

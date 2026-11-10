@@ -1,0 +1,56 @@
+---
+/**
+ * Eticheta unei secțiuni de pe Acasă (prototip, `.eticheta`): textul mic, apoi o linie fină pe
+ * restul rândului, care se trage la intrarea în ecran (data-divider). Pe închis, textul e
+ * --c-muted-dark și linia --c-line-dark (după tema secțiunii, .pe-inchis).
+ */
+interface Props {
+  text: string;
+  /** Elementul textului: h2 când eticheta e titlul secțiunii, p când titlul e în altă parte. */
+  nivel?: 'h2' | 'p';
+  id?: string;
+}
+
+const { text, nivel = 'h2', id } = Astro.props;
+const Tag = nivel;
+---
+
+<div class="eticheta">
+  <Tag class="eticheta__text" id={id}>{text}</Tag>
+  <div class="eticheta__linie" data-divider aria-hidden="true"></div>
+</div>
+
+<style>
+  .eticheta {
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+    padding-block: var(--section-y) 3em;
+  }
+
+  .eticheta__text {
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .eticheta__linie {
+    flex: 1;
+    height: 1px;
+    background: var(--c-line);
+    transform-origin: left center;
+  }
+
+  :global(.pe-inchis) .eticheta__text {
+    color: var(--c-muted-dark);
+  }
+
+  :global(.pe-inchis) .eticheta__linie {
+    background: var(--c-line-dark);
+  }
+</style>
