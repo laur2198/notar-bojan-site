@@ -6,18 +6,17 @@ Fișierul e pus de birou / designer și se folosește ca atare (geometria nu se 
 
 | Element | Sursă | Licență / condiții | Cum e folosit |
 |---|---|---|---|
-| Literele „Notar” și „Bojan” | fontul **Imperial Script** (© 2008 The Imperial Script Project Authors, https://github.com/googlefonts/imperial-script; pachetul npm `@fontsource/imperial-script`) | **SIL Open Font License 1.1** – folosire, modificare și includere în produse permise, inclusiv comercial; fontul nu se vinde separat; numele rezervat al fontului nu se folosește pentru versiuni modificate. Text: https://openfontlicense.org | În SVG: contururile exacte ale glifelor, descoperite prin mască. Pe ecrane < 640 px, „Notar Bojan” e text în Imperial Script, cu fontul self-hosted (woff2 din pachet, `src/styles/fonturi.css`). |
-| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Free License** – folosire permisă, inclusiv comercială, **cu atribuire obligatorie** („Vecteezy.com”, cu link spre https://www.vecteezy.com); **nu se folosește ca logo, marcă** sau element de identitate; nu se redistribuie separat, ca fișier de sine stătător. | Contururi umplute, descoperite prin mască, parte decorativă a semnăturii (aria-hidden), nu logo. Atribuirea: în subsolul fiecărei pagini, „Ilustrație strângere de mână: Vecteezy.com” (EN: „Handshake illustration: Vecteezy.com”), cu link. |
+| Literele „Notar” și „Bojan” | fontul **Imperial Script** (© 2008 The Imperial Script Project Authors, https://github.com/googlefonts/imperial-script) | **SIL Open Font License 1.1** – folosire, modificare și includere în produse permise, inclusiv comercial; fontul nu se vinde separat; numele rezervat al fontului nu se folosește pentru versiuni modificate. Text: https://openfontlicense.org | Doar în SVG: contururile glifelor, convertite în path-uri și descoperite prin mască. Fișierul fontului nu se încarcă pe site și nu e în build. |
+| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Pro Standard License** – fără atribuire, folosire ca parte din logo permisă pentru conținut vectorial (de confirmat factura/ID-ul licenței). | Contururi umplute, descoperite prin mască, parte decorativă a semnăturii (aria-hidden). Pe ecrane < 640 px apar doar mâinile. Fără atribuire pe site. |
 
 Istoric: versiunile provizorii anterioare foloseau fontul Lavishly Yours (SIL OFL), apoi Mr De Haviland
-(SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite.
+(SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite. Între timp, mâinile au fost
+folosite sub licența Vecteezy Free, cu atribuire în subsol; atribuirea s-a scos odată cu trecerea la
+Pro Standard.
 
 Note:
-- Atribuirea Vecteezy din subsol nu se scoate cât timp mâinile sunt pe site (condiția licenței Free).
-  Fără atribuire e nevoie de licența Pro Vecteezy.
-- Dacă semnătura (sau compoziția cu mâinile) ajunge să fie folosită ca logo al biroului (ex. pe
-  cărți de vizită, antet, firmă), ilustrația Vecteezy trebuie înlocuită: licența nu permite
-  folosirea ca marcă.
+- Factura și ID-ul licenței Pro Standard Vecteezy pentru ilustrația 79569313 se păstrează la birou;
+  până la confirmarea lor, licența e trecută ca „de confirmat”.
 - Dacă semnătura se înlocuiește cu desenul unui ilustrator, se actualizează acest tabel cu
   licența / cesiunea de drepturi a ilustratorului.
 

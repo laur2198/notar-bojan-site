@@ -3,11 +3,8 @@
  * latin-ext, axa `wght`, stil normal, font-display: swap. unicode-range copiat din pachete.
  *   - Geist Variable           text, butoane, titlurile h3–h4 (preload: doar latin, în BaseLayout);
  *   - Geist Mono Variable      etichetele mono decorative;
- *   - Funnel Display Variable  h1, h2, frazele mari și wordmark-ul (--font-display);
- *   - Imperial Script          doar „Notar Bojan” de sub mâinile semnăturii, pe ecrane < 640 px
- *                              (Semnatura.astro). Nu e variabil: un singur fișier pe subset, 400.
- *                              Se descarcă doar când textul e afișat (pe ecranele late e ascuns).
- * Toate patru au ș Ș ț Ț cu virgulă (U+0218–U+021B) și ă Ă (în latin-ext), â Â î Î (în latin);
+ *   - Funnel Display Variable  h1, h2, frazele mari și wordmark-ul (--font-display).
+ * Toate trei au ș Ș ț Ț cu virgulă (U+0218–U+021B) și ă Ă (în latin-ext), â Â î Î (în latin);
  * verificat în tabelele cmap ale fișierelor woff2. O pagină în română descarcă latin + latin-ext.
  * Fără italic: niciun text din src/content/ nu conține italic.
  */
@@ -69,25 +66,5 @@
   font-display: swap;
   font-weight: 300 800;
   src: url('@fontsource-variable/funnel-display/files/funnel-display-latin-wght-normal.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
-}
-
-/* imperial-script-latin-ext-400-normal (unicode-range ca la celelalte fonturi Fontsource) */
-@font-face {
-  font-family: 'Imperial Script';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400;
-  src: url('@fontsource/imperial-script/files/imperial-script-latin-ext-400-normal.woff2') format('woff2');
-  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
-}
-
-/* imperial-script-latin-400-normal */
-@font-face {
-  font-family: 'Imperial Script';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400;
-  src: url('@fontsource/imperial-script/files/imperial-script-latin-400-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }

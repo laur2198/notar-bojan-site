@@ -12,15 +12,11 @@
  * bojan, fiecare în intervalul lui [a, b] din gestul total, proporțional cu data-len.
  *
  * Pe ecranele înguste (< 640 px) semnătura întreagă devine prea mică: se arată doar mâinile
- * (masca #m-maini și grupul lor, cu viewBox-ul decupat pe ele) și, sub ele, „Notar Bojan” ca
- * text în Imperial Script (Semnatura.astro).
+ * (masca #m-maini și grupul lor, cu viewBox-ul decupat pe ele), fără litere (Semnatura.astro).
  */
 
 export const ORDINE_CUVINTE = ['notar', 'maini', 'bojan'] as const;
 export type Cuvant = (typeof ORDINE_CUVINTE)[number];
-
-/** Textul de sub mâini pe mobil: aceleași cuvinte ca literele din SVG. */
-export const TEXT_SEMNATURA_MOBIL = 'Notar Bojan';
 
 export interface TraseuRev {
   cuvant: Cuvant;

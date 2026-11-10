@@ -8,8 +8,7 @@
  *
  * Două SVG-uri pe instanță, alese din CSS:
  *   - ≥ 640 px: semnătura întreagă;
- *   - < 640 px: doar mâinile (viewBox decupat pe ele) și, sub ele, „Notar Bojan” ca text în
- *     Imperial Script (self-hosted, src/styles/fonturi.css; se descarcă doar când e afișat).
+ *   - < 640 px: doar mâinile (viewBox decupat pe ele), animate; fără litere.
  * Id-urile măștilor primesc sufixul instanței (`id`), pentru că semnătura apare de două ori pe
  * pagină (intro + hero).
  *
@@ -21,7 +20,7 @@
  * Fără JS și la prefers-reduced-motion rămâne așa; scriptul o ascunde (101) doar când chiar animă.
  */
 import svgSemnatura from '../assets/semnatura.svg?raw';
-import { randeazaSemnatura, TEXT_SEMNATURA_MOBIL } from '../lib/semnatura';
+import { randeazaSemnatura } from '../lib/semnatura';
 
 interface Props {
   /** Identificator unic în pagină (sufixul id-urilor și valoarea lui data-semnatura). */
@@ -45,18 +44,15 @@ const r = randeazaSemnatura(svgSemnatura, id);
     focusable="false"
     set:html={r.intreaga}
   />
-  <div class="semnatura__mobil">
-    <svg
-      class="semnatura__maini"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={r.viewBoxMaini}
-      width={r.viewBoxMaini.split(' ')[2]}
-      height={r.viewBoxMaini.split(' ')[3]}
-      focusable="false"
-      set:html={r.maini}
-    />
-    <span class="semnatura__text">{TEXT_SEMNATURA_MOBIL}</span>
-  </div>
+  <svg
+    class="semnatura__maini"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox={r.viewBoxMaini}
+    width={r.viewBoxMaini.split(' ')[2]}
+    height={r.viewBoxMaini.split(' ')[3]}
+    focusable="false"
+    set:html={r.maini}
+  />
 </div>
 
 <style>
@@ -76,33 +72,18 @@ const r = randeazaSemnatura(svgSemnatura, id);
     overflow: visible;
   }
 
-  .semnatura__mobil {
+  .semnatura .semnatura__maini {
     display: none;
   }
 
-  /* < 640 px: doar mâinile, cu „Notar Bojan” dedesubt. */
+  /* < 640 px: doar mâinile. */
   @media (max-width: 39.99rem) {
     .semnatura .semnatura__intreaga {
       display: none;
     }
 
-    .semnatura__mobil {
-      display: grid;
-      justify-items: center;
-      container-type: inline-size;
-    }
-
     .semnatura .semnatura__maini {
-      width: 78%;
-    }
-
-    .semnatura__text {
-      margin-top: -0.12em;
-      font-family: 'Imperial Script', cursive;
-      font-size: max(2rem, 19cqi);
-      font-weight: 400;
-      line-height: 1.1;
-      white-space: nowrap;
+      display: block;
     }
   }
 

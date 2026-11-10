@@ -74,7 +74,6 @@ export const en: Record<keyof typeof ro, string> = {
   'subsol.navigare': 'Navigation',
   'subsol.adresa': 'Address',
   'subsol.cif': 'Tax ID (CIF) {cif}',
-  'subsol.atribuireMaini': 'Handshake illustration:',
   'wordmark.acasa': '{denumire} – home page',
 
   // Home page
