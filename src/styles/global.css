@@ -180,7 +180,7 @@ small {
   font-size: var(--fs-sm);
 }
 
-/* Linkuri: text --c-ink (19.4:1 pe alb), subliniate; la hover sublinierea se îngroașă (indiciu fără culoare). */
+/* Linkuri: text --c-ink (16.6:1 pe alb), subliniate; la hover sublinierea se îngroașă (indiciu fără culoare). */
 a {
   color: var(--c-ink);
   text-decoration-line: underline;
@@ -197,6 +197,12 @@ a:hover {
 hr {
   border: 0;
   border-top: 1px solid var(--c-line);
+}
+
+/* Selecția de text: fundal brand, text alb (12.4:1). */
+::selection {
+  background: var(--c-brand);
+  color: var(--c-paper);
 }
 
 /* ---------------------------------------------------------------------------
@@ -225,15 +231,15 @@ body::after {
    --------------------------------------------------------------------------- */
 
 :focus-visible {
-  outline: 3px solid var(--c-ink);
+  outline: 3px solid var(--c-brand);
   outline-offset: 3px;
   border-radius: calc(var(--radius) / 3);
 }
 
 /*
- * Pe fundal deschis, focusul e --c-ink: 19.4:1 pe paper, 17.7:1 pe paper-2.
- * Pe fundalul închis (--c-ink) ink nu se vede, deci containerul închis primește clasa
- * `.pe-inchis`, iar focusul devine --c-paper: 19.4:1 pe ink.
+ * Pe fundal deschis, focusul e --c-brand: 12.4:1 pe paper, 11.3:1 pe paper-2.
+ * Pe fundalul închis (--c-brand-900) maroul nu se vede, deci containerul închis primește clasa
+ * `.pe-inchis`, iar focusul devine --c-paper: 16.7:1 pe brand-900.
  */
 .pe-inchis :focus-visible,
 .pe-inchis:focus-visible {
@@ -248,25 +254,30 @@ body::after {
 :root,
 [data-tema-sectiune='light'],
 [data-tema='light'] {
-  --buton-plin-bg: var(--c-ink);
+  /* Plin: alb pe brand (12.4:1), hover brand-900 (16.7:1). Contur: brand (12.4:1), hover brand-50 (10.1:1). */
+  --buton-plin-bg: var(--c-brand);
   --buton-plin-fg: var(--c-paper);
-  --buton-plin-hover: var(--c-ink-hover);
-  --buton-contur-fg: var(--c-ink);
-  --buton-contur-hover: var(--c-paper-2);
-  --buton-focus: var(--c-ink);
+  --buton-plin-hover: var(--c-brand-900);
+  --buton-contur-fg: var(--c-brand);
+  --buton-contur-hover: var(--c-brand-50);
+  --buton-focus: var(--c-brand);
   --buton-dezactivat: var(--c-muted);
+  /* Linia .sub la hover: roșul de accent (8.1:1 pe alb; decorativă, indiciul e linia). */
+  --sub-hover: var(--c-accent);
 }
 
 .pe-inchis,
 [data-tema-sectiune='dark'],
 [data-tema='dark'] {
+  /* Plin: alb cu text brand-900 (16.7:1), hover brand-50 (13.7:1). Contur: alb, hover brand (12.4:1). */
   --buton-plin-bg: var(--c-paper);
-  --buton-plin-fg: var(--c-ink);
-  --buton-plin-hover: var(--c-paper-hover);
+  --buton-plin-fg: var(--c-brand-900);
+  --buton-plin-hover: var(--c-brand-50);
   --buton-contur-fg: var(--c-paper);
-  --buton-contur-hover: var(--c-ink-3);
+  --buton-contur-hover: var(--c-brand);
   --buton-focus: var(--c-paper);
-  --buton-dezactivat: var(--c-muted-dark);
+  --buton-dezactivat: var(--c-brand-300);
+  --sub-hover: currentColor;
 }
 
 [data-tema-sectiune='dark'] :focus-visible,
@@ -275,7 +286,7 @@ body::after {
 }
 
 [data-tema-sectiune='light'] :focus-visible {
-  outline-color: var(--c-ink);
+  outline-color: var(--c-brand);
 }
 
 /*
@@ -310,6 +321,11 @@ body::after {
 .sub[aria-current]::before {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* Pe deschis, linia trasă la hover e roșul de accent; pagina curentă rămâne în culoarea textului. */
+.sub:is(:hover, :focus-visible)::before {
+  background: var(--sub-hover, currentColor);
 }
 
 .sub[aria-current]::before {
@@ -353,8 +369,8 @@ body::after {
 }
 
 /*
- * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-ink: 17.2:1. Singura culoare
- * din afara paletei monocrome: e un semnal de lucru, nu apare în producție.
+ * Marcaj «DE COMPLETAT» (doar în preview). Galben pal cu text --c-ink: 14.8:1. Singura culoare
+ * din afara paletei: e un semnal de lucru, nu apare în producție.
  * Conturul punctat îl face vizibil și fără a distinge culoarea.
  */
 mark.todo {
@@ -409,45 +425,45 @@ mark.todo {
   text-decoration-thickness: 0.08em;
 }
 
-/* Primar: fundal --c-ink, text --c-paper (19.4:1); hover --c-ink-2 (17.4:1) și subliniere. */
+/* Primar: fundal --c-brand, text --c-paper (12.4:1); hover --c-brand-900 (16.7:1) și subliniere. */
 .btn--primar {
-  --btn-bg: var(--c-ink);
+  --btn-bg: var(--c-brand);
   --btn-fg: var(--c-paper);
-  --btn-border: var(--c-ink);
+  --btn-border: var(--c-brand);
 }
 
 .btn--primar:hover {
-  --btn-bg: var(--c-ink-2);
-  --btn-border: var(--c-ink-2);
+  --btn-bg: var(--c-brand-900);
+  --btn-border: var(--c-brand-900);
   color: var(--c-paper);
 }
 
 /*
- * Secundar (btn--contur din prototip): transparent, contur și text --c-ink (19.4:1).
- * Hover: fundal --c-paper-2 (text 17.7:1) și subliniere.
+ * Secundar (btn--contur din prototip): transparent, contur și text --c-brand (12.4:1).
+ * Hover: fundal --c-brand-50 (text 10.1:1) și subliniere.
  */
 .btn--secundar {
   --btn-bg: transparent;
-  --btn-fg: var(--c-ink);
-  --btn-border: var(--c-ink);
+  --btn-fg: var(--c-brand);
+  --btn-border: var(--c-brand);
 }
 
 .btn--secundar:hover {
-  --btn-bg: var(--c-paper-2);
-  color: var(--c-ink);
+  --btn-bg: var(--c-brand-50);
+  color: var(--c-brand);
 }
 
-/* Invers, pe secțiunile închise: fundal --c-paper, text --c-ink (19.4:1); hover --c-paper-2 (17.7:1). */
+/* Invers, pe secțiunile închise: fundal --c-paper, text --c-brand-900 (16.7:1); hover --c-brand-50 (13.7:1). */
 .btn--invers {
   --btn-bg: var(--c-paper);
-  --btn-fg: var(--c-ink);
+  --btn-fg: var(--c-brand-900);
   --btn-border: var(--c-paper);
 }
 
 .btn--invers:hover {
-  --btn-bg: var(--c-paper-2);
-  --btn-border: var(--c-paper-2);
-  color: var(--c-ink);
+  --btn-bg: var(--c-brand-50);
+  --btn-border: var(--c-brand-50);
+  color: var(--c-brand-900);
 }
 
 /*
@@ -475,11 +491,11 @@ mark.todo {
   text-decoration-line: none;
 }
 
-/* Pe fundal închis, butonul inactiv rămâne lizibil: text și contur --c-muted-dark (7.9:1). */
+/* Pe fundal închis, butonul inactiv rămâne lizibil: text și contur --c-brand-300 (7.9:1 pe brand-900). */
 .pe-inchis .btn[aria-disabled='true'] {
-  --btn-fg: var(--c-muted-dark);
-  --btn-border: var(--c-muted-dark);
-  color: var(--c-muted-dark);
+  --btn-fg: var(--c-brand-300);
+  --btn-border: var(--c-brand-300);
+  color: var(--c-brand-300);
 }
 
 /* ---------------------------------------------------------------------------

@@ -26,7 +26,7 @@ export function culoare(nume: string): string {
  * Mărimile de font, evaluate pentru o lățime de fereastră dată (ghidul /stil/).
  * Tokenurile de font sunt expresii CSS: clamp(), calc(), var(), rem, vw și numere. Le evaluăm
  * aici cu 1rem = 16 px, fără să le copiem: o schimbare în tokens.css se vede direct în /stil/.
- * Blocul `@media (max-width: …rem)` din tokens.css suprascrie tokenurile sub acel prag.
+ * Blocurile `@media (max-width | min-width: …rem)` din tokens.css suprascriu tokenurile la acele lățimi.
  * ------------------------------------------------------------------------------------------- */
 
 const REM = 16;
@@ -37,20 +37,26 @@ function declaratii(css: string): Map<string, string> {
   return new Map([...faraComentarii.matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)].map(([, n, v]) => [n!, v!.trim()]));
 }
 
-const indexMedia = tokensCss.search(/@media\s*\(max-width:/);
-const baza = declaratii(indexMedia === -1 ? tokensCss : tokensCss.slice(0, indexMedia));
-const suprascrieri =
-  indexMedia === -1
-    ? null
-    : {
-        pragPx: Number(tokensCss.slice(indexMedia).match(/max-width:\s*([\d.]+)rem/)![1]) * REM,
-        valori: declaratii(tokensCss.slice(indexMedia)),
-      };
+/** Blocurile `@media (max-width: …rem)` / `(min-width: …rem)` din tokens.css, cu declarațiile lor. */
+interface BlocMedia {
+  tip: 'max' | 'min';
+  pragPx: number;
+  valori: Map<string, string>;
+}
 
-/** Valoarea brută a unui token la lățimea dată (ține cont de blocul @media). */
+const indexPrimMedia = tokensCss.search(/@media\s*\(/);
+const baza = declaratii(indexPrimMedia === -1 ? tokensCss : tokensCss.slice(0, indexPrimMedia));
+const blocuri: BlocMedia[] = [...tokensCss.matchAll(/@media\s*\((max|min)-width:\s*([\d.]+)rem\)\s*\{([\s\S]*?)\n\}/g)].map(
+  ([, tip, prag, corp]) => ({ tip: tip as 'max' | 'min', pragPx: Number(prag) * REM, valori: declaratii(corp!) }),
+);
+
+/** Valoarea brută a unui token la lățimea dată (ține cont de blocurile @media, în ordinea din fișier). */
 function valoareToken(nume: string, latime: number): string {
-  if (suprascrieri && latime <= suprascrieri.pragPx && suprascrieri.valori.has(nume)) return suprascrieri.valori.get(nume)!;
-  const v = baza.get(nume);
+  let v = baza.get(nume);
+  for (const b of blocuri) {
+    const seAplica = b.tip === 'max' ? latime <= b.pragPx : latime >= b.pragPx;
+    if (seAplica && b.valori.has(nume)) v = b.valori.get(nume);
+  }
   if (v === undefined) throw new Error(`Tokenul --${nume} lipsește din src/styles/tokens.css.`);
   return v;
 }
