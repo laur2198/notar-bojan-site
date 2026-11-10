@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { temaLaY, type ZonaSectiune } from './tema-navbar';
+import { esteDerulat, PRAG_DERULARE, temaLaY, type ZonaSectiune } from './tema-navbar';
 
 const sectiuni: ZonaSectiune[] = [
   { top: -800, bottom: 100, tema: 'light' },
@@ -30,5 +30,15 @@ describe('temaLaY', () => {
   it('fără secțiune sub linie: null (navbar-ul își păstrează tema)', () => {
     expect(temaLaY(2000, sectiuni)).toBeNull();
     expect(temaLaY(10, [])).toBeNull();
+  });
+});
+
+describe('esteDerulat (fundalul navbar-ului sub prag)', () => {
+  it('fundal plin doar peste 8 px de derulare; la 0, transparent', () => {
+    expect(PRAG_DERULARE).toBe(8);
+    expect(esteDerulat(0)).toBe(false);
+    expect(esteDerulat(8)).toBe(false);
+    expect(esteDerulat(9)).toBe(true);
+    expect(esteDerulat(2400)).toBe(true);
   });
 });

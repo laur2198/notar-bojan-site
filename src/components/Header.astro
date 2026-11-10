@@ -1,9 +1,14 @@
 ---
 /**
- * Navbar-ul (prototip, `.nav`; CLAUDE.md §4, §5, §6): fix sus, TRANSPARENT, fără umbră și fără
- * linie. Culoarea vine din data-tema (light / dark), pusă de src/scripts/tema-navbar.ts după
- * secțiunea de sub el ([data-tema-sectiune]), cu tranziție de 0.4 s. Excepție aprobată de la
- * „header plin” (CLAUDE.md §5): textul paginii poate trece pe sub navbar la derulare.
+ * Navbar-ul (prototip, `.nav`; CLAUDE.md §4, §5, §6): fix sus, fără umbră. Culoarea vine din
+ * data-tema (light / dark), pusă de src/scripts/tema-navbar.ts după secțiunea de sub el
+ * ([data-tema-sectiune]), cu tranziție de 0.4 s.
+ *   - Desktop (≥ 74rem): transparent mereu, ca în prototip.
+ *   - Sub 74rem: transparent doar sus; derulat peste 8 px (data-derulat, din tema-navbar.ts),
+ *     primește fundal plin în culoarea temei și o linie de 1 px jos, ca textul paginii să nu
+ *     treacă pe sub el. Tranziția urmează culoarea (0.4 s; instant la mișcare redusă). Cu meniul
+ *     compact deschis, fundalul îl dă panoul.
+ *   - Fără JS: fundal plin, în tema de la încărcare.
  *
  * - Desktop (≥ PRAG, vezi stilurile): wordmark | Servicii · Programare · Întrebări · Contact |
  *   RO|EN · telefon · WhatsApp · Buton „Programare”. Linkurile au linia care se trage la hover
@@ -198,7 +203,32 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     inset: 0 0 auto 0;
     z-index: 40;
     color: var(--c-ink);
-    transition: color 0.4s ease;
+    transition:
+      color 0.4s ease,
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  /*
+   * Sub pragul de desktop: fundal plin după 8 px de derulare (data-derulat), în culoarea temei,
+   * cu o linie de 1 px jos (box-shadow inset: fără umbră și fără să schimbe înălțimea).
+   */
+  @media (max-width: 73.99rem) {
+    .antet[data-derulat] {
+      background-color: var(--c-paper);
+      box-shadow: inset 0 -1px 0 var(--c-line);
+    }
+
+    .antet[data-derulat][data-tema='dark'] {
+      background-color: var(--c-ink);
+      box-shadow: inset 0 -1px 0 var(--c-line-dark);
+    }
+
+    /* Meniul compact deschis: fundalul îl dă panoul (ink), ca până acum. */
+    .antet[data-derulat]:has(.meniu-compact[open]) {
+      background-color: transparent;
+      box-shadow: none;
+    }
   }
 
   .antet[data-tema='dark'] {

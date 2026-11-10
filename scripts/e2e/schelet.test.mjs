@@ -255,3 +255,114 @@ describe('Cursorul și shutter-ul', () => {
     }
   });
 });
+
+/**
+ * Pentru 5 puncte din dreptunghiul navbar-ului: elementul de deasupra (elementFromPoint) e din
+ * header și, între el și header, există un fundal opac. Doar elementFromPoint nu ajunge: un header
+ * fix e ținta lui și când e transparent, deși textul paginii se vede prin el.
+ */
+function puncteNavbar() {
+  const antet = document.querySelector('[data-navbar]');
+  const r = antet.getBoundingClientRect();
+  const puncte = [
+    [0.04, 0.2],
+    [0.3, 0.5],
+    [0.5, 0.8],
+    [0.7, 0.35],
+    [0.96, 0.65],
+  ].map(([fx, fy]) => [r.left + r.width * fx, r.top + r.height * fy]);
+  return puncte.map(([x, y]) => {
+    const el = document.elementFromPoint(x, y);
+    let opac = false;
+    for (let n = el; n && antet.contains(n); n = n.parentElement) {
+      const c = getComputedStyle(n).backgroundColor;
+      const alfa = c.startsWith('rgba') ? Number(c.match(/[\d.]+/g)[3]) : 1;
+      if (alfa >= 0.99) opac = true;
+      if (n === antet) break;
+    }
+    return { x: Math.round(x), y: Math.round(y), dinHeader: !!el && antet.contains(el), opac, el: el?.tagName + '.' + (el?.className || '') };
+  });
+}
+
+// Derulare instantă: `scroll-behavior: smooth` face scrollTo animat, iar recalcularea
+// ScrollTrigger de imediat după încărcare l-ar putea anula (doar în test; utilizatorul derulează nativ).
+describe('Navbar-ul sub prag: fundal plin la derulare (V2b)', () => {
+  for (const cale of ['/', '/contact/']) {
+    it(`${cale} la 390 px, derulat: nicio bucată din pagină nu se vede în dreptunghiul navbar-ului`, async () => {
+      const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
+      await p.goto(BAZA + cale, { waitUntil: 'load' });
+      for (const y of [120, 900, 2000]) {
+        await p.evaluate((v) => scrollTo({ top: v, behavior: 'instant' }), y);
+        await p.waitForTimeout(600); // rAF + tranziția de 0.4 s
+        for (const pt of await p.evaluate(puncteNavbar)) {
+          assert.ok(pt.dinHeader && pt.opac, `derulat ${y}px, punctul (${pt.x}, ${pt.y}): ${pt.el}, fundal opac: ${pt.opac}`);
+        }
+      }
+      // La scroll 0 revine transparent.
+      await p.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+      await p.waitForTimeout(600);
+      const sus = await p.evaluate(() => ({
+        derulat: document.querySelector('[data-navbar]').hasAttribute('data-derulat'),
+        fundal: getComputedStyle(document.querySelector('[data-navbar]')).backgroundColor,
+      }));
+      assert.equal(sus.derulat, false);
+      assert.equal(sus.fundal, 'rgba(0, 0, 0, 0)');
+      await context.close();
+    });
+  }
+
+  it('fundalul are culoarea temei și o linie de 1 px; pagina reîncărcată deja derulată pornește cu fundal', async () => {
+    const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
+    await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+    // Peste hero (temă închisă), derulat puțin.
+    await p.evaluate(() => scrollTo({ top: 60, behavior: 'instant' }));
+    await p.waitForTimeout(600);
+    let s = await p.evaluate(() => {
+      const c = getComputedStyle(document.querySelector('[data-navbar]'));
+      return { fundal: c.backgroundColor, linie: c.boxShadow, tema: document.querySelector('[data-navbar]').dataset.tema };
+    });
+    assert.deepEqual(s, { fundal: 'rgb(15, 15, 15)', linie: 'rgb(44, 44, 44) 0px -1px 0px 0px inset', tema: 'dark' });
+    // Reîncărcare la jumătatea paginii (temă deschisă): fundal plin imediat, fără tranziție.
+    await p.evaluate(() => scrollTo({ top: 2500, behavior: 'instant' }));
+    await p.reload({ waitUntil: 'load' });
+    await p.waitForTimeout(50);
+    s = await p.evaluate(() => {
+      const c = getComputedStyle(document.querySelector('[data-navbar]'));
+      return { scroll: scrollY > 8, fundal: c.backgroundColor, linie: c.boxShadow };
+    });
+    assert.deepEqual(s, { scroll: true, fundal: 'rgb(255, 255, 255)', linie: 'rgb(227, 227, 227) 0px -1px 0px 0px inset' });
+    await context.close();
+  });
+
+  it('meniul compact deschis nu e afectat: panoul ink, navbar-ul fără fundal propriu', async () => {
+    const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
+    await p.goto(`${BAZA}/contact/`, { waitUntil: 'load' });
+    await p.evaluate(() => scrollTo({ top: 900, behavior: 'instant' }));
+    await p.waitForTimeout(600);
+    await p.click('summary.meniu-compact__buton');
+    await p.waitForTimeout(500);
+    const s = await p.evaluate(() => {
+      const antet = document.querySelector('[data-navbar]');
+      const r = antet.getBoundingClientRect();
+      return {
+        fundal: getComputedStyle(antet).backgroundColor,
+        text: getComputedStyle(antet).color,
+        sub: getComputedStyle(document.querySelector('.meniu-compact__panou')).backgroundColor,
+        punct: antet.contains(document.elementFromPoint(r.width / 2, r.height / 2)),
+      };
+    });
+    assert.deepEqual(s, { fundal: 'rgba(0, 0, 0, 0)', text: 'rgb(255, 255, 255)', sub: 'rgb(15, 15, 15)', punct: true });
+    await context.close();
+  });
+
+  it('martor: pe desktop (1280 px) navbar-ul rămâne transparent la derulare, deci verificarea de opacitate pică', async () => {
+    const { p, context } = await pagina({ viewport: { width: 1280, height: 800 } });
+    await p.goto(`${BAZA}/contact/`, { waitUntil: 'load' });
+    await p.evaluate(() => scrollTo({ top: 900, behavior: 'instant' }));
+    await p.waitForTimeout(600);
+    const pt = await p.evaluate(puncteNavbar);
+    assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('[data-navbar]')).backgroundColor), 'rgba(0, 0, 0, 0)');
+    assert.ok(pt.some((x) => !x.opac), 'pe desktop testul trebuie să vadă fundalul transparent');
+    await context.close();
+  });
+});

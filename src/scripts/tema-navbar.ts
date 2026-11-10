@@ -3,6 +3,11 @@
  * `data-tema-sectiune="light|dark"`; navbar-ul (`[data-navbar]`) primește `data-tema` după
  * secțiunea care conține linia de la jumătatea înălțimii lui. Fără GSAP: scroll pasiv + rAF.
  * Nu e mișcare (doar schimbă culorile), deci rulează și la prefers-reduced-motion.
+ *
+ * Tot aici, `data-derulat` pe navbar când pagina e derulată cu mai mult de PRAG_DERULARE px: sub
+ * pragul de desktop, navbar-ul primește atunci fundal plin în culoarea temei (Header.astro), ca
+ * textul paginii să nu treacă pe sub el. La încărcare, starea (temă + derulare) se aplică fără
+ * tranziție, deci o pagină reîncărcată deja derulată pornește direct cu fundal.
  */
 
 export type Tema = 'light' | 'dark';
@@ -24,6 +29,12 @@ export function temaLaY(y: number, sectiuni: readonly ZonaSectiune[]): Tema | nu
   return tema;
 }
 
+/** Peste câți px de derulare navbar-ul de sub prag primește fundal plin. */
+export const PRAG_DERULARE = 8;
+
+/** Navbar-ul primește fundal plin (sub pragul de desktop) peste PRAG_DERULARE px de derulare. */
+export const esteDerulat = (scrollY: number) => scrollY > PRAG_DERULARE;
+
 /** Pornește urmărirea. Întoarce funcția de oprire. */
 export function pornesteTemaNavbar(navbar: HTMLElement | null = document.querySelector('[data-navbar]')): () => void {
   if (!navbar) return () => {};
@@ -41,6 +52,7 @@ export function pornesteTemaNavbar(navbar: HTMLElement | null = document.querySe
       }),
     );
     if (tema && navbar.dataset.tema !== tema) navbar.dataset.tema = tema;
+    navbar.toggleAttribute('data-derulat', esteDerulat(window.scrollY));
   };
   const programeaza = () => {
     if (cerut) return;
