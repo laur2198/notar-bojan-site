@@ -1,8 +1,9 @@
 ---
 /**
- * /en/services/ (etapa 6): prezentare generală, fără pagini individuale și fără tabel de prețuri
- * (CLAUDE.md §6). Aceeași structură ca /servicii/: bandă de titlu, grila de carduri (GrilaServicii),
- * secțiunea gri despre onorarii și CTA.
+ * /en/services/ (etapa 6): prezentare generală, fără pagini individuale (CLAUDE.md §6). Aceeași
+ * structură ca /servicii/: bandă de titlu, grila de carduri (GrilaServicii) și CTA. Fără onorarii
+ * sau sume (CLAUDE.md §3.3): sub grilă, doar nota generală cu trimiterea la Ordinul MJ nr. 177/C/2024
+ * (`servicii.intro` din i18n, același text ca lead-ul de pe /servicii/).
  *
  * Fiecare card are ancora `id={slugRo}` (ținta cardurilor de pe /en/) și linkul secundar
  * „Details in Romanian” spre /servicii/{slugRo}/, cu hreflang="ro".
@@ -55,11 +56,15 @@ const carduri = serviciiEn.data.lista.map((s) => ({
   <Sectiune>
     {/* Cardurile sunt primul nivel de conținut sub h1, deci titlurile lor sunt h2. */}
     <GrilaServicii locale={locale} servicii={carduri} nivel="h2" />
-  </Sectiune>
-
-  <Sectiune id="onorarii" ton="gri" titlu={t(locale, 'servicii.onorariiScurt')}>
-    <p set:html={marcheazaPlaceholder(serviciiEn.data.fees)} />
+    <p class="nota-norme">{t(locale, 'servicii.intro')}</p>
   </Sectiune>
 
   <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
 </BaseLayout>
+
+<style>
+  .nota-norme {
+    margin-top: var(--space-4);
+    color: var(--c-muted);
+  }
+</style>

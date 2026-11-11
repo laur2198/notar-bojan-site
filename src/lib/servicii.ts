@@ -21,12 +21,11 @@ export function serviciiVecine<T extends ServiciuOrdonat>(toate: readonly T[], s
     .sort((a, b) => a.ordine - b.ordine);
 }
 
-/** Serviciile fără onorariu în preturi/ro.yaml și onorariile fără pagină de serviciu. */
-export function verificaPreturi(sluguriServicii: readonly string[], sluguriPreturi: readonly string[]) {
-  const servicii = new Set(sluguriServicii);
-  const preturi = new Set(sluguriPreturi);
-  return {
-    faraOnorariu: sluguriServicii.filter((s) => !preturi.has(s)),
-    faraPagina: sluguriPreturi.filter((s) => !servicii.has(s)),
-  };
+/**
+ * Cheia i18n a titlului SEO al paginii de serviciu: „{titlu} la notar în Brașov | …”. Dacă
+ * titlul conține deja „notar” (ex. „Divorț pe cale notarială”), varianta fără „la notar”,
+ * ca să nu se dubleze.
+ */
+export function cheieTitluSeo(titlu: string): 'servicii.seoTitluPagina' | 'servicii.seoTitluPaginaScurt' {
+  return /notar/i.test(titlu) ? 'servicii.seoTitluPaginaScurt' : 'servicii.seoTitluPagina';
 }

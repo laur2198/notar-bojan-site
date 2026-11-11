@@ -23,7 +23,7 @@ import { caleLogica, t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getBirou, marcheazaPlaceholder } from '../../lib/continut';
 import { breadcrumbList, idBirou, serviciu as serviciuJsonLd } from '../../lib/jsonld';
-import { serviciiVecine } from '../../lib/servicii';
+import { cheieTitluSeo, serviciiVecine } from '../../lib/servicii';
 import { url } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -65,7 +65,7 @@ const jsonld = [
 ];
 ---
 
-<BaseLayout locale={locale} title={t(locale, 'servicii.seoTitluPagina', { titlu: s.titlu })} description={s.rezumat}>
+<BaseLayout locale={locale} title={t(locale, cheieTitluSeo(s.titlu), { titlu: s.titlu })} description={s.rezumat}>
   <JsonLd date={jsonld} slot="head" />
   <BandaTitlu
     locale={locale}

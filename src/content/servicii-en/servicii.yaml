@@ -7,5 +7,4 @@ lista:
   - { titlu: "Certified copies and signatures", text: "Certified copies of documents, signature authentication and specimen signatures.", slugRo: "legalizari", etichete: ["Certified copies", "Signatures"], imagineAlt: "«DE VALIDAT: Wooden rubber stamp on an open legal document»" }
   - { titlu: "Declarations", text: "Sworn declarations, including parental consent for a minor travelling abroad.", slugRo: "declaratii", etichete: ["Sworn declarations", "Travel consent"] }
   - { titlu: "Gift deed", text: "Gift contracts for property and other assets.", slugRo: "donatie", etichete: ["Property", "Movable assets"], imagineAlt: "«DE VALIDAT: Hand holding out a set of keys»" }
-fees: "Notary fees are set according to the regulations in force. We give you the exact amount, including taxes, after checking your documents."
 validat: false

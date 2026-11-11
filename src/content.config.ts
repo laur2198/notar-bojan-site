@@ -299,26 +299,6 @@ const serviciiEn = defineCollection({
         }),
       )
       .min(1),
-    fees: z.string().min(1),
-    validat,
-  }),
-});
-
-// ---------------------------------------------------------------------------
-// preturi/ro.yaml
-// ---------------------------------------------------------------------------
-
-const preturi = defineCollection({
-  loader: glob({ base: `${BAZA}/preturi`, pattern: '*.yaml' }),
-  schema: z.object({
-    intro: z.string().min(1),
-    nota: z.string().min(1),
-    lista: z.array(
-      z.object({
-        serviciu: z.string().min(1),
-        text: z.string().min(1),
-      }),
-    ),
     validat,
   }),
 });
@@ -366,4 +346,4 @@ const recenzii = defineCollection({
   }),
 });
 
-export const collections = { birou, acasa, pagini, servicii, serviciiEn, preturi, faq, recenzii };
+export const collections = { birou, acasa, pagini, servicii, serviciiEn, faq, recenzii };
