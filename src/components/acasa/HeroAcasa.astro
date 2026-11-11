@@ -1,8 +1,9 @@
 ---
 /**
  * Hero-ul paginii Acasă (CLAUDE.md §5; V3b): deschis, pe tot ecranul de la încărcare.
- *   - sus, de la 992 px pe două coloane: stânga h1 (titlu + subtitlu în --c-muted, max. ~50% din
- *     lățime) și sub el semnătura, aliniată la stânga; dreapta fotografia biroului (4:5, înălțimea
+ *   - sus, de la 992 px pe două coloane: stânga blocul de titlu (h1 + subtitlul <p> în --c-muted,
+ *     amândouă inline, ca textul să curgă într-un singur paragraf; max. ~50% din lățime; h1-ul
+ *     conține doar titlul, pentru SEO) și sub el semnătura, aliniată la stânga; dreapta fotografia biroului (4:5, înălțimea
  *     limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
  *     Sub 992 px: h1 → fotografia (4:3, pe toată lățimea) → semnătura.
  *   - jos, pe toată lățimea: rândul din CMS + adresa din birou.yaml, linia și wordmark-ul gigant
@@ -50,10 +51,11 @@ const alt = textAlt(imagineAlt);
     <div class="hero__sus">
       <div class="hero__text">
         <slot />
-        <h1 class="hero__titlu" id="hero-titlu" data-hero-titlu>
-          <Fragment set:html={marcheazaPlaceholder(titlu)} />
-          <span class="hero__subtitlu"><Fragment set:html={marcheazaPlaceholder(subtitlu)} /></span>
-        </h1>
+        {/* h1 și subtitlul sunt inline în același bloc: arată ca un singur paragraf în două tonuri. */}
+        <div class="hero__titlu-bloc" data-hero-titlu>
+          <h1 class="hero__titlu" id="hero-titlu" set:html={marcheazaPlaceholder(titlu)} />
+          <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />
+        </div>
       </div>
       <div class="hero__foto" data-hero-foto>
         <FotoProvizorie locale={locale} provizorie={provizorie && !!imagine} />
@@ -191,13 +193,26 @@ const alt = textAlt(imagineAlt);
     justify-items: start;
   }
 
-  .hero__titlu {
+  /* Tipografia de h1 stă pe bloc; h1 și <p> o moștenesc și curg inline, unul după altul. */
+  .hero__titlu-bloc {
     max-width: 24em;
     margin: 0;
+    font-family: var(--font-display);
     font-size: var(--fs-h1);
+    font-weight: var(--fw-titlu);
     line-height: var(--lh-titlu-mare);
     letter-spacing: var(--ls-titlu-mare);
+    overflow-wrap: break-word;
     text-wrap: pretty;
+  }
+
+  .hero__titlu,
+  .hero__subtitlu {
+    display: inline;
+    max-width: none;
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
   }
 
   .hero__subtitlu {

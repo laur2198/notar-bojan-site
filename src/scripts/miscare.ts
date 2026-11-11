@@ -26,7 +26,7 @@
  *                          16 benzi pe desktop, 10 pe tabletă (≤ 991 px), 6 pe mobil (≤ 478 px).
  *                          Benzile se creează doar aici: la mișcare redusă nu există deloc.
  *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la `intro-gata` (sau imediat,
- *                          dacă a fost deja emis): h1 ([data-hero-titlu]) pe rânduri din mască,
+ *                          dacă a fost deja emis): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
  *                          linia ([data-hero-divider]) 0 → 100%, rândul de sub semnătură
  *                          ([data-hero-fade]) și wordmark-ul ([data-hero-wordmark]) apar, fotografia
  *                          ([data-hero-foto]) se descoperă de jos în sus (clip-path, 1 s, expo.out), iar
@@ -70,6 +70,37 @@ export function pregatesteTextAccesibil(el: HTMLElement): { tinta: HTMLElement; 
   vizual.innerHTML = original;
   el.replaceChildren(copie, vizual);
   return { tinta: vizual, aria: 'none', revino: () => (el.innerHTML = original) };
+}
+
+/**
+ * Titlul hero-ului de pe Acasă: un bloc cu <h1> și subtitlul <p>, amândouă inline (HeroAcasa.astro),
+ * ca h1-ul să conțină doar titlul. Împărțirea pe rânduri ar tăia h1-ul în bucăți (câte un <h1> pe
+ * rând), așa că se împarte o copie vizuală aria-hidden (span-uri cu aceleași clase), iar elementele
+ * reale rămân în pagină, sr-only, doar cât durează intrarea. `revino` readuce exact HTML-ul inițial.
+ * Un titlu simplu (h1–h6) se împarte direct, cu aria „auto”.
+ */
+export function pregatesteTitluHero(el: HTMLElement): { tinta: HTMLElement; aria: 'auto' | 'none'; revino: () => void } {
+  if (TITLURI.test(el.tagName)) return { tinta: el, aria: 'auto', revino: () => {} };
+  const reale = [...el.children].filter((c): c is HTMLElement => c instanceof HTMLElement);
+  const vizual = document.createElement('div');
+  vizual.setAttribute('aria-hidden', 'true');
+  reale.forEach((real, i) => {
+    const copie = document.createElement('span');
+    for (const a of real.attributes) if (a.name !== 'id') copie.setAttribute(a.name, a.value);
+    copie.innerHTML = real.innerHTML;
+    if (i > 0) vizual.append(' ');
+    vizual.append(copie);
+  });
+  for (const real of reale) real.classList.add('sr-only');
+  el.append(vizual);
+  return {
+    tinta: vizual,
+    aria: 'none',
+    revino: () => {
+      vizual.remove();
+      for (const real of reale) real.classList.remove('sr-only');
+    },
+  };
 }
 
 function reveal(el: HTMLElement): () => void {
@@ -158,8 +189,17 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   const foto = hero.querySelector<HTMLElement>('[data-hero-foto]');
   const semnatura = hero.querySelector('[data-semnatura]');
   let split: SplitText | null = null;
+  let revinoTitlu: () => void = () => {};
   let opresteDesen: (() => void) | null = null;
   let pornit = false;
+
+  /** După intrare (sau la oprire): fără împărțire, HTML-ul inițial al titlului. */
+  const refaTitlul = () => {
+    split?.revert();
+    split = null;
+    revinoTitlu();
+    revinoTitlu = () => {};
+  };
 
   const porneste = () => {
     if (pornit) return;
@@ -169,12 +209,14 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
     // Animațiile create acum (după evenimentul async) intră în contextul matchMedia, ca să fie anulate la reduced-motion.
     ctx.add(() => {
       if (titlu) {
-        split = SplitText.create(titlu, {
+        const { tinta, aria, revino } = pregatesteTitluHero(titlu);
+        revinoTitlu = revino;
+        split = SplitText.create(tinta, {
           type: 'lines',
           mask: 'lines',
-          aria: 'auto',
+          aria,
           autoSplit: true,
-          onSplit: (s) => gsap.from(s.lines, { yPercent: 110, duration: 0.8, stagger: 0.08, ease: 'expo.out' }),
+          onSplit: (s) => gsap.from(s.lines, { yPercent: 110, duration: 0.8, stagger: 0.08, ease: 'expo.out', onComplete: refaTitlul }),
         });
       }
       if (linie) gsap.fromTo(linie, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'power2.inOut' });
@@ -201,7 +243,7 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   return () => {
     window.clearTimeout(siguranta);
     document.removeEventListener(EVENIMENT_GATA, porneste);
-    split?.revert();
+    refaTitlul();
     opresteDesen?.();
     html.classList.add('hero-pornit');
   };
