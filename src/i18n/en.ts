@@ -74,12 +74,13 @@ export const en: Record<keyof typeof ro, string> = {
   'subsol.navigare': 'Navigation',
   'subsol.adresa': 'Address',
   'subsol.cif': 'Tax ID (CIF) {cif}',
+  'subsol.atribuire': 'Illustration:',
   'wordmark.acasa': '{denumire} – home page',
 
   // Home page
   'acasa.programare': 'Request an appointment',
   'acasa.suna': 'Call us: {telefon}',
-  'acasa.toateServiciile': 'See all services and fees',
+  'acasa.toateServiciile': 'See all services',
   'acasa.despreLink': 'About the office (in Romanian)',
   'acasa.toateIntrebarile': 'All questions',
   'acasa.toateServiciileScurt': 'All services',
@@ -118,22 +119,21 @@ export const en: Record<keyof typeof ro, string> = {
   'hero.fotoDeCompletat': 'Photo of the building/office – to be added',
   'servicii.vedeti': 'View service',
 
-  // Services and fees
-  'servicii.titlu': 'Services and fees',
-  'servicii.seoTitlu': 'Services and fees | {denumire}',
+  // Services (no fees or amounts: CLAUDE.md §3.3)
+  'servicii.titlu': 'Services',
+  'servicii.seoTitlu': 'Services | {denumire}',
   'servicii.seoDescriere': 'Notarial services at the office in Brasov, Romania: property sales, inheritance, powers of attorney, certified copies and signatures.',
-  'servicii.onorariiTitlu': 'Indicative fees',
-  'servicii.coloanaServiciu': 'Service',
-  'servicii.coloanaOnorariu': 'Indicative fee',
-  'servicii.onorariuCard': 'Fee:',
+  'servicii.intro': 'Notary fees are set according to the regulations in force (Order of the Minister of Justice no. 177/C/2024). We give you the exact amount, together with the legal taxes, after checking your documents.',
   'servicii.altele': 'Other services',
-  'servicii.seoTitluPagina': '{titlu} | {denumire}',
+  'servicii.seoTitluPagina': '{titlu} – notary in Brasov | {denumire}',
+  'servicii.seoTitluPaginaScurt': '{titlu} in Brasov | {denumire}',
   'breadcrumbs.acasa': 'Home',
 
   // "Prepare your file" box
   'dosar.titlu': 'Prepare your file',
   'dosar.durata': 'Duration',
   'dosar.onorariu': 'Fee',
+  'dosar.onorariuNorme': 'Regulations: Order of the Minister of Justice no. 177/C/2024.',
   'dosar.acte': 'Documents needed',
   'dosar.nota': 'We confirm the final list after checking your documents.',
   'dosar.trimite': 'Email us your documents',
@@ -174,7 +174,6 @@ export const en: Record<keyof typeof ro, string> = {
   // English version (stage 6)
   'faq.titlu': 'Frequently asked questions',
   'servicii.detaliiRo': 'Details in Romanian',
-  'servicii.onorariiScurt': 'Fees',
   'despre.nota': 'Good to know',
 
   // Share image (Open Graph)

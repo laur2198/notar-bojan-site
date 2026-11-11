@@ -1,8 +1,8 @@
 ---
 /**
- * /servicii/ – Servicii și prețuri (etapa 4): toate serviciile (grila de pe Acasă, cu onorariul
- * pe card), tabelul „Onorarii orientative” cu nota din preturi/ro.yaml și CTA.
- * Onorariile vin exclusiv din preturi/ro.yaml (CLAUDE.md §3.3); nu se inventează cifre.
+ * /servicii/ – Servicii: toate serviciile (grila de pe Acasă) și CTA.
+ * Fără onorarii, sume sau tabele de prețuri (CLAUDE.md §3.3, Codul deontologic): lead-ul paginii
+ * spune doar că onorariile se stabilesc conform Ordinului MJ nr. 177/C/2024 (text din i18n).
  */
 import { getCollection, getEntry } from 'astro:content';
 import BandaTitlu from '../../components/BandaTitlu.astro';
@@ -10,40 +10,21 @@ import DraftBadge from '../../components/DraftBadge.astro';
 import GrilaServicii from '../../components/GrilaServicii.astro';
 import SectiuneCta from '../../components/SectiuneCta.astro';
 import Sectiune from '../../components/Sectiune.astro';
-import TabelOnorarii from '../../components/TabelOnorarii.astro';
-import { cale, t } from '../../i18n';
+import { t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { esteDraft, getBirou, marcheazaPlaceholder } from '../../lib/continut';
-import { verificaPreturi } from '../../lib/servicii';
 
 const locale = 'ro';
-const [preturi, acasa, birou] = await Promise.all([getEntry('preturi', 'ro'), getEntry('acasa', 'ro/acasa'), getBirou()]);
-if (!preturi || !acasa) throw new Error('Lipsesc src/content/preturi/ro.yaml sau pagini/ro/acasa.yaml.');
+const [acasa, birou] = await Promise.all([getEntry('acasa', 'ro/acasa'), getBirou()]);
+if (!acasa) throw new Error('Lipsește src/content/pagini/ro/acasa.yaml.');
 
 const servicii = (await getCollection('servicii')).sort((a, b) => a.data.ordine - b.data.ordine);
-const onorarii = new Map(preturi.data.lista.map((p) => [p.serviciu, p.text]));
-
-// Avertisment clar la build dacă preturi/ro.yaml și paginile de servicii nu se potrivesc.
-const { faraOnorariu, faraPagina } = verificaPreturi(
-  servicii.map((s) => s.data.slug),
-  preturi.data.lista.map((p) => p.serviciu),
-);
-if (faraOnorariu.length) {
-  console.warn(`[servicii] ATENȚIE: servicii fără onorariu în src/content/preturi/ro.yaml: ${faraOnorariu.join(', ')}`);
-}
-if (faraPagina.length) {
-  console.warn(`[servicii] ATENȚIE: onorarii fără pagină de serviciu (src/content/servicii/ro/): ${faraPagina.join(', ')}`);
-}
-
-const carduri = servicii.map((s) => ({ ...s.data, textOnorariu: onorarii.get(s.data.slug) }));
-const randuri = servicii
-  .filter((s) => onorarii.has(s.data.slug))
-  .map((s) => ({ serviciu: s.data.titlu, href: `${cale('servicii', locale)}${s.data.slug}/`, onorariu: onorarii.get(s.data.slug)! }));
+const carduri = servicii.map((s) => s.data);
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'servicii.seoTitlu')} description={t(locale, 'servicii.seoDescriere')}>
-  <BandaTitlu locale={locale} titlu={t(locale, 'servicii.titlu')} leadHtml={marcheazaPlaceholder(preturi.data.intro)}>
-    <DraftBadge locale={locale} draft={esteDraft(preturi) || servicii.some((s) => esteDraft(s))} />
+  <BandaTitlu locale={locale} titlu={t(locale, 'servicii.titlu')} leadHtml={marcheazaPlaceholder(t(locale, 'servicii.intro'))}>
+    <DraftBadge locale={locale} draft={servicii.some((s) => esteDraft(s))} />
   </BandaTitlu>
 
   <Sectiune>
@@ -51,17 +32,5 @@ const randuri = servicii
     <GrilaServicii locale={locale} servicii={carduri} nivel="h2" />
   </Sectiune>
 
-  <Sectiune id="onorarii" ton="gri" titlu={t(locale, 'servicii.onorariiTitlu')}>
-    <TabelOnorarii locale={locale} titluId="onorarii-titlu" randuri={randuri} />
-    <p class="nota-onorarii" set:html={marcheazaPlaceholder(preturi.data.nota)} />
-  </Sectiune>
-
   <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
 </BaseLayout>
-
-<style>
-  .nota-onorarii {
-    margin-top: var(--space-3);
-    color: var(--c-muted);
-  }
-</style>

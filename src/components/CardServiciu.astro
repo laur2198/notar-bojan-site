@@ -31,11 +31,9 @@ interface Props {
   provizorie?: boolean;
   /** Nivelul titlului: h3 sub un h2 de secțiune. */
   nivel?: 'h2' | 'h3';
-  /** Textul de onorariu din preturi/ro.yaml (pe /servicii/). */
-  onorariu?: string;
 }
 
-const { locale, titlu, href, id, linkRo, rezumat, imagine, imagineAlt, provizorie = false, nivel = 'h3', onorariu } = Astro.props;
+const { locale, titlu, href, id, linkRo, rezumat, imagine, imagineAlt, provizorie = false, nivel = 'h3' } = Astro.props;
 const Titlu = nivel;
 ---
 
@@ -61,17 +59,6 @@ const Titlu = nivel;
       {href ? <a class="card-serviciu__link" href={href}>{titlu}</a> : titlu}
     </Titlu>
     <p class="card-serviciu__rezumat" set:html={marcheazaPlaceholder(rezumat)} />
-    {
-      onorariu && (
-        <p class="card-serviciu__onorariu">
-          <Iconita nume="onorariu" />
-          <span>
-            <span class="card-serviciu__onorariu-eticheta">{t(locale, 'servicii.onorariuCard')}</span>{' '}
-            <span set:html={marcheazaPlaceholder(onorariu)} />
-          </span>
-        </p>
-      )
-    }
     {
       linkRo ? (
         <p class="card-serviciu__detalii">
@@ -192,25 +179,6 @@ const Titlu = nivel;
     flex: 1;
     color: var(--c-muted);
     font-size: var(--fs-sm);
-  }
-
-  .card-serviciu__onorariu {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-1);
-    padding-top: var(--space-1);
-    border-top: 1px solid var(--c-line);
-    color: var(--c-ink);
-    font-size: var(--fs-sm);
-  }
-
-  .card-serviciu__onorariu :global(.iconita) {
-    margin-top: calc(var(--space-1) / 4);
-    color: var(--c-ink);
-  }
-
-  .card-serviciu__onorariu-eticheta {
-    font-weight: 700;
   }
 
   .card-serviciu__mai-mult {

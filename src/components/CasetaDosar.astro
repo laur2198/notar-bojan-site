@@ -1,7 +1,8 @@
 ---
 /**
  * Caseta „Pregătiți dosarul” de pe pagina de serviciu (CLAUDE.md §8): butonul „Trimiteți
- * actele pe email” (mailto: cu subiect și corp precompletat) sus, apoi durata, onorariul,
+ * actele pe email” (mailto: cu subiect și corp precompletat) sus, apoi durata, onorariul (text
+ * general din fișierul serviciului + trimiterea la Ordinul MJ nr. 177/C/2024; fără sume, §3.3),
  * actele necesare (bife ink, nu checkbox-uri), programarea și telefonul.
  * Card alb, radius-lg, umbră; sticky pe desktop (poziționarea o dă pagina).
  *
@@ -73,7 +74,11 @@ const telefon = linkTelefon(birou);
     </div>
     <div class="dosar__fapt">
       <dt><Iconita nume="onorariu" />{t(locale, 'dosar.onorariu')}</dt>
-      <dd set:html={marcheazaPlaceholder(onorariu)} />
+      <dd>
+        <span set:html={marcheazaPlaceholder(onorariu)} />
+        {/* Trimiterea la norme, o singură dată, aici (nu în fiecare fișier de serviciu). */}
+        <span class="dosar__norme">{t(locale, 'dosar.onorariuNorme')}</span>
+      </dd>
     </div>
   </dl>
 
@@ -142,6 +147,13 @@ const telefon = linkTelefon(birou);
   .dosar__fapt dd {
     margin: calc(var(--space-1) / 2) 0 0;
     max-width: none;
+  }
+
+  .dosar__norme {
+    display: block;
+    margin-top: calc(var(--space-1) / 2);
+    color: var(--c-muted);
+    font-size: var(--fs-sm);
   }
 
   .dosar__subtitlu {

@@ -30,7 +30,7 @@ describe('Ancoră în adresă la încărcare', () => {
     for (const [cale, selector] of [
       ['/#faq', '#faq'],
       ['/en/#faq', '#faq'],
-      ['/servicii/#onorarii', '#onorarii'],
+      ['/servicii/vanzare-cumparare/#alte-servicii', '#alte-servicii'],
     ]) {
       it(`${nume} ${cale}: ajunge la secțiune și rămâne după fonturi și ScrollTrigger`, async () => {
         const { p, erori, context } = await pagina(optiuni);
@@ -58,7 +58,7 @@ describe('Clic pe o ancoră în prima secundă după încărcare', () => {
   for (const [nume, optiuni] of VIEWPORTURI) {
     for (const [cale, selector] of [
       ['/', '#faq'],
-      ['/servicii/', '#onorarii'],
+      ['/servicii/vanzare-cumparare/', '#alte-servicii'],
     ]) {
       it(`${nume} ${cale} → ${selector}`, async () => {
         const { p, context } = await pagina(optiuni);

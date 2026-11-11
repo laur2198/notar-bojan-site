@@ -487,7 +487,7 @@ content:
         label: Onorariu
         type: text
         required: true
-        description: Doar texte stabilite de birou, conform normelor. Fără reduceri sau promoții.
+        description: Doar text general („conform normelor în vigoare…”). Fără sume, tarife sau formulări „de la … lei” (Codul deontologic, art. 15 și 17). Trimiterea la Ordinul MJ nr. 177/C/2024 o adaugă site-ul automat.
       - name: acteNecesare
         label: Acte necesare
         type: string
@@ -512,44 +512,6 @@ content:
       - name: body
         component: corp
         description: Păstrați cele trei secțiuni, „Ce este”, „Cum decurge” (listă numerotată) și „Bine de știut”, ca titluri de nivel 2.
-
-  # -------------------------------------------------------------------------
-  - name: preturi
-    label: Prețuri
-    type: file
-    path: src/content/preturi/ro.yaml
-    format: yaml
-    operations:
-      delete: false
-    fields:
-      - name: intro
-        label: Text introductiv
-        type: text
-        required: true
-      - name: nota
-        label: Notă sub tabel
-        type: text
-        required: true
-      - name: lista
-        label: Onorarii orientative
-        type: object
-        description: Doar valori stabilite de birou, conform normelor privind onorariile. Fără reduceri, promoții sau comparații.
-        list:
-          collapsible:
-            collapsed: true
-            summary: "{serviciu}"
-        fields:
-          - name: serviciu
-            label: Serviciul (slug)
-            type: string
-            required: true
-            description: Exact ca adresa paginii serviciului, ex. vanzare-cumparare.
-          - name: text
-            label: Onorariu orientativ
-            type: string
-            required: true
-      - name: validat
-        component: validat
 
   # -------------------------------------------------------------------------
   - name: faq-ro
@@ -791,10 +753,6 @@ content:
                 type: string
                 list:
                   max: 4
-          - name: fees
-            label: Text despre onorarii (EN)
-            type: text
-            required: true
           - name: validat
             component: validat
       - name: programare-en

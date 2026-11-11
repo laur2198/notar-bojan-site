@@ -46,9 +46,14 @@ interface Props {
   temaNavbar?: 'light' | 'dark';
   /** Pornirea intro-ului: o dată pe sesiune (implicit) sau doar manual (ghidul /stil/). */
   intro?: 'automat' | 'manual';
+  /**
+   * `id`-ul unei <Semnatura> din conținutul paginii (ex. „hero” pe Acasă): intro-ul o clonează la
+   * pornire, ca SVG-ul semnăturii să apară o singură dată în HTML (IntroSemnatura.astro).
+   */
+  semnaturaInPagina?: string;
 }
 
-const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light', intro = 'automat' } = Astro.props;
+const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light', intro = 'automat', semnaturaInPagina } = Astro.props;
 const birou = await getBirou();
 /** Denumirea oficială (birou.yaml) în titlu și descriere: niciodată forma scurtă, netradusă în EN. */
 const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumire);
@@ -77,7 +82,7 @@ const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumir
     <slot name="head" />
   </head>
   <body>
-    <IntroSemnatura />
+    <IntroSemnatura cloneazaDin={semnaturaInPagina} />
     <SkipLink locale={locale} />
     <Header locale={locale} birou={birou} tema={temaNavbar} />
     <main id="continut" tabindex="-1" data-tema-sectiune="light">

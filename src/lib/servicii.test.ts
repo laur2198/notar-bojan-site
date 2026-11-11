@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { serviciiVecine, verificaPreturi } from './servicii';
+import { cheieTitluSeo, serviciiVecine } from './servicii';
 
 const S = [1, 2, 3, 4, 5, 6, 7, 8].map((ordine) => ({ slug: `s${ordine}`, ordine }));
 
@@ -21,9 +21,11 @@ describe('serviciiVecine', () => {
   });
 });
 
-describe('verificaPreturi', () => {
-  it('găsește serviciile fără onorariu și onorariile fără pagină', () => {
-    expect(verificaPreturi(['a', 'b', 'c'], ['a', 'c', 'x'])).toEqual({ faraOnorariu: ['b'], faraPagina: ['x'] });
-    expect(verificaPreturi(['a'], ['a'])).toEqual({ faraOnorariu: [], faraPagina: [] });
+describe('cheieTitluSeo', () => {
+  it('„la notar în Brașov”, fără dublare când titlul conține deja „notar”', () => {
+    expect(cheieTitluSeo('Procuri')).toBe('servicii.seoTitluPagina');
+    expect(cheieTitluSeo('Vânzare-cumpărare')).toBe('servicii.seoTitluPagina');
+    expect(cheieTitluSeo('Divorț pe cale notarială')).toBe('servicii.seoTitluPaginaScurt');
+    expect(cheieTitluSeo('Acte Notariale diverse')).toBe('servicii.seoTitluPaginaScurt');
   });
 });

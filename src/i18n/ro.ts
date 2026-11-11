@@ -72,12 +72,13 @@ export const ro = {
   'subsol.navigare': 'Navigare',
   'subsol.adresa': 'Adresă',
   'subsol.cif': 'CIF {cif}',
+  'subsol.atribuire': 'Ilustrație:',
   'wordmark.acasa': '{denumire} – pagina principală',
 
   // Pagina Acasă
   'acasa.programare': 'Solicitați o programare',
   'acasa.suna': 'Sunați: {telefon}',
-  'acasa.toateServiciile': 'Vedeți toate serviciile și onorariile',
+  'acasa.toateServiciile': 'Vedeți toate serviciile',
   'acasa.despreLink': 'Despre birou',
   'acasa.toateIntrebarile': 'Toate întrebările',
   'acasa.toateServiciileScurt': 'Toate serviciile',
@@ -116,22 +117,22 @@ export const ro = {
   'hero.fotoDeCompletat': 'Fotografie clădire/birou – de completat',
   'servicii.vedeti': 'Vedeți serviciul',
 
-  // Servicii și prețuri
-  'servicii.titlu': 'Servicii și prețuri',
-  'servicii.seoTitlu': 'Servicii și prețuri | {denumire}',
-  'servicii.seoDescriere': 'Serviciile biroului notarial din Brașov, actele necesare pentru fiecare și onorariile orientative.',
-  'servicii.onorariiTitlu': 'Onorarii orientative',
-  'servicii.coloanaServiciu': 'Serviciu',
-  'servicii.coloanaOnorariu': 'Onorariu orientativ',
-  'servicii.onorariuCard': 'Onorariu:',
+  // Servicii (fără onorarii sau sume: CLAUDE.md §3.3)
+  'servicii.titlu': 'Servicii',
+  'servicii.seoTitlu': 'Servicii | {denumire}',
+  'servicii.seoDescriere': 'Serviciile biroului notarial din Brașov și actele necesare pentru fiecare.',
+  'servicii.intro': 'Onorariile notariale se stabilesc conform normelor în vigoare (Ordinul ministrului justiției nr. 177/C/2024). Suma exactă, împreună cu taxele legale, v-o comunicăm după ce verificăm actele.',
   'servicii.altele': 'Alte servicii',
-  'servicii.seoTitluPagina': '{titlu} | {denumire}',
+  // „{titlu} la notar în Brașov”; fără „la notar” când titlul conține deja „notar” (src/lib/servicii.ts).
+  'servicii.seoTitluPagina': '{titlu} la notar în Brașov | {denumire}',
+  'servicii.seoTitluPaginaScurt': '{titlu} în Brașov | {denumire}',
   'breadcrumbs.acasa': 'Acasă',
 
   // Caseta „Pregătiți dosarul”
   'dosar.titlu': 'Pregătiți dosarul',
   'dosar.durata': 'Durata',
   'dosar.onorariu': 'Onorariu',
+  'dosar.onorariuNorme': 'Norme: Ordinul ministrului justiției nr. 177/C/2024.',
   'dosar.acte': 'Acte necesare',
   'dosar.nota': 'Lista finală v-o confirmăm după verificarea actelor.',
   'dosar.trimite': 'Trimiteți actele pe email',
@@ -172,7 +173,6 @@ export const ro = {
   // Versiunea în engleză (etapa 6)
   'faq.titlu': 'Întrebări frecvente',
   'servicii.detaliiRo': 'Detalii în română',
-  'servicii.onorariiScurt': 'Onorarii',
   'despre.nota': 'Bine de știut',
 
   // Imaginea de distribuire (Open Graph)
