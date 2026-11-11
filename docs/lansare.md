@@ -9,7 +9,7 @@
 - [ ] **Zilele libere** confirmate pentru anul în curs (și, opțional, motivul în engleză); textul de confirmare șters.
 - [ ] **Fotografiile**: clădirea/biroul (hero, pe Acasă), portretul notarului (Despre). Fără ele, pe site rămân blocurile „Fotografie – de completat”.
 - [ ] **Titlul și descrierea pentru Google** ale paginii Acasă: titlu de cel mult 60 de caractere, descriere de cel mult 155 (RO și EN). Sugestie: „Notar public în Brașov – Bojan Elena Luminița”.
-- [ ] Toate textele cu «DE COMPLETAT» completate: pagini, servicii, prețuri, întrebări frecvente, politica de confidențialitate (inclusiv data actualizării).
+- [ ] Toate textele cu «DE COMPLETAT» completate: pagini, servicii, întrebări frecvente, politica de confidențialitate (inclusiv data actualizării).
 - [ ] **Politica de confidențialitate** citită și aprobată de birou (operatorul de date): temeiuri legale, termene de păstrare, furnizori (Google, WhatsApp/Meta, Cloudflare). Nota „Text propus…” de la început ștearsă.
 - [ ] Recenziile Google reale copiate (opțional), cu limba lor dacă nu sunt în română.
 - [ ] Bifa **„Text validat”** pusă pe fiecare fișier, după citire.
