@@ -34,14 +34,91 @@ describe('Acasă: intro și hero', () => {
     await context.close();
   });
 
-  it('titlul h1 rămâne accesibil cu textul întreg după împărțire', async () => {
-    const { p, context } = await pagina();
-    await p.goto(`${BAZA}/`, { waitUntil: 'load' });
-    await p.waitForTimeout(2500);
-    const n = await p.getByRole('heading', { level: 1, name: /Acte notariale pregătite din timp/ }).count();
-    assert.equal(n, 1);
-    assert.equal(await p.locator('h1').count(), 1);
-    await context.close();
+  it('h1 conține doar titlul; subtitlul e un <p> imediat după el; accesibil în timpul intrării și după', async () => {
+    for (const [cale, titlu] of [
+      ['/', /^Acte notariale pregătite din timp, ca drumul la birou să fie cât mai scurt\.$/],
+      ['/en/', /^Notarial acts prepared in advance, to keep your visit to the office short\.$/],
+    ]) {
+      const { p, context } = await pagina();
+      await p.goto(BAZA + cale, { waitUntil: 'domcontentloaded' });
+      const stare = () =>
+        p.evaluate(() => {
+          const h1 = document.querySelectorAll('h1');
+          const sub = h1[0].nextElementSibling;
+          return {
+            h1: h1.length,
+            text: h1[0].textContent.trim(),
+            id: h1[0].id,
+            eticheta: document.querySelector('[data-hero]').getAttribute('aria-labelledby'),
+            sub: `${sub.tagName}.${sub.classList[0]}`,
+            subText: sub.textContent.trim().length,
+            curat: [...document.querySelector('[data-hero-titlu]').children].map((c) => c.tagName + (c.classList.contains('sr-only') ? '.sr-only' : '')),
+          };
+        });
+      // În timpul intrării (rânduri din mască pe o copie aria-hidden): tot un singur h1, cu textul întreg.
+      await p.waitForFunction(() => document.documentElement.classList.contains('hero-pornit'));
+      const mijloc = await stare();
+      assert.equal(mijloc.h1, 1, `${cale}: un singur h1 în timpul intrării`);
+      assert.match(mijloc.text, titlu);
+      assert.equal(await p.getByRole('heading', { level: 1, name: titlu }).count(), 1);
+      await p.waitForTimeout(2500);
+      const final = await stare();
+      assert.equal(final.h1, 1);
+      assert.match(final.text, titlu);
+      assert.ok(final.text.length < 90, `${cale}: h1 are ${final.text.length} caractere`);
+      assert.equal(final.id, 'hero-titlu');
+      assert.equal(final.eticheta, 'hero-titlu');
+      assert.equal(final.sub, 'P.hero__subtitlu');
+      assert.ok(final.subText > 40);
+      assert.deepEqual(final.curat, ['H1', 'P'], `${cale}: după intrare, HTML-ul inițial (fără copie, fără sr-only)`);
+      assert.equal(await p.getByRole('heading', { level: 1, name: titlu }).count(), 1);
+      await context.close();
+    }
+  });
+
+  it('semnătura apare o singură dată în HTML; intro-ul o clonează din hero, cu măștile lui', async () => {
+    const html = await (await fetch(`${BAZA}/`)).text();
+    assert.equal((html.match(/class="semnatura__intreaga"/g) ?? []).length, 1);
+    assert.equal((html.match(/class="semnatura__maini"/g) ?? []).length, 1);
+    for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+      const { p, erori, context } = await pagina({ introVazut: false, viewport });
+      await p.goto(`${BAZA}/`, { waitUntil: 'domcontentloaded' });
+      await p.waitForFunction(() => document.documentElement.classList.contains('intro-pornit'));
+      await p.waitForTimeout(900);
+      const r = await p.evaluate(() => {
+        const intro = document.querySelector('[data-intro] [data-semnatura]');
+        const hero = document.querySelector('[data-hero] [data-semnatura]');
+        const iduri = [...document.querySelectorAll('[id]')].map((e) => e.id);
+        const vizibil = (radacina) => [...radacina.querySelectorAll('svg')].find((s) => getComputedStyle(s).display !== 'none');
+        const offseturi = (svg) => [...svg.querySelectorAll('path[data-a]')].map((x) => Number.parseFloat(getComputedStyle(x).strokeDashoffset));
+        const svgIntro = vizibil(intro);
+        return {
+          nume: intro.dataset.semnatura,
+          clasa: intro.classList.contains('intro__semnatura'),
+          duplicate: iduri.filter((id, i) => iduri.indexOf(id) !== i),
+          masti: [...intro.querySelectorAll('mask')].map((m) => m.id),
+          referinte: [...intro.querySelectorAll('[mask]')].every((e) => intro.querySelector(`mask[id="${e.getAttribute('mask').slice(5, -1)}"]`)),
+          trasee: [intro.querySelectorAll('path[data-a]').length, hero.querySelectorAll('path[data-a]').length],
+          latime: svgIntro.getBoundingClientRect().width,
+          intro: offseturi(svgIntro),
+          hero: offseturi(vizibil(hero)),
+        };
+      });
+      assert.equal(r.nume, 'intro');
+      assert.ok(r.clasa);
+      assert.deepEqual(r.duplicate, [], 'fără id-uri duplicate');
+      assert.ok(r.masti.length >= 4 && r.masti.every((id) => id.startsWith('semnatura-intro-')), `măști: ${r.masti}`);
+      assert.ok(r.referinte, 'formele clonei folosesc măștile clonei');
+      assert.equal(r.trasee[0], r.trasee[1]);
+      assert.ok(r.latime > 200, `semnătura intro-ului are ${r.latime} px`);
+      // La 0.9 s din 1.8 s: intro-ul e în plin desen (unele trăsături gata, altele neîncepute); hero-ul așteaptă.
+      assert.ok(r.intro.some((o) => o === 0) && r.intro.some((o) => o > 100), `intro în desen: ${r.intro}`);
+      assert.ok(r.hero.every((o) => o > 100), 'semnătura din hero e încă ascunsă');
+      await p.waitForTimeout(3600);
+      assert.match(await p.evaluate(() => document.documentElement.className), /hero-pornit/);
+      assert.deepEqual(erori, []);
+      await context.close();
+    }
   });
 });
 

@@ -27,6 +27,31 @@ const miscareRedusa = () => !window.matchMedia || matchMedia('(prefers-reduced-m
 
 let inCurs = false;
 
+/**
+ * Semnătura intro-ului. De regulă e în strat, din HTML. Pe paginile care au deja o semnătură în
+ * conținut (data-intro-sursa, ex. „hero” pe Acasă) stratul vine gol și semnătura se clonează
+ * acum din pagină: aceleași SVG-uri și aceleași intervale data-a / data-b, cu id-urile măștilor
+ * și referințele lor redenumite (`semnatura-{sursa}-` → `semnatura-intro-`), ca fiecare instanță
+ * să-și animeze măștile separat. Clona pornește din starea din HTML (fără stiluri inline).
+ */
+export function semnaturaIntro(strat: HTMLElement): Element | null {
+  const existenta = strat.querySelector('[data-semnatura]');
+  const sursa = strat.dataset.introSursa;
+  if (existenta || !sursa) return existenta;
+  const original = document.querySelector(`[data-semnatura="${CSS.escape(sursa)}"]`);
+  if (!original) return null;
+  const clona = original.cloneNode(true) as HTMLElement;
+  const vechi = `semnatura-${sursa}-`;
+  const nou = 'semnatura-intro-';
+  clona.dataset.semnatura = 'intro';
+  clona.classList.add('intro__semnatura');
+  for (const el of clona.querySelectorAll('[id]')) el.id = el.id.replace(vechi, nou);
+  for (const el of clona.querySelectorAll('[mask]')) el.setAttribute('mask', el.getAttribute('mask')!.replace(`#${vechi}`, `#${nou}`));
+  for (const p of clona.querySelectorAll<SVGPathElement>('path[data-a]')) p.style.removeProperty('stroke-dashoffset');
+  strat.append(clona);
+  return clona;
+}
+
 function anuntaGata() {
   document.documentElement.classList.add('intro-gata');
   document.dispatchEvent(new CustomEvent(EVENIMENT_GATA));
@@ -39,8 +64,9 @@ function anuntaGata() {
 export function ruleazaIntro(): boolean {
   const html = document.documentElement;
   const strat = document.querySelector<HTMLElement>('[data-intro]');
-  const svg = strat?.querySelector('[data-semnatura]');
-  if (inCurs || !strat || !svg || miscareRedusa()) {
+  // Clonarea (pe Acasă) se face doar dacă intro-ul chiar rulează.
+  const svg = inCurs || !strat || miscareRedusa() ? null : semnaturaIntro(strat);
+  if (!strat || !svg) {
     html.classList.remove('cu-intro');
     return false;
   }

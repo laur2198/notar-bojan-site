@@ -10,7 +10,8 @@
  *   - ≥ 640 px: semnătura întreagă;
  *   - < 640 px: doar mâinile (viewBox decupat pe ele), animate; fără litere.
  * Id-urile măștilor primesc sufixul instanței (`id`), pentru că semnătura apare de două ori pe
- * pagină (intro + hero).
+ * pagină (intro + hero). Pe Acasă e scrisă în HTML o singură dată (hero); intro-ul o clonează la
+ * pornire și redenumește id-urile (IntroSemnatura.astro, src/scripts/intro-semnatura.ts).
  *
  * Culoarea: currentColor, din `ton`: pe deschis maroul de brand (--c-brand, CLAUDE.md §5),
  * pe închis alb (--c-paper).

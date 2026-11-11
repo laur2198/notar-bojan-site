@@ -8,14 +8,25 @@
  * nu apare, deci intro-ul nu apare deloc. Cât e activ, derularea paginii e blocată.
  * aria-hidden + inert: cititoarele de ecran și focusul trec direct la pagină.
  *
- * Se montează o singură dată pe pagină (în V3, din BaseLayout; acum doar pe /stil/), împreună
- * cu <CapPagina /> în <head>.
+ * Se montează o singură dată pe pagină, din BaseLayout, împreună cu <CapPagina /> în <head>.
+ *
+ * `cloneazaDin`: pe paginile care au deja o semnătură în conținut (Acasă: cea din hero), SVG-ul
+ * (~100 KB) nu se mai scrie a doua oară în HTML. Stratul rămâne gol, iar intro-semnatura.ts
+ * clonează semnătura indicată (data-semnatura="…") chiar înainte de desen, cu id-urile măștilor
+ * redenumite (`semnatura-{sursa}-…` → `semnatura-intro-…`). Intro-ul rulează oricum doar cu JS.
  */
 import Semnatura from './Semnatura.astro';
+
+interface Props {
+  /** `id`-ul unei <Semnatura> din pagină (ton deschis) pe care intro-ul o clonează la pornire. */
+  cloneazaDin?: string;
+}
+
+const { cloneazaDin } = Astro.props;
 ---
 
-<div class="intro" data-intro aria-hidden="true" inert>
-  <Semnatura id="intro" class="intro__semnatura" />
+<div class="intro" data-intro data-intro-sursa={cloneazaDin} aria-hidden="true" inert>
+  {!cloneazaDin && <Semnatura id="intro" class="intro__semnatura" />}
 </div>
 
 <script>

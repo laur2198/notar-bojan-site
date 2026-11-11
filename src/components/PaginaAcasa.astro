@@ -88,7 +88,7 @@ const hero = await imagineOgHero(locale);
 const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.denumire), ...hero, alt: hero.alt ?? imagineOgImplicita(locale, birou.denumire).alt } : undefined;
 ---
 
-<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg}>
+<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg} semnaturaInPagina="hero">
   <HeroAcasa
     locale={locale}
     birou={birou}
