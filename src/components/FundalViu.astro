@@ -27,7 +27,10 @@ import { SEED, type Intensitate, type Seed } from '../lib/fundal-viu';
 
 interface Props {
   intensitate?: Intensitate;
-  /** Pozițiile, mărimile și mișcarea petelor (1–4): alt seed pe fiecare secțiune. */
+  /**
+   * Pozițiile, mărimile și mișcarea petelor: alt seed pe fiecare secțiune. 1 = hero-ul de pe Acasă,
+   * 2–4 = secțiuni cu text (≥ 500 px), 5 = capul paginilor interioare (AntetPagina, ≥ 26rem).
+   */
   seed?: Seed;
   /** Petele urmăresc lent cursorul (doar pe hero; pointer fin, fără mișcare redusă). */
   cursor?: boolean;
@@ -146,6 +149,10 @@ const pete = SEED[seed];
   .viu--seed-4 .viu__pata:nth-child(1) { --x: 8%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
   .viu--seed-4 .viu__pata:nth-child(2) { --x: 94%; --y: 70%; --d: min(48vw, 36rem); --d-mobil: min(64vw, 36rem); }
   .viu--seed-4 .viu__pata:nth-child(3) { --x: 40%; --y: 8%; --d: min(44vw, 34rem); --d-mobil: min(60vw, 34rem); }
+
+  .viu--seed-5 .viu__pata:nth-child(1) { --x: 94%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
+  .viu--seed-5 .viu__pata:nth-child(2) { --x: 6%; --y: 90%; --d: min(40vw, 32rem); --d-mobil: min(56vw, 32rem); }
+  .viu--seed-5 .viu__pata:nth-child(3) { --x: 60%; --y: 8%; --d: min(40vw, 32rem); --d-mobil: min(56vw, 32rem); }
 
   @media (max-width: 47.99rem) {
     .viu__pata {

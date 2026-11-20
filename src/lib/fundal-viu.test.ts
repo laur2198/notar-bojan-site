@@ -58,10 +58,11 @@ describe('fundalul viu: geometria per seed', () => {
     }
   });
 
-  it('înălțimea minimă: hero ≥ lățimea sub 992 px, ≥ 0.4 × lățimea peste; celelalte 500 px', () => {
+  it('înălțimea minimă: hero ≥ lățimea sub 992 px, ≥ 0.4 × lățimea peste; 2–4: 500 px; capul paginilor: 26rem', () => {
     expect(inaltimeMinima(1, 390)).toBe(390);
     expect(inaltimeMinima(1, 1440)).toBe(576);
     expect(inaltimeMinima(3, 3840)).toBe(500);
+    expect(inaltimeMinima(5, 320)).toBe(416);
   });
 });
 

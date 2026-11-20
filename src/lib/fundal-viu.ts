@@ -49,7 +49,7 @@ export function compusMaxim(intensitate: Intensitate, fundal: string): string {
  *   cursor   amplitudinea deplasării după cursor, în px (doar cu prop-ul `cursor`, pointer fin).
  * ------------------------------------------------------------------------------------------- */
 
-export const SEEDURI = [1, 2, 3, 4] as const;
+export const SEEDURI = [1, 2, 3, 4, 5] as const;
 export type Seed = (typeof SEEDURI)[number];
 
 export interface PataSeed {
@@ -68,6 +68,8 @@ export interface PataSeed {
 
 /** Pragul de la care se folosește `d` în loc de `dMobil` (48rem, ca în CSS). */
 export const PRAG_MOBIL_PX = 768;
+/** Înălțimea minimă a capului paginilor interioare (AntetPagina.astro, min-height: 26rem). */
+export const INALTIME_ANTET_PX = 26 * 16;
 /** Pragul layout-ului pe două coloane al hero-ului (62rem). */
 const PRAG_HERO_PX = 992;
 const REM_PX = 16;
@@ -93,6 +95,11 @@ export const SEED: Record<Seed, PataSeed[]> = {
     { culoare: 'piersica', x: 94, y: 70, d: 48, dMobil: 64, dMax: 36, dx: -12, dy: 10, s0: 1.08, s1: 0.92, cursor: 20 },
     { culoare: 'auriu', x: 40, y: 8, d: 44, dMobil: 60, dMax: 34, dx: 10, dy: -12, s0: 0.92, s1: 1.1, cursor: 28 },
   ],
+  5: [
+    { culoare: 'piersica', x: 94, y: 92, d: 42, dMobil: 58, dMax: 32, dx: -10, dy: 10, s0: 0.92, s1: 1.08, cursor: 20 },
+    { culoare: 'auriu', x: 6, y: 90, d: 40, dMobil: 56, dMax: 32, dx: 10, dy: -10, s0: 1.06, s1: 0.92, cursor: 22 },
+    { culoare: 'rosu', x: 60, y: 8, d: 40, dMobil: 56, dMax: 32, dx: -10, dy: 10, s0: 0.94, s1: 1.06, cursor: 24 },
+  ],
 };
 
 /**
@@ -100,10 +107,12 @@ export const SEED: Record<Seed, PataSeed[]> = {
  * garantată doar de la ea în sus. Seed 1 e al hero-ului (min-height 100svh): sub 992 px conținutul
  * e pe o coloană (≥ lățimea), de la 992 px cel puțin 0.4 × lățimea (ecrane până la 21:9).
  * Seed-urile 2–4 (secțiuni cu text): 500 px, independent de lățime și de câte elemente are CMS-ul.
+ * Seed 5 (capul paginilor interioare, AntetPagina): 26rem, garantat de min-height-ul lui.
  * scripts/e2e/acasa.test.mjs verifică pe pagina reală că secțiunile respectă minimul.
  */
 export function inaltimeMinima(seed: Seed, latime: number): number {
   if (seed === 1) return latime < PRAG_HERO_PX ? latime : 0.4 * latime;
+  if (seed === 5) return INALTIME_ANTET_PX;
   return 500;
 }
 

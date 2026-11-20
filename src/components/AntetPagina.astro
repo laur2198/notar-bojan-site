@@ -1,0 +1,170 @@
+---
+/**
+ * Capul paginilor interioare (CLAUDE.md §5, V4), după hero-ul de pe Acasă, la scară mai mică:
+ *   - stânga: breadcrumbs, slotul (DraftBadge), h1 (--fs-h1, ca pe Acasă, niciodată mai mare),
+ *     lead-ul opțional în --c-muted, apoi linia scurtă roșie (3 px) cu eticheta: implicit rândul
+ *     de sub hero-ul de pe Acasă (`hero.linie` din acasa.yaml, ex. „Notar public · Camera Notarilor
+ *     Publici Brașov”), deci același text, din CMS, pe fiecare limbă;
+ *   - dreapta, opțional (`fotografie`), fotografia 4:5 (4:3 sub 768 px), cu placeholder-ul
+ *     componentei Fotografie dacă imaginea lipsește; de la 992 px pe două coloane, textul centrat
+ *     vertical față de ea;
+ *   - jos, dividerul pe toată lățimea (data-divider).
+ * Fundal: --c-paper + FundalViu `puternic`, seed 5 (garantat geometric de la 26rem în sus, deci
+ * min-height: 26rem), fără urmărirea cursorului. Fără wordmark-ul gigant (doar pe Acasă și în
+ * subsol). Tema navbar-ului: light. Mișcarea: [data-reveal] pe h1 și pe lead, [data-divider] pe
+ * linii, ca pe Acasă; fără JS și la mișcare redusă, totul vizibil. Doar tokenuri.
+ */
+import type { ImageMetadata } from 'astro';
+import { getEntry } from 'astro:content';
+import type { Locale } from '../i18n';
+import { marcheazaPlaceholder } from '../lib/continut';
+import Breadcrumbs, { type Firimitura } from './Breadcrumbs.astro';
+import FotoProvizorie from './FotoProvizorie.astro';
+import Fotografie from './Fotografie.astro';
+import FundalViu from './FundalViu.astro';
+
+interface Props {
+  locale: Locale;
+  titlu: string;
+  /** Lead-ul (trecut prin marcheazaPlaceholder). Doar dacă pagina are deja un astfel de text. */
+  lead?: string;
+  breadcrumbs?: Firimitura[];
+  /** Eticheta de lângă linia roșie; implicit `hero.linie` din pagini/{limba}/acasa.yaml. */
+  eticheta?: string;
+  /** Coloana cu fotografia (placeholder dacă `imagine` lipsește). */
+  fotografie?: boolean;
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+  provizorie?: boolean;
+}
+
+const { locale, titlu, lead, breadcrumbs, eticheta, fotografie = false, imagine, imagineAlt = '', provizorie = false } = Astro.props;
+const acasa = eticheta === undefined ? await getEntry('acasa', `${locale}/acasa`) : undefined;
+const textEticheta = eticheta ?? acasa?.data.hero.linie ?? '';
+---
+
+<section class:list={['antet', { 'antet--cu-foto': fotografie }]} data-tema-sectiune="light" aria-labelledby="antet-titlu" data-antet>
+  <FundalViu intensitate="puternic" seed={5} />
+  <div class="container antet__interior">
+    <div class="antet__text">
+      {breadcrumbs && <Breadcrumbs locale={locale} elemente={breadcrumbs} />}
+      <slot />
+      <h1 class="antet__titlu" id="antet-titlu" data-reveal set:html={marcheazaPlaceholder(titlu)} />
+      {lead && <p class="antet__lead" data-reveal set:html={marcheazaPlaceholder(lead)} />}
+      {
+        textEticheta && (
+          <p class="antet__linie">
+            <span class="antet__accent" data-divider aria-hidden="true" />
+            <span set:html={marcheazaPlaceholder(textEticheta)} />
+          </p>
+        )
+      }
+    </div>
+    {
+      fotografie && (
+        <div class="antet__foto">
+          <FotoProvizorie locale={locale} provizorie={provizorie && !!imagine} />
+          <Fotografie
+            locale={locale}
+            imagine={imagine}
+            alt={imagineAlt}
+            raport="4 / 5"
+            raportMobil="4 / 3"
+            latimi={[480, 720, 960]}
+            sizes="(min-width: 62rem) 26rem, 100vw"
+            prioritar
+            class="antet__img"
+          />
+        </div>
+      )
+    }
+  </div>
+  <div class="container">
+    <div class="antet__divider" data-divider aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .antet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Seed 5 al fundalului viu e garantat geometric de la această înălțime (src/lib/fundal-viu.ts). */
+    min-height: 26rem;
+    /* Urcă sub navbar-ul transparent (global.css, main). */
+    margin-top: calc(-1 * var(--h-antet));
+    padding-top: calc(var(--h-antet) + var(--space-2));
+    background: var(--c-paper);
+    color: var(--c-ink);
+  }
+
+  .antet__interior {
+    display: grid;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+  }
+
+  .antet__text {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+    align-content: center;
+  }
+
+  .antet__text :global(.breadcrumbs) {
+    padding-block: 0;
+  }
+
+  .antet__titlu {
+    max-width: 22em;
+    margin: 0;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+  }
+
+  .antet__lead {
+    max-width: 38em;
+    margin: 0;
+    color: var(--c-muted);
+  }
+
+  .antet__linie {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+    max-width: none;
+    margin: var(--space-1) 0 0;
+    color: var(--c-muted);
+  }
+
+  /* Linia scurtă roșie (ca .hero__accent de pe Acasă; decorativă). */
+  .antet__accent {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3px;
+    background: var(--c-rosu);
+    transform-origin: left center;
+  }
+
+  .antet__foto {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.25em;
+  }
+
+  .antet__divider {
+    height: 1px;
+    background: var(--c-rosu);
+    transform-origin: left center;
+  }
+
+  @media (min-width: 62rem) {
+    .antet--cu-foto .antet__interior {
+      grid-template-columns: minmax(0, 1fr) 26rem;
+      column-gap: var(--space-6);
+      align-items: center;
+    }
+  }
+</style>

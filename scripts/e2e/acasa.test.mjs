@@ -86,7 +86,7 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const r = await p.evaluate(() => {
       const fraze = document.querySelector('[data-fraze]').closest('section');
-      const cta = document.querySelector('.faq__cta');
+      const cta = document.querySelector('[data-cta-final]');
       const subsol = document.querySelector('footer');
       const st = (el) => getComputedStyle(el);
       return {

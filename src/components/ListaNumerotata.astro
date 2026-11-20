@@ -1,0 +1,315 @@
+---
+/**
+ * Lista numerotată 01–0N (CLAUDE.md §5, V4), extrasă din serviciile de pe Acasă: cifra mono în
+ * --c-rosu, titlul cu săgeată, descrierea în --c-muted, etichete opționale, linii între rânduri.
+ * Folosită pe Acasă (ServiciiAcasa), /servicii/, „Alte servicii”, /en/services/, /programare/ și 404.
+ *
+ * Variante:
+ *   `mare`     (Acasă, /servicii/): fotografie mare 16:10 în stânga (parallax în cadru), textul în
+ *              dreapta; pe mobil una sub alta;
+ *   `compacta` (implicit): rânduri de text, cu o imagine mică 4:3 în dreapta, dacă există.
+ * Cu `href`, linkul e pe titlu (numele accesibil = titlul, WCAG 2.5.3) și ::after-ul lui acoperă
+ * tot rândul (clic oriunde, bula de cursor pe rând, hover ca pe Acasă: titlul subliniat, săgeata
+ * urcă). Fără `href`, rândul e doar text; `link` adaugă un link secundar vizibil (ex. „Details in
+ * Romanian” pe /en/services/). Doar tokenuri (CLAUDE.md §5, Paginile interioare).
+ */
+import type { ImageMetadata } from 'astro';
+import { t, type Locale } from '../i18n';
+import { marcheazaPlaceholder } from '../lib/continut';
+import FotoProvizorie from './FotoProvizorie.astro';
+import Fotografie from './Fotografie.astro';
+
+export interface ElementNumerotat {
+  titlu: string;
+  /** Descrierea (trecută prin marcheazaPlaceholder). */
+  text?: string;
+  href?: string;
+  etichete?: string[];
+  imagine?: ImageMetadata;
+  imagineAlt?: string;
+  /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
+  provizorie?: boolean;
+  /** Ancora rândului (ex. /en/services/#slug). */
+  id?: string;
+  /** Link secundar vizibil, când titlul nu e link. */
+  link?: { text: string; href: string; hreflang?: string };
+}
+
+interface Props {
+  locale: Locale;
+  elemente: ElementNumerotat[];
+  varianta?: 'mare' | 'compacta';
+  /** Nivelul titlurilor: h2 direct sub h1, h3 sub titlul unei secțiuni. */
+  nivel?: 'h2' | 'h3';
+  /** Prefix pentru id-urile descrierilor (unic pe pagină). */
+  prefix?: string;
+  /** Textul bulei de cursor (implicit „Vezi serviciul”). */
+  cursor?: string;
+}
+
+const { locale, elemente, varianta = 'compacta', nivel = 'h3', prefix = 'lista', cursor = t(locale, 'cursor.serviciu') } = Astro.props;
+const Titlu = nivel;
+const numar = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<ul class:list={['lista-nr', `lista-nr--${varianta}`]} role="list">
+  {
+    elemente.map((e, i) => (
+      <li
+        class:list={['lista-nr__rand', { 'lista-nr__rand--link': !!e.href, 'lista-nr__rand--cu-imagine': !!e.imagine || varianta === 'mare' }]}
+        id={e.id}
+        data-cursor={e.href ? cursor : undefined}
+      >
+        {(varianta === 'mare' || e.imagine) && (
+          <div class="lista-nr__img">
+            <FotoProvizorie locale={locale} provizorie={e.provizorie && !!e.imagine} />
+            <div class="lista-nr__cadru" data-parallax={varianta === 'mare' ? '10' : undefined}>
+              <Fotografie
+                locale={locale}
+                imagine={e.imagine}
+                alt={e.imagineAlt ?? ''}
+                raport={varianta === 'mare' ? '16 / 10' : '4 / 3'}
+                latimi={varianta === 'mare' ? [640, 960, 1280] : [320, 480]}
+                sizes={varianta === 'mare' ? '(min-width: 48rem) 60vw, 100vw' : '(min-width: 48rem) 14rem, 40vw'}
+                class="lista-nr__foto"
+              />
+            </div>
+          </div>
+        )}
+        <div class="lista-nr__desc">
+          <div>
+            <span class="lista-nr__nr" aria-hidden="true">
+              {numar(i)}
+            </span>
+            <Titlu class="lista-nr__titlu">
+              {e.href ? (
+                <a class="lista-nr__link" href={e.href} aria-describedby={e.text ? `${prefix}-${i}-text` : undefined}>
+                  {e.titlu}
+                  <span class="lista-nr__sageata" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              ) : (
+                e.titlu
+              )}
+            </Titlu>
+            {e.text && <p class="lista-nr__text" id={`${prefix}-${i}-text`} set:html={marcheazaPlaceholder(e.text)} />}
+            {e.link && (
+              <p class="lista-nr__secundar">
+                <a class="sub" href={e.link.href} hreflang={e.link.hreflang}>
+                  {e.link.text}
+                  <span class="lista-nr__sageata" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              </p>
+            )}
+          </div>
+          {e.etichete && e.etichete.length > 0 && (
+            <ul class="lista-nr__etichete" role="list" aria-label={t(locale, 'acasa.etichete')}>
+              {e.etichete.map((x) => (
+                <li>{x}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .lista-nr {
+    padding: 0;
+    list-style: none;
+  }
+
+  .lista-nr > li {
+    max-width: none;
+  }
+
+  .lista-nr > li + li {
+    border-top: 1px solid var(--c-line);
+  }
+
+  .lista-nr__rand {
+    position: relative;
+    display: grid;
+    gap: 1.25em;
+    padding-block: 2.2em;
+    color: inherit;
+  }
+
+  .lista-nr > .lista-nr__rand:first-child {
+    padding-top: 0;
+  }
+
+  /* Mare (Acasă, /servicii/): fotografia în stânga, textul în dreapta. */
+  @media (min-width: 48rem) {
+    .lista-nr--mare .lista-nr__rand {
+      grid-template-columns: 1.55fr 1fr;
+      gap: 3em;
+    }
+
+    /* Compactă: textul, apoi imaginea mică în dreapta. */
+    .lista-nr--compacta .lista-nr__rand--cu-imagine {
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      gap: 2.5em;
+    }
+
+    .lista-nr--compacta .lista-nr__img {
+      order: 2;
+    }
+  }
+
+  .lista-nr--compacta .lista-nr__rand {
+    padding-block: 1.6em;
+  }
+
+  .lista-nr__img {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--c-paper-2);
+  }
+
+  .lista-nr--mare .lista-nr__img {
+    aspect-ratio: 16 / 10;
+  }
+
+  .lista-nr--compacta .lista-nr__img {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Cadrul e mai înalt decât fereastra imaginii, ca parallax-ul să nu lase margini goale. */
+  .lista-nr--mare .lista-nr__cadru {
+    position: absolute;
+    inset: -12% 0;
+  }
+
+  .lista-nr--compacta .lista-nr__cadru {
+    position: absolute;
+    inset: 0;
+  }
+
+  .lista-nr__cadru :global(.lista-nr__foto) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+    transition: filter 0.2s ease;
+  }
+
+  .lista-nr__cadru :global(.fotografie--placeholder) {
+    border: 0;
+    background: var(--c-rosu-50);
+    color: var(--c-ink);
+  }
+
+  .lista-nr__rand--link:hover :global(.lista-nr__foto) {
+    filter: brightness(0.94);
+  }
+
+  .lista-nr__desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5em;
+  }
+
+  .lista-nr__nr {
+    display: block;
+    /* Roșul: 6.6:1 pe alb, ≥ 4.5:1 și peste fundalul viu (tokens.test.ts). */
+    color: var(--c-rosu);
+    font-family: var(--font-mono);
+  }
+
+  .lista-nr__titlu {
+    margin: 0.2em 0 0.45em;
+    font-family: var(--font-display);
+    font-size: var(--fs-titlu);
+    font-weight: var(--fw-titlu);
+    line-height: 1.05;
+    letter-spacing: var(--ls-titlu);
+  }
+
+  .lista-nr--compacta .lista-nr__titlu {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
+  }
+
+  .lista-nr__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Suprafața de clic: tot rândul. Focusul se desenează pe ea, nu doar pe titlu. */
+  .lista-nr__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: calc(var(--radius) / 3);
+  }
+
+  .lista-nr__link:focus-visible {
+    outline: none;
+  }
+
+  .lista-nr__link:focus-visible::after {
+    outline: 3px solid var(--c-rosu);
+    outline-offset: 3px;
+  }
+
+  .lista-nr__sageata {
+    display: inline-block;
+    color: var(--c-rosu);
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .lista-nr__rand--link:is(:hover, :has(:focus-visible)) .lista-nr__titlu {
+    text-decoration: underline;
+    text-decoration-thickness: 0.04em;
+    text-underline-offset: 0.12em;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .lista-nr__rand--link:hover .lista-nr__sageata {
+      transform: translate(0.15em, -0.15em);
+    }
+  }
+
+  .lista-nr__text {
+    max-width: 30em;
+    margin: 0;
+    color: var(--c-muted);
+  }
+
+  .lista-nr__secundar {
+    margin: 0.75em 0 0;
+  }
+
+  .lista-nr__secundar a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-height: 48px;
+    font-weight: 500;
+  }
+
+  .lista-nr__etichete {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lista-nr__etichete li {
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    color: var(--c-muted);
+  }
+</style>

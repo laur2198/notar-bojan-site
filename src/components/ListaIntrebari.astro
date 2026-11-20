@@ -1,0 +1,129 @@
+---
+/**
+ * Acordeonul de întrebări (CLAUDE.md §4, V4), extras de pe Acasă: <details>/<summary> nativ,
+ * linii între întrebări, iconița +/− în --c-rosu. Folosit pe Acasă (FaqAcasa) și pe
+ * /intrebari-frecvente/, /en/faq/.
+ *   `exclusiv`: nume comun pe <details> (un singur răspuns deschis, fără JS; Chrome 120+,
+ *   Safari 17.2+, Firefox 130+; mai vechi: se pot deschide mai multe). Pe Acasă da; pe pagina cu
+ *   toate întrebările nu (vizitatorul poate compara mai multe răspunsuri).
+ * Deschiderea animată doar unde browserul o permite și fără mișcare redusă. Răspunsurile trec prin
+ * marcheazaPlaceholder. Doar tokenuri.
+ */
+import { marcheazaPlaceholder } from '../lib/continut';
+
+interface Props {
+  intrebari: { intrebare: string; raspuns: string }[];
+  exclusiv?: string;
+  class?: string;
+}
+
+const { intrebari, exclusiv, class: clasa } = Astro.props;
+---
+
+<div class:list={['intrebari', clasa]}>
+  {
+    intrebari.map((q) => (
+      <details class="intrebari__item" name={exclusiv}>
+        <summary class="intrebari__intrebare">
+          <span set:html={marcheazaPlaceholder(q.intrebare)} />
+          <span class="intrebari__iconita" aria-hidden="true" />
+        </summary>
+        <div class="intrebari__raspuns">
+          <p set:html={marcheazaPlaceholder(q.raspuns)} />
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .intrebari {
+    border-top: 1px solid var(--c-line);
+  }
+
+  .intrebari__item {
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .intrebari__intrebare {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    min-height: 48px;
+    padding: 1.05em 0;
+    font-size: var(--fs-lg);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .intrebari__intrebare::-webkit-details-marker {
+    display: none;
+  }
+
+  .intrebari__intrebare:hover > span:first-child {
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.15em;
+  }
+
+  /* Iconița +/−: linia verticală se rotește în orizontală la deschidere. */
+  .intrebari__iconita {
+    position: relative;
+    flex-shrink: 0;
+    width: 0.8em;
+    height: 0.8em;
+    /* Roșul: 6.2:1 pe paper-2, ≥ 4.5:1 peste fundalul viu. */
+    color: var(--c-rosu);
+  }
+
+  .intrebari__iconita::before,
+  .intrebari__iconita::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .intrebari__iconita::after {
+    transform: rotate(90deg);
+  }
+
+  .intrebari__item[open] .intrebari__iconita::after {
+    transform: rotate(0);
+  }
+
+  .intrebari__raspuns p {
+    max-width: 34em;
+    margin: 0;
+    padding: 0 0 1.25em;
+    color: var(--c-muted);
+  }
+
+  /* Deschiderea animată (înălțimea răspunsului), doar unde browserul o permite. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (interpolate-size: allow-keywords) {
+      .intrebari__item {
+        interpolate-size: allow-keywords;
+      }
+
+      .intrebari__item::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size 0.5s var(--ease-out),
+          content-visibility 0.5s allow-discrete;
+      }
+
+      .intrebari__item[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+</style>

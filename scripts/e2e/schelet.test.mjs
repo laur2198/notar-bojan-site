@@ -89,7 +89,7 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
       ['#servicii', 'light'],
       ['#pasi', 'light'],
       ['#faq', 'light'],
-      ['.faq__cta', 'dark'],
+      ['[data-cta-final]', 'dark'],
     ]) {
       await p.evaluate((s) => {
         const el = document.querySelector(s);
