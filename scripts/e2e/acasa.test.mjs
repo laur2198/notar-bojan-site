@@ -84,7 +84,7 @@ describe('Acasă: hero (V3d, fără intro și fără semnătură)', () => {
 });
 
 describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
-  it('frazele mari și CTA-ul final pe roșu viu, temă închisă; subsolul rosu-900 cu linia --c-rosu-200 de 3 px', async () => {
+  it('frazele mari și CTA-ul final pe roșu viu, temă închisă; subsolul maro cu banda --c-rosu-200 de 8 px', async () => {
     const { p, erori, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const r = await p.evaluate(() => {
@@ -98,6 +98,7 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
         cta: [st(cta).backgroundColor, cta.dataset.temaSectiune],
         butonCta: st(cta.querySelector('.buton--plin')).backgroundColor,
         subsol: [st(subsol).backgroundColor, st(subsol).borderTopWidth, st(subsol).borderTopColor],
+        lipit: Math.abs(cta.getBoundingClientRect().bottom - subsol.getBoundingClientRect().top) < 1,
         programare: st(document.querySelector('.antet__programare')).backgroundColor,
         sectiuni: ['#servicii', '#pasi', '#faq'].map((id) => st(document.querySelector(id)).backgroundColor),
       };
@@ -107,8 +108,9 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     assert.equal(r.frazaCuloare, 'rgb(255, 255, 255)');
     assert.deepEqual(r.cta, ['rgb(180, 35, 24)', 'dark']);
     assert.equal(r.butonCta, 'rgb(255, 255, 255)', 'butonul plin pe roșu viu e alb');
-    // Subsolul rămâne rosu-900, cu linia de sus --c-rosu-200 (se desparte de CtaFinal-ul roșu viu).
-    assert.deepEqual(r.subsol, ['rgb(122, 20, 20)', '3px', 'rgb(251, 227, 223)']);
+    // V6: subsolul maro, cu banda de sus de 8 px --c-rosu-200: maroul nu atinge CtaFinal-ul roșu viu.
+    assert.deepEqual(r.subsol, ['rgb(74, 46, 30)', '8px', 'rgb(251, 227, 223)']);
+    assert.ok(r.lipit, 'banda e singura despărțire dintre CtaFinal și subsol');
     assert.equal(r.programare, 'rgb(180, 35, 24)', '„Programare” din navbar e plin roșu');
     assert.deepEqual(r.sectiuni, ['rgb(253, 241, 239)', 'rgb(244, 241, 238)', 'rgb(255, 255, 255)'], 'Servicii pe roz pal, apoi gri cald și alb');
     // Navbar-ul trece pe tema închisă peste galerie.
@@ -327,7 +329,7 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
           await p.waitForTimeout(150);
           const rect = await p.evaluate((s) => {
             const r = document.querySelector(s === '#hero' ? '[data-hero]' : s).getBoundingClientRect();
-            // 2 px în interior: rotunjirea nu prinde marginea secțiunii vecine (ex. banda CTA rosu-900).
+            // 2 px în interior: rotunjirea nu prinde marginea secțiunii vecine (ex. banda CTA roșie).
             const top = Math.ceil(Math.max(0, r.top)) + 2;
             const jos = Math.floor(Math.min(innerHeight, r.bottom)) - 2;
             return jos - top > 20 ? { x: 0, y: top, width: innerWidth, height: jos - top } : null;

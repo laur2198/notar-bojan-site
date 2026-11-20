@@ -25,11 +25,13 @@
   --c-rosu:        #B42318;  /* butonul plin (alb pe el 6.6:1), cifrele, liniile, iconițele, .sub la hover, focusul pe deschis (6.6:1 pe alb) */
   --c-rosu-hover:  #8F1D14;  /* hover pe butonul plin (alb pe el 8.9:1) */
   --c-rosu-50:     #FBEDEA;  /* hover pe butonul contur și pe butonul alb de pe roșu viu (roșu pe el 5.8:1, ink 14.7:1) */
-  --c-suprafata-rosie: #B42318; /* roșu VIU pentru suprafețele mari: frazele mari și CtaFinal (alb pe el 6.6:1) */
-  --c-rosu-200:    #FBE3DF;  /* text secundar pe suprafața roșie vie (5.4:1); linia de deasupra subsolului */
-  --c-rosu-900:    #7A1414;  /* roșu închis, DOAR subsolul și meniul compact (alb pe el 10.8:1) */
-  --c-rosu-300:    #E8C9C4;  /* text secundar pe rosu-900 (7.0:1) */
-  --c-linie-inchis: #9A2A22; /* borduri, separatoare pe roșu (doar decorativ) */
+  --c-suprafata-rosie: #B42318; /* roșu VIU pentru suprafețele mari: galeria cu frazele și CtaFinal (alb pe el 6.6:1) */
+  --c-rosu-200:    #FBE3DF;  /* text secundar pe suprafața roșie vie (5.4:1); banda de 8 px de deasupra subsolului */
+
+  /* Maroul închis (V6): DOAR subsolul și meniul compact. Nu stă lipit de roșu (banda rosu-200 între ele). */
+  --c-suprafata-maro: #4A2E1E; /* maro-lemn, ca --c-wordmark (alb pe el 12.3:1; 10.8:1 cu granulația) */
+  --c-maro-300:    #D9C3AE;  /* text secundar pe maro: titlurile coloanelor, rândul legal (7.3:1; 6.4:1 cu granulația) */
+  --c-linie-maro:  #6A4A36;  /* borduri, separatoare pe maro; hover pe butonul contur alb (alb pe el 7.9:1) */
 
   /*
    * Sloganul care „se aprinde” pornește din acest gri, nu din opacitate: 6.3:1 pe alb, ≥ 4.5:1 și

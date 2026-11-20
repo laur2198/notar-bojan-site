@@ -93,19 +93,20 @@ const perechi: Pereche[] = [
   { fata: 'c-rosu', fundal: 'c-rosu-50', uz: 'text', folosire: 'Butonul alb de pe roșu viu, la hover; placeholderul fotografiilor din galerie' },
   { fata: 'c-paper', fundal: 'c-suprafata-rosie', uz: 'text', folosire: 'Text pe roșu viu: frazele din galerie, CtaFinal' },
   { fata: 'c-rosu-200', fundal: 'c-suprafata-rosie', uz: 'text', folosire: 'Text secundar pe roșu viu: al doilea rând al frazelor, subtitlul din CtaFinal' },
-  { fata: 'c-paper', fundal: 'c-rosu-900', uz: 'text', folosire: 'Text pe roșu închis: subsolul, meniul compact' },
-  { fata: 'c-rosu-900', fundal: 'c-paper', uz: 'text', folosire: 'Butonul alb de pe roșu închis (navbar în tema închisă)' },
-  { fata: 'c-rosu-900', fundal: 'c-rosu-50', uz: 'text', folosire: 'Butonul alb de pe roșu închis, la hover' },
-  { fata: 'c-rosu-300', fundal: 'c-rosu-900', uz: 'text', folosire: 'Text secundar pe roșu închis: titlurile și rândul legal din subsol, butonul inactiv' },
+  { fata: 'c-paper', fundal: 'c-suprafata-maro', uz: 'text', folosire: 'Text pe maro: subsolul, meniul compact (linkurile, wordmark-ul)' },
+  { fata: 'c-suprafata-maro', fundal: 'c-paper', uz: 'text', folosire: 'Butonul alb de pe maro (subsol, meniul compact)' },
+  { fata: 'c-suprafata-maro', fundal: 'c-rosu-50', uz: 'text', folosire: 'Butonul alb de pe maro, la hover' },
+  { fata: 'c-maro-300', fundal: 'c-suprafata-maro', uz: 'text', folosire: 'Text secundar pe maro: titlurile coloanelor și rândul legal din subsol, butonul inactiv' },
+  { fata: 'c-paper', fundal: 'c-linie-maro', uz: 'text', folosire: 'Butonul contur de pe maro, la hover; nota din meniul compact' },
   { fata: 'c-ink', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (doar în preview)' },
   ...perechiViu,
   { fata: 'c-rosu', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, linia de sub h1, dividerele, săgețile, iconița WhatsApp, linia .sub la hover' },
   { fata: 'c-rosu', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus și iconița +/− pe secțiunile alternante' },
   { fata: 'c-ink', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul butonului contur, al telefonului și al butonului „Meniu”' },
-  { fata: 'c-paper', fundal: 'c-rosu-900', uz: 'ui', folosire: 'Contur de focus pe roșu închis; conturul butonului contur' },
+  { fata: 'c-paper', fundal: 'c-suprafata-maro', uz: 'ui', folosire: 'Contur de focus pe maro; conturul butonului contur' },
   { fata: 'c-paper', fundal: 'c-suprafata-rosie', uz: 'ui', folosire: 'Contur de focus pe roșu viu; conturul butonului contur din CtaFinal' },
   { fata: 'c-muted', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul punctat al butonului inactiv și al marcajului' },
-  { fata: 'c-rosu-300', fundal: 'c-rosu-900', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
+  { fata: 'c-maro-300', fundal: 'c-suprafata-maro', uz: 'ui', folosire: 'Conturul butonului inactiv pe maro' },
   {
     fata: 'c-line',
     fundal: 'c-paper',
@@ -114,17 +115,17 @@ const perechi: Pereche[] = [
     nota: 'Doar decorativ: nu delimitează câmpuri de formular sau butoane.',
   },
   {
-    fata: 'c-linie-inchis',
-    fundal: 'c-rosu-900',
+    fata: 'c-linie-maro',
+    fundal: 'c-suprafata-maro',
     uz: 'decorativ',
-    folosire: 'Borduri și separatoare pe închis',
+    folosire: 'Borduri și separatoare pe maro (subsol, meniul compact)',
     nota: 'Doar decorativ.',
   },
   {
     fata: 'c-rosu-200',
-    fundal: 'c-rosu-900',
+    fundal: 'c-suprafata-maro',
     uz: 'decorativ',
-    folosire: 'Linia de 3 px de pe marginea de sus a subsolului (sub CtaFinal-ul roșu viu)',
+    folosire: 'Banda de 8 px de pe marginea de sus a subsolului (maroul nu atinge CtaFinal-ul roșu viu)',
     nota: 'Doar decorativ.',
   },
 ];
@@ -208,8 +209,8 @@ const fonturi = [
       <section aria-labelledby="paleta">
         <h2 id="paleta">Paleta</h2>
         <p>
-          V3d: alb și alb cald, ink pentru text, roșu pentru acțiuni și accente, roșu închis pentru singura suprafață
-          închisă; fără maro. Nicio informație nu e purtată doar de culoare: starea „Deschis / Închis” are text și formă
+          V5–V6: alb ~50%, roșu ~25–30% (acțiunile, accentele, galeria cu frazele și CtaFinal), maro pentru
+          text, pentru numele biroului și pentru suprafețele închise (subsolul, meniul compact), gri cald. Nicio informație nu e purtată doar de culoare: starea „Deschis / Închis” are text și formă
           (disc plin / cerc gol), în ink / muted. Singura culoare din afara paletei e galbenul marcajului «DE COMPLETAT»,
           doar în preview.
         </p>
@@ -392,7 +393,7 @@ const fonturi = [
           </figure>
           <figure class="granulatie-mostra">
             <div class="granulatie-marita granulatie-marita--inchis" data-tema-sectiune="dark" aria-hidden="true"></div>
-            <figcaption>Pe <code>--c-rosu-900</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
+            <figcaption>Pe <code>--c-suprafata-maro</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
           </figure>
         </div>
       </section>
@@ -577,7 +578,7 @@ const fonturi = [
 
   .demo-inchis {
     padding-block: var(--space-7);
-    background: var(--c-rosu-900);
+    background: var(--c-suprafata-maro);
     color: var(--c-paper);
   }
 
@@ -947,8 +948,8 @@ const fonturi = [
   }
 
   .granulatie-marita--inchis {
-    background-color: var(--c-rosu-900);
-    border-color: var(--c-linie-inchis);
+    background-color: var(--c-suprafata-maro);
+    border-color: var(--c-linie-maro);
   }
 
   .granulatie-mostra figcaption {

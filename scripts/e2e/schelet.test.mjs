@@ -102,7 +102,7 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
       await p.waitForTimeout(300);
       assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), tema, selector);
     }
-    // Subsolul (rosu-900): într-o fereastră mai scundă decât el, derulat până jos, navbar-ul e peste el.
+    // Subsolul (maro): într-o fereastră mai scundă decât el, derulat până jos, navbar-ul e peste el.
     await p.setViewportSize({ width: 1280, height: 400 });
     await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await p.waitForTimeout(600);
@@ -132,7 +132,7 @@ describe('Meniul compact', () => {
     assert.equal(deschis.open, true);
     assert.equal(deschis.overflow, 'hidden', 'derularea paginii e blocată');
     assert.equal(deschis.panou, 'fixed');
-    assert.equal(deschis.fundal, 'rgb(122, 20, 20)');
+    assert.equal(deschis.fundal, 'rgb(74, 46, 30)', 'panoul e maro (V6)');
 
     // 25 de Tab-uri (mai multe decât elementele din panou): focusul nu iese din meniu.
     for (let i = 0; i < 25; i++) {
@@ -341,14 +341,15 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
   it('fundalul are culoarea temei și o linie de 1 px; pagina reîncărcată deja derulată pornește cu fundal', async () => {
     const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
-    // Peste subsol (temă închisă, rosu-900).
+    // Peste subsol (temă închisă, maro, V6).
     await p.evaluate(() => scrollTo({ top: document.querySelector('footer').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
     await p.waitForTimeout(600);
     let s = await p.evaluate(() => {
       const c = getComputedStyle(document.querySelector('[data-navbar]'));
       return { fundal: c.backgroundColor, linie: c.boxShadow, tema: document.querySelector('[data-navbar]').dataset.tema };
     });
-    assert.deepEqual(s, { fundal: 'rgb(122, 20, 20)', linie: 'rgb(154, 42, 34) 0px -1px 0px 0px inset', tema: 'dark' });
+    assert.deepEqual({ ...s, linie: undefined }, { fundal: 'rgb(74, 46, 30)', linie: undefined, tema: 'dark' });
+    assert.match(s.linie, /inset$/, 'linia de 1 px, derivată din fundal');
     // Reîncărcare la jumătatea paginii (temă deschisă): fundal plin imediat, fără tranziție.
     await p.evaluate(() => scrollTo({ top: document.querySelector('#servicii').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.reload({ waitUntil: 'load' });
@@ -364,7 +365,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     await context.close();
   });
 
-  it('meniul compact deschis nu e afectat: panoul rosu-900, navbar-ul fără fundal propriu', async () => {
+  it('meniul compact deschis nu e afectat: panoul maro, navbar-ul fără fundal propriu', async () => {
     const { p, context } = await pagina({ viewport: { width: 390, height: 844 } });
     await p.goto(`${BAZA}/contact/`, { waitUntil: 'load' });
     await p.evaluate(() => scrollTo({ top: 900, behavior: 'instant' }));
@@ -381,7 +382,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
         punct: antet.contains(document.elementFromPoint(r.width / 2, r.height / 2)),
       };
     });
-    assert.deepEqual(s, { fundal: 'rgba(0, 0, 0, 0)', text: 'rgb(255, 255, 255)', sub: 'rgb(122, 20, 20)', punct: true });
+    assert.deepEqual(s, { fundal: 'rgba(0, 0, 0, 0)', text: 'rgb(255, 255, 255)', sub: 'rgb(74, 46, 30)', punct: true });
     await context.close();
   });
 
@@ -407,7 +408,11 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     await p.evaluate(() => scrollTo({ top: document.querySelector('[data-galerie]').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.waitForTimeout(600);
     s = await stare();
-    assert.deepEqual(s, { tema: 'dark', fundal: 'rgb(180, 35, 24)', blur: 'none', linie: 'rgb(154, 42, 34) 0px -1px 0px 0px inset' });
+    assert.deepEqual({ ...s, linie: undefined }, { tema: 'dark', fundal: 'rgb(180, 35, 24)', blur: 'none', linie: undefined });
+    assert.match(s.linie, /inset$/);
+    // Peste roșul viu, navbar-ul preia suprafața: butonul „Programare” e alb cu text roșu, nu maro.
+    assert.equal(await p.getAttribute('[data-navbar]', 'data-suprafata'), 'vie');
+    assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('.antet__programare')).color), 'rgb(180, 35, 24)');
     // Peste lista de servicii.
     await p.evaluate(() => scrollTo({ top: document.querySelector('#servicii').getBoundingClientRect().top + scrollY + 400, behavior: 'instant' }));
     await p.waitForTimeout(600);

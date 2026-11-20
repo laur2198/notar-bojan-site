@@ -50,7 +50,7 @@ const fotografii = SLOTURI.map((slot, i) => ({ ...slot, nr: i + 1, ...galerie[i]
 const coloana = (latura: 'stanga' | 'dreapta') => fotografii.filter((f) => f.latura === latura);
 ---
 
-<section class="galerie pe-inchis" data-tema-sectiune="dark" data-galerie aria-label={t(locale, 'acasa.fraze')}>
+<section class="galerie pe-inchis" data-tema-sectiune="dark" data-suprafata="vie" data-galerie aria-label={t(locale, 'acasa.fraze')}>
   <div class="container galerie__grila">
     {
       (['stanga', 'dreapta'] as const).map((latura) => (
