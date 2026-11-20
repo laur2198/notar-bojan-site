@@ -122,7 +122,12 @@ const alt = textAlt(imagineAlt);
     /* Tot ecranul; pe mobil fără bara de jos. */
     min-height: calc(100svh - var(--inaltime-bara) - env(safe-area-inset-bottom, 0px));
     padding-top: calc(var(--h-antet) + var(--space-3));
-    padding-bottom: 0.5em;
+    /*
+     * V5: sub wordmark-ul maro rămâne mereu alb înainte de frazele roșii (maroul nu stă lipit de
+     * roșu): cel puțin deplasarea maximă a parallax-ului de ieșire (40% din blocul de jos, care e
+     * ~7.2% din container + ~2rem) plus ~1rem de alb.
+     */
+    padding-bottom: calc(0.03 * min(100vw, 78rem) + 2.5rem);
   }
 
   @media (min-width: 48rem) {
@@ -235,13 +240,14 @@ const alt = textAlt(imagineAlt);
 
     /*
      * Înălțimea fotografiei: ce rămâne din ecran după navbar, spațiile și blocul de jos (linia și
-     * wordmark-ul, care e ~7% din lățimea containerului; V3e: fără rândul de deasupra liniei), ca wordmark-ul să rămână vizibil
+     * wordmark-ul, care e ~7% din lățimea containerului; V3e: fără rândul de deasupra liniei; V5: plus
+     * spațiul alb de sub wordmark, ~3% din container + 2.5rem), ca wordmark-ul să rămână vizibil
      * complet la încărcare (1280×720, 1440×900). Lățimea urmează din raportul 4:5.
      */
     .hero__foto {
       justify-self: end;
       width: auto;
-      height: clamp(15rem, calc(100svh - var(--h-antet) - 7rem - 0.072 * min(100vw, 78rem)), 40rem);
+      height: clamp(15rem, calc(100svh - var(--h-antet) - 9rem - 0.102 * min(100vw, 78rem)), 40rem);
       aspect-ratio: 4 / 5;
     }
   }
@@ -267,7 +273,8 @@ const alt = textAlt(imagineAlt);
   /* Distanța linie → „Birou Individual Notarial”: 1.1em din rândul de sus, ca în prototip. */
   .hero :global(.hero__wordmark) {
     --wordmark-sus-sus: 1.1em;
-    color: var(--c-ink);
+    /* V5: numele biroului în maro-lemn (12.3:1 pe alb). */
+    color: var(--c-wordmark);
   }
 
   /*

@@ -6,34 +6,41 @@
  */
 :root {
   /*
-   * Culori (V3d, după feedbackul clientei: „roșul să fie o culoare vizibilă, site-ul mai colorat”):
-   * alb și alb cald pentru suprafețe, ink pentru text, ROȘU pentru acțiuni și accente, roșu închis
-   * pentru singura suprafață închisă. Maro nu mai apare în interfață. Contrastele de mai jos sunt
-   * fără granulație; cazul cel mai defavorabil (granulația de 6%) e verificat în
-   * src/lib/tokens.test.ts și în /stil/ (src/lib/contrast.ts), care eșuează sub AA.
+   * Culori: paleta finală 3A (V5, aleasă de clientă): roșu dominant, text maro. Proporții
+   * orientative: alb ~50%, roșu ~25–30% (suprafețele vii, butoanele, accentele, petele), maro ~15%
+   * (tot textul și numele biroului), gri cald ~10%. Maroul stă doar pe alb, gri cald sau roz pal,
+   * niciodată pe roșu. Contrastele de mai jos sunt fără granulație; cu granulația (6%), în
+   * src/lib/tokens.test.ts și în /stil/, care eșuează sub AA.
    */
-  --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header, secțiuni) */
-  --c-paper-2:    #FBF8F6;  /* alb cald, secțiunile alternante (ink 15.7:1, muted 6.3:1, roșu 6.2:1) */
-  --c-ink:        #1F1E1D;  /* textul pe deschis; wordmark-ul, navbar-ul, butonul contur (16.6:1 pe alb) */
-  --c-ink-2:      #34322F;  /* hover pe elementele ink */
-  --c-muted:      #5E5C59;  /* text secundar pe deschis (6.7:1 pe alb, 6.3:1 pe paper-2) */
-  --c-line:       #E2E1DF;  /* borduri, separatoare pe deschis (doar decorativ) */
+  --c-paper:       #FFFFFF;  /* fundal deschis (pagina, header, secțiuni) */
+  --c-paper-2:     #F4F1EE;  /* gri cald, secțiunile alternante (ink 14.9:1, muted 6.2:1, roșu 5.8:1) */
+  --c-paper-rosu:  #FDF1EF;  /* roz foarte pal, DOAR secțiunea Servicii (Acasă, /servicii/) (ink 15.2:1, muted 6.3:1, roșu 5.9:1) */
+  --c-ink:         #2A1A10;  /* maro foarte închis: textul principal și titlurile, butonul contur (16.8:1 pe alb) */
+  --c-ink-2:       #3D2718;  /* hover pe elementele ink (14.0:1 pe alb) */
+  --c-muted:       #5E5853;  /* gri cald, text secundar (7.0:1 pe alb, 6.2:1 pe paper-2, 6.3:1 pe paper-rosu) */
+  --c-line:        #E2DDD8;  /* linii, separatoare, gri cald (doar decorativ) */
+  --c-wordmark:    #4A2E1E;  /* maro-lemn: numele biroului pe deschis (navbar, wordmark-ul gigant și rândul de deasupra lui) (12.3:1 pe alb) */
 
-  /* Roșul: culoarea de acțiune. Niciodată pe paragrafe și niciodată pe alt roșu (rosu pe rosu-900: 1.6:1). */
-  --c-rosu:       #B42318;  /* butonul plin (alb pe el 6.6:1), cifrele, liniile, iconițele, .sub la hover, focusul pe deschis (6.6:1 pe alb) */
-  --c-rosu-hover: #8F1D14;  /* hover pe butonul plin (alb pe el 8.9:1) */
-  --c-rosu-50:    #FBEDEA;  /* hover pe butonul contur, fundaluri mici (roșu pe el 5.8:1, ink 14.6:1) */
-  --c-rosu-900:   #7A1414;  /* SINGURA suprafață închisă: subsolul, meniul compact, frazele mari, CTA-ul final (alb pe el 10.8:1) */
-  --c-rosu-300:   #E8C9C4;  /* text secundar pe rosu-900 (7.0:1); cifrele decorative pe închis */
-  --c-linie-inchis: #9A2A22; /* borduri, separatoare pe rosu-900 (doar decorativ) */
+  /* Roșul: culoarea de acțiune și a suprafețelor vii. Niciodată pe paragrafe și niciodată roșu pe roșu. */
+  --c-rosu:        #B42318;  /* butonul plin (alb pe el 6.6:1), cifrele, liniile, iconițele, .sub la hover, focusul pe deschis (6.6:1 pe alb) */
+  --c-rosu-hover:  #8F1D14;  /* hover pe butonul plin (alb pe el 8.9:1) */
+  --c-rosu-50:     #FBEDEA;  /* hover pe butonul contur și pe butonul alb de pe roșu viu (roșu pe el 5.8:1, ink 14.7:1) */
+  --c-suprafata-rosie: #B42318; /* roșu VIU pentru suprafețele mari: frazele mari și CtaFinal (alb pe el 6.6:1) */
+  --c-rosu-200:    #FBE3DF;  /* text secundar pe suprafața roșie vie (5.4:1); linia de deasupra subsolului */
+  --c-rosu-900:    #7A1414;  /* roșu închis, DOAR subsolul și meniul compact (alb pe el 10.8:1) */
+  --c-rosu-300:    #E8C9C4;  /* text secundar pe rosu-900 (7.0:1) */
+  --c-linie-inchis: #9A2A22; /* borduri, separatoare pe roșu (doar decorativ) */
 
   /*
    * Sloganul care „se aprinde” pornește din acest gri, nu din opacitate: 6.3:1 pe alb, ≥ 4.5:1 și
    * peste fundalul viu discret pe paper-2 („Cum lucrăm”), cu granulație. Nu se pune pe fundalul viu puternic.
    */
   --c-slogan-stins: #62605D;
-  /* Aceeași stare stinsă pe rosu-900 (frazele mari se aprind spre alb): 5.2:1 pe rosu-900. */
-  --c-slogan-stins-inchis: #DEA7A0;
+  /*
+   * Frazele mari, pe suprafața roșie vie, înainte să „se aprindă” spre alb: 5.1:1 pe #B42318, 4.51:1
+   * cu granulația (cea mai închisă nuanță care trece; #F6CFC8 pica: 4.05:1 cu granulația).
+   */
+  --c-slogan-stins-inchis: #FADDD8;
 
   /*
    * Marcajele de lucru, doar în preview (mark.todo, DraftBadge, FotoProvizorie): galben pal, singura
@@ -63,24 +70,27 @@
    * radial-gradient de la culoarea de mai jos, la opacitatea intensității (în centru), până la
    * transparent la 70% din rază. Geometria petelor (src/lib/fundal-viu.ts) garantează că zonele
    * colorate nu se ating niciodată (orice lățime 320–3840 px, orice moment al derulării, orice
-   * poziție a cursorului): cel mai saturat punct e centrul unei singure pete. Acolo, pe --c-paper
-   * și pe --c-paper-2, cu granulația de 6%: --c-ink, --c-muted și --c-rosu ≥ 4.5:1
-   * (src/lib/tokens.test.ts, /stil/). Opacitățile sunt per culoare: dacă se schimbă paleta, se
-   * schimbă aici și testul spune dacă mai trec.
-   *   puternic (hero): centrul cel mai închis #F8E8D2 pe paper, #F5E4CC pe paper-2 (auriul);
-   *     acolo, cu granulația și cu 3/255 toleranță de randare: ink 11.4:1, muted 4.58:1, roșu 4.51:1
-   *   discret (secțiuni cu text): #FDEFEC pe paper (piersica), #F7EBDC pe paper-2 (auriul);
-   *     acolo, la fel: ink 12.1:1, muted 4.83:1, roșu 4.77:1, sloganul stins 4.55:1
+   * poziție a cursorului): cel mai saturat punct e centrul unei singure pete. Acolo, cu granulația
+   * de 6% și 3/255 toleranță de randare: --c-ink, --c-muted și --c-rosu ≥ 4.5:1, pe --c-paper și
+   * --c-paper-2 (ambele intensități) și pe --c-paper-rosu (discret, secțiunea Servicii)
+   * (src/lib/tokens.test.ts, /stil/).
+   * V5 (paleta 3A): roșu, coral și piersică; roșul domină, auriul a ieșit. Numele slot-urilor
+   * rămân (`piersica` = coral, `auriu` = piersică), ca FundalViu.astro să nu se schimbe.
+   * Opacitățile sunt MAXIMUL care trece (pași de 0.005; testul verifică și că +0.005 pică); limita o
+   * dau muted și roșul pe paper-2 și, la discret, sloganul stins peste petele din „Cum lucrăm”.
+   * Culoarea cea mai închisă (centrul petei celei mai închise):
+   *   puternic: #FDEEE8 pe paper, #F3E3DE pe paper-2
+   *   discret:  #FEF6F3 pe paper, #F2EAE7 pe paper-2, #FAEAE7 pe paper-rosu
    */
   --viu-culoare-rosu:     #B42318;
-  --viu-culoare-piersica: #F2A38F;
-  --viu-culoare-auriu:    #E9B872;
-  --viu-puternic-rosu:     0.1;
-  --viu-puternic-piersica: 0.26;
-  --viu-puternic-auriu:    0.32;
-  --viu-discret-rosu:      0.06;
-  --viu-discret-piersica:  0.17;
-  --viu-discret-auriu:     0.2;
+  --viu-culoare-piersica: #F08A7A;   /* coral */
+  --viu-culoare-auriu:    #F5B39A;   /* piersică */
+  --viu-puternic-rosu:     0.065;
+  --viu-puternic-piersica: 0.14;
+  --viu-puternic-auriu:    0.23;
+  --viu-discret-rosu:      0.035;
+  --viu-discret-piersica:  0.07;
+  --viu-discret-auriu:     0.12;
 
   /*
    * Navbar-ul derulat pe tema deschisă (Header.astro, V3e): --c-paper la această opacitate, cu

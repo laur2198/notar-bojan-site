@@ -1,9 +1,9 @@
 ---
 /**
- * CTA-ul final (CLAUDE.md §5, V4), extras de pe Acasă: bandă ÎNCHISĂ, fundal --c-rosu-900, temă
- * `dark` (.pe-inchis); titlul alb, subtitlul --c-rosu-300 (7.0:1), Buton contur WhatsApp (alb)
- * și Buton plin „Programare” (alb, text rosu-900), varianta „pe închis” (variabilele --buton-*
- * ale temei închise, global.css). Pe Acasă (textele `cta` din acasa.yaml) și la finalul paginilor
+ * CTA-ul final (CLAUDE.md §5, V4–V5), extras de pe Acasă: bandă pe suprafața roșie VIE
+ * (--c-suprafata-rosie), temă `dark` (.pe-inchis) cu varianta vie (data-suprafata="vie",
+ * global.css): titlul alb (6.6:1), subtitlul --c-rosu-200 (5.4:1), Buton contur WhatsApp (alb,
+ * hover --c-rosu-hover) și Buton plin „Programare” (alb, text --c-rosu, hover --c-rosu-50). Pe Acasă (textele `cta` din acasa.yaml) și la finalul paginilor
  * interioare (textele `final`), în afară de Confidențialitate și 404. Doar tokenuri.
  */
 import { cale, t, type Locale } from '../i18n';
@@ -22,7 +22,7 @@ const { locale, birou, titlu, subtitlu } = Astro.props;
 const whatsapp = linkWhatsapp(birou, locale);
 ---
 
-<div class="cta-final pe-inchis" data-tema-sectiune="dark" data-cta-final>
+<div class="cta-final pe-inchis" data-tema-sectiune="dark" data-suprafata="vie" data-cta-final>
   <div class="container cta-final__grila">
     <div class="cta-final__interior">
       <p class="cta-final__text">
@@ -48,7 +48,7 @@ const whatsapp = linkWhatsapp(birou, locale);
 <style>
   .cta-final {
     padding-block: var(--section-y);
-    background: var(--c-rosu-900);
+    background: var(--c-suprafata-rosie);
     color: var(--c-paper);
   }
 
@@ -77,10 +77,10 @@ const whatsapp = linkWhatsapp(birou, locale);
     letter-spacing: var(--ls-h2);
   }
 
-  /* rosu-300 pe rosu-900: 7.0:1. */
+  /* rosu-200 pe roșu viu: 5.4:1. */
   .cta-final__sub {
     display: block;
-    color: var(--c-rosu-300);
+    color: var(--c-rosu-200);
   }
 
   .cta-final__butoane {

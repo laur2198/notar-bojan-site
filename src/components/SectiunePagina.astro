@@ -10,7 +10,8 @@ import FundalViu from './FundalViu.astro';
 import Eticheta from './acasa/Eticheta.astro';
 
 interface Props {
-  ton?: 'paper' | 'paper-2';
+  /** paper-rosu: doar secțiunea Servicii (/servicii/, ca pe Acasă), V5. */
+  ton?: 'paper' | 'paper-2' | 'paper-rosu';
   /** Seed-ul fundalului viu discret (2–4); fără el, fundal simplu. */
   viu?: Extract<Seed, 2 | 3 | 4>;
   /** Titlul secțiunii (h2), afișat ca eticheta de pe Acasă. */
@@ -65,5 +66,9 @@ const idTitlu = titlu && id ? `${id}-titlu` : undefined;
 
   .sectiune-pagina--paper-2 {
     background: var(--c-paper-2);
+  }
+
+  .sectiune-pagina--paper-rosu {
+    background: var(--c-paper-rosu);
   }
 </style>

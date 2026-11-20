@@ -298,6 +298,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: inline-flex;
   }
 
+  /* V5: numele biroului în maro-lemn pe tema deschisă (--c-wordmark); pe închis, alb (culoarea textului). */
+  .antet:not([data-tema='dark']):not(:has(.meniu-compact[open])) :global(.wordmark) {
+    color: var(--c-wordmark);
+  }
+
   /* Iconița WhatsApp în roșu pe tema deschisă (6.6:1 pe alb); pe închis, culoarea textului. */
   .antet:not([data-tema='dark']):not(:has(.meniu-compact[open])) .antet__whatsapp {
     color: var(--c-rosu);

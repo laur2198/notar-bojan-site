@@ -84,7 +84,7 @@ describe('Acasă: hero (V3d, fără intro și fără semnătură)', () => {
 });
 
 describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
-  it('frazele mari și CTA-ul final pe rosu-900, temă închisă; subsolul cu linia roșie de 3 px', async () => {
+  it('frazele mari și CTA-ul final pe roșu viu, temă închisă; subsolul rosu-900 cu linia --c-rosu-200 de 3 px', async () => {
     const { p, erori, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const r = await p.evaluate(() => {
@@ -102,13 +102,15 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
         sectiuni: ['#servicii', '#pasi', '#faq'].map((id) => st(document.querySelector(id)).backgroundColor),
       };
     });
-    assert.deepEqual(r.fraze, ['rgb(122, 20, 20)', 'dark', true]);
+    // V5: frazele mari și CtaFinal pe roșu viu (--c-suprafata-rosie).
+    assert.deepEqual(r.fraze, ['rgb(180, 35, 24)', 'dark', true]);
     assert.equal(r.frazaCuloare, 'rgb(255, 255, 255)');
-    assert.deepEqual(r.cta, ['rgb(122, 20, 20)', 'dark']);
-    assert.equal(r.butonCta, 'rgb(255, 255, 255)', 'butonul plin pe închis e alb');
-    assert.deepEqual(r.subsol, ['rgb(122, 20, 20)', '3px', 'rgb(180, 35, 24)']);
+    assert.deepEqual(r.cta, ['rgb(180, 35, 24)', 'dark']);
+    assert.equal(r.butonCta, 'rgb(255, 255, 255)', 'butonul plin pe roșu viu e alb');
+    // Subsolul rămâne rosu-900, cu linia de sus --c-rosu-200 (se desparte de CtaFinal-ul roșu viu).
+    assert.deepEqual(r.subsol, ['rgb(122, 20, 20)', '3px', 'rgb(251, 227, 223)']);
     assert.equal(r.programare, 'rgb(180, 35, 24)', '„Programare” din navbar e plin roșu');
-    assert.deepEqual(r.sectiuni, ['rgb(255, 255, 255)', 'rgb(251, 248, 246)', 'rgb(255, 255, 255)'], 'alternanța paper / paper-2');
+    assert.deepEqual(r.sectiuni, ['rgb(253, 241, 239)', 'rgb(244, 241, 238)', 'rgb(255, 255, 255)'], 'Servicii pe roz pal, apoi gri cald și alb');
     // Navbar-ul trece pe tema închisă peste frazele mari.
     await p.evaluate(() => scrollTo({ top: document.querySelector('[data-fraze]').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
     await p.waitForTimeout(500);
@@ -116,6 +118,26 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     assert.deepEqual(erori, []);
     await context.close();
   });
+
+  for (const [w, h] of [[390, 844], [1440, 900], [2560, 1080]]) {
+    it(`${w}×${h} (V5): maroul nu stă lipit de roșu: între wordmark și frazele roșii rămâne alb, și cât hero-ul iese din ecran`, async () => {
+      const { p, context } = await pagina({ viewport: { width: w, height: h } });
+      await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+      await p.waitForTimeout(1800);
+      const inaltimeHero = await p.evaluate(() => document.querySelector('[data-hero]').getBoundingClientRect().height);
+      for (const f of [0, 0.25, 0.5, 0.75, 0.95]) {
+        await p.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), Math.round(inaltimeHero * f));
+        await p.waitForTimeout(150);
+        const r = await p.evaluate(() => {
+          const wm = document.querySelector('[data-hero] [data-wordmark-gigant]').getBoundingClientRect();
+          const fraze = document.querySelector('[data-fraze]').closest('section').getBoundingClientRect();
+          return { gol: fraze.top - wm.bottom };
+        });
+        assert.ok(r.gol >= 8, `la ${f * 100}% din ieșire: ${Math.round(r.gol)} px între wordmark și roșu`);
+      }
+      await context.close();
+    });
+  }
 
   it('frazele: literele apar în nuanța stinsă (nu din opacitate) și se aprind în alb', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
@@ -216,7 +238,8 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
   // Toleranța de randare: browserul rotunjește amestecul pe 8 biți cu 1–2 trepte (măsurat); 3 trepte
   // pe canal. Două pete suprapuse ar da ~20 de trepte mai închis.
   const hexLum = (h) => luminanta(...[1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) - 3));
-  const MAXIM = { '#hero': '#FBE5E0', '#servicii': '#FDEFEC', '#pasi': '#F7EBDC', '#faq': '#FDEFEC' };
+  // V5: puternic pe alb (hero), discret pe roz pal (servicii), pe gri cald (pași), pe alb (întrebări).
+  const MAXIM = { '#hero': '#FDEEE8', '#servicii': '#FAEAE7', '#pasi': '#F2EAE7', '#faq': '#FEF6F3' };
   for (const [w, h] of [[390, 844], [1440, 900], [2560, 1080]]) {
     it(`${w}×${h}: în randarea reală, petele nu se suprapun (niciun pixel mai închis decât o singură pată)`, async () => {
       const { p, context } = await pagina({ viewport: { width: w, height: h } });
