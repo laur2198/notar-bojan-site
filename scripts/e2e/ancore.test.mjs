@@ -42,10 +42,8 @@ describe('Ancoră în adresă la încărcare', () => {
         await p.waitForTimeout(3500);
         await asteaptaLaSectiune(p, selector);
         const r = await p.evaluate(() => ({
-          intro: document.documentElement.classList.contains('cu-intro'),
           overflow: getComputedStyle(document.documentElement).overflow,
         }));
-        assert.equal(r.intro, false, 'intrarea cu ancoră sare intro-ul');
         assert.notEqual(r.overflow, 'hidden', 'derularea nu e blocată');
         assert.deepEqual(erori, []);
         await context.close();
@@ -62,8 +60,6 @@ describe('Clic pe o ancoră în prima secundă după încărcare', () => {
     ]) {
       it(`${nume} ${cale} → ${selector}`, async () => {
         const { p, context } = await pagina(optiuni);
-        // Intro-ul a rulat deja în sesiune (altfel ecranul lui acoperă pagina și primul clic îl sare).
-        await p.addInitScript(() => sessionStorage.setItem('intro-vazut', '1'));
         await p.goto(BAZA + cale, { waitUntil: 'domcontentloaded' });
         // Paginile nu au un link intern spre fiecare secțiune: îl adăugăm, ca un link din conținut.
         await p.evaluate((s) => {

@@ -5,15 +5,13 @@
  * BaraActiuni → Cursor. În <head>, CapPagina pune clasele de mișcare înainte de primul paint.
  * <main> și <footer> au data-tema-sectiune="light"; secțiunile închise din pagini își declară
  * tema (Hero, Sectiune ton="inchis"), ca navbar-ul să-și schimbe culoarea deasupra lor.
- * Intro-ul cu semnătura (IntroSemnatura) apare o dată pe sesiune, pe orice pagină de intrare
- * (CapPagina în modul „automat”; /stil/ folosește „manual”). Fără JS și la mișcare redusă nu apare.
+ * Intro-ul cu semnătura a fost scos în V3d, la cererea clientei.
  */
 import '../styles/global.css';
 import Breadcrumbs, { type Firimitura } from '../components/Breadcrumbs.astro';
 import BaraActiuni from '../components/BaraActiuni.astro';
 import CapPagina from '../components/CapPagina.astro';
 import Cursor from '../components/Cursor.astro';
-import IntroSemnatura from '../components/IntroSemnatura.astro';
 import DraftBadge from '../components/DraftBadge.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -44,16 +42,9 @@ interface Props {
    * hero). Corectă de la primul paint, fără să aștepte JS; apoi o actualizează tema-navbar.ts.
    */
   temaNavbar?: 'light' | 'dark';
-  /** Pornirea intro-ului: o dată pe sesiune (implicit) sau doar manual (ghidul /stil/). */
-  intro?: 'automat' | 'manual';
-  /**
-   * `id`-ul unei <Semnatura> din conținutul paginii (ex. „hero” pe Acasă): intro-ul o clonează la
-   * pornire, ca SVG-ul semnăturii să apară o singură dată în HTML (IntroSemnatura.astro).
-   */
-  semnaturaInPagina?: string;
 }
 
-const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light', intro = 'automat', semnaturaInPagina } = Astro.props;
+const { locale, title, description, draft = false, breadcrumbs, noindex = false, imagineOg, temaNavbar = 'light' } = Astro.props;
 const birou = await getBirou();
 /** Denumirea oficială (birou.yaml) în titlu și descriere: niciodată forma scurtă, netradusă în EN. */
 const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumire);
@@ -64,7 +55,7 @@ const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumir
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <CapPagina intro={intro} />
+    <CapPagina />
     <meta name="theme-color" content={culoare('c-rosu-900')} />
     <link rel="preload" href={fontTextLatin} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
@@ -82,7 +73,6 @@ const cuDenumire = (text: string) => text.replaceAll('{denumire}', birou.denumir
     <slot name="head" />
   </head>
   <body>
-    <IntroSemnatura cloneazaDin={semnaturaInPagina} />
     <SkipLink locale={locale} />
     <Header locale={locale} birou={birou} tema={temaNavbar} />
     <main id="continut" tabindex="-1" data-tema-sectiune="light">

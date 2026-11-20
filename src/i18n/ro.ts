@@ -72,7 +72,6 @@ export const ro = {
   'subsol.navigare': 'Navigare',
   'subsol.adresa': 'Adresă',
   'subsol.cif': 'CIF {cif}',
-  'subsol.atribuire': 'Ilustrație:',
   'wordmark.acasa': '{denumire} – pagina principală',
 
   // Pagina Acasă

@@ -25,12 +25,12 @@
  *                          de jos, stagger 0.01 from end, scrub 2.3, „bottom 60%” → „bottom top”;
  *                          16 benzi pe desktop, 10 pe tabletă (≤ 991 px), 6 pe mobil (≤ 478 px).
  *                          Benzile se creează doar aici: la mișcare redusă nu există deloc.
- *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la `intro-gata` (sau imediat,
- *                          dacă a fost deja emis): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
- *                          linia ([data-hero-divider]) și linia roșie de sub titlu ([data-hero-accent]) 0 → 100%, rândul de sub semnătură
- *                          ([data-hero-fade]) și wordmark-ul ([data-hero-wordmark]) apar, fotografia
- *                          ([data-hero-foto]) se descoperă de jos în sus (clip-path, 1 s, expo.out), iar
- *                          semnătura se desenează în 3.5 s. Până atunci CSS-ul le ascunde sub
+ *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la încărcarea modulului (V3d: fără
+ *                          intro): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
+ *                          linia ([data-hero-divider]) și linia roșie de sub titlu ([data-hero-accent])
+ *                          0 → 100%, rândul de deasupra liniei ([data-hero-fade]) și wordmark-ul
+ *                          ([data-hero-wordmark]) apar, fotografia ([data-hero-foto]) se descoperă de jos
+ *                          în sus (clip-path, 1 s, expo.out). Până atunci CSS-ul le ascunde sub
  *                          `html.miscare:not(.hero-pornit)` (HeroAcasa.astro).
  *   [data-parallax-iesire="N"] deplasare yPercent 0 → N cât secțiunea iese din ecran
  *                          (top top → bottom top), scrub. Blocul de jos al hero-ului (40) și
@@ -50,8 +50,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
-import { deseneazaLaVedere } from './desen-semnatura';
-import { EVENIMENT_GATA, EVENIMENT_TERMINAT } from './intro-semnatura';
 import { INTEROGARE_MISCARE } from './miscare-interogare';
 import { EVENIMENT_TEMA } from './tema-navbar';
 
@@ -185,10 +183,7 @@ function shutter(container: HTMLElement, n: number): () => void {
   };
 }
 
-/** Siguranță: dacă `intro-gata` nu vine în acest timp, hero-ul pornește oricum. */
-const ASTEPTARE_MAXIMA_INTRO = 6000;
-
-function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
+function intrareHero(hero: HTMLElement): () => void {
   const html = document.documentElement;
   const titlu = hero.querySelector<HTMLElement>('[data-hero-titlu]');
   const linie = hero.querySelector<HTMLElement>('[data-hero-divider]');
@@ -196,11 +191,8 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   const fade = [...hero.querySelectorAll<HTMLElement>('[data-hero-fade]')];
   const wordmark = hero.querySelector<HTMLElement>('[data-hero-wordmark]');
   const foto = hero.querySelector<HTMLElement>('[data-hero-foto]');
-  const semnatura = hero.querySelector('[data-semnatura]');
   let split: SplitText | null = null;
   let revinoTitlu: () => void = () => {};
-  let opresteDesen: (() => void) | null = null;
-  let pornit = false;
 
   /** După intrare (sau la oprire): fără împărțire, HTML-ul inițial al titlului. */
   const refaTitlul = () => {
@@ -210,52 +202,36 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
     revinoTitlu = () => {};
   };
 
-  const porneste = () => {
-    if (pornit) return;
-    pornit = true;
-    window.clearTimeout(siguranta);
-    document.removeEventListener(EVENIMENT_GATA, porneste);
-    // Animațiile create acum (după evenimentul async) intră în contextul matchMedia, ca să fie anulate la reduced-motion.
-    ctx.add(() => {
-      if (titlu) {
-        const { tinta, aria, revino } = pregatesteTitluHero(titlu);
-        revinoTitlu = revino;
-        split = SplitText.create(tinta, {
-          type: 'lines',
-          mask: 'lines',
-          aria,
-          autoSplit: true,
-          onSplit: (s) => gsap.from(s.lines, { yPercent: 110, duration: 0.8, stagger: 0.08, ease: 'expo.out', onComplete: refaTitlul }),
-        });
-      }
-      if (linie) gsap.fromTo(linie, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'power2.inOut' });
-      // Linia roșie de sub titlu (V3d): după primele rânduri ale titlului.
-      if (accent) gsap.fromTo(accent, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'power2.inOut', delay: 0.35 });
-      if (fade.length) gsap.fromTo(fade, { autoAlpha: 0, y: '1em' }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.inOut', delay: 0.2 });
-      if (wordmark) gsap.fromTo(wordmark, { autoAlpha: 0, y: '0.3em' }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.inOut', delay: 0.3 });
-      // Fotografia: mască de jos în sus (V3b).
-      if (foto) {
-        gsap.fromTo(
-          foto,
-          { clipPath: 'inset(100% 0% 0% 0%)' },
-          { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'expo.out', clearProps: 'clipPath' },
-        );
-      }
+  // Intrarea pornește direct, la încărcarea modulului (V3d: fără intro), în contextul matchMedia
+  // din pornesteMiscarea: anulată automat dacă preferința trece pe mișcare redusă.
+  if (titlu) {
+    const { tinta, aria, revino } = pregatesteTitluHero(titlu);
+    revinoTitlu = revino;
+    split = SplitText.create(tinta, {
+      type: 'lines',
+      mask: 'lines',
+      aria,
+      autoSplit: true,
+      onSplit: (s) => gsap.from(s.lines, { yPercent: 110, duration: 0.8, stagger: 0.08, ease: 'expo.out', onComplete: refaTitlul }),
     });
-    // Semnătura: 3.5 s, pornită când e în ecran (pe mobil poate fi sub fotografie).
-    if (semnatura) opresteDesen = deseneazaLaVedere(semnatura, 3500);
-    html.classList.add('hero-pornit');
-  };
-
-  const siguranta = window.setTimeout(porneste, ASTEPTARE_MAXIMA_INTRO);
-  if (html.classList.contains('intro-gata')) porneste();
-  else document.addEventListener(EVENIMENT_GATA, porneste);
+  }
+  if (linie) gsap.fromTo(linie, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'power2.inOut' });
+  // Linia roșie de sub titlu (V3d): după primele rânduri ale titlului.
+  if (accent) gsap.fromTo(accent, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'power2.inOut', delay: 0.35 });
+  if (fade.length) gsap.fromTo(fade, { autoAlpha: 0, y: '1em' }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.inOut', delay: 0.2 });
+  if (wordmark) gsap.fromTo(wordmark, { autoAlpha: 0, y: '0.3em' }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.inOut', delay: 0.3 });
+  // Fotografia: mască de jos în sus (V3b).
+  if (foto) {
+    gsap.fromTo(
+      foto,
+      { clipPath: 'inset(100% 0% 0% 0%)' },
+      { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'expo.out', clearProps: 'clipPath' },
+    );
+  }
+  html.classList.add('hero-pornit');
 
   return () => {
-    window.clearTimeout(siguranta);
-    document.removeEventListener(EVENIMENT_GATA, porneste);
     refaTitlul();
-    opresteDesen?.();
     html.classList.add('hero-pornit');
   };
 }
@@ -282,11 +258,12 @@ function fraze(container: HTMLElement): () => void {
     const { tinta, aria, revino } = pregatesteTextAccesibil(f);
     const split = SplitText.create(tinta, { type: 'words,chars', aria });
     const t = gsap.timeline();
-    t.fromTo(split.chars, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, stagger: { amount: 0.7, from: 'start' } }, 0);
+    // steps(1): opacitatea sare 0 → 1 (fără stări intermediare, oricât de lent se derulează).
+    t.fromTo(split.chars, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, ease: 'steps(1)', stagger: { amount: 0.7, from: 'start' } }, 0);
     t.fromTo(split.chars, { color: stins }, { color: aprins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'start' } }, 0);
     if (i < elemente.length - 1) {
       t.to(split.chars, { color: stins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'end' } }, '>');
-      t.to(split.chars, { autoAlpha: 0, duration: 0.01, stagger: { amount: 0.7, from: 'end' } }, '<0.35');
+      t.to(split.chars, { autoAlpha: 0, duration: 0.01, ease: 'steps(1)', stagger: { amount: 0.7, from: 'end' } }, '<0.35');
     }
     master.add(t, i === 0 ? 0 : '-=0.15');
     return () => {
@@ -410,11 +387,11 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
   const html = document.documentElement;
   gsap.registerPlugin(ScrollTrigger, SplitText);
   pornita = gsap.matchMedia();
-  pornita.add(INTEROGARE_MISCARE, (ctx) => {
+  pornita.add(INTEROGARE_MISCARE, () => {
     html.classList.add('miscare');
     const curatari = [
       ...[...radacina.querySelectorAll<HTMLElement>('[data-reveal]')].map(reveal),
-      ...[...radacina.querySelectorAll<HTMLElement>('[data-hero]')].map((h) => intrareHero(h, ctx)),
+      ...[...radacina.querySelectorAll<HTMLElement>('[data-hero]')].map(intrareHero),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-fraze]')].map(fraze),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-aprinde]')].map(aprinde),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-fundal-viu]')].map(fundalViu),
@@ -424,14 +401,12 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
     radacina.querySelectorAll<HTMLElement>('[data-parallax]').forEach(parallax);
     radacina.querySelectorAll<HTMLElement>('[data-footer]').forEach(intrareFooter);
     const reimprospateaza = () => ScrollTrigger.refresh();
-    document.addEventListener(EVENIMENT_TERMINAT, reimprospateaza);
     document.fonts?.ready.then(() => {
       reimprospateaza();
       pastreazaAncora();
     });
     html.classList.add('miscare-gata');
     return () => {
-      document.removeEventListener(EVENIMENT_TERMINAT, reimprospateaza);
       curatari.forEach((c) => c());
       html.classList.remove('miscare');
     };

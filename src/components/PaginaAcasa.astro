@@ -3,7 +3,7 @@
  * Pagina Acasă, aceeași pentru RO (/) și EN (/en/), după prototipul design-v2
  * (docs/design-v2/prototip-acasa.html; CLAUDE.md §5):
  *   hero → frazele mari (sticky) → servicii → cum lucrăm (+ slogan) → întrebări (+ încheiere).
- * Intro-ul cu semnătura și subsolul vin din BaseLayout. Textele vin din pagini/{limba}/acasa.yaml,
+ * Subsolul vine din BaseLayout. Textele vin din pagini/{limba}/acasa.yaml,
  * serviciile din servicii/ro (evidențiate, în ordinea din CMS) sau servicii-en/servicii.yaml,
  * întrebările din faq/{limba}.yaml (cele evidențiate, cel mult `faq.numarAfisat`).
  * Programul, recenziile și „Despre” rămân pe paginile lor (și programul în subsol).
@@ -88,7 +88,7 @@ const hero = await imagineOgHero(locale);
 const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.denumire), ...hero, alt: hero.alt ?? imagineOgImplicita(locale, birou.denumire).alt } : undefined;
 ---
 
-<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg} semnaturaInPagina="hero">
+<BaseLayout locale={locale} title={a.seo.titlu} description={a.seo.descriere} imagineOg={imagineOg}>
   <HeroAcasa
     locale={locale}
     birou={birou}

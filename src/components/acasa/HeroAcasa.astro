@@ -1,11 +1,12 @@
 ---
 /**
- * Hero-ul paginii Acasă (CLAUDE.md §5; V3b): deschis, pe tot ecranul de la încărcare.
+ * Hero-ul paginii Acasă (CLAUDE.md §5; V3b, V3d): deschis, pe tot ecranul de la încărcare.
  *   - sus, de la 992 px pe două coloane: stânga blocul de titlu (h1 + subtitlul <p> în --c-muted,
  *     amândouă inline, ca textul să curgă într-un singur paragraf; max. ~50% din lățime; h1-ul
- *     conține doar titlul, pentru SEO) și sub el semnătura, aliniată la stânga; dreapta fotografia biroului (4:5, înălțimea
- *     limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
- *     Sub 992 px: h1 → fotografia (4:3, pe toată lățimea) → semnătura.
+ *     conține doar titlul, pentru SEO) și sub el linia roșie scurtă (3 px), centrate vertical față
+ *     de fotografie (V3d: fără semnătură, coloana nu mai are gol jos); dreapta fotografia biroului
+ *     (4:5, înălțimea limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
+ *     Sub 992 px: h1 → linia roșie → fotografia (4:3, pe toată lățimea).
  *   - jos, pe toată lățimea: rândul din CMS + adresa din birou.yaml, linia și wordmark-ul gigant
  *     (62% din lățime de la 768 px). Blocul de jos are parallax la ieșire (yPercent 0 → 40).
  *   - fundal: FundalViu puternic (seed 1, cu cursor): pete difuze roșu / piersică / auriu, mișcate
@@ -14,8 +15,8 @@
  * prioritate mare (e LCP). Până vine fotografia reală: placeholder cald cu eticheta „Fotografie
  * birou – urmează” (marcat «DE COMPLETAT» în preview). Pe /en/ se folosește aceeași fotografie,
  * cu textul alternativ din pagina engleză.
- * Mișcarea o pornește src/scripts/miscare.ts ([data-hero]) la `intro-gata`: titlul pe rânduri,
- * semnătura desenată (3.5 s), fotografia descoperită de jos în sus (clip-path, 1 s, expo.out) și
+ * Mișcarea o pornește src/scripts/miscare.ts ([data-hero]) la încărcare: titlul pe rânduri, liniile
+ * trase, fotografia descoperită de jos în sus (clip-path, 1 s, expo.out) și
  * parallax-ul ei interior la ieșire (yPercent 0 → 8). Fără JS și la mișcare redusă totul e vizibil.
  * Fără butoane: telefonul și „Programare” sunt în navbar și în bara de jos (§4).
  */
@@ -25,7 +26,6 @@ import { t, type Locale } from '../../i18n';
 import { estePreview, marcheazaPlaceholder, textAlt, type Birou } from '../../lib/continut';
 import FotoProvizorie from '../FotoProvizorie.astro';
 import FundalViu from '../FundalViu.astro';
-import Semnatura from '../Semnatura.astro';
 import { imparteDenumirea } from '../../lib/denumire';
 import WordmarkGigant from '../WordmarkGigant.astro';
 
@@ -87,9 +87,6 @@ const alt = textAlt(imagineAlt);
           }
         </div>
       </div>
-      <div class="hero__semnatura">
-        <Semnatura id="hero" />
-      </div>
     </div>
     <div class="hero__jos" data-parallax-iesire="40">
       <p class="hero__linie" data-hero-fade>
@@ -139,13 +136,12 @@ const alt = textAlt(imagineAlt);
     }
   }
 
-  /* Mobil și tabletă: h1 → fotografie (4:3) → semnătură. */
+  /* Mobil și tabletă: h1 (+ linia roșie) → fotografie (4:3). */
   .hero__sus {
     display: grid;
     grid-template-areas:
       'text'
-      'foto'
-      'semn';
+      'foto';
     gap: var(--space-3);
     align-items: start;
   }
@@ -226,25 +222,20 @@ const alt = textAlt(imagineAlt);
     text-align: center;
   }
 
-  .hero__semnatura {
-    grid-area: semn;
-    width: min(70vw, 18rem);
-  }
-
-  /* Desktop: titlul și semnătura în stânga, fotografia în dreapta. */
+  /*
+   * Desktop: titlul în stânga, fotografia în dreapta. Fără semnătură (V3d), blocul de titlu stă
+   * centrat vertical față de fotografie, ca stânga să nu rămână goală jos.
+   */
   @media (min-width: 62rem) {
     .hero__sus {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-areas:
-        'text foto'
-        'semn foto';
-      grid-template-rows: auto 1fr;
+      grid-template-areas: 'text foto';
       column-gap: var(--space-5);
     }
 
-    .hero__semnatura {
-      width: min(24vw, 21rem);
-      align-self: end;
+    .hero__text {
+      align-self: center;
+      gap: var(--space-3);
     }
 
     /*
@@ -296,10 +287,10 @@ const alt = textAlt(imagineAlt);
   }
 
   /*
-   * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts la
-   * `intro-gata`): titlul, rândul de sub semnătură și wordmark-ul ascunse, linia la 0, fotografia
-   * acoperită (mască de jos în sus), semnătura nedesenată. Plasa de siguranță din cap-pagina.js
-   * scoate `miscare` dacă modulele nu pornesc.
+   * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts):
+   * titlul, rândul de deasupra liniei și wordmark-ul ascunse, liniile la 0, fotografia acoperită
+   * (mască de jos în sus). Plasa de siguranță din cap-pagina.js scoate `miscare` dacă modulele nu
+   * pornesc.
    */
   :global(html.miscare:not(.hero-pornit)) :is([data-hero-titlu], [data-hero-fade], [data-hero-wordmark]) {
     visibility: hidden;
@@ -311,10 +302,6 @@ const alt = textAlt(imagineAlt);
 
   :global(html.miscare:not(.hero-pornit)) [data-hero-foto] {
     clip-path: inset(100% 0 0 0);
-  }
-
-  :global(html.miscare:not(.hero-pornit)) .hero__semnatura :global(path[data-a]) {
-    stroke-dashoffset: 101;
   }
 
   /* Pe mobil, adresa e în subsol și în bara de jos (Locație). */

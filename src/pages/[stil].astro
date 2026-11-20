@@ -4,8 +4,9 @@
  * producție nu există (getStaticPaths întoarce o listă goală).
  *
  * Design v2 (CLAUDE.md §5; paleta caldă din V3b): arată DOAR fundația din prototip (docs/design-v2/prototip-acasa.html):
- * tokenurile de culoare cu contrastele lor, scara tipografică (cu wordmark-ul gigant), granulația,
- * semnătura, intro-ul (pornit doar din buton sau cu #intro) și helperii de mișcare.
+ * tokenurile de culoare cu contrastele lor (inclusiv fundalul viu), scara tipografică (cu
+ * wordmark-ul gigant), granulația, fundalul viu și helperii de mișcare. Semnătura și intro-ul au
+ * fost scoase în V3d, la cererea clientei.
  * Secțiunile paginii Acasă nu se portează aici.
  *
  * Culorile și mărimile se citesc din src/styles/tokens.css (src/lib/tokens.ts), deci rapoartele de
@@ -15,7 +16,7 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Buton from '../components/Buton.astro';
-import Semnatura from '../components/Semnatura.astro';
+import FundalViu from '../components/FundalViu.astro';
 import Shutter from '../components/Shutter.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
 import { amesteca, contrastCuGranulatie, formateazaRaport, GRANULATIE, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
@@ -194,13 +195,12 @@ const fonturi = [
   title={`Ghid de stil (uz intern) – ${birou.denumire}`}
   description="Ghidul de stil intern al site-ului: tokenuri, tipografie, componente."
   noindex
-  intro="manual"
 >
     <div class="container stil">
       <h1>Ghid de stil</h1>
       <p class="lead">
         Fundația vizuală a design-ului v2, după prototipul aprobat (<code>docs/design-v2/prototip-acasa.html</code>):
-        tokenurile, scara tipografică, granulația, semnătura, intro-ul și mișcarea la scroll. Pagină internă: nu este
+        tokenurile, scara tipografică, granulația, fundalul viu și mișcarea la scroll. Pagină internă: nu este
         indexată și nu apare în sitemap. Contrastele și mărimile sunt calculate la build din <code>src/styles/tokens.css</code>.
       </p>
 
@@ -396,35 +396,30 @@ const fonturi = [
         </div>
       </section>
 
-      <section aria-labelledby="semnatura">
-        <h2 id="semnatura">Semnătura</h2>
+      <section aria-labelledby="fundal-viu">
+        <h2 id="fundal-viu">Fundalul viu</h2>
         <p>
-          Literele (Imperial Script) și mâinile sunt forme umplute cu <code>currentColor</code> (prop-ul
-          <code>ton</code>: maro pe deschis, alb pe închis), descoperite de măști. Liniile centrale din măști au
-          <code>pathLength="100"</code> și se desenează prin <code>stroke-dashoffset</code>, în ordinea Notar → mâini →
-          Bojan, cu un singur progres pe tot gestul. Sub 640 px: doar mâinile. Fără JS
-          și cu mișcare redusă, semnătura apare direct desenată.
+          <code>FundalViu.astro</code>: 3 pete difuze (roșu, piersică, auriu), fără blur, mișcate doar de scroll și, pe
+          hero, de cursor; statice la mișcare redusă și fără JS. Opacitățile sunt tokenuri <code>--viu-*</code>; contrastul
+          textului e verificat în tabelul de mai sus, în punctul cel mai saturat (toate trei petele suprapuse).
         </p>
-        <div class="semnaturi">
-          <div class="semnatura-panou">
-            <Semnatura id="stil-deschis" />
-          </div>
-          <div class="semnatura-panou semnatura-panou--inchis pe-inchis" data-tema-sectiune="dark">
-            <Semnatura id="stil-inchis" ton="inchis" />
-          </div>
+        <div class="demo-viu-grila">
+          {
+            (['puternic', 'discret'] as const).map((intensitate, i) => (
+              <div class:list={['demo-viu', { 'demo-viu--alternant': i === 1 }]}>
+                <FundalViu intensitate={intensitate} seed={i === 0 ? 1 : 3} />
+                <div class="demo-viu__text">
+                  <p class="demo-viu__eticheta">
+                    <code>intensitate="{intensitate}"</code>
+                  </p>
+                  <p>Text principal peste pete.</p>
+                  <p class="demo-viu__muted">Text secundar, în --c-muted.</p>
+                  <p class="demo-viu__rosu">01 · cifrele în --c-rosu</p>
+                </div>
+              </div>
+            ))
+          }
         </div>
-        <Buton text="Redă desenul" varianta="contur" sageata={false} data-reda-semnatura hidden />
-      </section>
-
-      <section aria-labelledby="intro">
-        <h2 id="intro">Intro-ul</h2>
-        <p>
-          Ecran complet <code>--c-paper</code>, semnătura în <code>--c-ink</code> se desenează în 1,8 s; după o pauză de
-          0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
-          mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
-        </p>
-        <Buton text="Redă intro-ul" varianta="contur" sageata={false} data-reda-intro hidden />
-        <p class="nota" data-stare-intro aria-live="polite"></p>
       </section>
 
       <section aria-labelledby="miscare">
@@ -503,71 +498,6 @@ const fonturi = [
     </section>
 </BaseLayout>
 
-<script>
-  import { deseneazaSemnatura, pregatesteSemnatura } from '../scripts/desen-semnatura';
-
-  /*
-   * Semnăturile se desenează o dată, la prima intrare în ecran, și la „Redă desenul”. La mișcare
-   * redusă nu se animă deloc (rămân desenate, starea din HTML) și butonul rămâne ascuns.
-   */
-  const svguri = [...document.querySelectorAll('.semnaturi [data-semnatura]')];
-  const buton = document.querySelector<HTMLButtonElement>('[data-reda-semnatura]');
-  const miscareRedusa = matchMedia('(prefers-reduced-motion: reduce)');
-  const opriri = new Map<Element, () => void>();
-
-  const deseneaza = (svg: Element) => {
-    opriri.get(svg)?.();
-    opriri.set(svg, deseneazaSemnatura(svg, 3500));
-  };
-
-  if (!miscareRedusa.matches && 'IntersectionObserver' in window) {
-    for (const svg of svguri) pregatesteSemnatura(svg);
-    const observator = new IntersectionObserver(
-      (intrari) => {
-        for (const intrare of intrari) {
-          if (!intrare.isIntersecting) continue;
-          observator.unobserve(intrare.target);
-          deseneaza(intrare.target);
-        }
-      },
-      { threshold: 0.4 },
-    );
-    for (const svg of svguri) observator.observe(svg);
-    if (buton) {
-      buton.hidden = false;
-      buton.addEventListener('click', () => svguri.forEach(deseneaza));
-    }
-  }
-
-  // Dacă utilizatorul activează mișcarea redusă cât pagina e deschisă: totul desenat, fără buton.
-  miscareRedusa.addEventListener('change', (e) => {
-    if (!e.matches) return;
-    opriri.forEach((opreste) => opreste());
-    if (buton) buton.hidden = true;
-  });
-</script>
-
-<script>
-  import { EVENIMENT_GATA, ruleazaIntro } from '../scripts/intro-semnatura';
-
-  // „Redă intro-ul”: vizibil doar cu mișcare permisă (la mișcare redusă intro-ul nu există).
-  const butonIntro = document.querySelector<HTMLButtonElement>('[data-reda-intro]');
-  const stare = document.querySelector<HTMLElement>('[data-stare-intro]');
-  const redus = matchMedia('(prefers-reduced-motion: reduce)');
-  const actualizeazaButon = () => {
-    if (butonIntro) butonIntro.hidden = redus.matches;
-  };
-  actualizeazaButon();
-  redus.addEventListener('change', actualizeazaButon);
-  butonIntro?.addEventListener('click', () => {
-    if (stare) stare.textContent = '';
-    ruleazaIntro();
-  });
-  document.addEventListener(EVENIMENT_GATA, () => {
-    if (stare) stare.textContent = 'Evenimentul intro-gata a fost emis.';
-  });
-</script>
-
 <style>
   .demo-butoane {
     display: flex;
@@ -610,6 +540,38 @@ const fonturi = [
 
   .demo-inchis > .container > * + * {
     margin-top: var(--space-2);
+  }
+
+  .demo-viu-grila {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .demo-viu {
+    position: relative;
+    min-height: 20rem;
+    padding: var(--space-4) var(--space-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    background: var(--c-paper);
+  }
+
+  .demo-viu--alternant {
+    background: var(--c-paper-2);
+  }
+
+  .demo-viu__text > * + * {
+    margin-top: var(--space-1);
+  }
+
+  .demo-viu__muted {
+    color: var(--c-muted);
+  }
+
+  .demo-viu__rosu {
+    color: var(--c-rosu);
+    font-family: var(--font-mono);
   }
 
   .demo-miscare {
@@ -943,30 +905,4 @@ const fonturi = [
     color: var(--c-muted);
   }
 
-  /* Semnătura: aceeași lățime ca în hero-ul din prototip (min(28vw, 26rem)), pe deschis și pe închis */
-  .semnaturi {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    gap: var(--space-3);
-  }
-
-  .semnatura-panou {
-    display: grid;
-    place-items: center;
-    padding: var(--space-4) var(--space-3);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius);
-    background: var(--c-paper);
-    color: var(--c-ink);
-  }
-
-  .semnatura-panou > :global(.semnatura) {
-    width: min(100%, 26rem);
-  }
-
-  .semnatura-panou--inchis {
-    background: var(--c-rosu-900);
-    color: var(--c-paper);
-    border-color: var(--c-rosu-900);
-  }
 </style>

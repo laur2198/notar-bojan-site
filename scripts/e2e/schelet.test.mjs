@@ -79,16 +79,17 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
     await context.close();
   });
 
-  it('pe Acasă (V3b): deschisă peste toate secțiunile, închisă peste subsol', async () => {
+  it('pe Acasă (V3d): deschisă peste secțiunile deschise, închisă peste frazele mari, CTA-ul final și subsol', async () => {
     const { p, context } = await pagina();
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     await p.waitForTimeout(300);
     assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'light');
     for (const [selector, tema] of [
-      ['.fraze', 'light'],
+      ['.fraze', 'dark'],
       ['#servicii', 'light'],
       ['#pasi', 'light'],
       ['#faq', 'light'],
+      ['.faq__cta', 'dark'],
     ]) {
       await p.evaluate((s) => {
         const el = document.querySelector(s);
