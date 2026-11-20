@@ -8,7 +8,8 @@
  *     Sub 992 px: h1 → fotografia (4:3, pe toată lățimea) → semnătura.
  *   - jos, pe toată lățimea: rândul din CMS + adresa din birou.yaml, linia și wordmark-ul gigant
  *     (62% din lățime de la 768 px). Blocul de jos are parallax la ieșire (yPercent 0 → 40).
- *   - fundal: pete radiale calde, estompate, STATICE (WCAG 2.2.2).
+ *   - fundal: FundalViu puternic (seed 1, cu cursor): pete difuze roșu / piersică / auriu, mișcate
+ *     doar de scroll și de cursor, niciodată singure (WCAG 2.2.2).
  * Fotografia: astro:assets (<Picture>, AVIF/WebP, srcset, width/height), încărcată imediat, cu
  * prioritate mare (e LCP). Până vine fotografia reală: placeholder cald cu eticheta „Fotografie
  * birou – urmează” (marcat «DE COMPLETAT» în preview). Pe /en/ se folosește aceeași fotografie,
@@ -23,6 +24,7 @@ import { Picture } from 'astro:assets';
 import { t, type Locale } from '../../i18n';
 import { estePreview, marcheazaPlaceholder, textAlt, type Birou } from '../../lib/continut';
 import FotoProvizorie from '../FotoProvizorie.astro';
+import FundalViu from '../FundalViu.astro';
 import Semnatura from '../Semnatura.astro';
 import { imparteDenumirea } from '../../lib/denumire';
 import WordmarkGigant from '../WordmarkGigant.astro';
@@ -46,7 +48,7 @@ const alt = textAlt(imagineAlt);
 ---
 
 <section class="hero" id="sus" data-hero data-tema-sectiune="light" aria-labelledby="hero-titlu">
-  <div class="hero__pete" aria-hidden="true"><i></i><i></i><i></i></div>
+  <FundalViu intensitate="puternic" seed={1} cursor />
   <div class="container hero__interior">
     <div class="hero__sus">
       <div class="hero__text">
@@ -116,45 +118,6 @@ const alt = textAlt(imagineAlt);
     margin-top: calc(-1 * var(--h-antet));
     background: var(--c-paper);
     color: var(--c-ink);
-  }
-
-  /* Petele: radiale, calde, estompate, statice (fără animație). */
-  .hero__pete {
-    position: absolute;
-    inset: -10%;
-    z-index: 0;
-    pointer-events: none;
-    filter: blur(60px);
-    opacity: 0.9;
-  }
-
-  .hero__pete i {
-    position: absolute;
-    border-radius: 50%;
-  }
-
-  .hero__pete i:nth-child(1) {
-    left: 50%;
-    top: -15%;
-    width: 55vw;
-    height: 55vw;
-    background: radial-gradient(circle, #ede6e0 0%, rgb(237 230 224 / 0) 70%);
-  }
-
-  .hero__pete i:nth-child(2) {
-    left: -10%;
-    top: 35%;
-    width: 45vw;
-    height: 45vw;
-    background: radial-gradient(circle, #ede6e0 0%, rgb(237 230 224 / 0) 70%);
-  }
-
-  .hero__pete i:nth-child(3) {
-    left: 30%;
-    top: 55%;
-    width: 35vw;
-    height: 35vw;
-    background: radial-gradient(circle, #e6ddd5 0%, rgb(230 221 213 / 0) 70%);
   }
 
   .hero__interior {

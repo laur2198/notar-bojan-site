@@ -30,3 +30,46 @@ export function compusMaxim(intensitate: Intensitate, fundal: string): string {
   const variante = permutari(pete).map((ordine) => ordine.reduce((acc, p) => amesteca(acc, p.hex, p.alfa), fundal.toUpperCase()));
   return variante.reduce((cea, v) => (luminanta(v) < luminanta(cea) ? v : cea));
 }
+
+/* -------------------------------------------------------------------------------------------
+ * Mișcarea petelor, per `seed` (FundalViu.astro scrie valorile în data-atribute; le folosește
+ * src/scripts/miscare.ts). Pozițiile și mărimile sunt în CSS-ul componentei (CSP: fără style="").
+ *   dx, dy  deplasarea, în procente din mărimea petei: −d → +d cât secțiunea traversează ecranul;
+ *   s0, s1  scara la începutul și la sfârșitul traversării;
+ *   cursor  amplitudinea deplasării după cursor, în px (doar pe hero, pointer fin).
+ * ------------------------------------------------------------------------------------------- */
+
+export const SEEDURI = [1, 2, 3, 4] as const;
+export type Seed = (typeof SEEDURI)[number];
+
+export interface MiscarePata {
+  culoare: CuloareViu;
+  dx: number;
+  dy: number;
+  s0: number;
+  s1: number;
+  cursor: number;
+}
+
+export const MISCARE_SEED: Record<Seed, MiscarePata[]> = {
+  1: [
+    { culoare: 'rosu', dx: -12, dy: 14, s0: 0.92, s1: 1.12, cursor: 26 },
+    { culoare: 'piersica', dx: 14, dy: -10, s0: 1.1, s1: 0.92, cursor: 18 },
+    { culoare: 'auriu', dx: -10, dy: -15, s0: 0.95, s1: 1.15, cursor: 30 },
+  ],
+  2: [
+    { culoare: 'piersica', dx: -14, dy: 12, s0: 0.95, s1: 1.12, cursor: 20 },
+    { culoare: 'auriu', dx: 12, dy: 10, s0: 1.08, s1: 0.9, cursor: 24 },
+    { culoare: 'rosu', dx: -10, dy: -14, s0: 0.9, s1: 1.1, cursor: 28 },
+  ],
+  3: [
+    { culoare: 'auriu', dx: 13, dy: 12, s0: 0.92, s1: 1.1, cursor: 22 },
+    { culoare: 'rosu', dx: -12, dy: -10, s0: 1.12, s1: 0.94, cursor: 26 },
+    { culoare: 'piersica', dx: 10, dy: -14, s0: 0.95, s1: 1.15, cursor: 18 },
+  ],
+  4: [
+    { culoare: 'rosu', dx: 12, dy: 14, s0: 0.94, s1: 1.12, cursor: 24 },
+    { culoare: 'piersica', dx: -14, dy: 10, s0: 1.1, s1: 0.9, cursor: 20 },
+    { culoare: 'auriu', dx: 10, dy: -12, s0: 0.92, s1: 1.1, cursor: 28 },
+  ],
+};

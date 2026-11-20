@@ -16,6 +16,7 @@ import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import { marcheazaPlaceholder, textAlt } from '../../lib/continut';
 import FotoProvizorie from '../FotoProvizorie.astro';
+import FundalViu from '../FundalViu.astro';
 import Eticheta from './Eticheta.astro';
 
 interface Pas {
@@ -42,6 +43,7 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 ---
 
 <section class="pasi" id="pasi" data-tema-sectiune="light" aria-labelledby="pasi-titlu" data-pasi>
+  <FundalViu intensitate="discret" seed={3} />
   <div class="container">
     <Eticheta text={titlu} id="pasi-titlu" />
     <div class="pasi__grila">

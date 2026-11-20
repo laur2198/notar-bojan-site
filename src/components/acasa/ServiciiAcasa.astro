@@ -14,6 +14,7 @@ import Buton from '../Buton.astro';
 import DraftBadge from '../DraftBadge.astro';
 import FotoProvizorie from '../FotoProvizorie.astro';
 import Fotografie from '../Fotografie.astro';
+import FundalViu from '../FundalViu.astro';
 import Eticheta from './Eticheta.astro';
 
 export interface ServiciuRand {
@@ -40,6 +41,7 @@ const numar = (i: number) => String(i + 1).padStart(2, '0');
 ---
 
 <section class="servicii" id="servicii" data-tema-sectiune="light" aria-labelledby="servicii-titlu">
+  <FundalViu intensitate="discret" seed={2} />
   <div class="container">
     <Eticheta text={titlu} id="servicii-titlu" />
     <DraftBadge locale={locale} draft={draft} />

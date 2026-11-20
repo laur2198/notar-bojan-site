@@ -40,6 +40,12 @@
  *                          și se aprinde în alb, de la stânga; la ieșire se stinge și dispare, de la
  *                          dreapta; ultima rămâne aprinsă (FrazeSticky.astro, pe rosu-900).
  *   [data-aprinde]         textul „se aprinde” literă cu literă la scroll, culoarea --c-slogan-stins → --c-ink.
+ *   [data-fundal-viu]      petele din FundalViu.astro ([data-viu-pata]): xPercent/yPercent −d → +d și scara
+ *                          s0 → s1 (data-dx, data-dy, data-s0, data-s1), scrub, cât secțiunea traversează
+ *                          ecranul (top bottom → bottom top); will-change: transform doar cât e în ecran.
+ *                          Cu [data-viu-cursor] și pointer fin: straturile ([data-viu-grad]) urmăresc lent
+ *                          cursorul (gsap.quickTo, max. data-cursor-px px), doar cât secțiunea e în ecran.
+ *                          Fără nicio mișcare care continuă după ce vizitatorul se oprește (WCAG 2.2.2).
  */
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -313,6 +319,62 @@ function aprinde(el: HTMLElement): () => void {
   };
 }
 
+/** Petele fundalului viu, legate de scroll (FundalViu.astro). */
+function fundalViu(el: HTMLElement): () => void {
+  const sectiune = el.parentElement ?? el;
+  const pete = [...el.querySelectorAll<HTMLElement>('[data-viu-pata]')];
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: sectiune,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true,
+      onToggle: (st) => pete.forEach((p) => (p.style.willChange = st.isActive ? 'transform' : '')),
+    },
+  });
+  for (const p of pete) {
+    const n = (cheie: string, implicit: number) => {
+      const v = Number.parseFloat(p.dataset[cheie] ?? '');
+      return Number.isFinite(v) ? v : implicit;
+    };
+    const dx = n('dx', 0);
+    const dy = n('dy', 0);
+    tl.fromTo(p, { xPercent: -dx, yPercent: -dy, scale: n('s0', 1) }, { xPercent: dx, yPercent: dy, scale: n('s1', 1), ease: 'none' }, 0);
+  }
+  return () => pete.forEach((p) => (p.style.willChange = ''));
+}
+
+/**
+ * Petele care urmăresc cursorul (FundalViu cu `cursor`, doar pe hero): deplasare proporțională cu
+ * poziția cursorului față de centrul ferestrei, max. data-cursor-px px, cu gsap.quickTo (1.2 s,
+ * power3.out): când mouse-ul se oprește, tween-ul se termină și petele rămân pe loc.
+ */
+function fundalViuCursor(el: HTMLElement): () => void {
+  const sectiune = el.parentElement ?? el;
+  const straturi = [...el.querySelectorAll<HTMLElement>('[data-viu-grad]')].map((s) => ({
+    px: Math.min(30, Number.parseFloat(s.dataset.cursorPx ?? '') || 0),
+    x: gsap.quickTo(s, 'x', { duration: 1.2, ease: 'power3.out' }),
+    y: gsap.quickTo(s, 'y', { duration: 1.2, ease: 'power3.out' }),
+  }));
+  let vizibil = false;
+  const observator = new IntersectionObserver((intrari) => (vizibil = intrari.some((i) => i.isIntersecting)));
+  observator.observe(sectiune);
+  const laMiscare = (e: PointerEvent) => {
+    if (!vizibil || e.pointerType !== 'mouse') return;
+    const fx = (e.clientX / innerWidth) * 2 - 1;
+    const fy = (e.clientY / innerHeight) * 2 - 1;
+    for (const s of straturi) {
+      s.x(fx * s.px);
+      s.y(fy * s.px);
+    }
+  };
+  addEventListener('pointermove', laMiscare, { passive: true });
+  return () => {
+    removeEventListener('pointermove', laMiscare);
+    observator.disconnect();
+  };
+}
+
 /** Vizitatorul a derulat singur (rotiță, atingere, taste): nu mai mutăm pagina la ancoră. */
 let atins = false;
 if (typeof window !== 'undefined') {
@@ -355,6 +417,7 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
       ...[...radacina.querySelectorAll<HTMLElement>('[data-hero]')].map((h) => intrareHero(h, ctx)),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-fraze]')].map(fraze),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-aprinde]')].map(aprinde),
+      ...[...radacina.querySelectorAll<HTMLElement>('[data-fundal-viu]')].map(fundalViu),
     ];
     radacina.querySelectorAll<HTMLElement>('[data-parallax-iesire]').forEach(parallaxIesire);
     radacina.querySelectorAll<HTMLElement>('[data-divider]').forEach(divider);
@@ -372,6 +435,11 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
       curatari.forEach((c) => c());
       html.classList.remove('miscare');
     };
+  });
+  // Fundalul viu după cursor: doar cu mouse (pointer fin, hover) și fără mișcare redusă.
+  pornita.add(`${INTEROGARE_MISCARE} and (hover: hover) and (pointer: fine)`, () => {
+    const curatari = [...radacina.querySelectorAll<HTMLElement>('[data-fundal-viu][data-viu-cursor]')].map(fundalViuCursor);
+    return () => curatari.forEach((c) => c());
   });
   // Shutter-ul: numărul de benzi depinde de lățime; gsap refă benzile la trecerea pragurilor.
   pornita.add(

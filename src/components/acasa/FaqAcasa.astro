@@ -14,6 +14,7 @@ import { cale, t, type Locale } from '../../i18n';
 import { linkWhatsapp } from '../../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../../lib/continut';
 import Buton from '../Buton.astro';
+import FundalViu from '../FundalViu.astro';
 import Eticheta from './Eticheta.astro';
 
 interface Props {
@@ -30,6 +31,7 @@ const whatsapp = linkWhatsapp(birou, locale);
 ---
 
 <section class="faq" id="faq" data-tema-sectiune="light" aria-labelledby="faq-titlu">
+  <FundalViu intensitate="discret" seed={4} />
   <div class="container">
     <Eticheta text={t(locale, 'nav.faq')} nivel="p" />
     <div class="faq__grila">
