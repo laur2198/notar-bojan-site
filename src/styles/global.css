@@ -375,7 +375,7 @@ body::after {
  * Conturul punctat îl face vizibil și fără a distinge culoarea.
  */
 mark.todo {
-  background-color: #fff1b8;
+  background-color: var(--c-marcaj);
   color: var(--c-ink);
   padding: 0 calc(var(--space-1) / 2);
   border-radius: calc(var(--radius) / 2);

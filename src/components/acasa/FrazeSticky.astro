@@ -68,7 +68,7 @@ const { locale, fraze } = Astro.props;
     place-items: center;
     padding-block: var(--section-y);
     /* Grila de puncte: 0.125em la pas de 3.125em (0.125 + 3), --c-rosu-300 (#E8C9C4) la .16, decorativă. */
-    background-image: radial-gradient(circle, rgb(232 201 196 / 0.16) 0.0625em, transparent 0.07em);
+    background-image: radial-gradient(circle, color-mix(in srgb, var(--c-rosu-300) 16%, transparent) 0.0625em, transparent 0.07em);
     background-size: 3.125em 3.125em;
     background-position: center;
   }

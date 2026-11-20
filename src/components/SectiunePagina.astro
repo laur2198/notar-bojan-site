@@ -2,7 +2,7 @@
 /**
  * O secțiune deschisă a paginilor interioare (CLAUDE.md §5, V4): fundal --c-paper sau --c-paper-2
  * (alternanța secțiunilor), opțional FundalViu `discret` (secțiunile cu text lung; seed 2–4,
- * garantate geometric de la 500 px), opțional titlul ca pe Acasă (Eticheta: textul + linia care se
+ * garantate geometric de la 500 px, deci secțiunea are atunci min-height: 500px), opțional titlul ca pe Acasă (Eticheta: textul + linia care se
  * trage). Tema navbar-ului: light. Doar tokenuri. Suprafețele închise sunt doar CtaFinal și subsolul.
  */
 import type { Seed } from '../lib/fundal-viu';
@@ -26,7 +26,7 @@ const idTitlu = titlu && id ? `${id}-titlu` : undefined;
 ---
 
 <section
-  class:list={['sectiune-pagina', `sectiune-pagina--${ton}`, { 'sectiune-pagina--cu-titlu': !!titlu }, clasa]}
+  class:list={['sectiune-pagina', `sectiune-pagina--${ton}`, { 'sectiune-pagina--cu-titlu': !!titlu, 'sectiune-pagina--viu': !!viu }, clasa]}
   id={id}
   data-tema-sectiune="light"
   aria-labelledby={idTitlu}
@@ -49,6 +49,14 @@ const idTitlu = titlu && id ? `${id}-titlu` : undefined;
   /* Cu titlu, eticheta are deja spațiul de sus (padding-block: var(--section-y) 3em). */
   .sectiune-pagina--cu-titlu {
     padding-top: 0;
+  }
+
+  /*
+   * Cu fundal viu: cel puțin înălțimea minimă a seed-urilor 2–4 (500 px, src/lib/fundal-viu.ts),
+   * ca garanția geometrică a petelor să nu depindă de cât conținut are secțiunea în CMS.
+   */
+  .sectiune-pagina--viu {
+    min-height: 500px;
   }
 
   .sectiune-pagina--paper {

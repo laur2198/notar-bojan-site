@@ -16,7 +16,11 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Buton from '../components/Buton.astro';
+import CasetaDosar from '../components/CasetaDosar.astro';
+import CtaFinal from '../components/CtaFinal.astro';
 import FundalViu from '../components/FundalViu.astro';
+import ListaIntrebari from '../components/ListaIntrebari.astro';
+import ListaNumerotata from '../components/ListaNumerotata.astro';
 import Shutter from '../components/Shutter.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
 import { amesteca, contrastCuGranulatie, formateazaRaport, GRANULATIE, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
@@ -29,7 +33,7 @@ export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } 
 
 const birou = await getBirou();
 
-const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
+const MARK_FUNDAL = culoare('c-marcaj'); // mark.todo din global.css
 
 /*
  * Pseudo-tokenuri pentru fundaluri compuse:
@@ -168,7 +172,7 @@ interface TreaptaScara {
 const scara: TreaptaScara[] = [
   { nume: 'Frază mare', token: 'fs-statement', clasa: 'scara-statement', din: 'sticky-el', text: 'Un dosar complet înseamnă mai puține drumuri la birou.' },
   { nume: 'Titlu principal (h1)', token: 'fs-h1', clasa: 'scara-h1', din: 'hero__h1', text: 'Acte notariale pregătite din timp.' },
-  { nume: 'Titlu de secțiune', token: 'fs-titlu', clasa: 'scara-titlu', din: 'serv__titlu, faq__titlu', text: 'Succesiune și moștenire' },
+  { nume: 'Titlu de secțiune', token: 'fs-titlu', clasa: 'scara-titlu', din: 'lista-nr__titlu, faq__titlu', text: 'Succesiune și moștenire' },
   { nume: 'Titlu h2', token: 'fs-h2', clasa: 'scara-h2', din: 'slogan__text, cta__text', text: 'Aveți alte întrebări? Scrieți-ne.' },
   { nume: 'Titlu h3, text mare', token: 'fs-h3', clasa: 'scara-h3', din: 'faq__btn, nav__logo', text: 'Ce act de identitate trebuie să am la mine?' },
   { nume: 'Text de bază', token: 'fs-base', clasa: 'scara-base', din: 'body', text: 'Știința își păstrează însemnătatea: ușa biroului din Brașov se deschide la nouă.' },
@@ -447,6 +451,46 @@ const fonturi = [
         </div>
       </section>
 
+      <section aria-labelledby="interioare">
+        <h2 id="interioare">Componentele paginilor interioare (V4)</h2>
+        <p>
+          Toate folosesc doar tokenuri din <code>src/styles/tokens.css</code>: la schimbarea paletei nu se atinge nicio
+          componentă. <code>AntetPagina.astro</code> (capul fiecărei pagini interioare: breadcrumbs, h1, lead, linia roșie
+          decorativă, fotografia opțională, fundal viu seed 5) are un h1, deci nu se arată aici: vezi
+          <a href={url('/despre/')}>Despre</a> sau <a href={url('/servicii/vanzare-cumparare/')}>o pagină de serviciu</a>.
+        </p>
+        <h3><code>ListaNumerotata</code>, varianta compactă</h3>
+        <ListaNumerotata
+          locale="ro"
+          prefix="stil"
+          cursor=""
+          elemente={[
+            { titlu: 'Trimiteți actele', text: 'Pe email, din pagina serviciului.', href: url('/servicii/') },
+            { titlu: 'Verificăm dosarul', text: 'Vă spunem ce mai este necesar.' },
+            { titlu: 'Semnați la birou', text: 'Stabilim împreună data.' },
+          ]}
+        />
+        <h3><code>ListaIntrebari</code></h3>
+        <ListaIntrebari
+          intrebari={[
+            { intrebare: 'Trebuie să fac programare?', raspuns: 'Exemplu de răspuns, doar pentru ghidul de stil.' },
+            { intrebare: 'Pot trimite actele înainte?', raspuns: 'Exemplu de răspuns, doar pentru ghidul de stil.' },
+          ]}
+        />
+        <h3><code>CasetaDosar</code> (pagina de serviciu)</h3>
+        <div class="demo-caseta">
+          <CasetaDosar
+            locale="ro"
+            birou={birou}
+            durata="Exemplu: aprox. 1 oră"
+            onorariu="Exemplu de text general, fără sume."
+            acte={['Actul de identitate', 'Actul de proprietate']}
+            subiectEmail="Exemplu"
+            titluId="stil-dosar-titlu"
+          />
+        </div>
+      </section>
+
       <section aria-labelledby="butoane">
         <h2 id="butoane">Butonul cu text dublat</h2>
         <p>
@@ -486,6 +530,7 @@ const fonturi = [
       </div>
       <Shutter />
     </section>
+    <CtaFinal locale="ro" birou={birou} titlu="CtaFinal (banda închisă)" subtitlu="La finalul paginilor interioare și pe Acasă." />
     <section class="demo-inchis pe-inchis" data-tema-sectiune="dark" aria-labelledby="sectiune-inchisa">
       <div class="container">
         <h2 id="sectiune-inchisa">Secțiune închisă</h2>
@@ -574,6 +619,10 @@ const fonturi = [
     font-family: var(--font-mono);
   }
 
+  .demo-caseta {
+    max-width: 24rem;
+  }
+
   .demo-miscare {
     display: grid;
     gap: var(--space-2);
@@ -613,7 +662,7 @@ const fonturi = [
     inset: -12% 0;
     display: grid;
     place-items: center;
-    background: linear-gradient(160deg, #e9e9e9 0%, #cfcfcf 100%);
+    background: linear-gradient(160deg, var(--c-paper-2) 0%, var(--c-line) 100%);
     color: var(--c-ink);
   }
 
@@ -685,7 +734,7 @@ const fonturi = [
     width: 3.5rem;
     height: 3.5rem;
     border-radius: var(--radius);
-    box-shadow: inset 0 0 0 1px rgb(15 15 15 / 0.15);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-ink) 15%, transparent);
   }
 
   .culoare-text {
@@ -732,7 +781,7 @@ const fonturi = [
     min-height: 2.5rem;
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius);
-    box-shadow: inset 0 0 0 1px rgb(15 15 15 / 0.15);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-ink) 15%, transparent);
     font-weight: 600;
     font-size: var(--fs-base);
   }

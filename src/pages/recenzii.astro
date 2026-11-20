@@ -34,7 +34,8 @@ const areRating = birou.rating !== null && birou.numarRecenzii !== null;
 <BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu })} description={t(locale, 'recenzii.seoDescriere')}>
   <AntetPagina locale={locale} titlu={titlu} lead={acasa.data.recenzii.intro} breadcrumbs={firimituri} />
 
-  <SectiunePagina viu={2} eticheta={titlu}>
+  {/* Fără fundal viu: secțiunea e scurtă cât lista e goală (garanția petelor cere ≥ 500 px). */}
+  <SectiunePagina eticheta={titlu}>
     <div class="recenzii">
       {areRating && <CardRating locale={locale} birou={birou} />}
       {

@@ -11,6 +11,7 @@ describe('culorile din tokens.css', () => {
         'c-ink-2',
         'c-line',
         'c-linie-inchis',
+        'c-marcaj',
         'c-muted',
         'c-paper',
         'c-paper-2',

@@ -36,6 +36,21 @@
   --c-slogan-stins-inchis: #DEA7A0;
 
   /*
+   * Marcajele de lucru, doar în preview (mark.todo, DraftBadge, FotoProvizorie): galben pal, singura
+   * culoare din afara paletei; ink pe el 14.8:1. Nu apare în producție.
+   */
+  --c-marcaj: #FFF1B8;
+
+  /*
+   * Culorile oficiale ale literei „G” Google (LogoGoogle.astro, lângă rating și linkul spre
+   * recenzii): marcă terță, nu fac parte din paletă și NU se schimbă când se schimbă paleta.
+   */
+  --marca-google-albastru: #4285F4;
+  --marca-google-verde:    #34A853;
+  --marca-google-galben:   #FBBC05;
+  --marca-google-rosu:     #EA4335;
+
+  /*
    * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
    * prototip, negru cu alfa = zgomotul, opacitate .06. Stă ca strat fix peste pagină
    * (body::after, global.css), fără evenimente de pointer. Închide local culorile cu cel mult

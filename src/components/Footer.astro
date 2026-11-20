@@ -3,7 +3,7 @@
  * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5; V3d): fundal --c-rosu-900 (temă închisă),
  * cu o linie de 3 px --c-rosu pe marginea de sus; titlurile și rândul legal în --c-rosu-300,
  * linkurile în alb. Intră „de sub
- * conținut”: interiorul urcă (yPercent -25 → 0) și un strat #3D0A0A se estompează (0.35 → 0), cu
+ * conținut”: interiorul urcă (yPercent -25 → 0) și un strat mai închis decât rosu-900 se estompează (0.35 → 0), cu
  * scrub, pe intervalul clamp(top bottom) → clamp(top top). Mișcarea o face src/scripts/miscare.ts
  * ([data-footer]), doar cu mișcare permisă; altfel subsolul e static. Când s-a oprit, textul e fix.
  *
@@ -275,7 +275,8 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol__strat {
     position: absolute;
     inset: 0;
-    background: #3d0a0a;
+    /* Mai închis decât suprafața subsolului, derivat din ea: urmează paleta. */
+    background: color-mix(in srgb, var(--c-rosu-900), var(--c-ink) 50%);
     opacity: 0;
     pointer-events: none;
   }
