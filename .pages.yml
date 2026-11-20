@@ -270,11 +270,6 @@ content:
             type: text
             required: true
             description: Continuă titlul, cu gri, ex. ce servicii oferă biroul.
-          - name: linie
-            label: Rândul de sub semnătură
-            type: string
-            required: true
-            description: Apare în stânga; în dreapta apare automat adresa din „Setări birou”.
           - name: imagine
             component: imagine
             description: Fotografia biroului, în dreapta titlului (pe telefon, sub el); e și imaginea afișată când pagina e distribuită. Se încarcă doar pe pagina în română; pagina în engleză o folosește pe aceeași. Cel puțin 1600 px pe latura lungă. Fotografiile de stoc sunt permise doar provizoriu (bifați „Fotografie provizorie”).

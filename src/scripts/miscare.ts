@@ -28,7 +28,7 @@
  *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la încărcarea modulului (V3d: fără
  *                          intro): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
  *                          linia ([data-hero-divider]) și linia roșie de sub titlu ([data-hero-accent])
- *                          0 → 100%, rândul de deasupra liniei ([data-hero-fade]) și wordmark-ul
+ *                          0 → 100%, elementele [data-hero-fade] (dacă există) și wordmark-ul
  *                          ([data-hero-wordmark]) apar, fotografia ([data-hero-foto]) se descoperă de jos
  *                          în sus (clip-path, 1 s, expo.out). Până atunci CSS-ul le ascunde sub
  *                          `html.miscare:not(.hero-pornit)` (HeroAcasa.astro).

@@ -2,20 +2,18 @@
 /**
  * Capul paginilor interioare (CLAUDE.md §5, V4), după hero-ul de pe Acasă, la scară mai mică:
  *   - stânga: breadcrumbs, slotul (DraftBadge), h1 (--fs-h1, ca pe Acasă, niciodată mai mare),
- *     lead-ul opțional în --c-muted, apoi linia scurtă roșie (3 px) cu eticheta: implicit rândul
- *     de sub hero-ul de pe Acasă (`hero.linie` din acasa.yaml, ex. „Notar public · Camera Notarilor
- *     Publici Brașov”), deci același text, din CMS, pe fiecare limbă;
+ *     lead-ul opțional în --c-muted, apoi linia scurtă roșie (3 px), doar decorativă, fără text
+ *     (V3e: ca linia de sub h1 din hero-ul de pe Acasă; rândul „Notar public · …” a fost scos);
  *   - dreapta, opțional (`fotografie`), fotografia 4:5 (4:3 sub 768 px), cu placeholder-ul
  *     componentei Fotografie dacă imaginea lipsește; de la 992 px pe două coloane, textul centrat
  *     vertical față de ea;
  *   - jos, dividerul pe toată lățimea (data-divider).
- * Fundal: --c-paper + FundalViu `puternic`, seed 5 (garantat geometric de la 26rem în sus, deci
+ * Fundal: --c-paper + FundalViu `puternic` (sau `discret`, prop-ul `intensitate`), seed 5 (garantat geometric de la 26rem în sus, deci
  * min-height: 26rem), fără urmărirea cursorului. Fără wordmark-ul gigant (doar pe Acasă și în
  * subsol). Tema navbar-ului: light. Mișcarea: [data-reveal] pe h1 și pe lead, [data-divider] pe
  * linii, ca pe Acasă; fără JS și la mișcare redusă, totul vizibil. Doar tokenuri.
  */
 import type { ImageMetadata } from 'astro';
-import { getEntry } from 'astro:content';
 import type { Locale } from '../i18n';
 import { marcheazaPlaceholder } from '../lib/continut';
 import Breadcrumbs, { type Firimitura } from './Breadcrumbs.astro';
@@ -29,36 +27,27 @@ interface Props {
   /** Lead-ul (trecut prin marcheazaPlaceholder). Doar dacă pagina are deja un astfel de text. */
   lead?: string;
   breadcrumbs?: Firimitura[];
-  /** Eticheta de lângă linia roșie; implicit `hero.linie` din pagini/{limba}/acasa.yaml. */
-  eticheta?: string;
   /** Coloana cu fotografia (placeholder dacă `imagine` lipsește). */
   fotografie?: boolean;
   imagine?: ImageMetadata;
   imagineAlt?: string;
   provizorie?: boolean;
+  /** Intensitatea fundalului viu: puternic (implicit) sau discret (ex. Confidențialitate). */
+  intensitate?: 'puternic' | 'discret';
 }
 
-const { locale, titlu, lead, breadcrumbs, eticheta, fotografie = false, imagine, imagineAlt = '', provizorie = false } = Astro.props;
-const acasa = eticheta === undefined ? await getEntry('acasa', `${locale}/acasa`) : undefined;
-const textEticheta = eticheta ?? acasa?.data.hero.linie ?? '';
+const { locale, titlu, lead, breadcrumbs, fotografie = false, imagine, imagineAlt = '', provizorie = false, intensitate = 'puternic' } = Astro.props;
 ---
 
 <section class:list={['antet', { 'antet--cu-foto': fotografie }]} data-tema-sectiune="light" aria-labelledby="antet-titlu" data-antet>
-  <FundalViu intensitate="puternic" seed={5} />
+  <FundalViu intensitate={intensitate} seed={5} />
   <div class="container antet__interior">
     <div class="antet__text">
       {breadcrumbs && <Breadcrumbs locale={locale} elemente={breadcrumbs} />}
       <slot />
       <h1 class="antet__titlu" id="antet-titlu" data-reveal set:html={marcheazaPlaceholder(titlu)} />
       {lead && <p class="antet__lead" data-reveal set:html={marcheazaPlaceholder(lead)} />}
-      {
-        textEticheta && (
-          <p class="antet__linie">
-            <span class="antet__accent" data-divider aria-hidden="true" />
-            <span set:html={marcheazaPlaceholder(textEticheta)} />
-          </p>
-        )
-      }
+      <div class="antet__accent" data-divider aria-hidden="true"></div>
     </div>
     {
       fotografie && (
@@ -130,19 +119,10 @@ const textEticheta = eticheta ?? acasa?.data.hero.linie ?? '';
     color: var(--c-muted);
   }
 
-  .antet__linie {
-    display: flex;
-    align-items: center;
-    gap: 0.9em;
-    max-width: none;
-    margin: var(--space-1) 0 0;
-    color: var(--c-muted);
-  }
-
-  /* Linia scurtă roșie (ca .hero__accent de pe Acasă; decorativă). */
+  /* Linia scurtă roșie (ca .hero__accent de pe Acasă; decorativă, fără text). */
   .antet__accent {
-    flex-shrink: 0;
-    width: 3rem;
+    margin-top: var(--space-1);
+    width: 4.5rem;
     height: 3px;
     background: var(--c-rosu);
     transform-origin: left center;

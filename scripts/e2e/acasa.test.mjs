@@ -33,6 +33,9 @@ describe('Acasă: hero (V3d, fără intro și fără semnătură)', () => {
     assert.match(r.accent, /^(none|matrix\(1, 0, 0, 1, 0, 0\))$/, `linia roșie trasă: ${r.accent}`);
     const html = await (await fetch(`${BAZA}/`)).text();
     assert.doesNotMatch(html, /semnatura|vecteezy|intro-semnatura/i);
+    // V3e: fără rândul „Notar public · Camera Notarilor Publici Brașov” (și adresa) în hero.
+    assert.equal(await p.evaluate(() => document.querySelectorAll('.hero__linie, .hero__adresa').length), 0);
+    assert.doesNotMatch(await p.evaluate(() => document.querySelector('[data-hero]').textContent), /Camera Notarilor/);
     assert.deepEqual(erori, []);
     await context.close();
   });
