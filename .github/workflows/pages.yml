@@ -2,12 +2,16 @@
 # Adresa: https://laur2198.github.io/notar-bojan-site/
 # Build de PREVIEW (npm run build): conținutul nevalidat e marcat, paginile au noindex.
 # Producția (npm run build:prod) se face separat, pe Cloudflare, după validarea conținutului.
+#
+# Publică ramura design-v2 (redesign-ul monocrom). `main` rămâne codul clasic, dar nu se mai
+# publică până la lansare. Regula de ramuri a mediului github-pages (Settings → Environments)
+# trebuie să permită design-v2.
 
 name: Preview pe GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [design-v2]
   workflow_dispatch:
 
 # Permisiuni minime: citirea codului (checkout) și publicarea pe Pages (OIDC).
@@ -25,8 +29,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout (design-v2)
         uses: actions/checkout@v7
+        with:
+          ref: design-v2
 
       - name: Node (≥ 22.23.4, cerut de Astro 7)
         uses: actions/setup-node@v7
