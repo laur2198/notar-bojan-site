@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { amesteca, contrastCuGranulatie, raportContrast } from './contrast';
-import { compusMaxim, compusPata, CULORI_VIU, INTENSITATI, pata } from './fundal-viu';
+import { compusMaxim, compusPata, CULORI_VIU, INTENSITATI, pata, type Intensitate } from './fundal-viu';
+
+/** Culorile cele mai închise ale fundalului viu, pe fiecare fond (aceleași ca în comentariul din tokens.css). */
+const COMPUS = {
+  puternicPaper: '#FDEEE8',
+  puternicPaper2: '#F3E3DE',
+  discretPaper: '#FEF6F3',
+  discretPaper2: '#F2EAE7',
+  discretPaperRosu: '#FAEAE7',
+};
 import { culoare, culori, marimePx, numarToken } from './tokens';
 
 describe('culorile din tokens.css', () => {
-  it('sunt paleta V3d: alb / alb cald, ink, roșul de acțiune și roșul închis; fără maro', () => {
+  it('sunt paleta finală 3A (V5): alb / gri cald / roz pal, text maro, roșul viu, roșul închis', () => {
     expect(Object.keys(culori).sort()).toEqual(
       [
         'c-ink',
@@ -15,27 +24,37 @@ describe('culorile din tokens.css', () => {
         'c-muted',
         'c-paper',
         'c-paper-2',
+        'c-paper-rosu',
         'c-rosu',
-        'c-rosu-50',
+        'c-rosu-200',
         'c-rosu-300',
+        'c-rosu-50',
         'c-rosu-900',
         'c-rosu-hover',
         'c-slogan-stins',
         'c-slogan-stins-inchis',
+        'c-suprafata-rosie',
+        'c-wordmark',
       ].sort(),
     );
     expect(culoare('c-paper')).toBe('#FFFFFF');
-    expect(culoare('c-paper-2')).toBe('#FBF8F6');
-    expect(culoare('c-ink')).toBe('#1F1E1D');
-    expect(culoare('c-muted')).toBe('#5E5C59');
+    expect(culoare('c-paper-2')).toBe('#F4F1EE');
+    expect(culoare('c-paper-rosu')).toBe('#FDF1EF');
+    expect(culoare('c-ink')).toBe('#2A1A10');
+    expect(culoare('c-ink-2')).toBe('#3D2718');
+    expect(culoare('c-muted')).toBe('#5E5853');
+    expect(culoare('c-line')).toBe('#E2DDD8');
+    expect(culoare('c-wordmark')).toBe('#4A2E1E');
     expect(culoare('c-rosu')).toBe('#B42318');
     expect(culoare('c-rosu-hover')).toBe('#8F1D14');
     expect(culoare('c-rosu-50')).toBe('#FBEDEA');
+    expect(culoare('c-suprafata-rosie')).toBe('#B42318');
+    expect(culoare('c-rosu-200')).toBe('#FBE3DF');
     expect(culoare('c-rosu-900')).toBe('#7A1414');
     expect(culoare('c-rosu-300')).toBe('#E8C9C4');
   });
 
-  it('niciun token nu mai e maro (nuanță 15–45°, saturație medie, întunecat): nici --c-brand, nici --c-accent', () => {
+  it('tokenurile vechi de brand nu mai există (--c-brand*, --c-accent)', () => {
     for (const vechi of ['c-brand', 'c-brand-900', 'c-brand-300', 'c-brand-50', 'c-line-dark', 'c-accent']) {
       expect(culori[vechi]).toBeUndefined();
     }
@@ -48,21 +67,37 @@ describe('culorile din tokens.css', () => {
  * granulației (contrastCuGranulatie). Aceeași listă, mai detaliată, e în /stil/.
  */
 const PERECHI: [fata: string, fundal: string, raport: number, prag: number][] = [
-  ['c-ink', 'c-paper-2', 15.7, 4.5],
-  ['c-muted', 'c-paper', 6.7, 4.5],
-  ['c-muted', 'c-paper-2', 6.3, 4.5],
+  // Textul maro și gri cald pe suprafețele deschise.
+  ['c-ink', 'c-paper', 16.8, 4.5],
+  ['c-ink', 'c-paper-2', 14.9, 4.5],
+  ['c-ink', 'c-paper-rosu', 15.2, 4.5],
+  ['c-ink', 'c-rosu-50', 14.7, 4.5],
+  ['c-ink-2', 'c-paper', 14.0, 4.5],
+  ['c-muted', 'c-paper', 7.0, 4.5],
+  ['c-muted', 'c-paper-2', 6.2, 4.5],
+  ['c-muted', 'c-paper-rosu', 6.3, 4.5],
+  ['c-wordmark', 'c-paper', 12.3, 4.5],
+  ['c-wordmark', 'c-paper-2', 11.0, 4.5],
+  ['c-wordmark', 'c-paper-rosu', 11.2, 4.5],
+  ['c-slogan-stins', 'c-paper', 6.3, 4.5],
+  ['c-slogan-stins', 'c-paper-2', 5.6, 4.5],
+  // Roșul ca accent pe deschis.
   ['c-rosu', 'c-paper', 6.6, 4.5],
-  ['c-rosu', 'c-paper-2', 6.2, 4.5],
+  ['c-rosu', 'c-paper-2', 5.8, 4.5],
+  ['c-rosu', 'c-paper-rosu', 5.9, 4.5],
+  ['c-rosu', 'c-rosu-50', 5.8, 4.5],
+  // Butonul plin pe deschis.
   ['c-paper', 'c-rosu', 6.6, 4.5],
   ['c-paper', 'c-rosu-hover', 8.9, 4.5],
-  ['c-rosu', 'c-rosu-50', 5.8, 4.5],
-  ['c-ink', 'c-rosu-50', 14.6, 4.5],
+  // Suprafața roșie vie (frazele mari, CtaFinal): text alb și rosu-200; butonul alb cu text roșu.
+  ['c-paper', 'c-suprafata-rosie', 6.6, 4.5],
+  ['c-rosu-200', 'c-suprafata-rosie', 5.4, 4.5],
+  ['c-slogan-stins-inchis', 'c-suprafata-rosie', 5.1, 4.5],
+  // Roșul închis (subsol, meniul compact).
   ['c-paper', 'c-rosu-900', 10.8, 4.5],
+  ['c-rosu-300', 'c-rosu-900', 7.0, 4.5],
   ['c-rosu-900', 'c-paper', 10.8, 4.5],
   ['c-rosu-900', 'c-rosu-50', 9.5, 4.5],
-  ['c-rosu-300', 'c-rosu-900', 7.0, 4.5],
-  ['c-slogan-stins', 'c-paper', 6.3, 4.5],
-  ['c-slogan-stins-inchis', 'c-rosu-900', 5.2, 4.5],
 ];
 
 describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () => {
@@ -72,8 +107,21 @@ describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () =
     expect(contrastCuGranulatie(culoare(fata), culoare(fundal))).toBeGreaterThanOrEqual(prag);
   });
 
+  it('butoanele pe roșu viu: plin alb cu text roșu (și la hover, pe rosu-50); contur alb; focusul alb ≥ 3:1', () => {
+    expect(contrastCuGranulatie(culoare('c-rosu'), culoare('c-paper'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(culoare('c-rosu'), culoare('c-rosu-50'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-rosu-hover'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-suprafata-rosie'))).toBeGreaterThanOrEqual(3);
+  });
+
   it('roșul nu stă pe alt roșu: --c-rosu pe --c-rosu-900 pică (de aceea e interzis ca text sau UI)', () => {
     expect(raportContrast(culoare('c-rosu'), culoare('c-rosu-900'))).toBeLessThan(3);
+  });
+
+  it('maroul nu stă pe roșu: --c-ink și --c-wordmark pe suprafețele roșii pică', () => {
+    for (const t of ['c-ink', 'c-wordmark']) {
+      expect(raportContrast(culoare(t), culoare('c-suprafata-rosie'))).toBeLessThan(4.5);
+    }
   });
 });
 
@@ -81,7 +129,37 @@ describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () =
 const maiInchis = (hex: string, n: number) =>
   '#' + [1, 3, 5].map((i) => Math.max(0, parseInt(hex.slice(i, i + 2), 16) - n).toString(16).padStart(2, '0')).join('').toUpperCase();
 
+/** Fundalurile pe care stă fiecare intensitate: puternic pe alb și gri cald, discret și pe roz pal (Servicii). */
+const FONDURI: Record<Intensitate, string[]> = {
+  puternic: ['c-paper', 'c-paper-2'],
+  discret: ['c-paper', 'c-paper-2', 'c-paper-rosu'],
+};
+
+/**
+ * Toate condițiile de contrast ale unei pete în centrul ei, cu granulația și cu toleranța de randare
+ * (3/255 pe canal): ink, muted, roșu ≥ 4.5:1 pe fiecare fundal al intensității; la discret, pe
+ * paper-2 („Cum lucrăm”), și sloganul stins ≥ 4.5:1 și pașii inactivi (ink la .6) ≥ 3:1.
+ */
+function treceContrastul(hex: string, alfa: number, intensitate: Intensitate): boolean {
+  return FONDURI[intensitate].every((fond) => {
+    const compus = amesteca(culoare(fond), hex, alfa);
+    return [compus, maiInchis(compus, 3)].every(
+      (f) =>
+        ['c-ink', 'c-muted', 'c-rosu'].every((t) => contrastCuGranulatie(culoare(t), f) >= 4.5) &&
+        (intensitate !== 'discret' ||
+          fond !== 'c-paper-2' ||
+          (contrastCuGranulatie(culoare('c-slogan-stins'), f) >= 4.5 && contrastCuGranulatie(amesteca(compus, culoare('c-ink'), 0.6), compus) >= 3)),
+    );
+  });
+}
+
 describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
+  it('culorile V5: roșu, coral (slot-ul piersica) și piersică (slot-ul auriu)', () => {
+    expect(pata('rosu', 'puternic').hex).toBe('#B42318');
+    expect(pata('piersica', 'puternic').hex).toBe('#F08A7A');
+    expect(pata('auriu', 'puternic').hex).toBe('#F5B39A');
+  });
+
   it('fiecare intensitate are câte o pată din fiecare culoare, cu opacitate între 0 și 0.4; discret < puternic', () => {
     for (const c of CULORI_VIU) {
       const p = pata(c, 'puternic');
@@ -95,42 +173,35 @@ describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
 
   /*
    * Cel mai saturat punct posibil: centrul unei singure pete (geometria garantează că zonele
-   * colorate nu se suprapun: src/lib/fundal-viu.test.ts), pentru fiecare culoare, peste paper și
-   * paper-2; plus granulația de 6% (contrastCuGranulatie).
+   * colorate nu se suprapun: src/lib/fundal-viu.test.ts), pentru fiecare culoare, pe fiecare fundal
+   * al intensității; plus granulația de 6% și toleranța de randare.
    */
   for (const intensitate of INTENSITATI) {
-    for (const fond of ['c-paper', 'c-paper-2']) {
-      it(`${intensitate} pe --${fond}: ink, muted și roșu ≥ 4.5:1 în centrul fiecărei pete, cu granulație`, () => {
-        for (const c of CULORI_VIU) {
-          const compus = compusPata(c, intensitate, culoare(fond));
-          // Și cu toleranța de randare: browserul rotunjește amestecul cu 1–2 trepte (măsurat în e2e); 3 trepte pe canal.
-          for (const fundal of [compus, maiInchis(compus, 3)]) {
-            for (const text of ['c-ink', 'c-muted', 'c-rosu']) {
-              expect(contrastCuGranulatie(culoare(text), fundal), `${text} pe ${c} (${fundal})`).toBeGreaterThanOrEqual(4.5);
-            }
-          }
-        }
-        // Focusul (roșu, 3 px) e element de interfață: min. 3:1, acoperit de pragul de mai sus.
-        // Butonul plin își are propriul fundal: alb pe --c-rosu, neschimbat de pete.
-        expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-rosu'))).toBeGreaterThanOrEqual(4.5);
-      });
-    }
+    it(`${intensitate} (${FONDURI[intensitate].join(', ')}): ink, muted, roșu ≥ 4.5:1 în centrul fiecărei pete, cu granulație și toleranță`, () => {
+      for (const c of CULORI_VIU) {
+        const { hex, alfa } = pata(c, intensitate);
+        expect(treceContrastul(hex, alfa, intensitate), `${c} la ${alfa}`).toBe(true);
+      }
+      // Butonul plin își are propriul fundal: alb pe --c-rosu, neschimbat de pete.
+      expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-rosu'))).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it(`${intensitate}: opacitățile sunt maximul care trece (cu 0.005 în plus, contrastul pică)`, () => {
+      for (const c of CULORI_VIU) {
+        const { hex, alfa } = pata(c, intensitate);
+        expect(treceContrastul(hex, alfa + 0.005, intensitate), `${c}: ${alfa} + 0.005 încă trece`).toBe(false);
+      }
+    });
   }
 
-  it('„Cum lucrăm” (discret, paper-2): sloganul stins ≥ 4.5:1, pașii inactivi (ink la .6, text mare) ≥ 3:1', () => {
-    for (const c of CULORI_VIU) {
-      const compus = compusPata(c, 'discret', culoare('c-paper-2'));
-      expect(contrastCuGranulatie(culoare('c-slogan-stins'), compus)).toBeGreaterThanOrEqual(4.5);
-      expect(contrastCuGranulatie(culoare('c-slogan-stins'), maiInchis(compus, 3))).toBeGreaterThanOrEqual(4.5);
-      expect(contrastCuGranulatie(amesteca(compus, culoare('c-ink'), 0.6), compus)).toBeGreaterThanOrEqual(3);
-    }
-  });
-
   it('compusul maxim e cel din comentariul din tokens.css', () => {
-    expect(compusMaxim('puternic', culoare('c-paper'))).toBe('#F8E8D2');
-    expect(compusMaxim('puternic', culoare('c-paper-2'))).toBe('#F5E4CC');
-    expect(compusMaxim('discret', culoare('c-paper'))).toBe('#FDEFEC');
-    expect(compusMaxim('discret', culoare('c-paper-2'))).toBe('#F7EBDC');
+    expect(compusMaxim('puternic', culoare('c-paper'))).toBe(COMPUS.puternicPaper);
+    expect(compusMaxim('puternic', culoare('c-paper-2'))).toBe(COMPUS.puternicPaper2);
+    expect(compusMaxim('discret', culoare('c-paper'))).toBe(COMPUS.discretPaper);
+    expect(compusMaxim('discret', culoare('c-paper-2'))).toBe(COMPUS.discretPaper2);
+    expect(compusMaxim('discret', culoare('c-paper-rosu'))).toBe(COMPUS.discretPaperRosu);
+    // compusPata e folosit și de /stil/.
+    expect(compusPata('rosu', 'discret', culoare('c-paper'))).toMatch(/^#[0-9A-F]{6}$/);
   });
 
   it('valorile sunt tokenuri citite din tokens.css', () => {
