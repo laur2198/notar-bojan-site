@@ -1,6 +1,7 @@
 /*
  * Stiluri globale (CLAUDE.md §4–5). Se importă o singură dată, din layout.
- * Ordine: tokens → fonturi → reset → tipografie → granulație → focus → utilitare → butoane.
+ * Ordine: tokens → fonturi → reset → tipografie → granulație → focus → utilitare → carcasă →
+ * articol → mișcare. Butoanele sunt doar Buton.astro (V4: clasele vechi .btn au fost scoase).
  */
 @import './tokens.css';
 @import './fonturi.css';
@@ -82,7 +83,7 @@ button {
   cursor: pointer;
 }
 
-/* `hidden` câștigă întotdeauna, și peste clasele care setează display (ex. .btn). */
+/* `hidden` câștigă întotdeauna, și peste clasele care setează display. */
 [hidden] {
   display: none !important;
 }
@@ -333,8 +334,8 @@ body::after {
 }
 
 /* Pe fundal închis, linkurile (în afară de butoane) și sublinierea lor preiau culoarea textului. */
-.pe-inchis a:not(.btn, .buton),
-.pe-inchis a:not(.btn, .buton):hover {
+.pe-inchis a:not(.buton),
+.pe-inchis a:not(.buton):hover {
   color: inherit;
   text-decoration-color: currentColor;
 }
@@ -382,120 +383,6 @@ mark.todo {
   outline-offset: 1px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-}
-
-/* ---------------------------------------------------------------------------
-   Butoane (CLAUDE.md §5): min. 48 px înălțime
-   Culorile stau în variabile, ca starea hover să schimbe doar variabilele.
-   --------------------------------------------------------------------------- */
-
-.btn {
-  --btn-bg: transparent;
-  --btn-fg: var(--c-ink);
-  --btn-border: transparent;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  /* 16 px, 600, min. 48 px înălțime, padding 12×20. */
-  min-height: 48px;
-  min-width: 48px;
-  padding: calc(var(--space-1) * 1.5) calc(var(--space-2) * 1.25);
-  border: 2px solid var(--btn-border);
-  border-radius: var(--radius);
-  background-color: var(--btn-bg);
-  color: var(--btn-fg);
-  font-family: var(--font-sans);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  line-height: 1.25;
-  text-align: center;
-  text-decoration-line: none;
-  text-underline-offset: 0.18em;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    color 150ms ease;
-}
-
-.btn:hover {
-  /* Pe lângă culoare, hover-ul subliniază textul: indiciu care nu depinde de culoare. */
-  text-decoration-line: underline;
-  text-decoration-thickness: 0.08em;
-}
-
-/* Primar: fundal --c-rosu, text --c-paper (6.6:1); hover --c-rosu-hover (8.9:1) și subliniere. */
-.btn--primar {
-  --btn-bg: var(--c-rosu);
-  --btn-fg: var(--c-paper);
-  --btn-border: var(--c-rosu);
-}
-
-.btn--primar:hover {
-  --btn-bg: var(--c-rosu-hover);
-  --btn-border: var(--c-rosu-hover);
-  color: var(--c-paper);
-}
-
-/*
- * Secundar (btn--contur din prototip): transparent, contur și text --c-ink (16.6:1).
- * Hover: fundal --c-rosu-50 (text 14.6:1) și subliniere.
- */
-.btn--secundar {
-  --btn-bg: transparent;
-  --btn-fg: var(--c-ink);
-  --btn-border: var(--c-ink);
-}
-
-.btn--secundar:hover {
-  --btn-bg: var(--c-rosu-50);
-  color: var(--c-ink);
-}
-
-/* Invers, pe secțiunile închise: fundal --c-paper, text --c-rosu-900 (10.8:1); hover --c-rosu-50 (9.5:1). */
-.btn--invers {
-  --btn-bg: var(--c-paper);
-  --btn-fg: var(--c-rosu-900);
-  --btn-border: var(--c-paper);
-}
-
-.btn--invers:hover {
-  --btn-bg: var(--c-rosu-50);
-  --btn-border: var(--c-rosu-50);
-  color: var(--c-rosu-900);
-}
-
-/*
- * Contur deschis, pe fundal închis (hero): butonul secundar de lângă unul inversat.
- * Text și contur --c-paper pe ink / overlay: 19.4:1; hover cu fundal alb 12%.
- */
-.btn--contur-invers {
-  --btn-bg: transparent;
-  --btn-fg: var(--c-paper);
-  --btn-border: var(--c-paper);
-}
-
-.btn--contur-invers:hover {
-  --btn-bg: rgb(255 255 255 / 0.12);
-  color: var(--c-paper);
-}
-
-/* Link fără destinație (date încă necompletate, doar în preview): vizibil, dar inactiv. */
-.btn[aria-disabled='true'] {
-  --btn-bg: transparent;
-  --btn-fg: var(--c-muted);
-  --btn-border: var(--c-muted);
-  border-style: dashed;
-  cursor: not-allowed;
-  text-decoration-line: none;
-}
-
-/* Pe fundal închis, butonul inactiv rămâne lizibil: text și contur --c-rosu-300 (7.0:1 pe rosu-900). */
-.pe-inchis .btn[aria-disabled='true'] {
-  --btn-fg: var(--c-rosu-300);
-  --btn-border: var(--c-rosu-300);
-  color: var(--c-rosu-300);
 }
 
 /* ---------------------------------------------------------------------------

@@ -1,22 +1,23 @@
 ---
 /**
- * /en/services/ (etapa 6): prezentare generală, fără pagini individuale (CLAUDE.md §6). Aceeași
- * structură ca /servicii/: bandă de titlu, grila de carduri (GrilaServicii) și CTA. Fără onorarii
+ * /en/services/ (etapa 6, V4): prezentare generală, fără pagini individuale (CLAUDE.md §6). Aceeași
+ * structură ca /servicii/: AntetPagina, serviciile în ListaNumerotata (varianta mare) și CtaFinal. Fără onorarii
  * sau sume (CLAUDE.md §3.3): sub grilă, doar nota generală cu trimiterea la Ordinul MJ nr. 177/C/2024
  * (`servicii.intro` din i18n, același text ca lead-ul de pe /servicii/).
  *
- * Fiecare card are ancora `id={slugRo}` (ținta cardurilor de pe /en/) și linkul secundar
- * „Details in Romanian” spre /servicii/{slugRo}/, cu hreflang="ro".
+ * Fiecare rând are ancora `id={slugRo}` (ținta rândurilor de pe /en/), titlul ca text (nu link) și
+ * linkul vizibil „Details in Romanian” spre /servicii/{slugRo}/, cu hreflang="ro".
  */
 import { getCollection, getEntry } from 'astro:content';
-import BandaTitlu from '../../components/BandaTitlu.astro';
+import AntetPagina from '../../components/AntetPagina.astro';
+import CtaFinal from '../../components/CtaFinal.astro';
 import DraftBadge from '../../components/DraftBadge.astro';
-import GrilaServicii from '../../components/GrilaServicii.astro';
-import SectiuneCta from '../../components/SectiuneCta.astro';
-import Sectiune from '../../components/Sectiune.astro';
-import { cale, t } from '../../i18n';
+import ListaNumerotata from '../../components/ListaNumerotata.astro';
+import SectiunePagina from '../../components/SectiunePagina.astro';
+import { cale, caleLogica, t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getBirou, marcheazaPlaceholder } from '../../lib/continut';
+import { getBirou } from '../../lib/continut';
+import { url } from '../../lib/url';
 
 const locale = 'en';
 const [serviciiEn, acasa, birou, serviciiRo] = await Promise.all([
@@ -34,32 +35,39 @@ if (lipsa.length) {
   throw new Error(`servicii-en/servicii.yaml: slugRo fără pagină în src/content/servicii/ro/: ${lipsa.join(', ')}`);
 }
 
-// Fotografia cardului vine din serviciul românesc; textul alternativ e cel englez.
+// Fotografia rândului vine din serviciul românesc; textul alternativ e cel englez.
 const dateRo = new Map(serviciiRo.map((s) => [s.data.slug, s.data]));
-const carduri = serviciiEn.data.lista.map((s) => ({
-  slug: s.slugRo,
-  id: s.slugRo,
-  titlu: s.titlu,
-  rezumat: s.text,
-  imagine: dateRo.get(s.slugRo)?.imagine,
-  imagineAlt: s.imagineAlt ?? '',
-  fotoProvizorie: dateRo.get(s.slugRo)?.fotoProvizorie,
-  linkRo: `${cale('servicii', 'ro')}${s.slugRo}/`,
-}));
+const titlu = t(locale, 'servicii.titlu');
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: titlu }];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'servicii.seoTitlu')} description={t(locale, 'servicii.seoDescriere')}>
-  <BandaTitlu locale={locale} titlu={t(locale, 'servicii.titlu')} leadHtml={marcheazaPlaceholder(serviciiEn.data.intro)}>
+  <AntetPagina locale={locale} titlu={titlu} lead={serviciiEn.data.intro} breadcrumbs={firimituri}>
     <DraftBadge locale={locale} intrare={serviciiEn} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <Sectiune>
-    {/* Cardurile sunt primul nivel de conținut sub h1, deci titlurile lor sunt h2. */}
-    <GrilaServicii locale={locale} servicii={carduri} nivel="h2" />
+  <SectiunePagina viu={2} eticheta={titlu}>
+    {/* Serviciile sunt primul nivel de conținut sub h1, deci titlurile lor sunt h2. */}
+    <ListaNumerotata
+      locale={locale}
+      varianta="mare"
+      nivel="h2"
+      prefix="service"
+      elemente={serviciiEn.data.lista.map((s) => ({
+        id: s.slugRo,
+        titlu: s.titlu,
+        text: s.text,
+        etichete: s.etichete,
+        imagine: dateRo.get(s.slugRo)?.imagine,
+        imagineAlt: s.imagineAlt ?? '',
+        provizorie: dateRo.get(s.slugRo)?.fotoProvizorie,
+        link: { text: t(locale, 'servicii.detaliiRo'), href: `${cale('servicii', 'ro')}${s.slugRo}/`, hreflang: 'ro' },
+      }))}
+    />
     <p class="nota-norme">{t(locale, 'servicii.intro')}</p>
-  </Sectiune>
+  </SectiunePagina>
 
-  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>
 
 <style>

@@ -1,19 +1,30 @@
 ---
 /**
- * Pagina 404 (CLAUDE.md §6): mesaj în română și în engleză, linkuri spre Acasă, Servicii
- * și Contact, plus telefonul. Fără canonical și cu `noindex` în orice mod.
+ * Pagina 404 (CLAUDE.md §6), V4: AntetPagina (h1 și textul în română), apoi linkurile spre Acasă,
+ * Servicii, Contact și Programare în ListaNumerotata, în română și (pe paper-2, lang="en") în
+ * engleză, plus telefonul. Fără CtaFinal. Fără canonical și cu `noindex` în orice mod.
  * Pe GitHub Pages e servită la orice adresă inexistentă de sub calea de bază, deci toate
  * linkurile și resursele au cale absolută (cu bază, prin `cale()` / `url()`).
  */
-import Sectiune from '../components/Sectiune.astro';
+import AntetPagina from '../components/AntetPagina.astro';
+import ListaNumerotata from '../components/ListaNumerotata.astro';
+import SectiunePagina from '../components/SectiunePagina.astro';
 import TelefonLink from '../components/TelefonLink.astro';
-import { cale, t, type Locale } from '../i18n';
+import { cale, t, type CheieRuta, type CheieUI, type Locale } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { linkTelefon } from '../lib/contact';
 import { getBirou } from '../lib/continut';
 
 const birou = await getBirou();
 const telefon = linkTelefon(birou);
+
+/** V4: Acasă, Servicii, Contact, Programare, în ListaNumerotata. */
+const linkuri: { cheie: CheieRuta; eticheta: CheieUI }[] = [
+  { cheie: 'acasa', eticheta: '404.acasa' },
+  { cheie: 'servicii', eticheta: 'nav.servicii' },
+  { cheie: 'contact', eticheta: 'nav.contact' },
+  { cheie: 'programare', eticheta: 'nav.programare' },
+];
 
 const variante: { locale: Locale; titluId: string }[] = [
   { locale: 'ro', titluId: 'titlu-404' },
@@ -22,35 +33,29 @@ const variante: { locale: Locale; titluId: string }[] = [
 ---
 
 <BaseLayout locale="ro" title={`${t('ro', '404.titlu')} / ${t('en', '404.titlu')}`} description={t('ro', '404.descriere')} noindex>
-  {/* Același ritm ca paginile interioare: româna pe gri (ca banda de titlu), engleza pe alb. */}
+  <AntetPagina locale="ro" titlu={t('ro', '404.titlu')} lead={t('ro', '404.text')} />
   {
     variante.map(({ locale, titluId }) => (
-      <Sectiune ton={locale === 'ro' ? 'gri' : 'alb'} compact class={locale === 'ro' ? 'pagina-404__ro' : undefined}>
-          <section class="pagina-404__limba" lang={locale} aria-labelledby={titluId}>
-            {locale === 'ro' ? <h1 id={titluId}>{t(locale, '404.titlu')}</h1> : <h2 id={titluId}>{t(locale, '404.titlu')}</h2>}
-            <p>{t(locale, '404.text')}</p>
-            <ul class="pagina-404__linkuri" role="list">
-              <li>
-                <a class="btn btn--primar" href={cale('acasa', locale)}>
-                  {t(locale, '404.acasa')}
-                </a>
-              </li>
-              <li>
-                <a class="btn btn--secundar" href={cale('servicii', locale)}>
-                  {t(locale, 'nav.servicii')}
-                </a>
-              </li>
-              <li>
-                <a class="btn btn--secundar" href={cale('contact', locale)}>
-                  {t(locale, 'nav.contact')}
-                </a>
-              </li>
-            </ul>
-            <p class="pagina-404__telefon">
-              {t(locale, '404.telefon')} <TelefonLink locale={locale} telefon={telefon} />
-            </p>
-          </section>
-      </Sectiune>
+      <SectiunePagina ton={locale === 'ro' ? 'paper' : 'paper-2'} eticheta={locale === 'ro' ? t(locale, '404.titlu') : undefined}>
+        <section class="pagina-404__limba" lang={locale} aria-labelledby={locale === 'en' ? titluId : undefined} aria-label={locale === 'ro' ? t(locale, '404.titlu') : undefined}>
+          {locale === 'en' && (
+            <>
+              <h2 id={titluId}>{t(locale, '404.titlu')}</h2>
+              <p>{t(locale, '404.text')}</p>
+            </>
+          )}
+          <ListaNumerotata
+            locale={locale}
+            nivel={locale === 'ro' ? 'h2' : 'h3'}
+            prefix={`legaturi-${locale}`}
+            cursor=""
+            elemente={linkuri.map((l) => ({ titlu: t(locale, l.eticheta), href: cale(l.cheie, locale) }))}
+          />
+          <p class="pagina-404__telefon">
+            {t(locale, '404.telefon')} <TelefonLink locale={locale} telefon={telefon} />
+          </p>
+        </section>
+      </SectiunePagina>
     ))
   }
 </BaseLayout>
@@ -58,27 +63,13 @@ const variante: { locale: Locale; titluId: string }[] = [
 <style>
   .pagina-404__limba {
     display: grid;
-    gap: var(--space-2);
-  }
-
-  :global(.pagina-404__ro) {
-    border-bottom: 1px solid var(--c-line);
+    gap: var(--space-3);
   }
 
   .pagina-404__limba h2 {
-    font-size: var(--fs-h2);
-  }
-
-  .pagina-404__linkuri {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    padding: 0;
-    list-style: none;
-  }
-
-  .pagina-404__linkuri li {
-    max-width: none;
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
   }
 
   .pagina-404__telefon {

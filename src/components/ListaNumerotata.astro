@@ -43,7 +43,7 @@ interface Props {
   nivel?: 'h2' | 'h3';
   /** Prefix pentru id-urile descrierilor (unic pe pagină). */
   prefix?: string;
-  /** Textul bulei de cursor (implicit „Vezi serviciul”). */
+  /** Textul bulei de cursor (implicit „Vezi serviciul”); șir gol = fără bulă. */
   cursor?: string;
 }
 
@@ -58,7 +58,7 @@ const numar = (i: number) => String(i + 1).padStart(2, '0');
       <li
         class:list={['lista-nr__rand', { 'lista-nr__rand--link': !!e.href, 'lista-nr__rand--cu-imagine': !!e.imagine || varianta === 'mare' }]}
         id={e.id}
-        data-cursor={e.href ? cursor : undefined}
+        data-cursor={e.href && cursor ? cursor : undefined}
       >
         {(varianta === 'mare' || e.imagine) && (
           <div class="lista-nr__img">

@@ -1,16 +1,19 @@
 ---
 /**
- * /confidentialitate/: tipografie de document, cuprinsul generat din titlurile h2 și data
- * actualizării. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în
+ * /confidentialitate/ (V4): AntetPagina simplă (fără fotografie, fundal viu discret; lead = data
+ * actualizării), cuprinsul generat din titlurile h2 (sticky pe desktop) și textul în coloana de
+ * lectură, cu titlurile pe --fs-titlu. Fără CtaFinal. Nota de lucru de la început (blockquote-ul „Text propus…”) apare doar în
  * preview; în producție nu apare deloc în HTML (ContinutMarcat `faraNotaDeLucru`).
  */
 import { getEntry, render } from 'astro:content';
-import BandaTitlu from '../components/BandaTitlu.astro';
+import AntetPagina from '../components/AntetPagina.astro';
 import ContinutMarcat from '../components/ContinutMarcat.astro';
 import DraftBadge from '../components/DraftBadge.astro';
-import { formateazaZiLuna, t } from '../i18n';
+import SectiunePagina from '../components/SectiunePagina.astro';
+import { caleLogica, formateazaZiLuna, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { areMarcaj, estePreview, marcheazaPlaceholder } from '../lib/continut';
+import { areMarcaj, estePreview } from '../lib/continut';
+import { url } from '../lib/url';
 
 const locale = 'ro';
 const pagina = await getEntry('pagini', 'ro/confidentialitate');
@@ -21,19 +24,22 @@ const cuprins = headings.filter((h) => h.depth === 2);
 const actualizat = pagina.data.actualizat;
 const dataAfisata =
   actualizat && !areMarcaj(actualizat) ? `${formateazaZiLuna(locale, actualizat)} ${actualizat.slice(0, 4)}` : actualizat;
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: pagina.data.titlu }];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
-  <BandaTitlu
+  <AntetPagina
     locale={locale}
     titlu={pagina.data.titlu}
-    leadHtml={dataAfisata ? marcheazaPlaceholder(t(locale, 'doc.actualizat', { data: dataAfisata })) : undefined}
+    lead={dataAfisata ? t(locale, 'doc.actualizat', { data: dataAfisata }) : undefined}
+    breadcrumbs={firimituri}
+    intensitate="discret"
   >
     <DraftBadge locale={locale} intrare={pagina} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <section class="document" aria-label={pagina.data.titlu}>
-    <div class="container document__grila">
+  <SectiunePagina eticheta={pagina.data.titlu}>
+    <div class="document__grila">
       {
         cuprins.length > 0 && (
           <nav class="cuprins" aria-labelledby="cuprins-titlu">
@@ -52,14 +58,10 @@ const dataAfisata =
         <ContinutMarcat faraNotaDeLucru={!estePreview}><Content /></ContinutMarcat>
       </div>
     </div>
-  </section>
+  </SectiunePagina>
 </BaseLayout>
 
 <style>
-  .document {
-    padding-block: var(--section-y-sm) var(--section-y);
-  }
-
   .document__grila {
     display: grid;
     gap: var(--space-5);
@@ -74,20 +76,16 @@ const dataAfisata =
 
     .cuprins {
       position: sticky;
-      top: calc(var(--header-h-sm) + var(--space-3));
+      top: calc(var(--h-antet) + var(--space-3));
     }
   }
 
-  @media (min-width: 67rem) {
-    .cuprins {
-      top: calc(var(--header-h) + var(--space-3));
-    }
-  }
-
+  /* Cuprinsul: paper-2, linia roșie sus (ca CasetaDosar). */
   .cuprins {
     padding: var(--space-3);
     background: var(--c-paper-2);
-    border-radius: var(--radius-lg);
+    border-top: 3px solid var(--c-rosu);
+    border-radius: var(--radius);
   }
 
   .cuprins__titlu {
