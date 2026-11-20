@@ -1,22 +1,5 @@
 # Licențe pentru resursele grafice ale site-ului
 
-## Semnătura din hero și din intro (`src/assets/semnatura.svg`)
-
-Fișierul e pus de birou / designer și se folosește ca atare (geometria nu se modifică din cod).
-
-| Element | Sursă | Licență / condiții | Cum e folosit |
-|---|---|---|---|
-| Literele „Notar” și „Bojan” | fontul **Imperial Script** (© 2008 The Imperial Script Project Authors, https://github.com/googlefonts/imperial-script) | **SIL Open Font License 1.1** – folosire, modificare și includere în produse permise, inclusiv comercial; fontul nu se vinde separat; numele rezervat al fontului nu se folosește pentru versiuni modificate. Text: https://openfontlicense.org | Doar în SVG: contururile glifelor, convertite în path-uri și descoperite prin mască. Fișierul fontului nu se încarcă pe site și nu e în build. |
-| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Free License** – atribuire obligatorie (în subsol). Ilustrația e folosită doar decorativ pe site (intro și hero), NU ca logo sau element de identitate: nu intră în favicon, imaginea OG, manualul de brand, antet sau ștampilă. Pentru orice astfel de folosire se trece întâi pe Pro Standard sau se înlocuiește cu un desen propriu. | Contururi umplute, descoperite prin mască, parte decorativă a semnăturii (aria-hidden). Pe ecrane < 640 px apar doar mâinile. Atribuirea: în rândul legal din subsolul fiecărei pagini, „Ilustrație: Vecteezy.com” (EN: „Illustration: Vecteezy.com”), cu link spre https://www.vecteezy.com. |
-
-Istoric: versiunile provizorii anterioare foloseau fontul Lavishly Yours (SIL OFL), apoi Mr De Haviland
-(SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite.
-
-Note:
-- Atribuirea Vecteezy din subsol nu se scoate cât timp mâinile sunt pe site (condiția licenței Free).
-- Dacă semnătura se înlocuiește cu desenul unui ilustrator, se actualizează acest tabel cu
-  licența / cesiunea de drepturi a ilustratorului.
-
 ## Fotografiile provizorii (`src/assets/fotografii-provizorii/`)
 
 Fotografii de stoc, folosite **doar pe site-ul de previzualizare**, până vin fotografiile reale ale
@@ -45,3 +28,20 @@ serviciu concurent. Lista surselor e și în `src/assets/fotografii-provizorii/S
 
 Geist, Geist Mono (Vercel) și Funnel Display (NoirBlancRouge): SIL Open Font License 1.1, self-hosted
 prin pachetele Fontsource (`@fontsource-variable/*`).
+
+## Nefolosite pe site (arhivă)
+
+**20.11.2026 – V3d:** semnătura „Notar 🤝 Bojan” a fost scoasă de pe site la cererea clientei, împreună
+cu intro-ul de la încărcare. Fișierul e păstrat în `docs/arhiva/semnatura.svg` (nu e importat nicăieri
+și nu ajunge în build), ca să poată fi readus. Atribuirea Vecteezy din subsol a fost scoasă odată cu
+mâinile (licența Free o cere doar cât timp ilustrația e pe site). Dacă semnătura revine, revin și
+condițiile de mai jos.
+
+| Element | Sursă | Licență / condiții (dacă se readuce) |
+|---|---|---|
+| Literele „Notar” și „Bojan” | fontul **Imperial Script** (© 2008 The Imperial Script Project Authors, https://github.com/googlefonts/imperial-script) | **SIL Open Font License 1.1** – folosire, modificare și includere în produse permise, inclusiv comercial; fontul nu se vinde separat; numele rezervat nu se folosește pentru versiuni modificate. Text: https://openfontlicense.org. Folosit doar ca contururi în SVG; fișierul fontului nu a fost încărcat pe site. |
+| Mâinile care se strâng | **Vecteezy**, ilustrația nr. 79569313 | **Vecteezy Free License** – atribuire obligatorie (rândul legal din subsol: „Ilustrație: Vecteezy.com”, cu link spre https://www.vecteezy.com), doar decorativ, NU ca logo sau element de identitate (favicon, imagine OG, manual de brand, antet, ștampilă); pentru așa ceva, întâi Pro Standard sau un desen propriu. |
+
+Istoric: versiunile provizorii anterioare ale semnăturii foloseau fontul Lavishly Yours (SIL OFL), apoi
+Mr De Haviland (SIL OFL) și un gest abstract derivat dintr-un element Canva; înlocuite.
+
