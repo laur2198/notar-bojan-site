@@ -15,7 +15,7 @@
  *   (.sub); pagina curentă (aria-current) o are trasă permanent.
  * - Sub prag: wordmark | telefon | (Programare, de la 768 px: §4 cere butonul vizibil pe orice
  *   ecran, iar bara de jos apare doar sub 768 px) | „Meniu”.
- * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-rosu-900:
+ * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, maro (--c-suprafata-maro):
  *   linkurile mari (Funnel Display, rânduri din mască la deschidere, doar cu mișcare permisă),
  *   contactele (ListaContacte) și comutatorul de limbă. Cât e deschis, derularea paginii e
  *   blocată (CSS :has) și navbar-ul trece pe tema închisă. JS: Escape închide și readuce
@@ -217,7 +217,8 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
    *     (tokens.test.ts). Blur-ul doar cu meniul închis: backdrop-filter face din header blocul de
    *     referință al panoului fix al meniului compact.
    *   - dark: fundalul suprafeței închise de sub navbar (--navbar-inchis, citit de tema-navbar.ts din
-   *     secțiune; implicit --c-rosu-900), opac, linie --c-linie-inchis.
+   *     secțiune; implicit --c-suprafata-maro), opac, cu o linie derivată din el (mai deschisă cu 18%).
+   *     Peste roșul viu, tema-navbar.ts pune și data-suprafata="vie" (butoanele ca în CtaFinal).
    */
   .antet[data-derulat] {
     background-color: var(--c-paper);
@@ -233,11 +234,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   .antet[data-derulat][data-tema='dark'] {
-    background-color: var(--navbar-inchis, var(--c-rosu-900));
-    box-shadow: inset 0 -1px 0 var(--c-linie-inchis);
+    background-color: var(--navbar-inchis, var(--c-suprafata-maro));
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--navbar-inchis, var(--c-suprafata-maro)), var(--c-paper) 18%);
   }
 
-  /* Meniul compact deschis: fundalul îl dă panoul (rosu-900). */
+  /* Meniul compact deschis: fundalul îl dă panoul (maro). */
   .antet[data-derulat]:has(.meniu-compact[open]) {
     background-color: transparent;
     box-shadow: none;
@@ -260,19 +261,19 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   :global(html:not(.js)) .antet[data-tema='dark'] {
-    background: var(--c-rosu-900);
+    background: var(--c-suprafata-maro);
   }
 
   /* Meniul deschis: panoul e închis la culoare, deci navbar-ul trece pe tema închisă. */
   .antet:has(.meniu-compact[open]) {
     color: var(--c-paper);
     --buton-plin-bg: var(--c-paper);
-    --buton-plin-fg: var(--c-rosu-900);
+    --buton-plin-fg: var(--c-suprafata-maro);
     --buton-plin-hover: var(--c-rosu-50);
     --buton-contur-fg: var(--c-paper);
-    --buton-contur-hover: var(--c-rosu-hover);
+    --buton-contur-hover: var(--c-linie-maro);
     --buton-focus: var(--c-paper);
-    --buton-dezactivat: var(--c-rosu-300);
+    --buton-dezactivat: var(--c-maro-300);
     --sub-hover: currentColor;
   }
 
@@ -395,7 +396,7 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-top: var(--header-h-sm);
-    background: var(--c-rosu-900);
+    background: var(--c-suprafata-maro);
     color: var(--c-paper);
   }
 
@@ -413,12 +414,12 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: grid;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--c-linie-inchis);
+    border-top: 1px solid var(--c-linie-maro);
   }
 
   .meniu-compact__lista li {
     max-width: none;
-    border-bottom: 1px solid var(--c-linie-inchis);
+    border-bottom: 1px solid var(--c-linie-maro);
   }
 
   .meniu-compact__lista a {

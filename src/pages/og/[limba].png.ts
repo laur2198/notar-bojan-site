@@ -1,8 +1,8 @@
 /**
  * Imaginea Open Graph implicită (1200×630), generată la build, câte una pe limbă:
  * /og/ro.png și /og/en.png. Pe paleta caldă (CLAUDE.md §5, V3b), fără negru: fundal maro
- * închis (--c-rosu-900); sus „Notar public în Brașov” (Geist, alb); jos denumirea biroului
- * (Geist, --c-rosu-300), o linie fină --c-rosu-300 și numele notarului mare, în alb (Funnel Display
+ * închis (--c-suprafata-maro, maro, V6); sus „Notar public în Brașov” (Geist, alb); jos denumirea biroului
+ * (Geist, --c-maro-300), o linie fină --c-maro-300 și numele notarului mare, în alb (Funnel Display
  * 600, spațiere negativă, ca wordmark-ul), cât de mare încape pe lățime.
  *
  * Desenată cu `sharp` (vine cu Astro, e motorul lui de imagini; nu e o dependență nouă) și cu
@@ -66,7 +66,7 @@ export const GET: APIRoute = async ({ params }) => {
   const margine = 72;
   const latimeText = LATIME_OG - 2 * margine;
   const subtitlu = await rand(t(locale, 'og.subtitlu'), TEXT, 40, culoare('c-paper'), latimeText);
-  const denumire = await rand(birou.denumire, TEXT, 28, culoare('c-rosu-300'), latimeText);
+  const denumire = await rand(birou.denumire, TEXT, 28, culoare('c-maro-300'), latimeText);
   const nume = await rand(birou.notar, DISPLAY, 160, culoare('c-paper'), latimeText, -0.045);
 
   // Sus: subtitlul. Jos, de jos în sus: numele, linia fină, denumirea biroului.
@@ -75,13 +75,13 @@ export const GET: APIRoute = async ({ params }) => {
   const yLinie = yNume - 20;
   straturi.push({ input: nume.data, top: yNume, left: margine - Math.round(nume.inaltime * 0.03) });
   straturi.push({
-    input: { create: { width: latimeText, height: 2, channels: 4, background: culoare('c-rosu-300') } },
+    input: { create: { width: latimeText, height: 2, channels: 4, background: culoare('c-maro-300') } },
     top: yLinie,
     left: margine,
   });
   straturi.push({ input: denumire.data, top: yLinie - 16 - denumire.inaltime, left: margine });
 
-  const png = await sharp({ create: { width: LATIME_OG, height: INALTIME_OG, channels: 3, background: culoare('c-rosu-900') } })
+  const png = await sharp({ create: { width: LATIME_OG, height: INALTIME_OG, channels: 3, background: culoare('c-suprafata-maro') } })
     .composite(straturi)
     .png({ compressionLevel: 9 })
     .toBuffer();

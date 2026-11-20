@@ -35,10 +35,9 @@
  *   [data-parallax-iesire="N"] deplasare yPercent 0 → N cât secțiunea iese din ecran
  *                          (top top → bottom top), scrub. Blocul de jos al hero-ului (40) și
  *                          interiorul fotografiei din hero (8).
- *   [data-fraze]           frazele mari ([data-fraza]) se succed literă cu literă, legat de scroll:
- *                          fiecare literă apare în nuanța stinsă (--c-slogan-stins-inchis, nu opacitate)
- *                          și se aprinde în alb, de la stânga; la ieșire se stinge și dispare, de la
- *                          dreapta; ultima rămâne aprinsă (FrazeSticky.astro, pe rosu-900).
+ *   [data-galerie]         galeria cu frazele (GalerieFraze.astro, V6): fotografiile ([data-viteza]) cu
+ *                          parallax legat de scroll, fiecare cu viteza ei, doar de la 64rem; frazele au
+ *                          reveal-ul obișnuit (data-reveal).
  *   [data-aprinde]         textul „se aprinde” literă cu literă la scroll, culoarea --c-slogan-stins → --c-ink.
  *   [data-fundal-viu]      petele din FundalViu.astro ([data-viu-pata]): xPercent/yPercent −d → +d și scara
  *                          s0 → s1 (data-dx, data-dy, data-s0, data-s1), scrub, cât secțiunea traversează
@@ -246,42 +245,38 @@ function parallaxIesire(el: HTMLElement) {
 /** Culoarea unui token din tokens.css, citită la rulare (ex. --c-slogan-stins); fără hex-uri aici. */
 const culoareToken = (nume: string) => getComputedStyle(document.documentElement).getPropertyValue(nume).trim();
 
-function fraze(container: HTMLElement): () => void {
-  const elemente = [...container.querySelectorAll<HTMLElement>('[data-fraza]')];
-  const master = gsap.timeline({ scrollTrigger: { trigger: container, start: 'top 40%', end: 'bottom bottom', scrub: true } });
-  // V3d (pe rosu-900): fiecare literă apare direct în nuanța stinsă (5.2:1), fără stări
-  // intermediare de opacitate, apoi se aprinde în alb; la ieșire, invers.
-  const stins = culoareToken('--c-slogan-stins-inchis');
-  const aprins = culoareToken('--c-paper');
-  const curatari = elemente.map((f, i) => {
-    const { tinta, aria, revino } = pregatesteTextAccesibil(f);
-    const split = SplitText.create(tinta, { type: 'words,chars', aria });
-    const t = gsap.timeline();
-    // steps(1): opacitatea sare 0 → 1 (fără stări intermediare, oricât de lent se derulează).
-    t.fromTo(split.chars, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, ease: 'steps(1)', stagger: { amount: 0.7, from: 'start' } }, 0);
-    t.fromTo(split.chars, { color: stins }, { color: aprins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'start' } }, 0);
-    if (i < elemente.length - 1) {
-      t.to(split.chars, { color: stins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'end' } }, '>');
-      t.to(split.chars, { autoAlpha: 0, duration: 0.01, ease: 'steps(1)', stagger: { amount: 0.7, from: 'end' } }, '<0.35');
-    }
-    master.add(t, i === 0 ? 0 : '-=0.15');
-    return () => {
-      split.revert();
-      revino();
-    };
+/** Amplitudinea parallax-ului galeriei: deplasarea maximă e viteza × această valoare, în px, în fiecare sens. */
+const AMPLITUDINE_GALERIE = 160;
+
+/**
+ * Galeria cu frazele (GalerieFraze.astro, V6): fiecare fotografie ([data-viteza], -0.25…0.2) se
+ * deplasează cu viteza ei cât secțiunea traversează ecranul (scrub; y de la +v·A la −v·A px, deci
+ * vitezele pozitive urcă mai repede, cele negative coboară). Doar transform; will-change doar cât
+ * galeria e în ecran. Pornită doar de la 64rem (pe mobil, mozaic fără parallax).
+ */
+function galerie(container: HTMLElement): () => void {
+  const fotografii = [...container.querySelectorAll<HTMLElement>('[data-viteza]')];
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: container,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true,
+      onToggle: (st) => fotografii.forEach((f) => (f.style.willChange = st.isActive ? 'transform' : '')),
+    },
   });
-  return () => {
-    master.scrollTrigger?.kill();
-    master.kill();
-    curatari.forEach((c) => c());
-  };
+  for (const f of fotografii) {
+    const v = Number.parseFloat(f.dataset.viteza ?? '');
+    if (!Number.isFinite(v) || v === 0) continue;
+    tl.fromTo(f, { y: v * AMPLITUDINE_GALERIE }, { y: -v * AMPLITUDINE_GALERIE, ease: 'none' }, 0);
+  }
+  return () => fotografii.forEach((f) => (f.style.willChange = ''));
 }
 
 function aprinde(el: HTMLElement): () => void {
   const { tinta, aria, revino } = pregatesteTextAccesibil(el);
   // Din griul --c-slogan-stins (6.3:1 pe alb) în culoarea textului; nu din opacitate (V3b).
-  // Pe închis (.pe-inchis), din --c-slogan-stins-inchis (5.2:1 pe rosu-900).
-  const stins = culoareToken(el.closest('.pe-inchis') ? '--c-slogan-stins-inchis' : '--c-slogan-stins');
+  const stins = culoareToken('--c-slogan-stins');
   const split = SplitText.create(tinta, {
     type: 'words,chars',
     aria,
@@ -391,7 +386,6 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
     const curatari = [
       ...[...radacina.querySelectorAll<HTMLElement>('[data-reveal]')].map(reveal),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-hero]')].map(intrareHero),
-      ...[...radacina.querySelectorAll<HTMLElement>('[data-fraze]')].map(fraze),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-aprinde]')].map(aprinde),
       ...[...radacina.querySelectorAll<HTMLElement>('[data-fundal-viu]')].map(fundalViu),
     ];
@@ -409,6 +403,11 @@ export function pornesteMiscarea(radacina: ParentNode = document): gsap.MatchMed
       curatari.forEach((c) => c());
       html.classList.remove('miscare');
     };
+  });
+  // Galeria cu frazele: parallax doar de la 64rem (pe mobil, mozaic static) și fără mișcare redusă.
+  pornita.add(`${INTEROGARE_MISCARE} and (min-width: 64rem)`, () => {
+    const curatari = [...radacina.querySelectorAll<HTMLElement>('[data-galerie]')].map(galerie);
+    return () => curatari.forEach((c) => c());
   });
   // Fundalul viu după cursor: doar cu mouse (pointer fin, hover) și fără mișcare redusă.
   pornita.add(`${INTEROGARE_MISCARE} and (hover: hover) and (pointer: fine)`, () => {

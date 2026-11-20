@@ -282,7 +282,7 @@ content:
       - name: fraze
         label: Frazele mari de sub prima secțiune
         type: object
-        description: Exact trei fraze, care apar pe rând la derulare, pe fundal gri deschis.
+        description: Exact trei fraze, una sub alta, pe fundalul roșu, între fotografiile galeriei.
         list:
           min: 3
           max: 3
@@ -297,6 +297,21 @@ content:
           - name: rand2
             label: Al doilea rând (opțional)
             type: string
+      - name: galerie
+        label: Galerie (6 fotografii, decorative)
+        type: object
+        description: Fotografiile din secțiunea cu frazele. Recomandat - fotografii reale ale biroului. Ordinea - 1–3 coloana stângă (mare, mică, medie), 4–6 coloana dreaptă (medie, mare, mică).
+        list:
+          min: 6
+          max: 6
+          collapsible:
+            collapsed: true
+            summary: "Fotografia {index}"
+        fields:
+          - name: imagine
+            component: imagine
+          - name: fotoProvizorie
+            component: fotoProvizorie
       - name: servicii
         label: Secțiunea Servicii
         type: object

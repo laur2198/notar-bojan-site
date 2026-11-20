@@ -239,8 +239,9 @@ body::after {
 
 /*
  * Pe fundal deschis, focusul e --c-rosu: 6.6:1 pe paper, 6.2:1 pe paper-2 (min. 3:1, UI).
- * Pe fundalul închis (--c-rosu-900) roșul nu se vede (roșu pe roșu), deci containerul închis
- * primește clasa `.pe-inchis`, iar focusul devine --c-paper: 10.8:1 pe rosu-900.
+ * Pe fundalurile închise (maro: subsolul, meniul compact; roșu viu: galeria, CtaFinal) roșul nu se
+ * vede, deci containerul închis primește clasa `.pe-inchis`, iar focusul devine --c-paper: 12.3:1 pe
+ * maro, 6.6:1 pe roșu viu.
  */
 .pe-inchis :focus-visible,
 .pe-inchis:focus-visible {
@@ -270,21 +271,25 @@ body::after {
 .pe-inchis,
 [data-tema-sectiune='dark'],
 [data-tema='dark'] {
-  /* Plin: alb cu text rosu-900 (10.8:1), hover rosu-50 (9.5:1). Contur: alb, hover rosu-hover (alb 8.9:1). */
+  /*
+   * Închis = maro (V6: subsolul, meniul compact). Plin: alb cu text maro (12.3:1), hover rosu-50 (maro
+   * 10.8:1). Contur: alb, hover --c-linie-maro (alb 7.9:1; fără roșu lipit de maro). Inactiv: maro-300.
+   * Pe roșu viu, [data-suprafata='vie'] de mai jos înlocuiește aceste valori.
+   */
   --buton-plin-bg: var(--c-paper);
-  --buton-plin-fg: var(--c-rosu-900);
+  --buton-plin-fg: var(--c-suprafata-maro);
   --buton-plin-hover: var(--c-rosu-50);
   --buton-contur-fg: var(--c-paper);
-  --buton-contur-hover: var(--c-rosu-hover);
+  --buton-contur-hover: var(--c-linie-maro);
   --buton-focus: var(--c-paper);
-  --buton-dezactivat: var(--c-rosu-300);
+  --buton-dezactivat: var(--c-maro-300);
   --sub-hover: currentColor;
 }
 
 /*
- * Suprafața roșie VIE (V5: CtaFinal; data-suprafata="vie"): butonul plin e alb cu text --c-rosu
+ * Suprafața roșie VIE (galeria, CtaFinal; navbar-ul peste ele, din tema-navbar.ts; data-suprafata="vie"): butonul plin e alb cu text --c-rosu
  * (6.6:1), hover --c-rosu-50 (5.8:1); conturul alb (6.6:1 pe roșu viu), hover --c-rosu-hover (alb
- * 8.9:1); focusul alb (6.6:1); butonul inactiv --c-rosu-200 (5.4:1; --c-rosu-300 ar da doar 4.25:1).
+ * 8.9:1); focusul alb (6.6:1); butonul inactiv --c-rosu-200 (5.4:1).
  */
 [data-suprafata='vie'] {
   --buton-plin-bg: var(--c-paper);

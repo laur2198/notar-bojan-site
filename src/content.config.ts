@@ -163,7 +163,7 @@ const acasa = defineCollection({
         imagineAlt: z.string().min(1, 'Textul alternativ al fotografiei din hero e obligatoriu.'),
         fotoProvizorie,
       }),
-      /** Frazele mari din secțiunea închisă de sub hero, care se succed la derulare: exact 3. */
+      /** Frazele mari din secțiunea roșie de sub hero (galeria, V6): exact 3, pe coloana din mijloc. */
       fraze: z
         .array(
           z.object({
@@ -173,6 +173,19 @@ const acasa = defineCollection({
           }),
         )
         .length(3, 'Sunt exact 3 fraze.'),
+      /**
+       * Galeria din secțiunea frazelor (V6): exact 6 fotografii decorative (alt=""), în sloturile
+       * 1–3 (coloana stângă: mare 4:5, mică 3:4, medie 1:1) și 4–6 (dreapta: medie 1:1, mare 4:5,
+       * mică 3:4). Fără imagine, slotul apare ca placeholder.
+       */
+      galerie: z
+        .array(
+          z.object({
+            imagine: imagineOptionala(image),
+            fotoProvizorie,
+          }),
+        )
+        .length(6, 'Galeria are exact 6 fotografii.'),
       servicii: z.object({
         /** Eticheta secțiunii. */
         titlu: z.string().min(1),

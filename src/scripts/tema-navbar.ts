@@ -75,7 +75,10 @@ export function pornesteTemaNavbar(navbar: HTMLElement | null = document.querySe
     const finala = strat ?? tema;
     if (finala && navbar.dataset.tema !== finala) navbar.dataset.tema = finala;
     // Pe temă închisă, fundalul navbar-ului derulat e suprafața închisă de sub el (oricare token ar fi
-    // fundalul acelei secțiuni); fără ea (ex. un strat), rămâne implicitul din CSS (--c-rosu-900).
+    // fundalul acelei secțiuni); fără ea (ex. un strat), rămâne implicitul din CSS (--c-suprafata-maro).
+    // Peste roșul viu (data-suprafata="vie": galeria, CtaFinal), navbar-ul preia și suprafața, ca
+    // butoanele lui să aibă culorile de pe roșu viu (text roșu pe alb, nu maro lângă roșu).
+    let suprafata: string | undefined;
     if (finala === 'dark' && !strat) {
       const sub = sectiuni.filter((s) => s.dataset.temaSectiune === 'dark').find((s) => {
         const r = s.getBoundingClientRect();
@@ -84,7 +87,10 @@ export function pornesteTemaNavbar(navbar: HTMLElement | null = document.querySe
       const fundal = sub ? getComputedStyle(sub).backgroundColor : '';
       if (fundal && fundal !== 'rgba(0, 0, 0, 0)' && fundal !== 'transparent') navbar.style.setProperty('--navbar-inchis', fundal);
       else navbar.style.removeProperty('--navbar-inchis');
+      suprafata = sub?.dataset.suprafata;
     }
+    if (suprafata) navbar.dataset.suprafata = suprafata;
+    else delete navbar.dataset.suprafata;
     navbar.toggleAttribute('data-derulat', esteDerulat(window.scrollY));
   };
   const programeaza = () => {

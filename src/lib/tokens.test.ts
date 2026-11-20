@@ -13,13 +13,14 @@ const COMPUS = {
 import { culoare, culori, marimePx, numarToken } from './tokens';
 
 describe('culorile din tokens.css', () => {
-  it('sunt paleta finală 3A (V5): alb / gri cald / roz pal, text maro, roșul viu, roșul închis', () => {
+  it('sunt paleta finală 3A (V5) cu subsolul maro (V6): alb / gri cald / roz pal, text maro, roșul viu, maroul închis', () => {
     expect(Object.keys(culori).sort()).toEqual(
       [
         'c-ink',
         'c-ink-2',
         'c-line',
-        'c-linie-inchis',
+        'c-linie-maro',
+        'c-maro-300',
         'c-marcaj',
         'c-muted',
         'c-paper',
@@ -27,12 +28,10 @@ describe('culorile din tokens.css', () => {
         'c-paper-rosu',
         'c-rosu',
         'c-rosu-200',
-        'c-rosu-300',
         'c-rosu-50',
-        'c-rosu-900',
         'c-rosu-hover',
         'c-slogan-stins',
-        'c-slogan-stins-inchis',
+        'c-suprafata-maro',
         'c-suprafata-rosie',
         'c-wordmark',
       ].sort(),
@@ -50,8 +49,9 @@ describe('culorile din tokens.css', () => {
     expect(culoare('c-rosu-50')).toBe('#FBEDEA');
     expect(culoare('c-suprafata-rosie')).toBe('#B42318');
     expect(culoare('c-rosu-200')).toBe('#FBE3DF');
-    expect(culoare('c-rosu-900')).toBe('#7A1414');
-    expect(culoare('c-rosu-300')).toBe('#E8C9C4');
+    expect(culoare('c-suprafata-maro')).toBe('#4A2E1E');
+    expect(culoare('c-maro-300')).toBe('#D9C3AE');
+    expect(culoare('c-linie-maro')).toBe('#6A4A36');
   });
 
   it('tokenurile vechi de brand nu mai există (--c-brand*, --c-accent)', () => {
@@ -89,15 +89,16 @@ const PERECHI: [fata: string, fundal: string, raport: number, prag: number][] = 
   // Butonul plin pe deschis.
   ['c-paper', 'c-rosu', 6.6, 4.5],
   ['c-paper', 'c-rosu-hover', 8.9, 4.5],
-  // Suprafața roșie vie (frazele mari, CtaFinal): text alb și rosu-200; butonul alb cu text roșu.
+  // Suprafața roșie vie (galeria cu frazele, CtaFinal): text alb și rosu-200; butonul alb cu text roșu.
   ['c-paper', 'c-suprafata-rosie', 6.6, 4.5],
   ['c-rosu-200', 'c-suprafata-rosie', 5.4, 4.5],
-  ['c-slogan-stins-inchis', 'c-suprafata-rosie', 5.1, 4.5],
-  // Roșul închis (subsol, meniul compact).
-  ['c-paper', 'c-rosu-900', 10.8, 4.5],
-  ['c-rosu-300', 'c-rosu-900', 7.0, 4.5],
-  ['c-rosu-900', 'c-paper', 10.8, 4.5],
-  ['c-rosu-900', 'c-rosu-50', 9.5, 4.5],
+  // Maroul închis (V6: subsolul, meniul compact): text alb și maro-300; butonul alb cu text maro (și
+  // la hover, pe rosu-50); butonul contur la hover (alb pe linie-maro); marcajul «DE COMPLETAT».
+  ['c-paper', 'c-suprafata-maro', 12.3, 4.5],
+  ['c-maro-300', 'c-suprafata-maro', 7.3, 4.5],
+  ['c-suprafata-maro', 'c-paper', 12.3, 4.5],
+  ['c-suprafata-maro', 'c-rosu-50', 10.8, 4.5],
+  ['c-paper', 'c-linie-maro', 7.9, 4.5],
 ];
 
 describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () => {
@@ -114,13 +115,18 @@ describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () =
     expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-suprafata-rosie'))).toBeGreaterThanOrEqual(3);
   });
 
-  it('pe roșu viu, textul secundar și butonul inactiv sunt --c-rosu-200 (rosu-300 ar pica)', () => {
+  it('pe roșu viu, textul secundar și butonul inactiv sunt --c-rosu-200 (maro-300 ar pica)', () => {
     expect(contrastCuGranulatie(culoare('c-rosu-200'), culoare('c-suprafata-rosie'))).toBeGreaterThanOrEqual(4.5);
-    expect(raportContrast(culoare('c-rosu-300'), culoare('c-suprafata-rosie'))).toBeLessThan(4.5);
+    expect(raportContrast(culoare('c-maro-300'), culoare('c-suprafata-rosie'))).toBeLessThan(4.5);
   });
 
-  it('roșul nu stă pe alt roșu: --c-rosu pe --c-rosu-900 pică (de aceea e interzis ca text sau UI)', () => {
-    expect(raportContrast(culoare('c-rosu'), culoare('c-rosu-900'))).toBeLessThan(3);
+  it('pe maro, focusul și conturul butonului sunt albe (≥ 3:1); roșul pe maro pică (interzis ca text sau UI)', () => {
+    expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-suprafata-maro'))).toBeGreaterThanOrEqual(3);
+    expect(raportContrast(culoare('c-rosu'), culoare('c-suprafata-maro'))).toBeLessThan(3);
+  });
+
+  it('marcajul «DE COMPLETAT» (galben, text ink) rămâne lizibil în subsolul maro', () => {
+    expect(contrastCuGranulatie(culoare('c-ink'), culoare('c-marcaj'))).toBeGreaterThanOrEqual(4.5);
   });
 
   it('maroul nu stă pe roșu: --c-ink și --c-wordmark pe suprafețele roșii pică', () => {
