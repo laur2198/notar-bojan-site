@@ -65,8 +65,8 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
   it('fără JS: navbar-ul are fundal plin în tema de la încărcare (textul nu se pierde la derulare)', async () => {
     const { p, context } = await pagina({ javaScriptEnabled: false });
     for (const [cale, fundal, text] of [
-      ['/', 'rgb(255, 255, 255)', 'rgb(31, 30, 29)'],
-      ['/servicii/', 'rgb(255, 255, 255)', 'rgb(31, 30, 29)'],
+      ['/', 'rgb(255, 255, 255)', 'rgb(42, 26, 16)'],
+      ['/servicii/', 'rgb(255, 255, 255)', 'rgb(42, 26, 16)'],
     ]) {
       await p.goto(BAZA + cale, { waitUntil: 'load' });
       await p.evaluate(() => scrollTo(0, 1500));
@@ -356,7 +356,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     // Temă deschisă: --c-paper la 92% (color-mix) cu blur, linia --c-line.
     assert.equal(s.scroll, true);
     assert.match(s.fundal, /^color\(srgb 1 1 1 \/ 0\.92\)$|^rgba\(255, 255, 255, 0\.92\)$/);
-    assert.equal(s.linie, 'rgb(226, 225, 223) 0px -1px 0px 0px inset');
+    assert.equal(s.linie, 'rgb(226, 221, 216) 0px -1px 0px 0px inset');
     await context.close();
   });
 
@@ -381,7 +381,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     await context.close();
   });
 
-  it('desktop 1440 px (V3e): sus transparent; derulat peste fotografie și servicii translucid cu blur; peste frazele închise opac, fundalul lor', async () => {
+  it('desktop 1440 px (V3e): sus transparent; derulat peste fotografie și servicii translucid cu blur; peste frazele mari (roșu viu) opac, fundalul lor', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const stare = () =>
@@ -403,7 +403,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     await p.evaluate(() => scrollTo({ top: document.querySelector('[data-fraze]').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.waitForTimeout(600);
     s = await stare();
-    assert.deepEqual(s, { tema: 'dark', fundal: 'rgb(122, 20, 20)', blur: 'none', linie: 'rgb(154, 42, 34) 0px -1px 0px 0px inset' });
+    assert.deepEqual(s, { tema: 'dark', fundal: 'rgb(180, 35, 24)', blur: 'none', linie: 'rgb(154, 42, 34) 0px -1px 0px 0px inset' });
     // Peste lista de servicii.
     await p.evaluate(() => scrollTo({ top: document.querySelector('#servicii').getBoundingClientRect().top + scrollY + 400, behavior: 'instant' }));
     await p.waitForTimeout(600);

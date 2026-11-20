@@ -281,6 +281,21 @@ body::after {
   --sub-hover: currentColor;
 }
 
+/*
+ * Suprafața roșie VIE (V5: CtaFinal; data-suprafata="vie"): butonul plin e alb cu text --c-rosu
+ * (6.6:1), hover --c-rosu-50 (5.8:1); conturul alb (6.6:1 pe roșu viu), hover --c-rosu-hover (alb
+ * 8.9:1); focusul alb (6.6:1); butonul inactiv --c-rosu-200 (5.4:1; --c-rosu-300 ar da doar 4.25:1).
+ */
+[data-suprafata='vie'] {
+  --buton-plin-bg: var(--c-paper);
+  --buton-plin-fg: var(--c-rosu);
+  --buton-plin-hover: var(--c-rosu-50);
+  --buton-contur-fg: var(--c-paper);
+  --buton-contur-hover: var(--c-rosu-hover);
+  --buton-focus: var(--c-paper);
+  --buton-dezactivat: var(--c-rosu-200);
+}
+
 [data-tema-sectiune='dark'] :focus-visible,
 [data-tema-sectiune='dark']:focus-visible {
   outline-color: var(--c-paper);

@@ -1,6 +1,6 @@
 /**
  * Grila de puncte din secțiunea frazelor (FrazeSticky.astro), după prototip: punctele de bază
- * (0.125em la pas de 3em, --c-rosu-300 la .16, pe rosu-900) le desenează CSS-ul; aici, pe un canvas
+ * (0.125em la pas de 3em, --c-rosu-200 la .16, pe roșu viu) le desenează CSS-ul; aici, pe un canvas
  * peste ele, doar punctele din jurul cursorului (rază 10 pași), mai mari (până la +75%) și mai opace, cu urmărire
  * lină (lerp 0.12 pe poziție, 0.08 pe intensitate). Redesenare doar cât cutia e vizibilă și cât
  * se mișcă ceva. Doar la pointer fin și fără mișcare redusă; altfel canvasul rămâne gol.
@@ -19,8 +19,8 @@ export function pornestePuncte(): void {
   const ctx = canvas?.getContext('2d');
   if (!canvas || !cutie || !ctx) return;
   const conditie = matchMedia(INTEROGARE);
-  /** Culoarea punctelor: tokenul --c-rosu-300 (fără hex-uri aici; paleta se schimbă doar în tokens.css). */
-  const culoarePuncte = getComputedStyle(document.documentElement).getPropertyValue('--c-rosu-300').trim();
+  /** Culoarea punctelor: tokenul --c-rosu-200 (fără hex-uri aici; paleta se schimbă doar în tokens.css). */
+  const culoarePuncte = getComputedStyle(document.documentElement).getPropertyValue('--c-rosu-200').trim();
 
   let dpr = 1;
   let w = 0;
@@ -61,7 +61,7 @@ export function pornestePuncte(): void {
         const inf = influenta(x - p.cx, y - p.cy, raza, intensitate);
         if (inf <= 0) continue;
         const m = marime * (1 + 0.75 * inf);
-        // --c-rosu-300 (token), decorativ: peste punctul CSS de .16, ajunge la ~.7 lângă cursor.
+        // --c-rosu-200 (token), decorativ: peste punctul CSS de .16, ajunge la ~.7 lângă cursor.
         ctx.globalAlpha = 0.7 * inf;
         ctx.fillStyle = culoarePuncte;
         ctx.beginPath();

@@ -114,6 +114,11 @@ describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () =
     expect(contrastCuGranulatie(culoare('c-paper'), culoare('c-suprafata-rosie'))).toBeGreaterThanOrEqual(3);
   });
 
+  it('pe roșu viu, textul secundar și butonul inactiv sunt --c-rosu-200 (rosu-300 ar pica)', () => {
+    expect(contrastCuGranulatie(culoare('c-rosu-200'), culoare('c-suprafata-rosie'))).toBeGreaterThanOrEqual(4.5);
+    expect(raportContrast(culoare('c-rosu-300'), culoare('c-suprafata-rosie'))).toBeLessThan(4.5);
+  });
+
   it('roșul nu stă pe alt roșu: --c-rosu pe --c-rosu-900 pică (de aceea e interzis ca text sau UI)', () => {
     expect(raportContrast(culoare('c-rosu'), culoare('c-rosu-900'))).toBeLessThan(3);
   });
@@ -225,6 +230,9 @@ describe('navbar-ul derulat pe temă deschisă (V3e): --c-paper translucid', () 
   it('textul (ink), rândul de sus al wordmark-ului (ink la .8) ≥ 4.5:1; conturul butoanelor și roșul (UI) ≥ 3:1', () => {
     expect(contrastCuGranulatie(culoare('c-ink'), fundal)).toBeGreaterThanOrEqual(4.5);
     expect(contrastCuGranulatie(amesteca(fundal, culoare('c-ink'), 0.8), fundal)).toBeGreaterThanOrEqual(4.5);
+    // V5: numele biroului în --c-wordmark; rândul de sus la opacitate .8.
+    expect(contrastCuGranulatie(culoare('c-wordmark'), fundal)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(amesteca(fundal, culoare('c-wordmark'), 0.8), fundal)).toBeGreaterThanOrEqual(4.5);
     expect(contrastCuGranulatie(culoare('c-ink'), fundal)).toBeGreaterThanOrEqual(3);
     expect(contrastCuGranulatie(culoare('c-rosu'), fundal)).toBeGreaterThanOrEqual(3);
     // Butonul plin își are fundalul propriu (alb pe roșu), neschimbat.
