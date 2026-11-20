@@ -1,0 +1,69 @@
+---
+/**
+ * O secțiune deschisă a paginilor interioare (CLAUDE.md §5, V4): fundal --c-paper sau --c-paper-2
+ * (alternanța secțiunilor), opțional FundalViu `discret` (secțiunile cu text lung; seed 2–4,
+ * garantate geometric de la 500 px, deci secțiunea are atunci min-height: 500px), opțional titlul ca pe Acasă (Eticheta: textul + linia care se
+ * trage). Tema navbar-ului: light. Doar tokenuri. Suprafețele închise sunt doar CtaFinal și subsolul.
+ */
+import type { Seed } from '../lib/fundal-viu';
+import FundalViu from './FundalViu.astro';
+import Eticheta from './acasa/Eticheta.astro';
+
+interface Props {
+  ton?: 'paper' | 'paper-2';
+  /** Seed-ul fundalului viu discret (2–4); fără el, fundal simplu. */
+  viu?: Extract<Seed, 2 | 3 | 4>;
+  /** Titlul secțiunii (h2), afișat ca eticheta de pe Acasă. */
+  titlu?: string;
+  id?: string;
+  /** Numele accesibil, dacă secțiunea nu are titlu vizibil. */
+  eticheta?: string;
+  class?: string;
+}
+
+const { ton = 'paper', viu, titlu, id, eticheta, class: clasa } = Astro.props;
+const idTitlu = titlu && id ? `${id}-titlu` : undefined;
+---
+
+<section
+  class:list={['sectiune-pagina', `sectiune-pagina--${ton}`, { 'sectiune-pagina--cu-titlu': !!titlu, 'sectiune-pagina--viu': !!viu }, clasa]}
+  id={id}
+  data-tema-sectiune="light"
+  aria-labelledby={idTitlu}
+  aria-label={idTitlu ? undefined : eticheta}
+>
+  {viu && <FundalViu intensitate="discret" seed={viu} />}
+  <div class="container">
+    {titlu && <Eticheta text={titlu} id={idTitlu} />}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .sectiune-pagina {
+    position: relative;
+    padding-block: var(--section-y);
+    color: var(--c-ink);
+  }
+
+  /* Cu titlu, eticheta are deja spațiul de sus (padding-block: var(--section-y) 3em). */
+  .sectiune-pagina--cu-titlu {
+    padding-top: 0;
+  }
+
+  /*
+   * Cu fundal viu: cel puțin înălțimea minimă a seed-urilor 2–4 (500 px, src/lib/fundal-viu.ts),
+   * ca garanția geometrică a petelor să nu depindă de cât conținut are secțiunea în CMS.
+   */
+  .sectiune-pagina--viu {
+    min-height: 500px;
+  }
+
+  .sectiune-pagina--paper {
+    background: var(--c-paper);
+  }
+
+  .sectiune-pagina--paper-2 {
+    background: var(--c-paper-2);
+  }
+</style>

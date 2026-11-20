@@ -18,7 +18,7 @@
  *   [data-parallax="N"]    deplasare legată de scroll, yPercent N → −N pe durata vizibilității
  *                          (N negativ inversează sensul). Doar decorativ: fotografii, forme.
  *   [data-footer]          subsolul „intră de sub conținut” (Footer.astro): interiorul
- *                          ([data-footer-interior]) yPercent -25 → 0 și stratul #3D0A0A
+ *                          ([data-footer-interior]) yPercent -25 → 0 și stratul mai închis
  *                          ([data-footer-strat]) opacitate 0.35 → 0, scrub, clamp(top bottom) →
  *                          clamp(top top). La capăt, textul e static.
  *   [data-shutter]         benzi ink (doar demo pe /stil/, V3b) care acoperă secțiunea la ieșire (Shutter.astro): scaleY 0 → 1
@@ -28,7 +28,7 @@
  *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la încărcarea modulului (V3d: fără
  *                          intro): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
  *                          linia ([data-hero-divider]) și linia roșie de sub titlu ([data-hero-accent])
- *                          0 → 100%, rândul de deasupra liniei ([data-hero-fade]) și wordmark-ul
+ *                          0 → 100%, elementele [data-hero-fade] (dacă există) și wordmark-ul
  *                          ([data-hero-wordmark]) apar, fotografia ([data-hero-foto]) se descoperă de jos
  *                          în sus (clip-path, 1 s, expo.out). Până atunci CSS-ul le ascunde sub
  *                          `html.miscare:not(.hero-pornit)` (HeroAcasa.astro).
@@ -243,17 +243,16 @@ function parallaxIesire(el: HTMLElement) {
   gsap.fromTo(el, { yPercent: 0 }, { yPercent: n, ease: 'none', scrollTrigger: { trigger: sectiune, start: 'top top', end: 'bottom top', scrub: true } });
 }
 
-/** Culoarea unui token din tokens.css, citită la rulare (ex. --c-slogan-stins). */
-const culoareToken = (nume: string, rezerva: string) =>
-  getComputedStyle(document.documentElement).getPropertyValue(nume).trim() || rezerva;
+/** Culoarea unui token din tokens.css, citită la rulare (ex. --c-slogan-stins); fără hex-uri aici. */
+const culoareToken = (nume: string) => getComputedStyle(document.documentElement).getPropertyValue(nume).trim();
 
 function fraze(container: HTMLElement): () => void {
   const elemente = [...container.querySelectorAll<HTMLElement>('[data-fraza]')];
   const master = gsap.timeline({ scrollTrigger: { trigger: container, start: 'top 40%', end: 'bottom bottom', scrub: true } });
   // V3d (pe rosu-900): fiecare literă apare direct în nuanța stinsă (5.2:1), fără stări
   // intermediare de opacitate, apoi se aprinde în alb; la ieșire, invers.
-  const stins = culoareToken('--c-slogan-stins-inchis', '#dea7a0');
-  const aprins = culoareToken('--c-paper', '#ffffff');
+  const stins = culoareToken('--c-slogan-stins-inchis');
+  const aprins = culoareToken('--c-paper');
   const curatari = elemente.map((f, i) => {
     const { tinta, aria, revino } = pregatesteTextAccesibil(f);
     const split = SplitText.create(tinta, { type: 'words,chars', aria });
@@ -282,7 +281,7 @@ function aprinde(el: HTMLElement): () => void {
   const { tinta, aria, revino } = pregatesteTextAccesibil(el);
   // Din griul --c-slogan-stins (6.3:1 pe alb) în culoarea textului; nu din opacitate (V3b).
   // Pe închis (.pe-inchis), din --c-slogan-stins-inchis (5.2:1 pe rosu-900).
-  const stins = el.closest('.pe-inchis') ? culoareToken('--c-slogan-stins-inchis', '#dea7a0') : culoareToken('--c-slogan-stins', '#62605d');
+  const stins = culoareToken(el.closest('.pe-inchis') ? '--c-slogan-stins-inchis' : '--c-slogan-stins');
   const split = SplitText.create(tinta, {
     type: 'words,chars',
     aria,

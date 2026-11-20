@@ -1,21 +1,24 @@
 ---
 /**
- * /recenzii/: ratingul agregat (doar dacă e completat), toate recenziile reale de pe Google
- * din recenzii.yaml, de la cea mai nouă, și linkul spre profilul Google. Cu lista goală:
+ * /recenzii/ (V4): AntetPagina, ratingul agregat (doar dacă e completat: cifra mare, stelele roșii,
+ * textul vizibil), toate recenziile reale de pe Google din recenzii.yaml, de la cea mai nouă, ca
+ * citate cu linii între ele, linkul spre profilul Google și CtaFinal. Cu lista goală:
  * un mesaj neutru și linkul. Fără JSON-LD Review: recenziile Google nu se marchează ca proprii.
  * Nu se generează niciodată recenzii (CLAUDE.md §3.4, §7).
  */
 import { getEntry } from 'astro:content';
-import BandaTitlu from '../components/BandaTitlu.astro';
+import AntetPagina from '../components/AntetPagina.astro';
+import Buton from '../components/Buton.astro';
 import CardRating from '../components/CardRating.astro';
 import CardRecenzie from '../components/CardRecenzie.astro';
+import CtaFinal from '../components/CtaFinal.astro';
 import DraftBadge from '../components/DraftBadge.astro';
-import LinkExtern from '../components/LinkExtern.astro';
-import Sectiune from '../components/Sectiune.astro';
-import { t } from '../i18n';
+import SectiunePagina from '../components/SectiunePagina.astro';
+import { caleLogica, t } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { linkExtern } from '../lib/contact';
-import { getBirou, marcheazaPlaceholder } from '../lib/continut';
+import { getBirou } from '../lib/continut';
+import { url } from '../lib/url';
 
 const locale = 'ro';
 const [recenzii, acasa, birou] = await Promise.all([getEntry('recenzii', 'recenzii'), getEntry('acasa', 'ro/acasa'), getBirou()]);
@@ -23,22 +26,18 @@ if (!recenzii || !acasa) throw new Error('Lipsesc recenzii/recenzii.yaml sau pag
 const lista = [...recenzii.data.lista].sort((a, b) => b.data.localeCompare(a.data));
 const profil = linkExtern(birou.googleProfilUrl, '');
 const titlu = t(locale, 'recenzii.titluPagina');
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: titlu }];
 // Ratingul agregat apare doar dacă e completat; altfel butonul de mai jos e suficient.
 const areRating = birou.rating !== null && birou.numarRecenzii !== null;
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu })} description={t(locale, 'recenzii.seoDescriere')}>
-  <BandaTitlu locale={locale} titlu={titlu} leadHtml={marcheazaPlaceholder(acasa.data.recenzii.intro)} />
+  <AntetPagina locale={locale} titlu={titlu} lead={acasa.data.recenzii.intro} breadcrumbs={firimituri} />
 
-  <Sectiune>
+  {/* Fără fundal viu: secțiunea e scurtă cât lista e goală (garanția petelor cere ≥ 500 px). */}
+  <SectiunePagina eticheta={titlu}>
     <div class="recenzii">
-      {
-        areRating && (
-          <div class="recenzii__rating">
-            <CardRating locale={locale} birou={birou} />
-          </div>
-        )
-      }
+      {areRating && <CardRating locale={locale} birou={birou} />}
       {
         lista.length > 0 ? (
           <ul class="recenzii__lista" role="list">
@@ -55,61 +54,47 @@ const areRating = birou.rating !== null && birou.numarRecenzii !== null;
           </div>
         )
       }
-      <p class="recenzii__google">
-        <LinkExtern locale={locale} link={profil} class="btn btn--primar">
-          {t(locale, 'recenzii.vedetiToate')}
-        </LinkExtern>
-      </p>
+      <Buton
+        text={t(locale, 'recenzii.vedetiToate')}
+        href={profil.valid ? profil.href : undefined}
+        dezactivat={!profil.valid}
+        target={profil.valid ? '_blank' : undefined}
+        rel={profil.valid ? 'noopener noreferrer' : undefined}
+        textSr={profil.valid ? t(locale, 'link.filaNoua') : `(${t(locale, 'link.indisponibil')})`}
+      />
     </div>
-  </Sectiune>
+  </SectiunePagina>
+
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>
 
 <style>
   .recenzii {
     display: grid;
     gap: var(--space-5);
-    justify-items: center;
+    justify-items: start;
+    max-width: 52rem;
   }
 
-  .recenzii__rating {
-    width: 100%;
-    max-width: 26rem;
-  }
-
+  /* Recenziile: citate una sub alta, cu linii între ele (fără carduri). */
   .recenzii__lista {
     display: grid;
-    gap: var(--space-3);
     width: 100%;
     padding: 0;
     list-style: none;
+    border-top: 1px solid var(--c-line);
   }
 
   .recenzii__lista > li {
-    display: grid;
     max-width: none;
-  }
-
-  @media (min-width: 48rem) {
-    .recenzii__lista {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 75rem) {
-    .recenzii__lista {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--c-line);
   }
 
   .recenzii__gol {
     display: grid;
-    justify-items: center;
+    justify-items: start;
     gap: var(--space-1);
-    text-align: center;
     color: var(--c-muted);
-  }
-
-  .recenzii__google {
-    max-width: none;
   }
 </style>

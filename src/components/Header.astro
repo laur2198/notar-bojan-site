@@ -3,11 +3,11 @@
  * Navbar-ul (prototip, `.nav`; CLAUDE.md §4, §5, §6): fix sus, fără umbră. Culoarea vine din
  * data-tema (light / dark), pusă de src/scripts/tema-navbar.ts după secțiunea de sub el
  * ([data-tema-sectiune]), cu tranziție de 0.4 s.
- *   - Desktop (≥ 74rem): transparent mereu, ca în prototip.
- *   - Sub 74rem: transparent doar sus; derulat peste 8 px (data-derulat, din tema-navbar.ts),
- *     primește fundal plin în culoarea temei și o linie de 1 px jos, ca textul paginii să nu
- *     treacă pe sub el. Tranziția urmează culoarea (0.4 s; instant la mișcare redusă). Cu meniul
- *     compact deschis, fundalul îl dă panoul.
+ *   - Pe toate lățimile (V3e): transparent doar sus; derulat peste 8 px (data-derulat, din
+ *     tema-navbar.ts), primește fundal în culoarea temei (light: --c-paper la 92% cu blur 12 px,
+ *     opac fără suport de backdrop-filter; dark: suprafața închisă de sub el, opacă) și o linie de
+ *     1 px jos, ca textul paginii să nu treacă pe sub el. Tranziția urmează culoarea (0.4 s;
+ *     instant la mișcare redusă). Cu meniul compact deschis, fundalul îl dă panoul.
  *   - Fără JS: fundal plin, în tema de la încărcare.
  *
  * - Desktop (≥ PRAG, vezi stilurile): wordmark | Servicii · Programare · Întrebări · Contact |
@@ -210,25 +210,37 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   /*
-   * Sub pragul de desktop: fundal plin după 8 px de derulare (data-derulat), în culoarea temei,
-   * cu o linie de 1 px jos (box-shadow inset: fără umbră și fără să schimbe înălțimea).
+   * Pe toate lățimile (V3e): transparent doar sus; după 8 px de derulare (data-derulat), fundal în
+   * culoarea temei, cu o linie de 1 px jos (box-shadow inset: fără umbră, fără să schimbe înălțimea).
+   *   - light: --c-paper opac (fallback), sau --c-paper la --navbar-alfa (0.92) cu blur(12px) unde
+   *     backdrop-filter există. Contrastul e verificat peste negru, cazul cel mai defavorabil
+   *     (tokens.test.ts). Blur-ul doar cu meniul închis: backdrop-filter face din header blocul de
+   *     referință al panoului fix al meniului compact.
+   *   - dark: fundalul suprafeței închise de sub navbar (--navbar-inchis, citit de tema-navbar.ts din
+   *     secțiune; implicit --c-rosu-900), opac, linie --c-linie-inchis.
    */
-  @media (max-width: 73.99rem) {
-    .antet[data-derulat] {
-      background-color: var(--c-paper);
-      box-shadow: inset 0 -1px 0 var(--c-line);
-    }
+  .antet[data-derulat] {
+    background-color: var(--c-paper);
+    box-shadow: inset 0 -1px 0 var(--c-line);
+  }
 
-    .antet[data-derulat][data-tema='dark'] {
-      background-color: var(--c-rosu-900);
-      box-shadow: inset 0 -1px 0 var(--c-linie-inchis);
+  @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+    .antet[data-derulat]:not([data-tema='dark']):not(:has(.meniu-compact[open])) {
+      background-color: color-mix(in srgb, var(--c-paper) calc(var(--navbar-alfa) * 100%), transparent);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
     }
+  }
 
-    /* Meniul compact deschis: fundalul îl dă panoul (rosu-900). */
-    .antet[data-derulat]:has(.meniu-compact[open]) {
-      background-color: transparent;
-      box-shadow: none;
-    }
+  .antet[data-derulat][data-tema='dark'] {
+    background-color: var(--navbar-inchis, var(--c-rosu-900));
+    box-shadow: inset 0 -1px 0 var(--c-linie-inchis);
+  }
+
+  /* Meniul compact deschis: fundalul îl dă panoul (rosu-900). */
+  .antet[data-derulat]:has(.meniu-compact[open]) {
+    background-color: transparent;
+    box-shadow: none;
   }
 
   .antet[data-tema='dark'] {

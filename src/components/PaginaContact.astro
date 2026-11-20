@@ -1,44 +1,71 @@
 ---
 /**
- * /contact/ și /en/contact/: cele trei blocuri ale benzii de informații (adresă, program, telefon și email),
- * textul Markdown (Cum ajungeți, Parcare) și o zonă de hartă placeholder cu linkul spre
- * Google Maps. Fără iframe, fără formular de contact (nu e în contract).
- * JSON-LD-ul biroului se face în etapa 8.
+ * /contact/ și /en/contact/ (V4): AntetPagina fără fotografie; apoi, pe fundal viu discret, în
+ * stânga contactele ca rânduri mari separate prin linii (ListaContacte `mare`: telefon, WhatsApp,
+ * email, email pentru acte, adresa cu „Deschideți în Google Maps”), în dreapta programul (starea
+ * „Deschis acum”, programul săptămânii cu ziua curentă marcată prin text și formă, zilele libere
+ * apropiate); pe paper-2, textul din contact.md (Cum ajungeți, Parcare) și zona de hartă: fără
+ * iframe și fără nimic încărcat de la Google (CLAUDE.md §3.1), doar linkul spre Google Maps.
+ * Apoi CtaFinal. Fără formular de contact (nu e în contract).
  */
 import { getEntry, render } from 'astro:content';
-import BandaInfo from './BandaInfo.astro';
+import AntetPagina from './AntetPagina.astro';
+import Buton from './Buton.astro';
 import ContinutMarcat from './ContinutMarcat.astro';
-import BandaTitlu from './BandaTitlu.astro';
+import CtaFinal from './CtaFinal.astro';
 import DraftBadge from './DraftBadge.astro';
 import Iconita from './Iconita.astro';
-import LinkExtern from './LinkExtern.astro';
-import { t, type Locale } from '../i18n';
+import ListaContacte from './ListaContacte.astro';
+import ProgramSaptamana from './ProgramSaptamana.astro';
+import SectiunePagina from './SectiunePagina.astro';
+import StareProgram from './StareProgram.astro';
+import ZileLibereApropiate from './ZileLibereApropiate.astro';
+import { caleLogica, t, type Locale } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { linkExtern } from '../lib/contact';
 import { esteDraft, getBirou, marcheazaPlaceholder } from '../lib/continut';
+import { url } from '../lib/url';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const [pagina, birouIntrare] = await Promise.all([getEntry('pagini', `${locale}/contact`), getEntry('birou', 'birou')]);
-if (!pagina || !birouIntrare) throw new Error(`Lipsesc pagini/${locale}/contact.md sau setari/birou.yaml.`);
+const [pagina, birouIntrare, acasa] = await Promise.all([
+  getEntry('pagini', `${locale}/contact`),
+  getEntry('birou', 'birou'),
+  getEntry('acasa', `${locale}/acasa`),
+]);
+if (!pagina || !birouIntrare || !acasa) throw new Error(`Lipsesc pagini/${locale}/contact.md, setari/birou.yaml sau pagini/${locale}/acasa.yaml.`);
 const birou = await getBirou();
 const { Content } = await render(pagina);
 const harta = linkExtern(birou.googleMapsUrl, '');
 const { strada, codPostal, oras } = birou.adresa;
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: pagina.data.titlu }];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
-  <BandaTitlu locale={locale} titlu={pagina.data.titlu}>
+  <AntetPagina locale={locale} titlu={pagina.data.titlu} breadcrumbs={firimituri}>
     <DraftBadge locale={locale} draft={esteDraft(pagina) || esteDraft(birouIntrare)} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <BandaInfo locale={locale} birou={birou} varianta="contact" ton="alb" />
+  <SectiunePagina viu={2} eticheta={pagina.data.titlu}>
+    <div class="contact__grila">
+      <div>
+        <h2 class="contact__titlu">{t(locale, 'banda.contactTitlu')}</h2>
+        <ListaContacte locale={locale} birou={birou} emailActe adresa mare />
+      </div>
+      <div class="contact__program">
+        <h2 class="contact__titlu">{t(locale, 'banda.programul')}</h2>
+        <StareProgram locale={locale} program={birou.program} zileLibere={birou.zileLibere} />
+        <ProgramSaptamana locale={locale} program={birou.program} mare />
+        <ZileLibereApropiate locale={locale} birou={birou} />
+      </div>
+    </div>
+  </SectiunePagina>
 
-  <div class="contact-detalii">
-    <div class="container contact-detalii__grila">
+  <SectiunePagina ton="paper-2" eticheta={t(locale, 'harta.titlu')}>
+    <div class="contact__grila">
       <div class="continut-articol">
         <ContinutMarcat><Content /></ContinutMarcat>
       </div>
@@ -50,35 +77,52 @@ const { strada, codPostal, oras } = birou.adresa;
           <br />
           <span set:html={marcheazaPlaceholder(codPostal)} /> {oras}
         </p>
-        <LinkExtern locale={locale} link={harta} class="btn btn--primar">
-          <Iconita nume="extern" />
-          {t(locale, 'harta.deschide')}
-        </LinkExtern>
+        <Buton
+          text={t(locale, 'harta.deschide')}
+          href={harta.valid ? harta.href : undefined}
+          dezactivat={!harta.valid}
+          target={harta.valid ? '_blank' : undefined}
+          rel={harta.valid ? 'noopener noreferrer' : undefined}
+          textSr={harta.valid ? t(locale, 'link.filaNoua') : `(${t(locale, 'link.indisponibil')})`}
+        />
       </div>
     </div>
-  </div>
+  </SectiunePagina>
+
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>
 
 <style>
-  .contact-detalii {
-    padding-block: var(--section-y-sm) var(--section-y);
-    border-top: 1px solid var(--c-line);
-  }
-
-  .contact-detalii__grila {
+  .contact__grila {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-6);
   }
 
   @media (min-width: 64rem) {
-    .contact-detalii__grila {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    .contact__grila {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
       align-items: start;
-      gap: var(--space-6);
     }
   }
 
-  /* Zona de hartă: imagine statică placeholder, fără nimic încărcat de la Google. */
+  .contact__titlu {
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
+  }
+
+  .contact__program {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+  }
+
+  .contact__program :global(.program) {
+    width: 100%;
+  }
+
+  /* Zona de hartă: statică, fără nimic încărcat de la Google; doar linkul. */
   .harta {
     display: grid;
     justify-items: center;
@@ -86,16 +130,16 @@ const { strada, codPostal, oras } = birou.adresa;
     gap: var(--space-2);
     min-height: 20rem;
     padding: var(--space-4);
-    background: var(--c-paper-2);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius-lg);
+    background: var(--c-paper);
+    border-top: 3px solid var(--c-rosu);
+    border-radius: var(--radius);
     text-align: center;
   }
 
   .harta :global(.harta__pin) {
     width: var(--space-6);
     height: var(--space-6);
-    color: var(--c-ink);
+    color: var(--c-rosu);
     stroke-width: 1.5;
   }
 

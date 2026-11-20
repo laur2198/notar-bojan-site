@@ -36,6 +36,21 @@
   --c-slogan-stins-inchis: #DEA7A0;
 
   /*
+   * Marcajele de lucru, doar în preview (mark.todo, DraftBadge, FotoProvizorie): galben pal, singura
+   * culoare din afara paletei; ink pe el 14.8:1. Nu apare în producție.
+   */
+  --c-marcaj: #FFF1B8;
+
+  /*
+   * Culorile oficiale ale literei „G” Google (LogoGoogle.astro, lângă rating și linkul spre
+   * recenzii): marcă terță, nu fac parte din paletă și NU se schimbă când se schimbă paleta.
+   */
+  --marca-google-albastru: #4285F4;
+  --marca-google-verde:    #34A853;
+  --marca-google-galben:   #FBBC05;
+  --marca-google-rosu:     #EA4335;
+
+  /*
    * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
    * prototip, negru cu alfa = zgomotul, opacitate .06. Stă ca strat fix peste pagină
    * (body::after, global.css), fără evenimente de pointer. Închide local culorile cu cel mult
@@ -45,23 +60,34 @@
 
   /*
    * Fundalul viu (FundalViu.astro): 3 pete pe instanță, câte una din fiecare culoare, fiecare un
-   * radial-gradient de la culoarea de mai jos, la opacitatea intensității, până la transparent la
-   * 70% din rază. Cazul cel mai defavorabil pentru textul de deasupra: toate trei suprapuse în
-   * centrul lor (orice poziție, scalare sau deplasare), pe --c-paper-2, plus granulația de 6%.
-   * Acolo: --c-muted, --c-ink și --c-rosu ≥ 4.5:1 (src/lib/tokens.test.ts, /stil/).
-   *   puternic (hero):            compus maxim #F8E5DA pe paper, #F5E0D3 pe paper-2
-   *   discret (secțiuni cu text): compus maxim #FAEEE8 pe paper, #F7E8E0 pe paper-2
-   * Contrastele exacte, cu și fără granulație, sunt în tabelul din /stil/.
+   * radial-gradient de la culoarea de mai jos, la opacitatea intensității (în centru), până la
+   * transparent la 70% din rază. Geometria petelor (src/lib/fundal-viu.ts) garantează că zonele
+   * colorate nu se ating niciodată (orice lățime 320–3840 px, orice moment al derulării, orice
+   * poziție a cursorului): cel mai saturat punct e centrul unei singure pete. Acolo, pe --c-paper
+   * și pe --c-paper-2, cu granulația de 6%: --c-ink, --c-muted și --c-rosu ≥ 4.5:1
+   * (src/lib/tokens.test.ts, /stil/). Opacitățile sunt per culoare: dacă se schimbă paleta, se
+   * schimbă aici și testul spune dacă mai trec.
+   *   puternic (hero): centrul cel mai închis #F8E8D2 pe paper, #F5E4CC pe paper-2 (auriul);
+   *     acolo, cu granulația și cu 3/255 toleranță de randare: ink 11.4:1, muted 4.58:1, roșu 4.51:1
+   *   discret (secțiuni cu text): #FDEFEC pe paper (piersica), #F7EBDC pe paper-2 (auriul);
+   *     acolo, la fel: ink 12.1:1, muted 4.83:1, roșu 4.77:1, sloganul stins 4.55:1
    */
   --viu-culoare-rosu:     #B42318;
   --viu-culoare-piersica: #F2A38F;
   --viu-culoare-auriu:    #E9B872;
-  --viu-puternic-rosu:     0.04;
-  --viu-puternic-piersica: 0.11;
-  --viu-puternic-auriu:    0.13;
-  --viu-discret-rosu:      0.025;
-  --viu-discret-piersica:  0.07;
-  --viu-discret-auriu:     0.08;
+  --viu-puternic-rosu:     0.1;
+  --viu-puternic-piersica: 0.26;
+  --viu-puternic-auriu:    0.32;
+  --viu-discret-rosu:      0.06;
+  --viu-discret-piersica:  0.17;
+  --viu-discret-auriu:     0.2;
+
+  /*
+   * Navbar-ul derulat pe tema deschisă (Header.astro, V3e): --c-paper la această opacitate, cu
+   * backdrop-filter: blur(12px). Contrastul textului verificat peste negru (cazul cel mai
+   * defavorabil: o fotografie întunecată sub navbar), cu granulația: src/lib/tokens.test.ts.
+   */
+  --navbar-alfa: 0.92;
 
   /* Tipografie: fonturi self-hosted (fonturi.css) */
   --font-sans:    'Geist Variable', system-ui, sans-serif;                         /* text, butoane, h3–h4 */

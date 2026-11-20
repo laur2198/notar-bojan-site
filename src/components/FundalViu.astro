@@ -6,13 +6,15 @@
  *
  * Aspect: 3 pete, câte una din fiecare culoare (--viu-culoare-rosu / -piersica / -auriu), fiecare
  * un radial-gradient deja difuz: culoarea la opacitatea intensității (--viu-{intensitate}-{culoare})
- * în centru, transparent la 70% din rază. Mărimi 40–70vw, poziții după `seed`. Fără filter: blur()
- * și fără mix-blend-mode. Contrastul textului de deasupra e verificat în punctul cel mai saturat
- * posibil (toate trei suprapuse în centru, pe paper și paper-2, cu granulația): src/lib/tokens.test.ts.
+ * în centru, transparent la 70% din rază. Mărimi 42–50vw (58–66vw sub 768 px), plafonate la 32–38rem,
+ * poziții după `seed` (src/lib/fundal-viu.ts, SEED). Fără filter: blur() și fără mix-blend-mode.
+ * Petele nu se suprapun niciodată (distantaMinima, testată la 320–3840 px, pe toată derularea, cu
+ * cursorul), deci punctul cel mai saturat e centrul unei singure pete; contrastul textului de
+ * deasupra (ink, muted, roșu ≥ 4.5:1, pe paper și paper-2, cu granulația): src/lib/tokens.test.ts.
  *
  * Mișcarea (src/scripts/miscare.ts, [data-fundal-viu]), fără animație care continuă singură
  * (WCAG 2.2.2): legată de scroll (ScrollTrigger, scrub), cât secțiunea traversează ecranul, fiecare
- * pată se deplasează ±10–15% și se scalează între 0.9 și 1.15 (src/lib/fundal-viu.ts, MISCARE_SEED);
+ * pată se deplasează ±10–15% și se scalează între 0.9 și 1.15 (src/lib/fundal-viu.ts, SEED);
  * cu `cursor` și pointer fin, petele urmăresc lent cursorul (max. 30 px; gsap.quickTo). Doar
  * `transform`, cu will-change doar cât secțiunea e în ecran. La mișcare redusă și fără JS: statice.
  *
@@ -21,11 +23,14 @@
  * primesc `position: relative; z-index: 1` (cu specificitate 0, deci o componentă îi poate suprascrie).
  * Nu apare la tipărire și în forced-colors.
  */
-import { MISCARE_SEED, type Intensitate, type Seed } from '../lib/fundal-viu';
+import { SEED, type Intensitate, type Seed } from '../lib/fundal-viu';
 
 interface Props {
   intensitate?: Intensitate;
-  /** Pozițiile, mărimile și mișcarea petelor (1–4): alt seed pe fiecare secțiune. */
+  /**
+   * Pozițiile, mărimile și mișcarea petelor: alt seed pe fiecare secțiune. 1 = hero-ul de pe Acasă,
+   * 2–4 = secțiuni cu text (≥ 500 px), 5 = capul paginilor interioare (AntetPagina, ≥ 26rem).
+   */
   seed?: Seed;
   /** Petele urmăresc lent cursorul (doar pe hero; pointer fin, fără mișcare redusă). */
   cursor?: boolean;
@@ -33,7 +38,7 @@ interface Props {
 }
 
 const { intensitate = 'discret', seed = 1, cursor = false, class: clasa } = Astro.props;
-const pete = MISCARE_SEED[seed];
+const pete = SEED[seed];
 ---
 
 <div
@@ -67,10 +72,12 @@ const pete = MISCARE_SEED[seed];
   }
 
   .viu__pata {
+    --d-activ: var(--d);
+
     position: absolute;
-    left: calc(var(--x) - var(--d) / 2);
-    top: calc(var(--y) - var(--d) / 2);
-    width: var(--d);
+    left: calc(var(--x) - var(--d-activ) / 2);
+    top: calc(var(--y) - var(--d-activ) / 2);
+    width: var(--d-activ);
     aspect-ratio: 1;
   }
 
@@ -122,33 +129,34 @@ const pete = MISCARE_SEED[seed];
   }
 
   /*
-   * Pozițiile (centrul, în % din secțiune) și mărimile (40–70vw), per seed, în ordinea din
-   * MISCARE_SEED (src/lib/fundal-viu.ts).
+   * Geometria per seed, copiată EXACT din SEED (src/lib/fundal-viu.ts; testul compară): centrul în %
+   * din secțiune, mărimea în vw plafonată în rem (de la 768 px --d, sub 768 px --d-mobil). Pozițiile
+   * sunt alese ca zonele colorate să nu se atingă la nicio lățime, în niciun moment al derulării și
+   * la nicio poziție a cursorului (distantaMinima), deci peste text contează cel mult o pată.
    */
-  .viu--seed-1 .viu__pata:nth-child(1) { --x: 84%; --y: 18%; --d: 54vw; }
-  .viu--seed-1 .viu__pata:nth-child(2) { --x: 10%; --y: 58%; --d: 62vw; }
-  .viu--seed-1 .viu__pata:nth-child(3) { --x: 56%; --y: 96%; --d: 48vw; }
+  .viu--seed-1 .viu__pata:nth-child(1) { --x: 94%; --y: 8%; --d: min(46vw, 34rem); --d-mobil: min(62vw, 34rem); }
+  .viu--seed-1 .viu__pata:nth-child(2) { --x: 6%; --y: 31%; --d: min(50vw, 38rem); --d-mobil: min(66vw, 38rem); }
+  .viu--seed-1 .viu__pata:nth-child(3) { --x: 58%; --y: 92%; --d: min(44vw, 34rem); --d-mobil: min(60vw, 34rem); }
 
-  .viu--seed-2 .viu__pata:nth-child(1) { --x: 90%; --y: 10%; --d: 60vw; }
-  .viu--seed-2 .viu__pata:nth-child(2) { --x: 6%;  --y: 46%; --d: 52vw; }
-  .viu--seed-2 .viu__pata:nth-child(3) { --x: 82%; --y: 86%; --d: 44vw; }
+  .viu--seed-2 .viu__pata:nth-child(1) { --x: 94%; --y: 8%; --d: min(48vw, 36rem); --d-mobil: min(64vw, 36rem); }
+  .viu--seed-2 .viu__pata:nth-child(2) { --x: 6%; --y: 8%; --d: min(46vw, 34rem); --d-mobil: min(62vw, 34rem); }
+  .viu--seed-2 .viu__pata:nth-child(3) { --x: 51%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
 
-  .viu--seed-3 .viu__pata:nth-child(1) { --x: 12%; --y: 14%; --d: 56vw; }
-  .viu--seed-3 .viu__pata:nth-child(2) { --x: 92%; --y: 52%; --d: 46vw; }
-  .viu--seed-3 .viu__pata:nth-child(3) { --x: 34%; --y: 94%; --d: 64vw; }
+  .viu--seed-3 .viu__pata:nth-child(1) { --x: 6%; --y: 84%; --d: min(46vw, 34rem); --d-mobil: min(62vw, 34rem); }
+  .viu--seed-3 .viu__pata:nth-child(2) { --x: 94%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
+  .viu--seed-3 .viu__pata:nth-child(3) { --x: 59%; --y: 8%; --d: min(48vw, 36rem); --d-mobil: min(64vw, 36rem); }
 
-  .viu--seed-4 .viu__pata:nth-child(1) { --x: 8%;  --y: 22%; --d: 46vw; }
-  .viu--seed-4 .viu__pata:nth-child(2) { --x: 94%; --y: 42%; --d: 62vw; }
-  .viu--seed-4 .viu__pata:nth-child(3) { --x: 58%; --y: 100%; --d: 52vw; }
+  .viu--seed-4 .viu__pata:nth-child(1) { --x: 8%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
+  .viu--seed-4 .viu__pata:nth-child(2) { --x: 94%; --y: 70%; --d: min(48vw, 36rem); --d-mobil: min(64vw, 36rem); }
+  .viu--seed-4 .viu__pata:nth-child(3) { --x: 40%; --y: 8%; --d: min(44vw, 34rem); --d-mobil: min(60vw, 34rem); }
 
-  /* Pe telefon secțiunile sunt înalte și înguste: petele cresc (max. 70vw), ca să se vadă. */
+  .viu--seed-5 .viu__pata:nth-child(1) { --x: 94%; --y: 92%; --d: min(42vw, 32rem); --d-mobil: min(58vw, 32rem); }
+  .viu--seed-5 .viu__pata:nth-child(2) { --x: 6%; --y: 90%; --d: min(40vw, 32rem); --d-mobil: min(56vw, 32rem); }
+  .viu--seed-5 .viu__pata:nth-child(3) { --x: 60%; --y: 8%; --d: min(40vw, 32rem); --d-mobil: min(56vw, 32rem); }
+
   @media (max-width: 47.99rem) {
     .viu__pata {
-      --d-mobil: min(70vw, calc(var(--d) * 1.3));
-
-      left: calc(var(--x) - var(--d-mobil) / 2);
-      top: calc(var(--y) - var(--d-mobil) / 2);
-      width: var(--d-mobil);
+      --d-activ: var(--d-mobil);
     }
   }
 

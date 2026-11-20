@@ -19,6 +19,8 @@ export function pornestePuncte(): void {
   const ctx = canvas?.getContext('2d');
   if (!canvas || !cutie || !ctx) return;
   const conditie = matchMedia(INTEROGARE);
+  /** Culoarea punctelor: tokenul --c-rosu-300 (fără hex-uri aici; paleta se schimbă doar în tokens.css). */
+  const culoarePuncte = getComputedStyle(document.documentElement).getPropertyValue('--c-rosu-300').trim();
 
   let dpr = 1;
   let w = 0;
@@ -59,8 +61,9 @@ export function pornestePuncte(): void {
         const inf = influenta(x - p.cx, y - p.cy, raza, intensitate);
         if (inf <= 0) continue;
         const m = marime * (1 + 0.75 * inf);
-        // --c-rosu-300 (#E8C9C4), decorativ: peste punctul CSS de .16, ajunge la ~.7 lângă cursor.
-        ctx.fillStyle = `rgba(232,201,196,${(0.7 * inf).toFixed(3)})`;
+        // --c-rosu-300 (token), decorativ: peste punctul CSS de .16, ajunge la ~.7 lângă cursor.
+        ctx.globalAlpha = 0.7 * inf;
+        ctx.fillStyle = culoarePuncte;
         ctx.beginPath();
         ctx.arc(x, y, m / 2, 0, Math.PI * 2);
         ctx.fill();

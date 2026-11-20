@@ -154,8 +154,6 @@ const acasa = defineCollection({
         titlu: z.string().min(1),
         /** Continuarea titlului, în gri (tot în h1). */
         subtitlu: z.string().min(1),
-        /** Rândul din stânga de sub semnătură; în dreapta apare adresa din birou.yaml. */
-        linie: z.string().min(1),
         /**
          * Fotografia biroului din hero (V3b), în dreapta titlului (pe mobil sub el); și imaginea de
          * distribuire (og:image). Se încarcă doar în pagina română; /en/ o folosește pe aceeași.

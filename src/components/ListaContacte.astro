@@ -1,14 +1,16 @@
 ---
 /**
- * Lista de contacte directe: telefon, WhatsApp, email (și, opțional, emailul pentru acte),
- * fiecare cu iconiță și text. Folosită în meniul compact, pe /programare/ și pe /contact/
- * (prin BandaInfo), în RO și EN. Sub listă, nota despre WhatsApp: acolo nu se trimit acte.
+ * Lista de contacte directe: telefon, WhatsApp, email (și, opțional, emailul pentru acte și
+ * adresa cu linkul spre Google Maps), fiecare cu iconiță și text. Folosită în meniul compact, pe
+ * /programare/ și pe /contact/, în RO și EN. Sub listă, nota despre WhatsApp: acolo nu se trimit acte.
+ * Varianta `mare` (V4, /contact/): rânduri mari separate prin linii, iconițele în --c-rosu,
+ * valoarea în Funnel Display pe --fs-h3. Doar tokenuri.
  *
  * Datele încă necompletate («DE COMPLETAT», doar în preview) apar ca text marcat, fără link.
  * WhatsApp se deschide într-o filă nouă (anunțat pentru cititoarele de ecran).
  */
 import { t, type CheieUI, type Locale } from '../i18n';
-import { linkEmail, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
+import { linkEmail, linkExtern, linkTelefon, linkWhatsapp, type LinkContact } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
 import Iconita from './Iconita.astro';
 
@@ -21,10 +23,15 @@ interface Props {
   etichete?: boolean;
   /** Nota despre WhatsApp și acte, sub listă. */
   nota?: boolean;
+  /** Rândul cu adresa și linkul „Deschideți în Google Maps” (pe /contact/). */
+  adresa?: boolean;
+  /** Rânduri mari, separate prin linii (pe /contact/). */
+  mare?: boolean;
   class?: string;
 }
 
-const { locale, birou, emailActe = false, etichete = true, nota = true, class: clasa } = Astro.props;
+const { locale, birou, emailActe = false, etichete = true, nota = true, adresa = false, mare = false, class: clasa } = Astro.props;
+const harta = linkExtern(birou.googleMapsUrl, t(locale, 'harta.deschide'));
 
 interface Contact {
   iconita: 'telefon' | 'whatsapp' | 'email';
@@ -41,7 +48,7 @@ const contacte: Contact[] = [
 ];
 ---
 
-<div class:list={['contacte', clasa]}>
+<div class:list={['contacte', { 'contacte--mare': mare }, clasa]}>
   <ul class="contacte__lista" role="list">
     {
       contacte.map((c) => (
@@ -70,6 +77,29 @@ const contacte: Contact[] = [
           </span>
         </li>
       ))
+    }
+    {
+      adresa && (
+        <li class="contacte__rand">
+          <Iconita nume="pin" class="contacte__iconita" />
+          <span class="contacte__corp">
+            <span class:list={['contacte__eticheta', { 'sr-only': !etichete }]}>
+              {t(locale, 'contact.adresa')}
+              {!etichete && ': '}
+            </span>
+            <address class="contacte__adresa">
+              <span set:html={marcheazaPlaceholder(birou.adresa.strada)} />, <span set:html={marcheazaPlaceholder(birou.adresa.codPostal)} />{' '}
+              {birou.adresa.oras}, {t(locale, 'contact.judet', { judet: birou.adresa.judet })}
+            </address>
+            {harta.valid && (
+              <a class="sub contacte__harta" href={harta.href} target="_blank" rel="noopener noreferrer">
+                {harta.text}
+                <span class="sr-only"> {t(locale, 'link.filaNoua')}</span>
+              </a>
+            )}
+          </span>
+        </li>
+      )
     }
   </ul>
   {nota && <p class="contacte__nota">{t(locale, 'whatsapp.nota')}</p>}
@@ -134,6 +164,46 @@ const contacte: Contact[] = [
 
   :global(.pe-inchis) .contacte__eticheta:not(.sr-only) {
     color: var(--c-rosu-300);
+  }
+
+  /* Varianta mare (/contact/): rânduri cu linii, iconițele roșii, valoarea mare. */
+  .contacte--mare .contacte__lista {
+    gap: 0;
+    border-top: 1px solid var(--c-line);
+  }
+
+  .contacte--mare .contacte__rand {
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .contacte--mare .contacte__rand :global(.contacte__iconita) {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.15em;
+    /* Roșul ca element de interfață (6.6:1 pe alb). */
+    color: var(--c-rosu);
+  }
+
+  .contacte--mare .contacte__link,
+  .contacte--mare .contacte__adresa {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-titlu);
+    letter-spacing: -0.01em;
+  }
+
+  .contacte__adresa {
+    font-style: normal;
+  }
+
+  .contacte__harta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    justify-self: start;
+    font-weight: 500;
   }
 
   :global(.pe-inchis) .contacte__nota {

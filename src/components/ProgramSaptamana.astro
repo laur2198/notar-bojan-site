@@ -18,9 +18,11 @@ interface Props {
   simplu?: boolean;
   /** Text de 16 px și rânduri mai strânse (footer). */
   compact?: boolean;
+  /** Rânduri mari cu linii (V4, /contact/): ziua curentă marcată prin text („· azi”) și formă (bara roșie). */
+  mare?: boolean;
 }
 
-const { locale, program, ton = 'deschis', captionVizibil = false, simplu = false, compact = false } = Astro.props;
+const { locale, program, ton = 'deschis', captionVizibil = false, simplu = false, compact = false, mare = false } = Astro.props;
 const zile = zileSaptamana(locale);
 
 const ore = (zi: ZiProgram) =>
@@ -29,7 +31,7 @@ const ore = (zi: ZiProgram) =>
     : t(locale, 'program.interval', { deschidere: zi.deschidere, inchidere: zi.inchidere });
 ---
 
-<table class:list={['program', `program--${ton}`, { 'program--simplu': simplu, 'program--compact': compact }]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
+<table class:list={['program', `program--${ton}`, { 'program--simplu': simplu, 'program--compact': compact, 'program--mare': mare }]} data-program-saptamana data-eticheta-azi={t(locale, 'program.azi')}>
   <caption class:list={{ 'sr-only': !captionVizibil }}>{t(locale, 'program.caption')}</caption>
   <thead class="sr-only">
     <tr>
@@ -95,7 +97,7 @@ const ore = (zi: ZiProgram) =>
 
   .program--inchis th,
   .program--inchis td {
-    border-bottom-color: rgb(255 255 255 / 0.2);
+    border-bottom-color: color-mix(in srgb, var(--c-paper) 20%, transparent);
   }
 
   tr[aria-current='date'] th,
@@ -130,6 +132,30 @@ const ore = (zi: ZiProgram) =>
   tr[aria-current='date'] th {
     box-shadow: inset 4px 0 0 currentColor;
     padding-left: calc(var(--space-1) * 1.5);
+  }
+
+  /* Mare (/contact/): rânduri înalte, linii, ziua curentă cu bara roșie (formă) și „· azi” (text). */
+  .program--mare {
+    max-width: 32rem;
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-lg);
+  }
+
+  .program--mare th,
+  .program--mare td {
+    padding-block: 0.7em;
+  }
+
+  .program--mare th {
+    font-weight: 500;
+  }
+
+  .program--mare .program__inchis {
+    color: var(--c-muted);
+  }
+
+  .program--mare tr[aria-current='date'] th {
+    box-shadow: inset 4px 0 0 var(--c-rosu);
   }
 
   .program--compact {

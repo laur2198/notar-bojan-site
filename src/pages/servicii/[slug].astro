@@ -3,25 +3,26 @@
  * /servicii/[slug]/ – pagina unui serviciu (etapa 4). Câte o pagină pentru fiecare fișier din
  * src/content/servicii/ro/ (un serviciu nou adăugat din CMS primește automat pagină).
  *
- * Structura: bandă de titlu (breadcrumbs, h1, lead) pe paper-2; apoi, pe alb, conținutul
- * (Ce este / Cum decurge / Bine de știut) și caseta „Pregătiți dosarul” (sticky pe desktop,
- * imediat după lead pe mobil); „Alte servicii”; CTA. JSON-LD: BreadcrumbList și Service.
+ * Structura (V4): AntetPagina (breadcrumbs, h1, lead = „pentru cine”, fotografia serviciului);
+ * conținutul (Ce este / Cum decurge / Bine de știut) în coloana de lectură, cu fundal viu discret,
+ * și caseta „Pregătiți dosarul” în coloana laterală, sticky pe desktop, sub conținut pe mobil;
+ * „Alte servicii” în ListaNumerotata; CtaFinal. JSON-LD: BreadcrumbList și Service (neschimbate).
  *
  * TODO: întrebările din faq/ro.yaml care privesc serviciul nu se leagă automat. Dacă biroul
  * vrea, se poate adăuga în schema serviciilor un câmp opțional cu întrebările alese manual.
  */
 import { getCollection, getEntry, render } from 'astro:content';
-import BandaTitlu from '../../components/BandaTitlu.astro';
+import AntetPagina from '../../components/AntetPagina.astro';
 import ContinutMarcat from '../../components/ContinutMarcat.astro';
 import CasetaDosar from '../../components/CasetaDosar.astro';
+import CtaFinal from '../../components/CtaFinal.astro';
 import DraftBadge from '../../components/DraftBadge.astro';
-import GrilaServicii from '../../components/GrilaServicii.astro';
 import JsonLd from '../../components/JsonLd.astro';
-import SectiuneCta from '../../components/SectiuneCta.astro';
-import Sectiune from '../../components/Sectiune.astro';
-import { caleLogica, t } from '../../i18n';
+import ListaNumerotata from '../../components/ListaNumerotata.astro';
+import SectiunePagina from '../../components/SectiunePagina.astro';
+import { cale, caleLogica, t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getBirou, marcheazaPlaceholder } from '../../lib/continut';
+import { getBirou } from '../../lib/continut';
 import { breadcrumbList, idBirou, serviciu as serviciuJsonLd } from '../../lib/jsonld';
 import { cheieTitluSeo, serviciiVecine } from '../../lib/servicii';
 import { url } from '../../lib/url';
@@ -67,18 +68,25 @@ const jsonld = [
 
 <BaseLayout locale={locale} title={t(locale, cheieTitluSeo(s.titlu), { titlu: s.titlu })} description={s.rezumat}>
   <JsonLd date={jsonld} slot="head" />
-  <BandaTitlu
+  <AntetPagina
     locale={locale}
     titlu={s.titlu}
-    leadHtml={marcheazaPlaceholder(s.pentruCine)}
+    lead={s.pentruCine}
     breadcrumbs={firimituri.map((f, i) => ({ eticheta: f.eticheta, href: i < firimituri.length - 1 ? url(f.cale) : undefined }))}
+    fotografie
+    imagine={s.imagine}
+    imagineAlt={s.imagineAlt}
+    provizorie={s.fotoProvizorie}
   >
     <DraftBadge locale={locale} intrare={intrare} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <section class="serviciu" aria-label={s.titlu}>
-    <div class="container serviciu__grila">
-      <div class="serviciu__caseta">
+  <SectiunePagina viu={3} eticheta={s.titlu}>
+    <div class="serviciu__grila">
+      <div class="serviciu__continut continut-articol">
+        <ContinutMarcat><Content /></ContinutMarcat>
+      </div>
+      <div class="serviciu__caseta" data-caseta-dosar>
         <CasetaDosar
           locale={locale}
           birou={birou}
@@ -88,62 +96,52 @@ const jsonld = [
           subiectEmail={s.subiectEmail}
         />
       </div>
-      <div class="serviciu__continut continut-articol">
-        <ContinutMarcat><Content /></ContinutMarcat>
-      </div>
     </div>
-  </section>
+  </SectiunePagina>
 
   {
     vecine.length > 0 && (
-      <Sectiune id="alte-servicii" ton="gri" titlu={t(locale, 'servicii.altele')}>
-        <GrilaServicii locale={locale} servicii={vecine} coloane={3} />
-      </Sectiune>
+      <SectiunePagina id="alte-servicii" ton="paper-2" titlu={t(locale, 'servicii.altele')}>
+        <ListaNumerotata
+          locale={locale}
+          prefix="alte"
+          elemente={vecine.map((v) => ({
+            titlu: v.titlu,
+            text: v.rezumat,
+            href: `${cale('servicii', locale)}${v.slug}/`,
+            imagine: v.imagine,
+            imagineAlt: v.imagineAlt,
+            provizorie: v.fotoProvizorie,
+          }))}
+        />
+      </SectiunePagina>
     )
   }
 
-  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>
 
 <style>
-  .serviciu {
-    padding-block: var(--section-y-sm) var(--section-y);
-    background: var(--c-paper);
-  }
-
   .serviciu__grila {
     display: grid;
     gap: var(--space-5);
   }
 
-  /* Desktop: conținutul în stânga, caseta în dreapta, lipită sub header-ul fix. */
+  /*
+   * Desktop: conținutul în coloana de lectură, caseta în coloana laterală, lipită sub navbar
+   * (sticky) cât timp conținutul e mai lung decât ea. Sub prag, caseta trece sub conținut.
+   */
   @media (min-width: 64rem) {
     .serviciu__grila {
-      grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
-      grid-template-areas: 'continut caseta';
+      grid-template-columns: minmax(0, var(--measure)) minmax(20rem, 24rem);
+      justify-content: space-between;
       align-items: start;
       gap: var(--space-6);
     }
 
-    .serviciu__continut {
-      grid-area: continut;
-    }
-
-    /*
-     * Sticky: caseta rămâne sub header cât timp conținutul e mai lung decât ea. Cu textele
-     * actuale caseta e coloana mai înaltă, deci nu are de ce să se lipească; regula intră
-     * în funcțiune singură dacă textele serviciului se lungesc.
-     */
     .serviciu__caseta {
-      grid-area: caseta;
       position: sticky;
-      top: calc(var(--header-h-sm) + var(--space-3));
-    }
-  }
-
-  @media (min-width: 67rem) {
-    .serviciu__caseta {
-      top: calc(var(--header-h) + var(--space-3));
+      top: calc(var(--h-antet) + var(--space-3));
     }
   }
 </style>

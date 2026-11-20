@@ -7,7 +7,8 @@
  *     de fotografie (V3d: fără semnătură, coloana nu mai are gol jos); dreapta fotografia biroului
  *     (4:5, înălțimea limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
  *     Sub 992 px: h1 → linia roșie → fotografia (4:3, pe toată lățimea).
- *   - jos, pe toată lățimea: rândul din CMS + adresa din birou.yaml, linia și wordmark-ul gigant
+ *   - jos, pe toată lățimea: linia (dividerul roșu) și wordmark-ul gigant (V3e: fără rândul
+ *     „Notar public · …” și adresa de deasupra liniei; fotografia crește cu spațiul eliberat)
  *     (62% din lățime de la 768 px). Blocul de jos are parallax la ieșire (yPercent 0 → 40).
  *   - fundal: FundalViu puternic (seed 1, cu cursor): pete difuze roșu / piersică / auriu, mișcate
  *     doar de scroll și de cursor, niciodată singure (WCAG 2.2.2).
@@ -34,15 +35,13 @@ interface Props {
   birou: Birou;
   titlu: string;
   subtitlu: string;
-  linie: string;
   imagine?: ImageMetadata;
   imagineAlt: string;
   /** Fotografie de stoc provizorie (eticheta „Fotografie provizorie” în preview). */
   provizorie?: boolean;
 }
 
-const { locale, birou, titlu, subtitlu, linie, imagine, imagineAlt, provizorie = false } = Astro.props;
-const { strada, oras } = birou.adresa;
+const { locale, birou, titlu, subtitlu, imagine, imagineAlt, provizorie = false } = Astro.props;
 /** Textul alternativ fără marcajele «DE COMPLETAT» / «DE VALIDAT» (atributul alt nu poate conține HTML). */
 const alt = textAlt(imagineAlt);
 ---
@@ -89,10 +88,6 @@ const alt = textAlt(imagineAlt);
       </div>
     </div>
     <div class="hero__jos" data-parallax-iesire="40">
-      <p class="hero__linie" data-hero-fade>
-        <span set:html={marcheazaPlaceholder(linie)} />
-        <span class="hero__adresa"><Fragment set:html={marcheazaPlaceholder(strada)} />, {oras}</span>
-      </p>
       <div class="hero__divider" data-hero-divider aria-hidden="true"></div>
       <div data-hero-wordmark>
         <WordmarkGigant
@@ -186,7 +181,7 @@ const alt = textAlt(imagineAlt);
     width: 100%;
     aspect-ratio: 4 / 3;
     border-radius: 0.25em;
-    background: #f8ebe7;
+    background: var(--c-rosu-50);
   }
 
   /* Cadrul e mai înalt decât fereastra fotografiei, ca parallax-ul (yPercent 0 → 8) să nu lase gol. */
@@ -208,14 +203,14 @@ const alt = textAlt(imagineAlt);
     object-fit: cover;
   }
 
-  /* Placeholder cald până la fotografia reală: text --c-ink pe #ECD3CC în cel mai rău caz (11.7:1). */
+  /* Placeholder cald până la fotografia reală, din tokenuri: text --c-ink ≥ 11:1 și pe capătul cel mai închis. */
   .hero__placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 12% var(--space-3) 0;
-    background: linear-gradient(160deg, #f8ebe7 0%, #ecd3cc 100%);
+    background: linear-gradient(160deg, var(--c-rosu-50) 0%, color-mix(in srgb, var(--c-rosu-50), var(--c-rosu-300) 45%) 100%);
     color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 600;
@@ -239,14 +234,14 @@ const alt = textAlt(imagineAlt);
     }
 
     /*
-     * Înălțimea fotografiei: ce rămâne din ecran după navbar, spațiile și blocul de jos (rândul,
-     * linia și wordmark-ul, care e ~7% din lățimea containerului), ca wordmark-ul să rămână vizibil
+     * Înălțimea fotografiei: ce rămâne din ecran după navbar, spațiile și blocul de jos (linia și
+     * wordmark-ul, care e ~7% din lățimea containerului; V3e: fără rândul de deasupra liniei), ca wordmark-ul să rămână vizibil
      * complet la încărcare (1280×720, 1440×900). Lățimea urmează din raportul 4:5.
      */
     .hero__foto {
       justify-self: end;
       width: auto;
-      height: clamp(15rem, calc(100svh - var(--h-antet) - 9.25rem - 0.072 * min(100vw, 78rem)), 38rem);
+      height: clamp(15rem, calc(100svh - var(--h-antet) - 7rem - 0.072 * min(100vw, 78rem)), 40rem);
       aspect-ratio: 4 / 5;
     }
   }
@@ -255,17 +250,6 @@ const alt = textAlt(imagineAlt);
     position: relative;
   }
 
-  .hero__linie {
-    display: flex;
-    justify-content: space-between;
-    gap: 1em;
-    max-width: none;
-    margin: 0;
-    padding-bottom: 0.55em;
-    color: var(--c-muted);
-  }
-
-  /* Dividerul de deasupra wordmark-ului: roșul (V3d; decorativ, 6.6:1 pe alb). */
   .hero__divider {
     height: 1px;
     background: var(--c-rosu);
@@ -288,11 +272,11 @@ const alt = textAlt(imagineAlt);
 
   /*
    * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts):
-   * titlul, rândul de deasupra liniei și wordmark-ul ascunse, liniile la 0, fotografia acoperită
+   * titlul și wordmark-ul ascunse, liniile la 0, fotografia acoperită
    * (mască de jos în sus). Plasa de siguranță din cap-pagina.js scoate `miscare` dacă modulele nu
    * pornesc.
    */
-  :global(html.miscare:not(.hero-pornit)) :is([data-hero-titlu], [data-hero-fade], [data-hero-wordmark]) {
+  :global(html.miscare:not(.hero-pornit)) :is([data-hero-titlu], [data-hero-wordmark]) {
     visibility: hidden;
   }
 
@@ -304,10 +288,4 @@ const alt = textAlt(imagineAlt);
     clip-path: inset(100% 0 0 0);
   }
 
-  /* Pe mobil, adresa e în subsol și în bara de jos (Locație). */
-  @media (max-width: 47.99rem) {
-    .hero__adresa {
-      display: none;
-    }
-  }
 </style>

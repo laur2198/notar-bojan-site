@@ -1,0 +1,101 @@
+---
+/**
+ * CTA-ul final (CLAUDE.md §5, V4), extras de pe Acasă: bandă ÎNCHISĂ, fundal --c-rosu-900, temă
+ * `dark` (.pe-inchis); titlul alb, subtitlul --c-rosu-300 (7.0:1), Buton contur WhatsApp (alb)
+ * și Buton plin „Programare” (alb, text rosu-900), varianta „pe închis” (variabilele --buton-*
+ * ale temei închise, global.css). Pe Acasă (textele `cta` din acasa.yaml) și la finalul paginilor
+ * interioare (textele `final`), în afară de Confidențialitate și 404. Doar tokenuri.
+ */
+import { cale, t, type Locale } from '../i18n';
+import { linkWhatsapp } from '../lib/contact';
+import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Buton from './Buton.astro';
+
+interface Props {
+  locale: Locale;
+  birou: Birou;
+  titlu: string;
+  subtitlu: string;
+}
+
+const { locale, birou, titlu, subtitlu } = Astro.props;
+const whatsapp = linkWhatsapp(birou, locale);
+---
+
+<div class="cta-final pe-inchis" data-tema-sectiune="dark" data-cta-final>
+  <div class="container cta-final__grila">
+    <div class="cta-final__interior">
+      <p class="cta-final__text">
+        <span set:html={marcheazaPlaceholder(titlu)} />
+        <span class="cta-final__sub" set:html={marcheazaPlaceholder(subtitlu)} />
+      </p>
+      <div class="cta-final__butoane">
+        <Buton
+          text={t(locale, 'whatsapp.nume')}
+          href={whatsapp.href}
+          varianta="contur"
+          dezactivat={!whatsapp.valid}
+          target={whatsapp.valid ? '_blank' : undefined}
+          rel={whatsapp.valid ? 'noopener noreferrer' : undefined}
+          textSr={whatsapp.valid ? t(locale, 'link.filaNoua') : `(${t(locale, 'link.indisponibil')})`}
+        />
+        <Buton text={t(locale, 'actiune.programare')} href={cale('programare', locale)} />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cta-final {
+    padding-block: var(--section-y);
+    background: var(--c-rosu-900);
+    color: var(--c-paper);
+  }
+
+  .cta-final__grila {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 3em;
+  }
+
+  .cta-final__interior {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5em;
+  }
+
+  .cta-final__text {
+    max-width: none;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-titlu);
+    line-height: 1.1;
+    letter-spacing: var(--ls-h2);
+  }
+
+  /* rosu-300 pe rosu-900: 7.0:1. */
+  .cta-final__sub {
+    display: block;
+    color: var(--c-rosu-300);
+  }
+
+  .cta-final__butoane {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+  }
+
+  @media (max-width: 61.99rem) {
+    .cta-final__grila {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-final__interior {
+      grid-column: 1;
+    }
+  }
+</style>

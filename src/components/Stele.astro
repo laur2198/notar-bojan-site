@@ -2,6 +2,9 @@
 /**
  * Nota în stele (1–5), cu umplere parțială (ex. 4,8 → 4 stele și 80% din a cincea).
  * Decorativ (aria-hidden): nota se afișează mereu și ca text lângă stele.
+ * Procentul umplut vine dintr-o clasă (`stele--p0` … `stele--p100`, pași de 5%), nu din atributul
+ * style: CSP-ul de producție (style-src 'self') blochează stilurile inline (V4: corectat; înainte,
+ * sub CSP, toate stelele apăreau pline). Stelele pline în --c-rosu, cele goale în --c-line.
  */
 interface Props {
   nota: number;
@@ -9,12 +12,12 @@ interface Props {
 }
 
 const { nota, class: clasa } = Astro.props;
-const procent = Math.max(0, Math.min(5, nota)) * 20;
+const procent = Math.round((Math.max(0, Math.min(5, nota)) * 20) / 5) * 5;
 const STEA = 'M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z';
 const stele = [0, 1, 2, 3, 4];
 ---
 
-<span class:list={['stele', clasa]} style={`--procent: ${procent}%`} aria-hidden="true">
+<span class:list={['stele', `stele--p${procent}`, clasa]} aria-hidden="true">
   <span class="stele__strat stele__strat--gol">
     {stele.map(() => <svg viewBox="0 0 24 24" width="20" height="20"><path d={STEA} /></svg>)}
   </span>
@@ -45,6 +48,28 @@ const stele = [0, 1, 2, 3, 4];
     fill: var(--c-line);
   }
 
+  .stele--p0 { --procent: 0%; }
+  .stele--p5 { --procent: 5%; }
+  .stele--p10 { --procent: 10%; }
+  .stele--p15 { --procent: 15%; }
+  .stele--p20 { --procent: 20%; }
+  .stele--p25 { --procent: 25%; }
+  .stele--p30 { --procent: 30%; }
+  .stele--p35 { --procent: 35%; }
+  .stele--p40 { --procent: 40%; }
+  .stele--p45 { --procent: 45%; }
+  .stele--p50 { --procent: 50%; }
+  .stele--p55 { --procent: 55%; }
+  .stele--p60 { --procent: 60%; }
+  .stele--p65 { --procent: 65%; }
+  .stele--p70 { --procent: 70%; }
+  .stele--p75 { --procent: 75%; }
+  .stele--p80 { --procent: 80%; }
+  .stele--p85 { --procent: 85%; }
+  .stele--p90 { --procent: 90%; }
+  .stele--p95 { --procent: 95%; }
+  .stele--p100 { --procent: 100%; }
+
   .stele__strat--plin {
     position: absolute;
     inset: 0;
@@ -53,6 +78,6 @@ const stele = [0, 1, 2, 3, 4];
   }
 
   .stele__strat--plin svg {
-    fill: var(--c-ink);
+    fill: var(--c-rosu);
   }
 </style>
