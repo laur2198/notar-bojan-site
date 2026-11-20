@@ -30,6 +30,10 @@ function masoaraNavbar() {
   const x = r.left + r.width / 2;
   const y = antet.getBoundingClientRect().height / 2;
   let fundal = 'rgb(255, 255, 255)';
+  // V3e: derulat pe temă închisă, navbar-ul are fundal propriu opac; el e fundalul textului. Cel
+  // translucid al temei deschise (92%) se verifică peste negru în tokens.test.ts; aici, pagina de sub el.
+  const propriu = getComputedStyle(antet).backgroundColor;
+  if (/^rgb\(/.test(propriu)) return { text: getComputedStyle(antet).color, fundal: propriu, tema: antet.dataset.tema };
   for (const el of document.elementsFromPoint(x, y)) {
     if (antet.contains(el)) continue;
     const c = getComputedStyle(el).backgroundColor;
@@ -79,13 +83,13 @@ describe('Navbar-ul transparent: contrast față de fundalul de sub el', () => {
     await context.close();
   });
 
-  it('pe Acasă (V3d): deschisă peste secțiunile deschise, închisă peste frazele mari, CTA-ul final și subsol', async () => {
+  it('pe Acasă (V3d): deschisă peste secțiunile deschise, închisă peste galerie, CTA-ul final și subsol', async () => {
     const { p, context } = await pagina();
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     await p.waitForTimeout(300);
     assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'light');
     for (const [selector, tema] of [
-      ['.fraze', 'dark'],
+      ['[data-galerie]', 'dark'],
       ['#servicii', 'light'],
       ['#pasi', 'light'],
       ['#faq', 'light'],
@@ -381,7 +385,7 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     await context.close();
   });
 
-  it('desktop 1440 px (V3e): sus transparent; derulat peste fotografie și servicii translucid cu blur; peste frazele mari (roșu viu) opac, fundalul lor', async () => {
+  it('desktop 1440 px (V3e): sus transparent; derulat peste fotografie și servicii translucid cu blur; peste galerie (roșu viu) opac, fundalul ei', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const stare = () =>
@@ -399,8 +403,8 @@ describe('Navbar-ul: fundal la derulare pe toate lățimile (V2b, V3e)', () => {
     assert.equal(s.tema, 'light');
     assert.match(s.fundal, /0\.92\)$/);
     assert.equal(s.blur, 'blur(12px)');
-    // Peste frazele mari (rosu-900): opac, fundalul secțiunii, fără blur.
-    await p.evaluate(() => scrollTo({ top: document.querySelector('[data-fraze]').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
+    // Peste galerie (roșu viu): opac, fundalul secțiunii, fără blur.
+    await p.evaluate(() => scrollTo({ top: document.querySelector('[data-galerie]').getBoundingClientRect().top + scrollY + 300, behavior: 'instant' }));
     await p.waitForTimeout(600);
     s = await stare();
     assert.deepEqual(s, { tema: 'dark', fundal: 'rgb(180, 35, 24)', blur: 'none', linie: 'rgb(154, 42, 34) 0px -1px 0px 0px inset' });

@@ -17,6 +17,25 @@ fraze:
   - titlu: "An authentic act is full proof."
     rand2: "That is why we draft it with care."
 
+galerie:
+  # V6: 6 fotografii decorative în jurul frazelor. Ordinea = sloturile: 1–3 coloana stângă (mare 4:5,
+  # mică 3:4, medie 1:1), 4–6 coloana dreaptă (medie 1:1, mare 4:5, mică 3:4).
+  # PROVIZORII (Unsplash, vezi src/assets/fotografii-provizorii/SURSE.md). Fișierele nu sunt încă în
+  # repo: după ce se urcă în src/assets/fotografii-provizorii/, se completează căile de mai jos
+  # (cele din comentarii). Fără cale, slotul apare ca placeholder.
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-4-brasov.jpg
+    fotoProvizorie: true
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-2-stampila.jpg
+    fotoProvizorie: true
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-6-dosare.jpg
+    fotoProvizorie: true
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-5-stilou.jpg
+    fotoProvizorie: true
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-1-biblioteca.jpg
+    fotoProvizorie: true
+  - imagine: "" # ../../../assets/fotografii-provizorii/galerie-3-semnatura.jpg
+    fotoProvizorie: true
+
 servicii:
   titlu: "Notarial services"
   intro: "Each service page lists the documents to prepare and how the procedure works."

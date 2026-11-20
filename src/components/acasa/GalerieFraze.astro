@@ -1,0 +1,260 @@
+---
+/**
+ * Galeria cu frazele mari (V6, înlocuiește FrazeSticky): secțiune pe roșu viu
+ * (--c-suprafata-rosie, temă `dark`, .pe-inchis), cu frazele din CMS pe coloana din mijloc și 6
+ * fotografii decorative în coloanele laterale, de mărimi și proporții diferite, decalate pe verticală.
+ *
+ * Frazele: prima e h2, celelalte p; text alb (6.6:1), `rand2` în --c-rosu-200 (5.4:1), scara
+ * --fs-statement; fiecare cu reveal pe rânduri (data-reveal), una sub alta, cu spațiu mare între ele.
+ *
+ * Fotografiile (pagini/{limba}/acasa.yaml, `galerie`, exact 6), sloturile:
+ *   stânga (~26%): 1 mare 4:5 (100%), 2 mică 3:4 (60%, la dreapta), 3 medie 1:1 (80%);
+ *   dreapta (~26%, pornește cu ~8rem mai jos): 4 medie 1:1 (75%, la stânga), 5 mare 4:5 (100%),
+ *   6 mică 3:4 (55%).
+ * Sub 64rem: frazele sus, apoi mozaic pe 2 coloane (sloturile 1, 5 și 6 pe 2 rânduri, 4 pe toată
+ * lățimea, 16:9), fără parallax.
+ * `<Picture>` AVIF/WebP, lățimi 400/700/1000, `sizes` per slot, lazy, decoding async, width/height;
+ * cadrul are raportul fixat în CSS, deci CLS 0. Decorative: alt="" și containerul aria-hidden. Fără
+ * imagine, slotul e un placeholder (--c-rosu-50, text --c-rosu: 5.8:1). Eticheta „Fotografie
+ * provizorie” (FotoProvizorie, galben cu text ink: 14.8:1) rămâne lizibilă și pe roșu.
+ *
+ * Mișcarea (src/scripts/miscare.ts, [data-galerie]): parallax legat de scroll (ScrollTrigger cu
+ * scrub), fiecare fotografie cu viteza ei (data-viteza, -0.25…0.2, diferite între vecini), doar
+ * transform, doar de la 64rem; nimic automat; static la mișcare redusă și fără JS. Doar tokenuri.
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { t, type Locale } from '../../i18n';
+import { marcheazaPlaceholder } from '../../lib/continut';
+import FotoProvizorie from '../FotoProvizorie.astro';
+
+interface Props {
+  locale: Locale;
+  fraze: { titlu: string; rand2?: string }[];
+  galerie: { imagine?: ImageMetadata; fotoProvizorie?: boolean }[];
+}
+
+const { locale, fraze, galerie } = Astro.props;
+
+/** Sloturile, în ordinea din CMS: latura, raportul, viteza de parallax și `sizes`. */
+const SLOTURI = [
+  { latura: 'stanga', raport: '4-5', viteza: -0.2, sizes: '(min-width: 64rem) 20vw, 50vw' },
+  { latura: 'stanga', raport: '3-4', viteza: 0.15, sizes: '(min-width: 64rem) 12vw, 50vw' },
+  { latura: 'stanga', raport: '1-1', viteza: -0.1, sizes: '(min-width: 64rem) 16vw, 50vw' },
+  { latura: 'dreapta', raport: '1-1', viteza: 0.1, sizes: '(min-width: 64rem) 15vw, 100vw' },
+  { latura: 'dreapta', raport: '4-5', viteza: -0.25, sizes: '(min-width: 64rem) 20vw, 50vw' },
+  { latura: 'dreapta', raport: '3-4', viteza: 0.2, sizes: '(min-width: 64rem) 11vw, 50vw' },
+] as const;
+
+const fotografii = SLOTURI.map((slot, i) => ({ ...slot, nr: i + 1, ...galerie[i] }));
+const coloana = (latura: 'stanga' | 'dreapta') => fotografii.filter((f) => f.latura === latura);
+---
+
+<section class="galerie pe-inchis" data-tema-sectiune="dark" data-galerie aria-label={t(locale, 'acasa.fraze')}>
+  <div class="container galerie__grila">
+    {
+      (['stanga', 'dreapta'] as const).map((latura) => (
+        /* aria-hidden și pe sloturi: pe mobil coloana are display: contents, care în unele browsere o scoate din arborele de accesibilitate. */
+        <div class:list={['galerie__coloana', `galerie__coloana--${latura}`]} aria-hidden="true">
+          {coloana(latura).map((f) => (
+            <div class:list={['galerie__slot', `galerie__slot--${f.nr}`]} data-viteza={f.viteza} aria-hidden="true">
+              <div class:list={['galerie__cadru', `galerie__cadru--${f.raport}`]}>
+                {f.imagine ? (
+                  <Picture
+                    src={f.imagine}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    widths={[400, 700, 1000].filter((w) => w <= f.imagine!.width)}
+                    sizes={f.sizes}
+                    loading="lazy"
+                    decoding="async"
+                    class="galerie__img"
+                  />
+                ) : (
+                  <span class="galerie__placeholder">{t(locale, 'foto.deCompletat')}</span>
+                )}
+                <FotoProvizorie locale={locale} provizorie={f.fotoProvizorie && !!f.imagine} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ))
+    }
+    <div class="galerie__fraze">
+      {
+        fraze.map((f, i) => {
+          const Tag = i === 0 ? 'h2' : 'p';
+          return (
+            <Tag class="galerie__fraza" data-reveal>
+              <Fragment set:html={marcheazaPlaceholder(f.titlu)} />
+              {f.rand2 && <span class="galerie__rand2" set:html={marcheazaPlaceholder(f.rand2)} />}
+            </Tag>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .galerie {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--section-y);
+    background: var(--c-suprafata-rosie);
+    color: var(--c-paper);
+  }
+
+  /* Mobil: frazele sus, apoi mozaicul pe 2 coloane. */
+  .galerie__grila {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      'fraze fraze'
+      'f1 f2'
+      'f1 f3'
+      'f4 f4'
+      'f5 f6'
+      'f5 f6';
+    grid-template-rows: auto 9rem 9rem auto 9rem 9rem;
+    gap: var(--space-2);
+  }
+
+  .galerie__fraze {
+    grid-area: fraze;
+    display: grid;
+    gap: var(--space-5);
+    padding-bottom: var(--space-4);
+    text-align: center;
+  }
+
+  .galerie__fraza {
+    justify-self: center;
+    max-width: 18em;
+    margin: 0;
+    color: var(--c-paper);
+    font-family: var(--font-display);
+    font-size: var(--fs-statement);
+    font-weight: var(--fw-titlu);
+    line-height: var(--lh-titlu-mare);
+    letter-spacing: var(--ls-titlu-mare);
+    text-wrap: balance;
+  }
+
+  /* Al doilea rând: rosu-200 pe roșu viu (5.4:1). */
+  .galerie__rand2 {
+    display: block;
+    color: var(--c-rosu-200);
+  }
+
+  /* Pe mobil, coloanele laterale dispar ca blocuri: sloturile intră direct în mozaic. */
+  .galerie__coloana {
+    display: contents;
+  }
+
+  .galerie__slot--1 { grid-area: f1; }
+  .galerie__slot--2 { grid-area: f2; }
+  .galerie__slot--3 { grid-area: f3; }
+  .galerie__slot--4 { grid-area: f4; }
+  .galerie__slot--5 { grid-area: f5; }
+  .galerie__slot--6 { grid-area: f6; }
+
+  .galerie__cadru {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: var(--radius);
+    background: var(--c-rosu-50);
+  }
+
+  /* Pe mobil, fotografia de pe toată lățimea e 16:9; celelalte umplu celulele mozaicului. */
+  .galerie__slot--4 .galerie__cadru {
+    aspect-ratio: 16 / 9;
+  }
+
+  .galerie__cadru :global(picture) {
+    display: block;
+    height: 100%;
+  }
+
+  .galerie__cadru :global(.galerie__img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .galerie__placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: var(--space-2);
+    /* --c-rosu pe --c-rosu-50: 5.8:1. */
+    color: var(--c-rosu);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Desktop: 3 coloane (~26 / 48 / 26), fotografii de mărimi diferite, decalate pe verticală. */
+  @media (min-width: 64rem) {
+    .galerie {
+      padding-block: var(--space-7);
+    }
+
+    .galerie__grila {
+      grid-template-columns: 26fr 48fr 26fr;
+      grid-template-areas: 'stanga fraze dreapta';
+      grid-template-rows: auto;
+      align-items: start;
+      gap: var(--space-5);
+    }
+
+    .galerie__coloana {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .galerie__coloana--stanga {
+      grid-area: stanga;
+    }
+
+    .galerie__coloana--dreapta {
+      grid-area: dreapta;
+      padding-top: 8rem;
+    }
+
+    .galerie__slot {
+      grid-area: auto;
+    }
+
+    .galerie__slot--1 { width: 100%; }
+    .galerie__slot--2 { width: 60%; align-self: flex-end; }
+    .galerie__slot--3 { width: 80%; }
+    .galerie__slot--4 { width: 75%; align-self: flex-start; }
+    .galerie__slot--5 { width: 100%; }
+    .galerie__slot--6 { width: 55%; }
+
+    .galerie__cadru {
+      height: auto;
+    }
+
+    .galerie__cadru--4-5 { aspect-ratio: 4 / 5; }
+    .galerie__cadru--3-4 { aspect-ratio: 3 / 4; }
+    .galerie__cadru--1-1 { aspect-ratio: 1 / 1; }
+
+    /* Pe desktop, slotul 4 își păstrează raportul de 1:1 (16:9 doar pe mobil). */
+    .galerie__slot--4 .galerie__cadru {
+      aspect-ratio: 1 / 1;
+    }
+
+    .galerie__fraze {
+      align-self: stretch;
+      align-content: space-around;
+      gap: var(--space-7);
+      padding-block: var(--space-6);
+    }
+  }
+</style>

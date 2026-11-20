@@ -1,5 +1,5 @@
 /**
- * Teste e2e pentru pagina Acasă (V3, V3d): intrarea hero-ului, fundalul viu, frazele pe roșu, tastatura (întrebări
+ * Teste e2e pentru pagina Acasă (V3, V3d): intrarea hero-ului, fundalul viu, galeria cu frazele pe roșu (V6), tastatura (întrebări
  * și pași), conținutul complet fără JS și la mișcare redusă, CSP. Rulare: vezi miscare.test.mjs.
  */
 import assert from 'node:assert/strict';
@@ -88,13 +88,13 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     const { p, erori, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     const r = await p.evaluate(() => {
-      const fraze = document.querySelector('[data-fraze]').closest('section');
+      const fraze = document.querySelector('[data-galerie]');
       const cta = document.querySelector('[data-cta-final]');
       const subsol = document.querySelector('footer');
       const st = (el) => getComputedStyle(el);
       return {
         fraze: [st(fraze).backgroundColor, fraze.dataset.temaSectiune, fraze.classList.contains('pe-inchis')],
-        frazaCuloare: st(document.querySelector('[data-fraza]')).color,
+        frazaCuloare: st(document.querySelector('.galerie__fraza')).color,
         cta: [st(cta).backgroundColor, cta.dataset.temaSectiune],
         butonCta: st(cta.querySelector('.buton--plin')).backgroundColor,
         subsol: [st(subsol).backgroundColor, st(subsol).borderTopWidth, st(subsol).borderTopColor],
@@ -102,7 +102,7 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
         sectiuni: ['#servicii', '#pasi', '#faq'].map((id) => st(document.querySelector(id)).backgroundColor),
       };
     });
-    // V5: frazele mari și CtaFinal pe roșu viu (--c-suprafata-rosie).
+    // V6: galeria cu frazele și CtaFinal pe roșu viu (--c-suprafata-rosie).
     assert.deepEqual(r.fraze, ['rgb(180, 35, 24)', 'dark', true]);
     assert.equal(r.frazaCuloare, 'rgb(255, 255, 255)');
     assert.deepEqual(r.cta, ['rgb(180, 35, 24)', 'dark']);
@@ -111,8 +111,8 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     assert.deepEqual(r.subsol, ['rgb(122, 20, 20)', '3px', 'rgb(251, 227, 223)']);
     assert.equal(r.programare, 'rgb(180, 35, 24)', '„Programare” din navbar e plin roșu');
     assert.deepEqual(r.sectiuni, ['rgb(253, 241, 239)', 'rgb(244, 241, 238)', 'rgb(255, 255, 255)'], 'Servicii pe roz pal, apoi gri cald și alb');
-    // Navbar-ul trece pe tema închisă peste frazele mari.
-    await p.evaluate(() => scrollTo({ top: document.querySelector('[data-fraze]').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
+    // Navbar-ul trece pe tema închisă peste galerie.
+    await p.evaluate(() => scrollTo({ top: document.querySelector('[data-galerie]').getBoundingClientRect().top + scrollY + 200, behavior: 'instant' }));
     await p.waitForTimeout(500);
     assert.equal(await p.getAttribute('[data-navbar]', 'data-tema'), 'dark');
     assert.deepEqual(erori, []);
@@ -130,7 +130,7 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
         await p.waitForTimeout(150);
         const r = await p.evaluate(() => {
           const wm = document.querySelector('[data-hero] [data-wordmark-gigant]').getBoundingClientRect();
-          const fraze = document.querySelector('[data-fraze]').closest('section').getBoundingClientRect();
+          const fraze = document.querySelector('[data-galerie]').getBoundingClientRect();
           return { gol: fraze.top - wm.bottom };
         });
         assert.ok(r.gol >= 8, `la ${f * 100}% din ieșire: ${Math.round(r.gol)} px între wordmark și roșu`);
@@ -139,24 +139,88 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     });
   }
 
-  it('frazele: literele apar în nuanța stinsă (nu din opacitate) și se aprind în alb', async () => {
+  it('galeria (V6): 6 fotografii decorative (aria-hidden, alt gol), frazele din CMS (h2, apoi p), al doilea rând în --c-rosu-200', async () => {
+    const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
+    await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+    const r = await p.evaluate(() => {
+      const g = document.querySelector('[data-galerie]');
+      const sloturi = [...g.querySelectorAll('.galerie__slot')];
+      return {
+        sloturi: sloturi.length,
+        ascunse: sloturi.every((s) => s.closest('[aria-hidden="true"]')),
+        alt: [...g.querySelectorAll('img')].every((i) => i.getAttribute('alt') === ''),
+        lazy: [...g.querySelectorAll('img')].every((i) => i.loading === 'lazy' && i.decoding === 'async' && i.getAttribute('width') && i.getAttribute('height')),
+        fraze: [...g.querySelectorAll('.galerie__fraza')].map((f) => f.tagName),
+        rand2: [...g.querySelectorAll('.galerie__rand2')].map((e) => getComputedStyle(e).color),
+        vitezele: sloturi.map((s) => Number(s.dataset.viteza)),
+      };
+    });
+    assert.equal(r.sloturi, 6);
+    assert.ok(r.ascunse, 'fotografiile sunt aria-hidden');
+    assert.ok(r.alt && r.lazy, 'imaginile: alt="", lazy, decoding async, width/height');
+    assert.deepEqual(r.fraze, ['H2', 'P', 'P']);
+    assert.ok(r.rand2.length > 0 && r.rand2.every((c) => c === 'rgb(251, 227, 223)'), 'rand2 în --c-rosu-200');
+    assert.ok(r.vitezele.every((v) => v >= -0.25 && v <= 0.2), 'vitezele în [-0.25, 0.2]');
+    for (let i = 1; i < 6; i++) if (i !== 3) assert.notEqual(r.vitezele[i], r.vitezele[i - 1], `vecinii ${i} și ${i + 1} au viteze diferite`);
+    await context.close();
+  });
+
+  it('galeria la 1440 px: 3 coloane, coloana dreaptă pornește mai jos; parallax legat de derulare, fără mișcare după oprire', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
     await p.goto(`${BAZA}/`, { waitUntil: 'load' });
     await p.waitForTimeout(1500);
-    const fraze = await p.evaluate(() => document.querySelector('[data-fraze]').getBoundingClientRect().top + scrollY);
-    // Puțin după începutul primei fraze: unele litere aprinse, altele stinse; niciuna pe jumătate transparentă.
-    await p.evaluate((y) => scrollTo({ top: y - 900 * 0.4 + 120, behavior: 'instant' }), fraze);
-    await p.waitForTimeout(400);
-    const r = await p.evaluate(() => {
-      const litere = [...document.querySelectorAll('[data-fraza]')[0].querySelectorAll('[aria-hidden] div, [aria-hidden] span')].filter((e) => e.children.length === 0);
-      return litere.map((e) => [getComputedStyle(e).color, Number(getComputedStyle(e).opacity)]);
+    const layout = await p.evaluate(() => {
+      const [st, dr] = ['stanga', 'dreapta'].map((l) => document.querySelector(`.galerie__coloana--${l}`).getBoundingClientRect());
+      const fr = document.querySelector('.galerie__fraze').getBoundingClientRect();
+      return { ordine: st.right <= fr.left && fr.right <= dr.left, latimi: [st.width, fr.width, dr.width].map(Math.round), decalaj: document.querySelector('.galerie__slot--4').getBoundingClientRect().top - document.querySelector('.galerie__slot--1').getBoundingClientRect().top };
     });
-    const vizibile = r.filter(([, o]) => o > 0);
-    assert.ok(vizibile.length > 0, 'unele litere au apărut');
-    assert.ok(r.every(([, o]) => o === 0 || o === 1), 'opacitatea e doar 0 sau 1 (fără stări intermediare)');
-    assert.ok(vizibile.some(([c]) => c !== 'rgb(255, 255, 255)'), 'unele litere vizibile sunt încă stinse');
+    assert.ok(layout.ordine, 'stânga | frazele | dreapta');
+    assert.ok(layout.latimi[1] > 1.6 * layout.latimi[0], `coloana din mijloc e cea mai lată: ${layout.latimi}`);
+    assert.ok(layout.decalaj > 60, `coloana dreaptă pornește mai jos (${Math.round(layout.decalaj)} px)`);
+    const transforme = () => p.evaluate(() => [...document.querySelectorAll('[data-galerie] [data-viteza]')].map((e) => getComputedStyle(e).transform));
+    const top = await p.evaluate(() => document.querySelector('[data-galerie]').getBoundingClientRect().top + scrollY);
+    await p.evaluate((y) => scrollTo({ top: y - 600, behavior: 'instant' }), top);
+    await p.waitForTimeout(300);
+    const a = await transforme();
+    await p.evaluate((y) => scrollTo({ top: y + 300, behavior: 'instant' }), top);
+    await p.waitForTimeout(300);
+    const b = await transforme();
+    assert.ok(a.every((t, i) => t !== b[i]), 'fiecare fotografie se deplasează cu derularea');
+    assert.ok(new Set(b).size === 6, 'vitezele diferă: deplasări diferite');
+    assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('[data-galerie] [data-viteza]')).willChange), 'transform');
+    await p.waitForTimeout(1200);
+    assert.deepEqual(await transforme(), b, 'nimic nu se mișcă după oprirea derulării');
+    assert.ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'fără derulare orizontală');
     await context.close();
   });
+
+  for (const [nume, optiuni] of [
+    ['390 px', { viewport: { width: 390, height: 844 } }],
+    ['1440 px, mișcare redusă', { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' }],
+  ]) {
+    it(`galeria ${nume}: fotografiile stau pe loc la derulare`, async () => {
+      const { p, context } = await pagina(optiuni);
+      await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+      await p.waitForTimeout(1000);
+      const top = await p.evaluate(() => document.querySelector('[data-galerie]').getBoundingClientRect().top + scrollY);
+      for (const dy of [-400, 300, 900]) {
+        await p.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), top + dy);
+        await p.waitForTimeout(200);
+        const t = await p.evaluate(() => [...document.querySelectorAll('[data-galerie] [data-viteza]')].map((e) => getComputedStyle(e).transform));
+        assert.ok(t.every((x) => x === 'none'), `fără transform: ${t}`);
+      }
+      if (optiuni.viewport.width < 600) {
+        const m = await p.evaluate(() => {
+          const fr = document.querySelector('.galerie__fraze').getBoundingClientRect();
+          const sl = [...document.querySelectorAll('.galerie__slot')].map((s) => s.getBoundingClientRect());
+          return { frazeSus: sl.every((r) => r.top >= fr.bottom - 1), latimeIntreaga: sl.filter((r) => r.width > fr.width - 2).length };
+        });
+        assert.ok(m.frazeSus, 'pe mobil, frazele sunt deasupra fotografiilor');
+        assert.equal(m.latimeIntreaga, 1, 'o singură fotografie pe toată lățimea');
+      }
+      await context.close();
+    });
+  }
 
   it('petele se mișcă doar cât se derulează: după oprire rămân pe loc', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 } });
@@ -368,7 +432,7 @@ describe('Acasă: conținut complet fără JS și la mișcare redusă', () => {
               wordmark: vizibil(document.querySelector('[data-hero-wordmark]')),
               accent: getComputedStyle(document.querySelector('[data-hero-accent]')).transform,
               pete: [...document.querySelectorAll('[data-viu-pata]')].map((el) => getComputedStyle(el).transform),
-              fraze: toate('[data-fraza]'),
+              fraze: toate('.galerie__fraza'),
               pasi: toate('#pasi .pas__text'),
               intrebari: document.querySelectorAll('#faq details').length,
               reveal: toate('[data-reveal]'),

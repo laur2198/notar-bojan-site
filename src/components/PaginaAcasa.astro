@@ -2,7 +2,7 @@
 /**
  * Pagina Acasă, aceeași pentru RO (/) și EN (/en/), după prototipul design-v2
  * (docs/design-v2/prototip-acasa.html; CLAUDE.md §5):
- *   hero → frazele mari (sticky) → servicii → cum lucrăm (+ slogan) → întrebări (+ încheiere).
+ *   hero → galeria cu frazele mari → servicii → cum lucrăm (+ slogan) → întrebări (+ încheiere).
  * Subsolul vine din BaseLayout. Textele vin din pagini/{limba}/acasa.yaml,
  * serviciile din servicii/ro (evidențiate, în ordinea din CMS) sau servicii-en/servicii.yaml,
  * întrebările din faq/{limba}.yaml (cele evidențiate, cel mult `faq.numarAfisat`).
@@ -16,7 +16,7 @@ import { imagineOgHero, imagineOgImplicita } from '../lib/og';
 import DraftBadge from './DraftBadge.astro';
 import CumLucram from './acasa/CumLucram.astro';
 import FaqAcasa from './acasa/FaqAcasa.astro';
-import FrazeSticky from './acasa/FrazeSticky.astro';
+import GalerieFraze from './acasa/GalerieFraze.astro';
 import HeroAcasa from './acasa/HeroAcasa.astro';
 import ServiciiAcasa, { type ServiciuRand } from './acasa/ServiciiAcasa.astro';
 
@@ -100,7 +100,7 @@ const imagineOg = hero ? { ...imagineOgImplicita(locale, birou.denumire), ...her
   >
     <DraftBadge locale={locale} intrare={acasa} />
   </HeroAcasa>
-  <FrazeSticky locale={locale} fraze={a.fraze} />
+  <GalerieFraze locale={locale} fraze={a.fraze} galerie={a.galerie} />
   <ServiciiAcasa locale={locale} titlu={a.servicii.titlu} text={a.servicii.intro} servicii={servicii} draft={serviciiDraft} />
   <CumLucram locale={locale} titlu={a.pasi.titlu} pasi={pasi} slogan={a.pasi.slogan} />
   <FaqAcasa

@@ -23,6 +23,12 @@ serviciu concurent. Lista surselor e și în `src/assets/fotografii-provizorii/S
 | `pas-1-trimiteti-actele.jpg` | „Cum lucrăm”, pasul 1 | https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-desk-3q4V539j_bw |
 | `pas-2-verificam-dosarul.jpg` | „Cum lucrăm”, pasul 2 | https://unsplash.com/photos/two-people-reviewing-documents-at-meeting-table-TFFn3BYLc5s |
 | `pas-3-semnati-la-birou.jpg` | „Cum lucrăm”, pasul 3 | https://unsplash.com/photos/person-writing-on-white-paper-wB9iWZKwljw |
+| `galerie-1-biblioteca.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 5 (dreapta, mare 4:5) | https://unsplash.com/photos/books-in-glass-bookcase-jKU2NneZAbI |
+| `galerie-2-stampila.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 2 (stânga, mică 3:4) | https://unsplash.com/photos/a-wooden-wax-seal-stamp-on-a-table-OlIUGzk4His |
+| `galerie-3-semnatura.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 6 (dreapta, mică 3:4) | https://unsplash.com/photos/man-signing-a-document-with-a-pen-QI6NLgN5XnM |
+| `galerie-4-brasov.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 1 (stânga, mare 4:5) | https://unsplash.com/photos/brasov-sign-on-a-green-mountain-above-old-city-rooftops-OfRkwL8as_s |
+| `galerie-5-stilou.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 4 (dreapta, medie 1:1) | https://unsplash.com/photos/fountain-pen-on-black-lined-paper-y02jEX_B0O0 |
+| `galerie-6-dosare.jpg` | Galeria din secțiunea frazelor (Acasă), slotul 3 (stânga, medie 1:1) | https://unsplash.com/photos/a-stack-of-thick-folders-on-a-white-surface-XN4T2PVUUgk |
 
 ## Fonturile site-ului
 
