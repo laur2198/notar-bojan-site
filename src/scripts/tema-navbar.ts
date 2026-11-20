@@ -4,10 +4,11 @@
  * secțiunea care conține linia de la jumătatea înălțimii lui. Fără GSAP: scroll pasiv + rAF.
  * Nu e mișcare (doar schimbă culorile), deci rulează și la prefers-reduced-motion.
  *
- * Tot aici, `data-derulat` pe navbar când pagina e derulată cu mai mult de PRAG_DERULARE px: sub
- * pragul de desktop, navbar-ul primește atunci fundal plin în culoarea temei (Header.astro), ca
- * textul paginii să nu treacă pe sub el. La încărcare, starea (temă + derulare) se aplică fără
- * tranziție, deci o pagină reîncărcată deja derulată pornește direct cu fundal.
+ * Tot aici, `data-derulat` pe navbar când pagina e derulată cu mai mult de PRAG_DERULARE px: pe
+ * toate lățimile (V3e), navbar-ul primește atunci fundal în culoarea temei (Header.astro), ca
+ * textul paginii să nu treacă pe sub el; pe temă închisă, `--navbar-inchis` = fundalul secțiunii
+ * închise de sub el. La încărcare, starea (temă + derulare) se aplică fără tranziție, deci o
+ * pagină reîncărcată deja derulată pornește direct cu fundal.
  */
 
 export type Tema = 'light' | 'dark';
@@ -47,10 +48,10 @@ function temaStrat(y: number, straturi: HTMLElement[]): Tema | null {
  */
 export const EVENIMENT_TEMA = 'tema-navbar-actualizeaza';
 
-/** Peste câți px de derulare navbar-ul de sub prag primește fundal plin. */
+/** Peste câți px de derulare navbar-ul primește fundal (pe toate lățimile, V3e). */
 export const PRAG_DERULARE = 8;
 
-/** Navbar-ul primește fundal plin (sub pragul de desktop) peste PRAG_DERULARE px de derulare. */
+/** Navbar-ul primește fundal peste PRAG_DERULARE px de derulare. */
 export const esteDerulat = (scrollY: number) => scrollY > PRAG_DERULARE;
 
 /** Pornește urmărirea. Întoarce funcția de oprire. */
@@ -73,6 +74,17 @@ export function pornesteTemaNavbar(navbar: HTMLElement | null = document.querySe
     const strat = temaStrat(y, [...document.querySelectorAll<HTMLElement>('[data-tema-strat]')]);
     const finala = strat ?? tema;
     if (finala && navbar.dataset.tema !== finala) navbar.dataset.tema = finala;
+    // Pe temă închisă, fundalul navbar-ului derulat e suprafața închisă de sub el (oricare token ar fi
+    // fundalul acelei secțiuni); fără ea (ex. un strat), rămâne implicitul din CSS (--c-rosu-900).
+    if (finala === 'dark' && !strat) {
+      const sub = sectiuni.filter((s) => s.dataset.temaSectiune === 'dark').find((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top <= y && r.bottom > y;
+      });
+      const fundal = sub ? getComputedStyle(sub).backgroundColor : '';
+      if (fundal && fundal !== 'rgba(0, 0, 0, 0)' && fundal !== 'transparent') navbar.style.setProperty('--navbar-inchis', fundal);
+      else navbar.style.removeProperty('--navbar-inchis');
+    }
     navbar.toggleAttribute('data-derulat', esteDerulat(window.scrollY));
   };
   const programeaza = () => {

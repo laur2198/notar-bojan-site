@@ -67,6 +67,13 @@
   --viu-discret-piersica:  0.17;
   --viu-discret-auriu:     0.2;
 
+  /*
+   * Navbar-ul derulat pe tema deschisă (Header.astro, V3e): --c-paper la această opacitate, cu
+   * backdrop-filter: blur(12px). Contrastul textului verificat peste negru (cazul cel mai
+   * defavorabil: o fotografie întunecată sub navbar), cu granulația: src/lib/tokens.test.ts.
+   */
+  --navbar-alfa: 0.92;
+
   /* Tipografie: fonturi self-hosted (fonturi.css) */
   --font-sans:    'Geist Variable', system-ui, sans-serif;                         /* text, butoane, h3–h4 */
   --font-display: 'Funnel Display Variable', 'Geist Variable', system-ui, sans-serif; /* h1, h2, frazele mari, wordmark */

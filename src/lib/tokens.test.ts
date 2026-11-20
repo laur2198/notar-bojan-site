@@ -137,6 +137,28 @@ describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
   });
 });
 
+describe('navbar-ul derulat pe temă deschisă (V3e): --c-paper translucid', () => {
+  /*
+   * Cazul cel mai defavorabil: sub navbar trece o zonă neagră (fotografie întunecată); fundalul e
+   * --c-paper la --navbar-alfa peste negru (blur-ul doar mediază, nu întunecă), plus granulația.
+   */
+  const alfa = numarToken('navbar-alfa');
+  const fundal = amesteca('#000000', culoare('c-paper'), alfa);
+
+  it('opacitatea e între 0.9 și 1', () => {
+    expect(alfa).toBeGreaterThanOrEqual(0.9);
+    expect(alfa).toBeLessThanOrEqual(1);
+  });
+
+  it('textul (ink), rândul de sus al wordmark-ului (ink la .8) ≥ 4.5:1; conturul butoanelor și roșul (UI) ≥ 3:1', () => {
+    expect(contrastCuGranulatie(culoare('c-ink'), fundal)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(amesteca(fundal, culoare('c-ink'), 0.8), fundal)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(culoare('c-ink'), fundal)).toBeGreaterThanOrEqual(3);
+    expect(contrastCuGranulatie(culoare('c-rosu'), fundal)).toBeGreaterThanOrEqual(3);
+    // Butonul plin își are fundalul propriu (alb pe roșu), neschimbat.
+  });
+});
+
 describe('marimePx', () => {
   it('textul de bază: fix 18 px, 19 px de la 1600 px', () => {
     expect(marimePx('fs-base', 375)).toBe(18);
