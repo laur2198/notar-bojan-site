@@ -36,11 +36,6 @@
    * peste fundalul viu discret pe paper-2 („Cum lucrăm”), cu granulație. Nu se pune pe fundalul viu puternic.
    */
   --c-slogan-stins: #62605D;
-  /*
-   * Frazele mari, pe suprafața roșie vie, înainte să „se aprindă” spre alb: 5.1:1 pe #B42318, 4.51:1
-   * cu granulația (cea mai închisă nuanță care trece; #F6CFC8 pica: 4.05:1 cu granulația).
-   */
-  --c-slogan-stins-inchis: #FADDD8;
 
   /*
    * Marcajele de lucru, doar în preview (mark.todo, DraftBadge, FotoProvizorie): galben pal, singura

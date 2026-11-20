@@ -32,7 +32,6 @@ describe('culorile din tokens.css', () => {
         'c-rosu-900',
         'c-rosu-hover',
         'c-slogan-stins',
-        'c-slogan-stins-inchis',
         'c-suprafata-rosie',
         'c-wordmark',
       ].sort(),
@@ -89,10 +88,9 @@ const PERECHI: [fata: string, fundal: string, raport: number, prag: number][] = 
   // Butonul plin pe deschis.
   ['c-paper', 'c-rosu', 6.6, 4.5],
   ['c-paper', 'c-rosu-hover', 8.9, 4.5],
-  // Suprafața roșie vie (frazele mari, CtaFinal): text alb și rosu-200; butonul alb cu text roșu.
+  // Suprafața roșie vie (galeria cu frazele, CtaFinal): text alb și rosu-200; butonul alb cu text roșu.
   ['c-paper', 'c-suprafata-rosie', 6.6, 4.5],
   ['c-rosu-200', 'c-suprafata-rosie', 5.4, 4.5],
-  ['c-slogan-stins-inchis', 'c-suprafata-rosie', 5.1, 4.5],
   // Roșul închis (subsol, meniul compact).
   ['c-paper', 'c-rosu-900', 10.8, 4.5],
   ['c-rosu-300', 'c-rosu-900', 7.0, 4.5],
