@@ -1,36 +1,52 @@
 ---
 /**
- * /servicii/ – Servicii: toate serviciile (grila de pe Acasă) și CTA.
- * Fără onorarii, sume sau tabele de prețuri (CLAUDE.md §3.3, Codul deontologic): lead-ul paginii
- * spune doar că onorariile se stabilesc conform Ordinului MJ nr. 177/C/2024 (text din i18n).
+ * /servicii/ (V4): AntetPagina (lead-ul trimite la Ordinul MJ nr. 177/C/2024, fără sume: CLAUDE.md
+ * §3.3–3.4, text din i18n), toate serviciile în ListaNumerotata (varianta mare, cu fotografiile și
+ * etichetele lor, ca pe Acasă) și CtaFinal.
  */
 import { getCollection, getEntry } from 'astro:content';
-import BandaTitlu from '../../components/BandaTitlu.astro';
+import AntetPagina from '../../components/AntetPagina.astro';
+import CtaFinal from '../../components/CtaFinal.astro';
 import DraftBadge from '../../components/DraftBadge.astro';
-import GrilaServicii from '../../components/GrilaServicii.astro';
-import SectiuneCta from '../../components/SectiuneCta.astro';
-import Sectiune from '../../components/Sectiune.astro';
-import { t } from '../../i18n';
+import ListaNumerotata from '../../components/ListaNumerotata.astro';
+import SectiunePagina from '../../components/SectiunePagina.astro';
+import { cale, caleLogica, t } from '../../i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { esteDraft, getBirou, marcheazaPlaceholder } from '../../lib/continut';
+import { esteDraft, getBirou } from '../../lib/continut';
+import { url } from '../../lib/url';
 
 const locale = 'ro';
 const [acasa, birou] = await Promise.all([getEntry('acasa', 'ro/acasa'), getBirou()]);
 if (!acasa) throw new Error('Lipsește src/content/pagini/ro/acasa.yaml.');
 
 const servicii = (await getCollection('servicii')).sort((a, b) => a.data.ordine - b.data.ordine);
-const carduri = servicii.map((s) => s.data);
+const titlu = t(locale, 'servicii.titlu');
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: titlu }];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'servicii.seoTitlu')} description={t(locale, 'servicii.seoDescriere')}>
-  <BandaTitlu locale={locale} titlu={t(locale, 'servicii.titlu')} leadHtml={marcheazaPlaceholder(t(locale, 'servicii.intro'))}>
+  <AntetPagina locale={locale} titlu={titlu} lead={t(locale, 'servicii.intro')} breadcrumbs={firimituri}>
     <DraftBadge locale={locale} draft={servicii.some((s) => esteDraft(s))} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <Sectiune>
-    {/* Cardurile sunt primul nivel de conținut sub h1, deci titlurile lor sunt h2. */}
-    <GrilaServicii locale={locale} servicii={carduri} nivel="h2" />
-  </Sectiune>
+  <SectiunePagina viu={2} eticheta={titlu}>
+    {/* Serviciile sunt primul nivel de conținut sub h1, deci titlurile lor sunt h2. */}
+    <ListaNumerotata
+      locale={locale}
+      varianta="mare"
+      nivel="h2"
+      prefix="serviciu"
+      elemente={servicii.map(({ data: s }) => ({
+        titlu: s.titlu,
+        text: s.rezumat,
+        href: `${cale('servicii', locale)}${s.slug}/`,
+        etichete: s.etichete,
+        imagine: s.imagine,
+        imagineAlt: s.imagineAlt,
+        provizorie: s.fotoProvizorie,
+      }))}
+    />
+  </SectiunePagina>
 
-  <SectiuneCta locale={locale} birou={birou} titlu={acasa.data.final.titlu} text={acasa.data.final.text} />
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>

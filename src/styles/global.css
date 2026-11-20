@@ -524,8 +524,10 @@ main:focus {
 }
 
 /* ---------------------------------------------------------------------------
- Tipografie de articol pentru corpurile Markdown (servicii, despre, programare,
- contact, confidențialitate): titluri, liste, pași numerotați (stilul PasiLucru)
+ Tipografie de articol pentru corpurile Markdown (servicii, despre, programare, contact,
+ confidențialitate), V4: coloana de lectură (--measure), titlurile pe scara --fs-titlu
+ (Funnel Display, ca pe Acasă), listele cu marcaj roșu, pașii numerotați 01–0N în --c-rosu
+ (mono, ca ListaNumerotata), cu linii între ei. Doar tokenuri.
  --------------------------------------------------------------------------- */
 .continut-articol {
   display: grid;
@@ -534,12 +536,20 @@ main:focus {
 }
 
 .continut-articol h2 {
-  margin-top: var(--space-4);
-  font-size: var(--fs-h3);
+  margin-top: var(--space-5);
+  font-family: var(--font-display);
+  font-size: var(--fs-titlu);
+  font-weight: var(--fw-titlu);
+  line-height: var(--lh-titlu);
+  letter-spacing: var(--ls-titlu);
 }
 
 .continut-articol h2:first-child {
   margin-top: 0;
+}
+
+.continut-articol h3 {
+  margin-top: var(--space-3);
 }
 
 .continut-articol strong {
@@ -554,64 +564,41 @@ main:focus {
 }
 
 .continut-articol ul li::marker {
-  color: var(--c-ink);
+  color: var(--c-rosu);
 }
 
-/* Nota de lucru de la începutul unor documente (ex. confidențialitate): fundal gri, linie ink. */
+/* Nota de lucru de la începutul unor documente (ex. confidențialitate): paper-2, linie roșie. */
 .continut-articol blockquote {
   padding: var(--space-2) var(--space-3);
   background: var(--c-paper-2);
-  border-left: 3px solid var(--c-ink);
+  border-left: 3px solid var(--c-rosu);
   border-radius: var(--radius);
   color: var(--c-muted);
 }
 
-/* „Cum decurge”: pașii numerotați, în stilul PasiLucru (număr 600, ink, în cerc subțire). */
+/* „Cum decurge”: pașii numerotați 01–0N, numărul mono în roșu, linii între pași. */
 .continut-articol ol {
-  --cerc: var(--space-5);
-
   display: grid;
-  gap: var(--space-3);
   padding: 0;
   list-style: none;
   counter-reset: pas;
+  border-top: 1px solid var(--c-line);
 }
 
 .continut-articol ol > li {
   position: relative;
-  min-height: var(--cerc);
-  padding-left: calc(var(--cerc) + var(--space-2));
-  padding-top: calc((var(--cerc) - 1.6em) / 2);
+  padding: 0.9em 0 0.9em 3.2em;
+  border-bottom: 1px solid var(--c-line);
   counter-increment: pas;
 }
 
 .continut-articol ol > li::before {
-  content: counter(pas);
+  content: counter(pas, decimal-leading-zero);
   position: absolute;
   left: 0;
-  top: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--cerc);
-  height: var(--cerc);
-  color: var(--c-ink);
-  border: 1.5px solid var(--c-ink);
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Linia de legătură dintre pași (decorativă). */
-.continut-articol ol > li:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: calc(var(--cerc) / 2);
-  top: var(--cerc);
-  bottom: calc(-1 * var(--space-3));
-  width: 1px;
-  background: var(--c-ink);
+  top: 0.9em;
+  color: var(--c-rosu);
+  font-family: var(--font-mono);
 }
 
 /* ---------------------------------------------------------------------------

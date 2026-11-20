@@ -3,8 +3,9 @@
  * Caseta „Pregătiți dosarul” de pe pagina de serviciu (CLAUDE.md §8): butonul „Trimiteți
  * actele pe email” (mailto: cu subiect și corp precompletat) sus, apoi durata, onorariul (text
  * general din fișierul serviciului + trimiterea la Ordinul MJ nr. 177/C/2024; fără sume, §3.3),
- * actele necesare (bife ink, nu checkbox-uri), programarea și telefonul.
- * Card alb, radius-lg, umbră; sticky pe desktop (poziționarea o dă pagina).
+ * actele necesare (listă numerotată 01–0N, numerele în --c-rosu), programarea și telefonul.
+ * V4: fundal --c-paper-2, fără umbră, butoanele cu Buton.astro (plin: trimiterea; contur:
+ * programarea); sticky pe desktop (poziționarea o dă pagina). Doar tokenuri.
  *
  * Dacă `emailActe` nu e completat (doar în preview), butonul rămâne vizibil, fără `href`,
  * cu `aria-disabled`, iar adresa apare marcată.
@@ -12,6 +13,7 @@
 import { cale, t, type Locale } from '../i18n';
 import { linkActe, linkTelefon } from '../lib/contact';
 import { marcheazaPlaceholder, type Birou } from '../lib/continut';
+import Buton from './Buton.astro';
 import Iconita from './Iconita.astro';
 
 interface Props {
@@ -43,20 +45,14 @@ const telefon = linkTelefon(birou);
 
   {/* Acțiunea principală sus: pe mobil se vede din primul ecran (criteriul etapei 4). */}
   <div class="dosar__trimite">
-    {
-      email.valid ? (
-        <a class="btn btn--primar" href={email.href}>
-          <Iconita nume="email" />
-          {t(locale, 'dosar.trimite')}
-        </a>
-      ) : (
-        <a class="btn btn--primar" role="link" aria-disabled="true">
-          <Iconita nume="email" />
-          {t(locale, 'dosar.trimite')}
-          <span class="sr-only"> ({t(locale, 'link.indisponibil')})</span>
-        </a>
-      )
-    }
+    <Buton
+      text={t(locale, 'dosar.trimite')}
+      href={email.valid ? email.href : undefined}
+      dezactivat={!email.valid}
+      textSr={email.valid ? undefined : `(${t(locale, 'link.indisponibil')})`}
+      sageata={false}
+      class="dosar__buton"
+    />
     {
       !email.valid && (
         <p class="dosar__mic">
@@ -83,20 +79,22 @@ const telefon = linkTelefon(birou);
   </dl>
 
   <h3 class="dosar__subtitlu">{t(locale, 'dosar.acte')}</h3>
-  <ul class="dosar__acte" role="list">
+  <ol class="dosar__acte" role="list">
     {
-      acte.map((act) => (
+      acte.map((act, i) => (
         <li>
-          <Iconita nume="bifa" class="dosar__bifa" />
+          <span class="dosar__nr" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
           <span set:html={marcheazaPlaceholder(act)} />
         </li>
       ))
     }
-  </ul>
+  </ol>
   <p class="dosar__nota">{t(locale, 'dosar.nota')}</p>
 
   <div class="dosar__actiuni">
-    <a class="btn btn--secundar" href={cale('programare', locale)}>{t(locale, 'acasa.programare')}</a>
+    <Buton text={t(locale, 'acasa.programare')} href={cale('programare', locale)} varianta="contur" class="dosar__buton" />
     <p class="dosar__telefon">
       {t(locale, 'dosar.sunati')}{' '}
       {telefon.valid ? <a href={telefon.href}>{telefon.text}</a> : <span set:html={marcheazaPlaceholder(telefon.text)} />}
@@ -109,9 +107,9 @@ const telefon = linkTelefon(birou);
     display: grid;
     gap: var(--space-2);
     padding: var(--space-3);
-    background: var(--c-paper);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    background: var(--c-paper-2);
+    border-top: 3px solid var(--c-rosu);
+    border-radius: var(--radius);
   }
 
   @media (min-width: 48rem) {
@@ -121,7 +119,10 @@ const telefon = linkTelefon(birou);
   }
 
   .dosar__titlu {
-    font-size: var(--fs-h3);
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--ls-h2);
   }
 
   .dosar__fapte {
@@ -141,7 +142,7 @@ const telefon = linkTelefon(birou);
   }
 
   .dosar__fapt dt :global(.iconita) {
-    color: var(--c-ink);
+    color: var(--c-rosu);
   }
 
   .dosar__fapt dd {
@@ -163,23 +164,25 @@ const telefon = linkTelefon(birou);
 
   .dosar__acte {
     display: grid;
-    gap: var(--space-1);
     padding: 0;
     list-style: none;
+    border-top: 1px solid var(--c-line);
   }
 
   .dosar__acte li {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-1);
+    align-items: baseline;
+    gap: var(--space-2);
     max-width: none;
+    padding-block: 0.6em;
+    border-bottom: 1px solid var(--c-line);
   }
 
-  /* Bifa ink: decorativă, lista e o listă obișnuită (nu checkbox-uri). */
-  .dosar__acte :global(.dosar__bifa) {
-    margin-top: calc(var(--space-1) / 4);
-    color: var(--c-ink);
-    stroke-width: 2.5;
+  /* Numărul: roșu, mono (6.2:1 pe paper-2); decorativ, ordinea e dată de <ol>. */
+  .dosar__nr {
+    flex-shrink: 0;
+    color: var(--c-rosu);
+    font-family: var(--font-mono);
   }
 
   .dosar__nota,
@@ -200,9 +203,9 @@ const telefon = linkTelefon(birou);
     border-top: 1px solid var(--c-line);
   }
 
-  .dosar__trimite .btn,
-  .dosar__actiuni .btn {
+  .dosar :global(.dosar__buton) {
     width: 100%;
+    justify-content: center;
   }
 
   .dosar__telefon {
