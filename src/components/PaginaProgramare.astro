@@ -1,85 +1,91 @@
 ---
 /**
- * /programare/ și /en/appointments/ (CLAUDE.md §8): introducerea, cardul „Alegeți data și ora” (link spre
- * pagina de programări Google Calendar, în filă nouă, anunțată), alături telefonul, WhatsApp-ul și emailul, starea
- * programului și programul săptămânal, apoi restul textului (Înainte de programare, Anulare).
- * Fără iframe: calendarul nu se încarcă în pagină (vezi EmbedCuConsimtamant, nefolosită).
+ * /programare/ și /en/appointments/ (CLAUDE.md §8), V4: AntetPagina (lead = introducerea din
+ * programare.md); programarea online (Buton „Alegeți data și ora” spre pagina de programări
+ * Google Calendar, în filă nouă, anunțată; inactiv cât `programareUrl` lipsește) și, alături,
+ * telefonul, WhatsApp-ul, emailul, starea și programul săptămânal (logica existentă); pașii
+ * („Cum lucrăm” din acasa.yaml, aceiași 3 pași ca pe Acasă) în ListaNumerotata; restul textului
+ * (Înainte de programare, Anulare); CtaFinal. Fără iframe: calendarul nu se încarcă în pagină.
  */
 import { getEntry, render } from 'astro:content';
-import BandaTitlu from './BandaTitlu.astro';
+import AntetPagina from './AntetPagina.astro';
+import Buton from './Buton.astro';
 import ContinutMarcat from './ContinutMarcat.astro';
+import CtaFinal from './CtaFinal.astro';
 import DraftBadge from './DraftBadge.astro';
-import Iconita from './Iconita.astro';
-import LinkExtern from './LinkExtern.astro';
-import ProgramSaptamana from './ProgramSaptamana.astro';
-import StareProgram from './StareProgram.astro';
 import ListaContacte from './ListaContacte.astro';
-import { t, type Locale } from '../i18n';
+import ListaNumerotata from './ListaNumerotata.astro';
+import ProgramSaptamana from './ProgramSaptamana.astro';
+import SectiunePagina from './SectiunePagina.astro';
+import StareProgram from './StareProgram.astro';
+import { caleLogica, t, type Locale } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { linkExtern } from '../lib/contact';
 import { getBirou, marcheazaPlaceholder } from '../lib/continut';
 import { extrageIntro } from '../lib/markdown';
+import { url } from '../lib/url';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const pagina = await getEntry('pagini', `${locale}/programare`);
-if (!pagina) throw new Error(`Lipsește src/content/pagini/${locale}/programare.md.`);
+const [pagina, acasa] = await Promise.all([getEntry('pagini', `${locale}/programare`), getEntry('acasa', `${locale}/acasa`)]);
+if (!pagina || !acasa) throw new Error(`Lipsesc pagini/${locale}/programare.md sau pagini/${locale}/acasa.yaml.`);
 const birou = await getBirou();
 const { Content } = await render(pagina);
 const intro = extrageIntro(pagina.body);
 const calendar = linkExtern(birou.programareUrl, '');
+const firimituri = [{ eticheta: t(locale, 'breadcrumbs.acasa'), href: url(caleLogica('acasa', locale)) }, { eticheta: pagina.data.titlu }];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'pagina.seoTitlu', { titlu: pagina.data.titlu })} description={pagina.data.seoDescriere}>
-  <BandaTitlu locale={locale} titlu={pagina.data.titlu} leadHtml={intro ? marcheazaPlaceholder(intro) : undefined}>
+  <AntetPagina locale={locale} titlu={pagina.data.titlu} lead={intro || undefined} breadcrumbs={firimituri}>
     <DraftBadge locale={locale} intrare={pagina} />
-  </BandaTitlu>
+  </AntetPagina>
 
-  <section class="programare" aria-labelledby="programare-card">
-    <div class="container programare__grila">
+  <SectiunePagina viu={2} eticheta={t(locale, 'programare.cardTitlu')}>
+    <div class="programare__grila">
       <div class="programare__card">
-        <h2 id="programare-card">{t(locale, 'programare.cardTitlu')}</h2>
-        <LinkExtern locale={locale} link={calendar} class="btn btn--primar programare__buton">
-          <Iconita nume="calendar" />
-          {t(locale, 'programare.alegeti')}
-          <Iconita nume="extern" class="programare__extern" />
-        </LinkExtern>
+        <h2 id="programare-card" class="programare__titlu">{t(locale, 'programare.cardTitlu')}</h2>
+        <Buton
+          text={t(locale, 'programare.alegeti')}
+          href={calendar.valid ? calendar.href : undefined}
+          dezactivat={!calendar.valid}
+          target={calendar.valid ? '_blank' : undefined}
+          rel={calendar.valid ? 'noopener noreferrer' : undefined}
+          textSr={calendar.valid ? t(locale, 'link.filaNoua') : `(${t(locale, 'link.indisponibil')})`}
+          class="programare__buton"
+        />
         <p class="programare__nota">
           {t(locale, 'programare.nota')} <span aria-hidden="true">{t(locale, 'link.filaNoua')}</span>
         </p>
-        {
-          !calendar.valid && (
-            <p class="programare__nota" set:html={marcheazaPlaceholder(birou.programareUrl)} />
-          )
-        }
+        {!calendar.valid && <p class="programare__nota" set:html={marcheazaPlaceholder(birou.programareUrl)} />}
       </div>
 
       <aside class="programare__alaturi" aria-labelledby="programare-altfel">
-        <h2 id="programare-altfel" class="programare__subtitlu">{t(locale, 'programare.altfel')}</h2>
+        <h2 id="programare-altfel" class="programare__titlu">{t(locale, 'programare.altfel')}</h2>
         <ListaContacte locale={locale} birou={birou} />
         <StareProgram locale={locale} program={birou.program} zileLibere={birou.zileLibere} />
         <ProgramSaptamana locale={locale} program={birou.program} captionVizibil />
       </aside>
     </div>
-  </section>
+  </SectiunePagina>
 
-  <section class="programare__text" aria-label={pagina.data.titlu}>
-    <div class="container">
-      <div class="continut-articol fara-intro">
-        <ContinutMarcat><Content /></ContinutMarcat>
-      </div>
+  <SectiunePagina ton="paper-2" id="pasi-programare" titlu={acasa.data.pasi.titlu}>
+    <ListaNumerotata locale={locale} prefix="pas" elemente={acasa.data.pasi.lista.map((p) => ({ titlu: p.titlu, text: p.text }))} />
+  </SectiunePagina>
+
+  <SectiunePagina eticheta={pagina.data.titlu}>
+    <div class="continut-articol fara-intro">
+      <ContinutMarcat><Content /></ContinutMarcat>
     </div>
-  </section>
+  </SectiunePagina>
+
+  <CtaFinal locale={locale} birou={birou} titlu={acasa.data.final.titlu} subtitlu={acasa.data.final.text} />
 </BaseLayout>
 
 <style>
-  .programare {
-    padding-block: var(--section-y-sm);
-  }
-
   .programare__grila {
     display: grid;
     gap: var(--space-5);
@@ -93,36 +99,21 @@ const calendar = linkExtern(birou.programareUrl, '');
     }
   }
 
-  /* Cardul principal: alb, radius-lg, umbră, padding 32 px. */
+  /* Programarea online: paper-2, linia roșie sus (ca CasetaDosar), fără umbră. */
   .programare__card {
     display: grid;
     gap: var(--space-2);
+    justify-items: start;
     padding: var(--space-4);
-    background: var(--c-paper);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
+    background: var(--c-paper-2);
+    border-top: 3px solid var(--c-rosu);
+    border-radius: var(--radius);
   }
 
-  .programare__card h2 {
-    font-size: var(--fs-h3);
-  }
-
-  /* Pe toată lățimea cardului pe mobil, natural pe ecrane late. */
-  .programare__card :global(.programare__buton) {
-    width: 100%;
-    font-size: var(--fs-lg);
-  }
-
-  @media (min-width: 48rem) {
-    .programare__card :global(.programare__buton) {
-      width: auto;
-      justify-self: start;
-    }
-  }
-
-  .programare__card :global(.programare__extern) {
-    width: 1em;
-    height: 1em;
+  .programare__titlu {
+    font-size: var(--fs-titlu);
+    line-height: var(--lh-titlu);
+    letter-spacing: var(--ls-titlu);
   }
 
   .programare__nota {
@@ -135,15 +126,7 @@ const calendar = linkExtern(birou.programareUrl, '');
     align-content: start;
   }
 
-  .programare__subtitlu {
-    font-size: var(--fs-h3);
-  }
-
-  .programare__text {
-    padding-block: 0 var(--section-y);
-  }
-
-  /* Introducerea e deja în banda de titlu: paragrafele de dinaintea primului h2 nu se repetă. */
+  /* Introducerea e deja în capul paginii: paragrafele de dinaintea primului h2 nu se repetă. */
   .fara-intro :global(> p:not(h2 ~ p)) {
     display: none;
   }

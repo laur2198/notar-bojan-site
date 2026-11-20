@@ -1,7 +1,8 @@
 ---
 /**
- * Cardul cu ratingul Google (banda de pe Acasă, /recenzii/): logo, nota, stelele și
- * numărul de recenzii, doar dacă `rating` și `numarRecenzii` sunt completate. Altfel, doar
+ * Ratingul Google (/recenzii/), V4: logo, cifra mare, stelele în --c-rosu și textul ratingului
+ * vizibil („Nota: 4,8 din 5 stele · N recenzii pe Google”), doar dacă `rating` și `numarRecenzii`
+ * sunt completate. Altfel, doar
  * „Vedeți recenziile noastre pe Google”. Nu se afișează niciodată un rating inventat.
  */
 import { formateazaNumar, t, tPlural, type Locale } from '../i18n';
@@ -25,11 +26,14 @@ const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
     areRating ? (
       <>
         <p class="card-rating__nota">
-          <span>{nota}</span>
-          <Stele nota={birou.rating!} />
-          <span class="sr-only">{t(locale, 'recenzii.notaStele', { nota })}</span>
+          <span class="card-rating__cifra" aria-hidden="true">
+            {nota}
+          </span>
+          <Stele nota={birou.rating!} class="card-rating__stele" />
         </p>
-        <p>{tPlural(locale, 'recenzii.numar', birou.numarRecenzii!)}</p>
+        <p class="card-rating__text">
+          {t(locale, 'recenzii.notaStele', { nota })} · {tPlural(locale, 'recenzii.numar', birou.numarRecenzii!)}
+        </p>
       </>
     ) : (
       <p>{t(locale, 'recenzii.vedetiNoastre')}</p>
@@ -38,15 +42,11 @@ const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
 </div>
 
 <style>
+  /* V4: fără card și fără umbră; cifra mare (Funnel Display), stelele în roșu, textul ratingului vizibil. */
   .card-rating {
     display: grid;
-    justify-items: center;
+    justify-items: start;
     gap: var(--space-1);
-    padding: var(--space-3);
-    background: var(--c-paper);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    text-align: center;
   }
 
   .card-rating :global(.card-rating__google) {
@@ -57,9 +57,24 @@ const nota = areRating ? formateazaNumar(locale, birou.rating!, 1) : '';
   .card-rating__nota {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1);
-    font-size: var(--fs-h3);
-    font-weight: 700;
+    gap: var(--space-2);
+    margin: 0;
     color: var(--c-ink);
+  }
+
+  .card-rating__cifra {
+    font-family: var(--font-display);
+    font-size: var(--fs-statement);
+    font-weight: var(--fw-titlu);
+    line-height: 1;
+    letter-spacing: var(--ls-titlu-mare);
+  }
+
+  .card-rating__nota :global(.card-rating__stele) {
+    font-size: var(--fs-h2);
+  }
+
+  .card-rating__text {
+    color: var(--c-muted);
   }
 </style>
