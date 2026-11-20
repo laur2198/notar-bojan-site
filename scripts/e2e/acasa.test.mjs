@@ -4,7 +4,10 @@
  */
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { createRequire } from 'node:module';
 import { BAZA, cuBrowser, pagina } from './util.mjs';
+
+const sharp = createRequire(import.meta.url)('sharp');
 
 cuBrowser();
 
@@ -171,6 +174,84 @@ describe('Acasă V3d: roșul, suprafețele închise și fundalul viu', () => {
     assert.deepEqual(await deplasari(), colt, 'cursorul oprit: petele stau');
     await context.close();
   });
+
+  /*
+   * Garanția geometrică a petelor (src/lib/fundal-viu.ts, distantaMinima) presupune o înălțime
+   * minimă a secțiunii: inaltimeMinima(seed, lățime), copiată aici. Pagina reală trebuie s-o respecte.
+   */
+  const inaltimeMinima = (seed, latime) => (seed === 1 ? (latime < 992 ? latime : 0.4 * latime) : 500);
+  for (const [w, h] of [[320, 568], [390, 844], [740, 360], [768, 1024], [991, 700], [1024, 600], [1280, 600], [1440, 900], [1920, 1080], [2560, 1080], [3440, 1440]]) {
+    it(`${w}×${h}: fiecare secțiune cu fundal viu e cel puțin cât înălțimea minimă a seed-ului ei (RO și EN)`, async () => {
+      const { p, context } = await pagina({ viewport: { width: w, height: h }, reducedMotion: 'reduce' });
+      for (const cale of ['/', '/en/']) {
+        await p.goto(BAZA + cale, { waitUntil: 'load' });
+        const r = await p.evaluate(() =>
+          [...document.querySelectorAll('[data-fundal-viu]')].map((v) => ({
+            seed: Number(v.className.match(/viu--seed-(\d)/)[1]),
+            h: v.getBoundingClientRect().height,
+          })),
+        );
+        assert.equal(r.length, 4);
+        for (const { seed, h: inaltime } of r) {
+          assert.ok(inaltime >= inaltimeMinima(seed, w), `${cale} seed ${seed}: ${Math.round(inaltime)} px < ${inaltimeMinima(seed, w)} px`);
+        }
+      }
+      await context.close();
+    });
+  }
+
+  /*
+   * Randarea reală confirmă modelul: fără conținut și fără granulație, cel mai închis pixel al
+   * fundalului unei secțiuni nu e mai închis decât centrul celei mai închise pete singure
+   * (compusMaxim din src/lib/fundal-viu.ts, valorile de mai jos: tokens.test.ts). Două pete
+   * suprapuse ar da un pixel mai închis. Cu mișcarea pornită, în mai multe puncte ale derulării.
+   */
+  const luminanta = (r, g, b) => {
+    const l = (c) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * l(r) + 0.7152 * l(g) + 0.0722 * l(b);
+  };
+  // Toleranța de randare: browserul rotunjește amestecul pe 8 biți cu 1–2 trepte (măsurat); 3 trepte
+  // pe canal. Două pete suprapuse ar da ~20 de trepte mai închis.
+  const hexLum = (h) => luminanta(...[1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) - 3));
+  const MAXIM = { '#hero': '#FBE5E0', '#servicii': '#FDEFEC', '#pasi': '#F7EBDC', '#faq': '#FDEFEC' };
+  for (const [w, h] of [[390, 844], [1440, 900], [2560, 1080]]) {
+    it(`${w}×${h}: în randarea reală, petele nu se suprapun (niciun pixel mai închis decât o singură pată)`, async () => {
+      const { p, context } = await pagina({ viewport: { width: w, height: h } });
+      await p.goto(`${BAZA}/`, { waitUntil: 'load' });
+      await p.waitForTimeout(1500);
+      await p.evaluate(() => {
+        document.querySelector('[data-hero]').id ||= 'hero';
+        const foaie = document.styleSheets[0];
+        foaie.insertRule('body::after { display: none !important; }', foaie.cssRules.length);
+        for (const el of document.querySelectorAll('.viu ~ *, [data-navbar], .bara-actiuni, .bara')) el.style.visibility = 'hidden';
+      });
+      for (const [selector, maxim] of Object.entries(MAXIM)) {
+        const sectiune = await p.evaluate((s) => {
+          const el = document.querySelector(s === '#hero' ? '[data-hero]' : s);
+          return { top: el.getBoundingClientRect().top + scrollY, h: el.getBoundingClientRect().height };
+        }, selector);
+        const prag = hexLum(maxim);
+        for (const f of [-0.6, -0.2, 0.2, 0.6]) {
+          const y = Math.max(0, sectiune.top + f * sectiune.h);
+          await p.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), y);
+          await p.waitForTimeout(150);
+          const rect = await p.evaluate((s) => {
+            const r = document.querySelector(s === '#hero' ? '[data-hero]' : s).getBoundingClientRect();
+            // 2 px în interior: rotunjirea nu prinde marginea secțiunii vecine (ex. banda CTA rosu-900).
+            const top = Math.ceil(Math.max(0, r.top)) + 2;
+            const jos = Math.floor(Math.min(innerHeight, r.bottom)) - 2;
+            return jos - top > 20 ? { x: 0, y: top, width: innerWidth, height: jos - top } : null;
+          }, selector);
+          if (!rect) continue;
+          const { data, info } = await sharp(await p.screenshot({ clip: rect })).raw().toBuffer({ resolveWithObject: true });
+          let minim = 1;
+          for (let i = 0; i < data.length; i += info.channels * 7) minim = Math.min(minim, luminanta(data[i], data[i + 1], data[i + 2]));
+          assert.ok(minim >= prag, `${selector} la ${f}: pixel cu luminanța ${minim.toFixed(4)} < ${prag.toFixed(4)} (${maxim})`);
+        }
+      }
+      await context.close();
+    });
+  }
 
   it('la mișcare redusă: petele statice, fără will-change, nici la scroll, nici la cursor', async () => {
     const { p, context } = await pagina({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });

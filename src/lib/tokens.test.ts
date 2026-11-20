@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { amesteca, contrastCuGranulatie, raportContrast } from './contrast';
-import { compusMaxim, CULORI_VIU, INTENSITATI, pata } from './fundal-viu';
+import { compusMaxim, compusPata, CULORI_VIU, INTENSITATI, pata } from './fundal-viu';
 import { culoare, culori, marimePx, numarToken } from './tokens';
 
 describe('culorile din tokens.css', () => {
@@ -76,28 +76,38 @@ describe('contrastul perechilor (WCAG 2.1 AA, inclusiv granulația de 6%)', () =
   });
 });
 
+/** Culoarea cu `n` trepte (din 255) mai închisă pe fiecare canal. */
+const maiInchis = (hex: string, n: number) =>
+  '#' + [1, 3, 5].map((i) => Math.max(0, parseInt(hex.slice(i, i + 2), 16) - n).toString(16).padStart(2, '0')).join('').toUpperCase();
+
 describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
-  it('fiecare intensitate are câte o pată din fiecare culoare, cu opacitate între 0 și 0.3; discret < puternic', () => {
+  it('fiecare intensitate are câte o pată din fiecare culoare, cu opacitate între 0 și 0.4; discret < puternic', () => {
     for (const c of CULORI_VIU) {
       const p = pata(c, 'puternic');
       const d = pata(c, 'discret');
       expect(p.alfa).toBeGreaterThan(0);
-      expect(p.alfa).toBeLessThanOrEqual(0.3);
+      expect(p.alfa).toBeLessThanOrEqual(0.4);
       expect(d.alfa).toBeGreaterThan(0);
       expect(d.alfa).toBeLessThan(p.alfa);
     }
   });
 
   /*
-   * Cel mai saturat punct posibil: cele 3 pete suprapuse în centru, în ordinea cea mai
-   * defavorabilă, peste paper și paper-2; plus granulația de 6% (contrastCuGranulatie).
+   * Cel mai saturat punct posibil: centrul unei singure pete (geometria garantează că zonele
+   * colorate nu se suprapun: src/lib/fundal-viu.test.ts), pentru fiecare culoare, peste paper și
+   * paper-2; plus granulația de 6% (contrastCuGranulatie).
    */
   for (const intensitate of INTENSITATI) {
     for (const fond of ['c-paper', 'c-paper-2']) {
-      it(`${intensitate} pe --${fond}: ink, muted și roșu ≥ 4.5:1 în punctul cel mai saturat, cu granulație`, () => {
-        const compus = compusMaxim(intensitate, culoare(fond));
-        for (const text of ['c-ink', 'c-muted', 'c-rosu']) {
-          expect(contrastCuGranulatie(culoare(text), compus), `${text} pe ${compus}`).toBeGreaterThanOrEqual(4.5);
+      it(`${intensitate} pe --${fond}: ink, muted și roșu ≥ 4.5:1 în centrul fiecărei pete, cu granulație`, () => {
+        for (const c of CULORI_VIU) {
+          const compus = compusPata(c, intensitate, culoare(fond));
+          // Și cu toleranța de randare: browserul rotunjește amestecul cu 1–2 trepte (măsurat în e2e); 3 trepte pe canal.
+          for (const fundal of [compus, maiInchis(compus, 3)]) {
+            for (const text of ['c-ink', 'c-muted', 'c-rosu']) {
+              expect(contrastCuGranulatie(culoare(text), fundal), `${text} pe ${c} (${fundal})`).toBeGreaterThanOrEqual(4.5);
+            }
+          }
         }
         // Focusul (roșu, 3 px) e element de interfață: min. 3:1, acoperit de pragul de mai sus.
         // Butonul plin își are propriul fundal: alb pe --c-rosu, neschimbat de pete.
@@ -107,16 +117,19 @@ describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
   }
 
   it('„Cum lucrăm” (discret, paper-2): sloganul stins ≥ 4.5:1, pașii inactivi (ink la .6, text mare) ≥ 3:1', () => {
-    const compus = compusMaxim('discret', culoare('c-paper-2'));
-    expect(contrastCuGranulatie(culoare('c-slogan-stins'), compus)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastCuGranulatie(amesteca(compus, culoare('c-ink'), 0.6), compus)).toBeGreaterThanOrEqual(3);
+    for (const c of CULORI_VIU) {
+      const compus = compusPata(c, 'discret', culoare('c-paper-2'));
+      expect(contrastCuGranulatie(culoare('c-slogan-stins'), compus)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastCuGranulatie(culoare('c-slogan-stins'), maiInchis(compus, 3))).toBeGreaterThanOrEqual(4.5);
+      expect(contrastCuGranulatie(amesteca(compus, culoare('c-ink'), 0.6), compus)).toBeGreaterThanOrEqual(3);
+    }
   });
 
   it('compusul maxim e cel din comentariul din tokens.css', () => {
-    expect(compusMaxim('puternic', culoare('c-paper'))).toBe('#F8E5DA');
-    expect(compusMaxim('puternic', culoare('c-paper-2'))).toBe('#F5E0D3');
-    expect(compusMaxim('discret', culoare('c-paper'))).toBe('#FAEEE8');
-    expect(compusMaxim('discret', culoare('c-paper-2'))).toBe('#F7E8E0');
+    expect(compusMaxim('puternic', culoare('c-paper'))).toBe('#F8E8D2');
+    expect(compusMaxim('puternic', culoare('c-paper-2'))).toBe('#F5E4CC');
+    expect(compusMaxim('discret', culoare('c-paper'))).toBe('#FDEFEC');
+    expect(compusMaxim('discret', culoare('c-paper-2'))).toBe('#F7EBDC');
   });
 
   it('valorile sunt tokenuri citite din tokens.css', () => {
