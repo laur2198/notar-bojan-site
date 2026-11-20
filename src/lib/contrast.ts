@@ -44,3 +44,33 @@ export function treceAA(raport: number, uz: Uz): boolean {
 export function formateazaRaport(raport: number): string {
   return `${(Math.floor(raport * 100) / 100).toFixed(2)}:1`;
 }
+
+/** Amestec sRGB, ca `color-mix(in srgb, a, b p%)` din CSS: p = ponderea lui b (0–1). */
+export function amesteca(a: string, b: string, p: number): string {
+  const ca = hexInRgb(a);
+  const cb = hexInRgb(b);
+  return (
+    '#' +
+    ca
+      .map((v, i) => Math.round(v * (1 - p) + cb[i]! * p))
+      .map((v) => v.toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase()
+  );
+}
+
+/** Opacitatea granulației: zgomot negru, alfa maxim .06 (tokens.css, --granulatie). */
+export const GRANULATIE = 0.06;
+
+/** O culoare sub pixelul cel mai închis al granulației (negru la opacitatea maximă). */
+export function subGranulatie(hex: string): string {
+  return amesteca(hex, '#000000', GRANULATIE);
+}
+
+/**
+ * Contrastul în cazul cel mai defavorabil al granulației: stratul închide cu până la 6% pixelii,
+ * independent, deci fie fundalul, fie culoarea din față poate fi mai închisă. Raportul cel mai mic.
+ */
+export function contrastCuGranulatie(text: string, fundal: string): number {
+  return Math.min(raportContrast(text, fundal), raportContrast(subGranulatie(text), fundal), raportContrast(text, subGranulatie(fundal)));
+}

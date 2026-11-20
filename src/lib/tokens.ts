@@ -87,3 +87,10 @@ export function numarToken(nume: string): number {
   if (!Number.isFinite(v)) throw new Error(`Tokenul --${nume} nu e un număr.`);
   return v;
 }
+
+/** Valoarea hex a oricărui token de culoare din tokens.css, ex. `hexToken('viu-culoare-rosu')`. */
+export function hexToken(nume: string): string {
+  const v = valoareToken(nume, Infinity);
+  if (!/^#[0-9a-fA-F]{6}$/.test(v)) throw new Error(`Tokenul --${nume} nu e o culoare hex (#RRGGBB).`);
+  return v.toUpperCase();
+}

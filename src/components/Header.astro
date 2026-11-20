@@ -15,7 +15,7 @@
  *   (.sub); pagina curentă (aria-current) o are trasă permanent.
  * - Sub prag: wordmark | telefon | (Programare, de la 768 px: §4 cere butonul vizibil pe orice
  *   ecran, iar bara de jos apare doar sub 768 px) | „Meniu”.
- * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-brand-900:
+ * - „Meniu” e un <details> (merge fără JS) care se deschide ca panou pe tot ecranul, --c-rosu-900:
  *   linkurile mari (Funnel Display, rânduri din mască la deschidere, doar cu mișcare permisă),
  *   contactele (ListaContacte) și comutatorul de limbă. Cât e deschis, derularea paginii e
  *   blocată (CSS :has) și navbar-ul trece pe tema închisă. JS: Escape închide și readuce
@@ -220,11 +220,11 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     }
 
     .antet[data-derulat][data-tema='dark'] {
-      background-color: var(--c-brand-900);
-      box-shadow: inset 0 -1px 0 var(--c-line-dark);
+      background-color: var(--c-rosu-900);
+      box-shadow: inset 0 -1px 0 var(--c-linie-inchis);
     }
 
-    /* Meniul compact deschis: fundalul îl dă panoul (brand-900). */
+    /* Meniul compact deschis: fundalul îl dă panoul (rosu-900). */
     .antet[data-derulat]:has(.meniu-compact[open]) {
       background-color: transparent;
       box-shadow: none;
@@ -248,19 +248,19 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
   }
 
   :global(html:not(.js)) .antet[data-tema='dark'] {
-    background: var(--c-brand-900);
+    background: var(--c-rosu-900);
   }
 
   /* Meniul deschis: panoul e închis la culoare, deci navbar-ul trece pe tema închisă. */
   .antet:has(.meniu-compact[open]) {
     color: var(--c-paper);
     --buton-plin-bg: var(--c-paper);
-    --buton-plin-fg: var(--c-brand-900);
-    --buton-plin-hover: var(--c-brand-50);
+    --buton-plin-fg: var(--c-rosu-900);
+    --buton-plin-hover: var(--c-rosu-50);
     --buton-contur-fg: var(--c-paper);
-    --buton-contur-hover: var(--c-brand);
+    --buton-contur-hover: var(--c-rosu-hover);
     --buton-focus: var(--c-paper);
-    --buton-dezactivat: var(--c-brand-300);
+    --buton-dezactivat: var(--c-rosu-300);
     --sub-hover: currentColor;
   }
 
@@ -286,9 +286,9 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: inline-flex;
   }
 
-  /* Iconița WhatsApp în maro pe tema deschisă (12.4:1 pe alb); pe închis, culoarea textului. */
+  /* Iconița WhatsApp în roșu pe tema deschisă (6.6:1 pe alb); pe închis, culoarea textului. */
   .antet:not([data-tema='dark']):not(:has(.meniu-compact[open])) .antet__whatsapp {
-    color: var(--c-brand);
+    color: var(--c-rosu);
   }
 
   /* Ce apare doar pe desktop. */
@@ -378,7 +378,7 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-top: var(--header-h-sm);
-    background: var(--c-brand-900);
+    background: var(--c-rosu-900);
     color: var(--c-paper);
   }
 
@@ -396,12 +396,12 @@ const etichetaTelefon = t(locale, 'acasa.suna', { telefon: telefon.text });
     display: grid;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--c-line-dark);
+    border-top: 1px solid var(--c-linie-inchis);
   }
 
   .meniu-compact__lista li {
     max-width: none;
-    border-bottom: 1px solid var(--c-line-dark);
+    border-bottom: 1px solid var(--c-linie-inchis);
   }
 
   .meniu-compact__lista a {

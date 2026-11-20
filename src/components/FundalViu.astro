@@ -1,0 +1,160 @@
+---
+/**
+ * Fundalul viu (CLAUDE.md §5, V3d): pete colorate mari, foarte difuze, în spatele conținutului
+ * unei secțiuni deschise. Pe Acasă: hero (puternic, cu cursor), servicii, „Cum lucrăm” și
+ * întrebări (discret). Reutilizabil (V4: capul paginilor interioare).
+ *
+ * Aspect: 3 pete, câte una din fiecare culoare (--viu-culoare-rosu / -piersica / -auriu), fiecare
+ * un radial-gradient deja difuz: culoarea la opacitatea intensității (--viu-{intensitate}-{culoare})
+ * în centru, transparent la 70% din rază. Mărimi 40–70vw, poziții după `seed`. Fără filter: blur()
+ * și fără mix-blend-mode. Contrastul textului de deasupra e verificat în punctul cel mai saturat
+ * posibil (toate trei suprapuse în centru, pe paper și paper-2, cu granulația): src/lib/tokens.test.ts.
+ *
+ * Mișcarea (src/scripts/miscare.ts, [data-fundal-viu]), fără animație care continuă singură
+ * (WCAG 2.2.2): legată de scroll (ScrollTrigger, scrub), cât secțiunea traversează ecranul, fiecare
+ * pată se deplasează ±10–15% și se scalează între 0.9 și 1.15 (src/lib/fundal-viu.ts, MISCARE_SEED);
+ * cu `cursor` și pointer fin, petele urmăresc lent cursorul (max. 30 px; gsap.quickTo). Doar
+ * `transform`, cu will-change doar cât secțiunea e în ecran. La mișcare redusă și fără JS: statice.
+ *
+ * Stă în secțiune ca prim copil: absolut, inset 0, overflow hidden, z-index 0, fără evenimente de
+ * pointer, aria-hidden. Secțiunea are nevoie doar de `position: relative`; frații de după el
+ * primesc `position: relative; z-index: 1` (cu specificitate 0, deci o componentă îi poate suprascrie).
+ * Nu apare la tipărire și în forced-colors.
+ */
+import { MISCARE_SEED, type Intensitate, type Seed } from '../lib/fundal-viu';
+
+interface Props {
+  intensitate?: Intensitate;
+  /** Pozițiile, mărimile și mișcarea petelor (1–4): alt seed pe fiecare secțiune. */
+  seed?: Seed;
+  /** Petele urmăresc lent cursorul (doar pe hero; pointer fin, fără mișcare redusă). */
+  cursor?: boolean;
+  class?: string;
+}
+
+const { intensitate = 'discret', seed = 1, cursor = false, class: clasa } = Astro.props;
+const pete = MISCARE_SEED[seed];
+---
+
+<div
+  class:list={['viu', `viu--${intensitate}`, `viu--seed-${seed}`, clasa]}
+  data-fundal-viu
+  data-viu-cursor={cursor ? '' : undefined}
+  aria-hidden="true"
+>
+  {
+    pete.map((p) => (
+      <i class={`viu__pata viu__pata--${p.culoare}`} data-viu-pata data-dx={p.dx} data-dy={p.dy} data-s0={p.s0} data-s1={p.s1}>
+        <i class="viu__grad" data-viu-grad data-cursor-px={p.cursor} />
+      </i>
+    ))
+  }
+</div>
+
+<style>
+  .viu {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Conținutul secțiunii stă deasupra petelor. */
+  :global(:where(.viu ~ *)) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .viu__pata {
+    position: absolute;
+    left: calc(var(--x) - var(--d) / 2);
+    top: calc(var(--y) - var(--d) / 2);
+    width: var(--d);
+    aspect-ratio: 1;
+  }
+
+  /* Gradientul e pe un strat interior: scroll-ul mișcă pata, cursorul mișcă stratul. */
+  .viu__grad {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--viu-c) calc(var(--viu-a) * 100%), transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  .viu__pata--rosu {
+    --viu-c: var(--viu-culoare-rosu);
+  }
+
+  .viu__pata--piersica {
+    --viu-c: var(--viu-culoare-piersica);
+  }
+
+  .viu__pata--auriu {
+    --viu-c: var(--viu-culoare-auriu);
+  }
+
+  .viu--puternic .viu__pata--rosu {
+    --viu-a: var(--viu-puternic-rosu);
+  }
+
+  .viu--puternic .viu__pata--piersica {
+    --viu-a: var(--viu-puternic-piersica);
+  }
+
+  .viu--puternic .viu__pata--auriu {
+    --viu-a: var(--viu-puternic-auriu);
+  }
+
+  .viu--discret .viu__pata--rosu {
+    --viu-a: var(--viu-discret-rosu);
+  }
+
+  .viu--discret .viu__pata--piersica {
+    --viu-a: var(--viu-discret-piersica);
+  }
+
+  .viu--discret .viu__pata--auriu {
+    --viu-a: var(--viu-discret-auriu);
+  }
+
+  /*
+   * Pozițiile (centrul, în % din secțiune) și mărimile (40–70vw), per seed, în ordinea din
+   * MISCARE_SEED (src/lib/fundal-viu.ts).
+   */
+  .viu--seed-1 .viu__pata:nth-child(1) { --x: 84%; --y: 18%; --d: 54vw; }
+  .viu--seed-1 .viu__pata:nth-child(2) { --x: 10%; --y: 58%; --d: 62vw; }
+  .viu--seed-1 .viu__pata:nth-child(3) { --x: 56%; --y: 96%; --d: 48vw; }
+
+  .viu--seed-2 .viu__pata:nth-child(1) { --x: 90%; --y: 10%; --d: 60vw; }
+  .viu--seed-2 .viu__pata:nth-child(2) { --x: 6%;  --y: 46%; --d: 52vw; }
+  .viu--seed-2 .viu__pata:nth-child(3) { --x: 82%; --y: 86%; --d: 44vw; }
+
+  .viu--seed-3 .viu__pata:nth-child(1) { --x: 12%; --y: 14%; --d: 56vw; }
+  .viu--seed-3 .viu__pata:nth-child(2) { --x: 92%; --y: 52%; --d: 46vw; }
+  .viu--seed-3 .viu__pata:nth-child(3) { --x: 34%; --y: 94%; --d: 64vw; }
+
+  .viu--seed-4 .viu__pata:nth-child(1) { --x: 8%;  --y: 22%; --d: 46vw; }
+  .viu--seed-4 .viu__pata:nth-child(2) { --x: 94%; --y: 42%; --d: 62vw; }
+  .viu--seed-4 .viu__pata:nth-child(3) { --x: 58%; --y: 100%; --d: 52vw; }
+
+  /* Pe telefon secțiunile sunt înalte și înguste: petele cresc (max. 70vw), ca să se vadă. */
+  @media (max-width: 47.99rem) {
+    .viu__pata {
+      --d-mobil: min(70vw, calc(var(--d) * 1.3));
+
+      left: calc(var(--x) - var(--d-mobil) / 2);
+      top: calc(var(--y) - var(--d-mobil) / 2);
+      width: var(--d-mobil);
+    }
+  }
+
+  @media print, (forced-colors: active) {
+    .viu {
+      display: none;
+    }
+  }
+</style>

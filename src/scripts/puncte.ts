@@ -1,7 +1,7 @@
 /**
  * Grila de puncte din secțiunea frazelor (FrazeSticky.astro), după prototip: punctele de bază
- * (0.125em la pas de 3em, maro de brand la .14) le desenează CSS-ul; aici, pe un canvas peste ele, doar
- * punctele din jurul cursorului (rază 10 pași), mai mari (până la +75%) și opace, cu urmărire
+ * (0.125em la pas de 3em, --c-rosu-300 la .16, pe rosu-900) le desenează CSS-ul; aici, pe un canvas
+ * peste ele, doar punctele din jurul cursorului (rază 10 pași), mai mari (până la +75%) și mai opace, cu urmărire
  * lină (lerp 0.12 pe poziție, 0.08 pe intensitate). Redesenare doar cât cutia e vizibilă și cât
  * se mișcă ceva. Doar la pointer fin și fără mișcare redusă; altfel canvasul rămâne gol.
  */
@@ -59,8 +59,8 @@ export function pornestePuncte(): void {
         const inf = influenta(x - p.cx, y - p.cy, raza, intensitate);
         if (inf <= 0) continue;
         const m = marime * (1 + 0.75 * inf);
-        // Maro de brand (#4A2E1E): peste punctul CSS de .14, ajunge la ~.9 lângă cursor.
-        ctx.fillStyle = `rgba(74,46,30,${(0.88 * inf).toFixed(3)})`;
+        // --c-rosu-300 (#E8C9C4), decorativ: peste punctul CSS de .16, ajunge la ~.7 lângă cursor.
+        ctx.fillStyle = `rgba(232,201,196,${(0.7 * inf).toFixed(3)})`;
         ctx.beginPath();
         ctx.arc(x, y, m / 2, 0, Math.PI * 2);
         ctx.fill();

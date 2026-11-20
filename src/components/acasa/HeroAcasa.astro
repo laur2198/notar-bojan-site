@@ -1,20 +1,22 @@
 ---
 /**
- * Hero-ul paginii Acasă (CLAUDE.md §5; V3b): deschis, pe tot ecranul de la încărcare.
+ * Hero-ul paginii Acasă (CLAUDE.md §5; V3b, V3d): deschis, pe tot ecranul de la încărcare.
  *   - sus, de la 992 px pe două coloane: stânga blocul de titlu (h1 + subtitlul <p> în --c-muted,
  *     amândouă inline, ca textul să curgă într-un singur paragraf; max. ~50% din lățime; h1-ul
- *     conține doar titlul, pentru SEO) și sub el semnătura, aliniată la stânga; dreapta fotografia biroului (4:5, înălțimea
- *     limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
- *     Sub 992 px: h1 → fotografia (4:3, pe toată lățimea) → semnătura.
+ *     conține doar titlul, pentru SEO) și sub el linia roșie scurtă (3 px), centrate vertical față
+ *     de fotografie (V3d: fără semnătură, coloana nu mai are gol jos); dreapta fotografia biroului
+ *     (4:5, înălțimea limitată ca wordmark-ul să rămână vizibil complet la 1280×720 și 1440×900).
+ *     Sub 992 px: h1 → linia roșie → fotografia (4:3, pe toată lățimea).
  *   - jos, pe toată lățimea: rândul din CMS + adresa din birou.yaml, linia și wordmark-ul gigant
  *     (62% din lățime de la 768 px). Blocul de jos are parallax la ieșire (yPercent 0 → 40).
- *   - fundal: pete radiale calde, estompate, STATICE (WCAG 2.2.2).
+ *   - fundal: FundalViu puternic (seed 1, cu cursor): pete difuze roșu / piersică / auriu, mișcate
+ *     doar de scroll și de cursor, niciodată singure (WCAG 2.2.2).
  * Fotografia: astro:assets (<Picture>, AVIF/WebP, srcset, width/height), încărcată imediat, cu
  * prioritate mare (e LCP). Până vine fotografia reală: placeholder cald cu eticheta „Fotografie
  * birou – urmează” (marcat «DE COMPLETAT» în preview). Pe /en/ se folosește aceeași fotografie,
  * cu textul alternativ din pagina engleză.
- * Mișcarea o pornește src/scripts/miscare.ts ([data-hero]) la `intro-gata`: titlul pe rânduri,
- * semnătura desenată (3.5 s), fotografia descoperită de jos în sus (clip-path, 1 s, expo.out) și
+ * Mișcarea o pornește src/scripts/miscare.ts ([data-hero]) la încărcare: titlul pe rânduri, liniile
+ * trase, fotografia descoperită de jos în sus (clip-path, 1 s, expo.out) și
  * parallax-ul ei interior la ieșire (yPercent 0 → 8). Fără JS și la mișcare redusă totul e vizibil.
  * Fără butoane: telefonul și „Programare” sunt în navbar și în bara de jos (§4).
  */
@@ -23,7 +25,7 @@ import { Picture } from 'astro:assets';
 import { t, type Locale } from '../../i18n';
 import { estePreview, marcheazaPlaceholder, textAlt, type Birou } from '../../lib/continut';
 import FotoProvizorie from '../FotoProvizorie.astro';
-import Semnatura from '../Semnatura.astro';
+import FundalViu from '../FundalViu.astro';
 import { imparteDenumirea } from '../../lib/denumire';
 import WordmarkGigant from '../WordmarkGigant.astro';
 
@@ -46,7 +48,7 @@ const alt = textAlt(imagineAlt);
 ---
 
 <section class="hero" id="sus" data-hero data-tema-sectiune="light" aria-labelledby="hero-titlu">
-  <div class="hero__pete" aria-hidden="true"><i></i><i></i><i></i></div>
+  <FundalViu intensitate="puternic" seed={1} cursor />
   <div class="container hero__interior">
     <div class="hero__sus">
       <div class="hero__text">
@@ -56,6 +58,7 @@ const alt = textAlt(imagineAlt);
           <h1 class="hero__titlu" id="hero-titlu" set:html={marcheazaPlaceholder(titlu)} />
           <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />
         </div>
+        <div class="hero__accent" data-hero-accent aria-hidden="true"></div>
       </div>
       <div class="hero__foto" data-hero-foto>
         <FotoProvizorie locale={locale} provizorie={provizorie && !!imagine} />
@@ -83,9 +86,6 @@ const alt = textAlt(imagineAlt);
             )
           }
         </div>
-      </div>
-      <div class="hero__semnatura">
-        <Semnatura id="hero" />
       </div>
     </div>
     <div class="hero__jos" data-parallax-iesire="40">
@@ -117,45 +117,6 @@ const alt = textAlt(imagineAlt);
     color: var(--c-ink);
   }
 
-  /* Petele: radiale, calde, estompate, statice (fără animație). */
-  .hero__pete {
-    position: absolute;
-    inset: -10%;
-    z-index: 0;
-    pointer-events: none;
-    filter: blur(60px);
-    opacity: 0.9;
-  }
-
-  .hero__pete i {
-    position: absolute;
-    border-radius: 50%;
-  }
-
-  .hero__pete i:nth-child(1) {
-    left: 50%;
-    top: -15%;
-    width: 55vw;
-    height: 55vw;
-    background: radial-gradient(circle, #ede6e0 0%, rgb(237 230 224 / 0) 70%);
-  }
-
-  .hero__pete i:nth-child(2) {
-    left: -10%;
-    top: 35%;
-    width: 45vw;
-    height: 45vw;
-    background: radial-gradient(circle, #ede6e0 0%, rgb(237 230 224 / 0) 70%);
-  }
-
-  .hero__pete i:nth-child(3) {
-    left: 30%;
-    top: 55%;
-    width: 35vw;
-    height: 35vw;
-    background: radial-gradient(circle, #e6ddd5 0%, rgb(230 221 213 / 0) 70%);
-  }
-
   .hero__interior {
     position: relative;
     z-index: 1;
@@ -175,13 +136,12 @@ const alt = textAlt(imagineAlt);
     }
   }
 
-  /* Mobil și tabletă: h1 → fotografie (4:3) → semnătură. */
+  /* Mobil și tabletă: h1 (+ linia roșie) → fotografie (4:3). */
   .hero__sus {
     display: grid;
     grid-template-areas:
       'text'
-      'foto'
-      'semn';
+      'foto';
     gap: var(--space-3);
     align-items: start;
   }
@@ -226,7 +186,7 @@ const alt = textAlt(imagineAlt);
     width: 100%;
     aspect-ratio: 4 / 3;
     border-radius: 0.25em;
-    background: #ede6e0;
+    background: #f8ebe7;
   }
 
   /* Cadrul e mai înalt decât fereastra fotografiei, ca parallax-ul (yPercent 0 → 8) să nu lase gol. */
@@ -248,39 +208,34 @@ const alt = textAlt(imagineAlt);
     object-fit: cover;
   }
 
-  /* Placeholder cald până la fotografia reală: text --c-ink pe #D9CFC6 în cel mai rău caz (10.8:1). */
+  /* Placeholder cald până la fotografia reală: text --c-ink pe #ECD3CC în cel mai rău caz (11.7:1). */
   .hero__placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 12% var(--space-3) 0;
-    background: linear-gradient(160deg, #ede6e0 0%, #d9cfc6 100%);
+    background: linear-gradient(160deg, #f8ebe7 0%, #ecd3cc 100%);
     color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 600;
     text-align: center;
   }
 
-  .hero__semnatura {
-    grid-area: semn;
-    width: min(70vw, 18rem);
-  }
-
-  /* Desktop: titlul și semnătura în stânga, fotografia în dreapta. */
+  /*
+   * Desktop: titlul în stânga, fotografia în dreapta. Fără semnătură (V3d), blocul de titlu stă
+   * centrat vertical față de fotografie, ca stânga să nu rămână goală jos.
+   */
   @media (min-width: 62rem) {
     .hero__sus {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-areas:
-        'text foto'
-        'semn foto';
-      grid-template-rows: auto 1fr;
+      grid-template-areas: 'text foto';
       column-gap: var(--space-5);
     }
 
-    .hero__semnatura {
-      width: min(24vw, 21rem);
-      align-self: end;
+    .hero__text {
+      align-self: center;
+      gap: var(--space-3);
     }
 
     /*
@@ -310,38 +265,43 @@ const alt = textAlt(imagineAlt);
     color: var(--c-muted);
   }
 
+  /* Dividerul de deasupra wordmark-ului: roșul (V3d; decorativ, 6.6:1 pe alb). */
   .hero__divider {
     height: 1px;
-    background: var(--c-ink);
+    background: var(--c-rosu);
+    transform-origin: left center;
+  }
+
+  /* Linia de sub h1: roșul, 3 px, scurtă (V3d; decorativă). */
+  .hero__accent {
+    width: 4.5rem;
+    height: 3px;
+    background: var(--c-rosu);
     transform-origin: left center;
   }
 
   /* Distanța linie → „Birou Individual Notarial”: 1.1em din rândul de sus, ca în prototip. */
   .hero :global(.hero__wordmark) {
     --wordmark-sus-sus: 1.1em;
-    color: var(--c-brand-900);
+    color: var(--c-ink);
   }
 
   /*
-   * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts la
-   * `intro-gata`): titlul, rândul de sub semnătură și wordmark-ul ascunse, linia la 0, fotografia
-   * acoperită (mască de jos în sus), semnătura nedesenată. Plasa de siguranță din cap-pagina.js
-   * scoate `miscare` dacă modulele nu pornesc.
+   * Starea dinaintea intrării (doar cu JS și fără mișcare redusă, până pornește miscare.ts):
+   * titlul, rândul de deasupra liniei și wordmark-ul ascunse, liniile la 0, fotografia acoperită
+   * (mască de jos în sus). Plasa de siguranță din cap-pagina.js scoate `miscare` dacă modulele nu
+   * pornesc.
    */
   :global(html.miscare:not(.hero-pornit)) :is([data-hero-titlu], [data-hero-fade], [data-hero-wordmark]) {
     visibility: hidden;
   }
 
-  :global(html.miscare:not(.hero-pornit)) [data-hero-divider] {
+  :global(html.miscare:not(.hero-pornit)) :is([data-hero-divider], [data-hero-accent]) {
     transform: scaleX(0);
   }
 
   :global(html.miscare:not(.hero-pornit)) [data-hero-foto] {
     clip-path: inset(100% 0 0 0);
-  }
-
-  :global(html.miscare:not(.hero-pornit)) .hero__semnatura :global(path[data-a]) {
-    stroke-dashoffset: 101;
   }
 
   /* Pe mobil, adresa e în subsol și în bara de jos (Locație). */
