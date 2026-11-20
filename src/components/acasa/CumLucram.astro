@@ -1,6 +1,6 @@
 ---
 /**
- * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune deschisă (V3b). Stânga o imagine care se
+ * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune deschisă, --c-paper-2 (V3d). Stânga o imagine care se
  * schimbă după pasul activ (fotografia pasului din CMS sau, fără ea, placeholder cald cu cifra mare
  * roșie, decorativă; doar cadrul activ e în arborele de accesibilitate), dreapta pașii din CMS:
  * titluri mari, cele inactive la opacitate .6 (text mare: ≥ 3.5:1 pe alb), cel activ 1 și cu un
@@ -9,7 +9,7 @@
  * Fără JS și la mișcare redusă: toți pașii și toate descrierile vizibile (descrierile inactive se
  * ascund doar sub html.miscare); acolo focusul și clicul schimbă doar imaginea, aria-expanded rămâne true.
  * Sub pași, sloganul care „se aprinde” literă cu literă la derulare, din griul --c-slogan-stins
- * (5.3:1) în --c-ink (src/scripts/miscare.ts, [data-aprinde]).
+ * (6.3:1 pe alb, ≥ 4.5:1 peste fundalul viu discret) în --c-ink (src/scripts/miscare.ts, [data-aprinde]).
  */
 import { t, type Locale } from '../../i18n';
 import type { ImageMetadata } from 'astro';
@@ -128,10 +128,11 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 </script>
 
 <style>
+  /* --c-paper-2: alternanța secțiunilor deschise (V3d). */
   .pasi {
     position: relative;
     padding-bottom: var(--section-y);
-    background: var(--c-paper);
+    background: var(--c-paper-2);
     color: var(--c-ink);
   }
 

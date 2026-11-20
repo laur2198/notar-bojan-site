@@ -1,14 +1,16 @@
 ---
 /**
- * Secțiunea cu frazele mari (prototip, `.sticky-wrap`; CLAUDE.md §3.2, §5), deschisă (V3b):
- * fundal --c-paper-2, text --c-ink. Cu mișcare permisă: ~300vh de derulare, cutia de 100vh rămâne lipită, iar cele 3 fraze din CMS
- * se succed literă cu literă (apariție de la stânga, dispariție de la dreapta, legat de scroll;
- * ultima rămâne). Mișcarea o face src/scripts/miscare.ts ([data-fraze]).
- * Fără JS și la mișcare redusă (fără clasa `miscare` pe <html>): frazele una sub alta, statice.
+ * Secțiunea cu frazele mari (prototip, `.sticky-wrap`; CLAUDE.md §3.2, §5), ÎNCHISĂ (V3d):
+ * fundal --c-rosu-900, text alb (10.8:1), temă `dark` pentru navbar. Cu mișcare permisă: ~300vh
+ * de derulare, cutia de 100vh rămâne lipită, iar cele 3 fraze din CMS se succed literă cu literă,
+ * legat de scroll: fiecare literă apare în nuanța stinsă --c-slogan-stins-inchis (5.2:1 pe
+ * rosu-900, nu opacitate) și „se aprinde” în alb; la ieșire se stinge la loc și dispare, de la
+ * dreapta; ultima rămâne aprinsă. Mișcarea o face src/scripts/miscare.ts ([data-fraze]).
+ * Fără JS și la mișcare redusă (fără clasa `miscare` pe <html>): frazele una sub alta, albe, statice.
  *
- * Fundalul: grila de puncte (0.125em la pas de 3em, maro de brand la .14) e din CSS, deci există
- * și fără JS; în jurul cursorului (rază 10 pași) punctele cresc și ajung la .9, printr-un canvas propriu,
- * doar la pointer fin și fără mișcare redusă (src/scripts/puncte.ts).
+ * Fundalul: grila de puncte (0.125em la pas de 3em, --c-rosu-300 la .16, decorativă) e din CSS,
+ * deci există și fără JS; în jurul cursorului (rază 10 pași) punctele cresc și ajung la .7, printr-un
+ * canvas propriu, doar la pointer fin și fără mișcare redusă (src/scripts/puncte.ts).
  */
 import { t, type Locale } from '../../i18n';
 import { marcheazaPlaceholder } from '../../lib/continut';
@@ -21,7 +23,7 @@ interface Props {
 const { locale, fraze } = Astro.props;
 ---
 
-<section class="fraze" data-tema-sectiune="light" aria-label={t(locale, 'acasa.fraze')}>
+<section class="fraze pe-inchis" data-tema-sectiune="dark" aria-label={t(locale, 'acasa.fraze')}>
   <div class="fraze__derulare" data-fraze>
     <div class="fraze__cutie" data-puncte-cutie>
       <canvas class="fraze__canvas" data-puncte aria-hidden="true"></canvas>
@@ -56,8 +58,8 @@ const { locale, fraze } = Astro.props;
 <style>
   .fraze {
     position: relative;
-    background: var(--c-paper-2);
-    color: var(--c-ink);
+    background: var(--c-rosu-900);
+    color: var(--c-paper);
   }
 
   .fraze__cutie {
@@ -65,8 +67,8 @@ const { locale, fraze } = Astro.props;
     display: grid;
     place-items: center;
     padding-block: var(--section-y);
-    /* Grila de puncte: 0.125em la pas de 3.125em (0.125 + 3), maro de brand la .14. */
-    background-image: radial-gradient(circle, rgb(74 46 30 / 0.14) 0.0625em, transparent 0.07em);
+    /* Grila de puncte: 0.125em la pas de 3.125em (0.125 + 3), --c-rosu-300 (#E8C9C4) la .16, decorativă. */
+    background-image: radial-gradient(circle, rgb(232 201 196 / 0.16) 0.0625em, transparent 0.07em);
     background-size: 3.125em 3.125em;
     background-position: center;
   }
@@ -91,7 +93,7 @@ const { locale, fraze } = Astro.props;
     justify-self: center;
     max-width: 20em;
     margin: 0;
-    color: var(--c-ink);
+    color: var(--c-paper);
     font-family: var(--font-display);
     font-size: var(--fs-statement);
     font-weight: var(--fw-titlu);

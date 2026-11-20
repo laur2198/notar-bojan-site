@@ -27,8 +27,11 @@
   --c-rosu-300:   #E8C9C4;  /* text secundar pe rosu-900 (7.0:1); cifrele decorative pe închis */
   --c-linie-inchis: #9A2A22; /* borduri, separatoare pe rosu-900 (doar decorativ) */
 
-  /* Sloganul care „se aprinde” pornește din acest gri (5.3:1 pe alb), nu din opacitate. */
-  --c-slogan-stins: #6B6B6B;
+  /*
+   * Sloganul care „se aprinde” pornește din acest gri, nu din opacitate: 6.3:1 pe alb, ≥ 4.5:1 și
+   * peste fundalul viu discret pe paper-2 („Cum lucrăm”), cu granulație. Nu se pune pe fundalul viu puternic.
+   */
+  --c-slogan-stins: #62605D;
   /* Aceeași stare stinsă pe rosu-900 (frazele mari se aprind spre alb): 5.2:1 pe rosu-900. */
   --c-slogan-stins-inchis: #DEA7A0;
 

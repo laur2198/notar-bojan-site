@@ -1,12 +1,14 @@
 ---
 /**
- * Întrebările frecvente pe Acasă (prototip, `.faq`; CLAUDE.md §4): secțiune deschisă, --c-paper-2
- * (V3b); iconița +/− în --c-rosu. Stânga titlul
+ * Întrebările frecvente pe Acasă (prototip, `.faq`; CLAUDE.md §4): secțiune deschisă, --c-paper
+ * (V3d: alternanța paper / paper-2 a secțiunilor deschise); iconița +/− în --c-rosu. Stânga titlul
  * mare (rânduri din mască, data-reveal), dreapta acordeonul cu întrebările evidențiate din
  * faq/{limba}.yaml. Acordeonul e <details>/<summary> nativ (§4): `name` comun ține un singur
  * răspuns deschis, fără JS (Chrome 120+, Safari 17.2+, Firefox 130+; mai vechi: se pot deschide
  * mai multe). Deschiderea animată doar unde browserul o permite și fără mișcare redusă.
- * Apoi încheierea: titlu și subtitlu (gri) + Buton contur WhatsApp și Buton plin „Programare”.
+ * Apoi CTA-ul final, o bandă ÎNCHISĂ separată (V3d): fundal --c-rosu-900, temă `dark`; titlul alb,
+ * subtitlul --c-rosu-300 (7.0:1), Buton contur WhatsApp (alb) și Buton plin „Programare” (alb, text
+ * rosu-900), în varianta „pe închis” (variabilele --buton-* ale temei închise, global.css).
  */
 import { cale, t, type Locale } from '../../i18n';
 import { linkWhatsapp } from '../../lib/contact';
@@ -48,8 +50,11 @@ const whatsapp = linkWhatsapp(birou, locale);
         }
       </div>
     </div>
-    <div class="faq__cta">
-      <div class="faq__cta-interior">
+  </div>
+</section>
+<div class="faq__cta pe-inchis" data-tema-sectiune="dark">
+  <div class="container faq__cta-grila">
+    <div class="faq__cta-interior">
       <p class="faq__cta-text">
         <span set:html={marcheazaPlaceholder(ctaTitlu)} />
         <span class="faq__cta-sub" set:html={marcheazaPlaceholder(ctaSubtitlu)} />
@@ -66,16 +71,15 @@ const whatsapp = linkWhatsapp(birou, locale);
         />
         <Buton text={t(locale, 'actiune.programare')} href={cale('programare', locale)} />
       </div>
-      </div>
     </div>
   </div>
-</section>
+</div>
 
 <style>
   .faq {
     position: relative;
     padding-bottom: var(--section-y);
-    background: var(--c-paper-2);
+    background: var(--c-paper);
     color: var(--c-ink);
   }
 
@@ -183,11 +187,17 @@ const whatsapp = linkWhatsapp(birou, locale);
     }
   }
 
+  /* CTA-ul final: banda închisă (rosu-900), aceeași grilă ca întrebările. */
   .faq__cta {
+    padding-block: var(--section-y);
+    background: var(--c-rosu-900);
+    color: var(--c-paper);
+  }
+
+  .faq__cta-grila {
     display: grid;
     grid-template-columns: 1fr 1.4fr;
     gap: 3em;
-    padding-top: var(--section-y);
   }
 
   .faq__cta-interior {
@@ -209,9 +219,10 @@ const whatsapp = linkWhatsapp(birou, locale);
     letter-spacing: var(--ls-h2);
   }
 
+  /* rosu-300 pe rosu-900: 7.0:1. */
   .faq__cta-sub {
     display: block;
-    color: var(--c-muted);
+    color: var(--c-rosu-300);
   }
 
   .faq__cta-butoane {
@@ -222,7 +233,7 @@ const whatsapp = linkWhatsapp(birou, locale);
 
   @media (max-width: 61.99rem) {
     .faq__grila,
-    .faq__cta {
+    .faq__cta-grila {
       grid-template-columns: 1fr;
     }
 

@@ -56,6 +56,7 @@ const alt = textAlt(imagineAlt);
           <h1 class="hero__titlu" id="hero-titlu" set:html={marcheazaPlaceholder(titlu)} />
           <p class="hero__subtitlu" set:html={marcheazaPlaceholder(subtitlu)} />
         </div>
+        <div class="hero__accent" data-hero-accent aria-hidden="true"></div>
       </div>
       <div class="hero__foto" data-hero-foto>
         <FotoProvizorie locale={locale} provizorie={provizorie && !!imagine} />
@@ -310,9 +311,18 @@ const alt = textAlt(imagineAlt);
     color: var(--c-muted);
   }
 
+  /* Dividerul de deasupra wordmark-ului: roșul (V3d; decorativ, 6.6:1 pe alb). */
   .hero__divider {
     height: 1px;
-    background: var(--c-ink);
+    background: var(--c-rosu);
+    transform-origin: left center;
+  }
+
+  /* Linia de sub h1: roșul, 3 px, scurtă (V3d; decorativă). */
+  .hero__accent {
+    width: 4.5rem;
+    height: 3px;
+    background: var(--c-rosu);
     transform-origin: left center;
   }
 
@@ -332,7 +342,7 @@ const alt = textAlt(imagineAlt);
     visibility: hidden;
   }
 
-  :global(html.miscare:not(.hero-pornit)) [data-hero-divider] {
+  :global(html.miscare:not(.hero-pornit)) :is([data-hero-divider], [data-hero-accent]) {
     transform: scaleX(0);
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contrastCuGranulatie, raportContrast } from './contrast';
+import { amesteca, contrastCuGranulatie, raportContrast } from './contrast';
 import { compusMaxim, CULORI_VIU, INTENSITATI, pata } from './fundal-viu';
 import { culoare, culori, marimePx, numarToken } from './tokens';
 
@@ -60,7 +60,7 @@ const PERECHI: [fata: string, fundal: string, raport: number, prag: number][] = 
   ['c-rosu-900', 'c-paper', 10.8, 4.5],
   ['c-rosu-900', 'c-rosu-50', 9.5, 4.5],
   ['c-rosu-300', 'c-rosu-900', 7.0, 4.5],
-  ['c-slogan-stins', 'c-paper', 5.3, 4.5],
+  ['c-slogan-stins', 'c-paper', 6.3, 4.5],
   ['c-slogan-stins-inchis', 'c-rosu-900', 5.2, 4.5],
 ];
 
@@ -105,6 +105,12 @@ describe('fundalul viu (FundalViu.astro, --viu-*)', () => {
       });
     }
   }
+
+  it('„Cum lucrăm” (discret, paper-2): sloganul stins ≥ 4.5:1, pașii inactivi (ink la .6, text mare) ≥ 3:1', () => {
+    const compus = compusMaxim('discret', culoare('c-paper-2'));
+    expect(contrastCuGranulatie(culoare('c-slogan-stins'), compus)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastCuGranulatie(amesteca(compus, culoare('c-ink'), 0.6), compus)).toBeGreaterThanOrEqual(3);
+  });
 
   it('compusul maxim e cel din comentariul din tokens.css', () => {
     expect(compusMaxim('puternic', culoare('c-paper'))).toBe('#F8E5DA');

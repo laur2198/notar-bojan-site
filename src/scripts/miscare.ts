@@ -27,7 +27,7 @@
  *                          Benzile se creează doar aici: la mișcare redusă nu există deloc.
  *   [data-hero]            intrarea hero-ului de pe Acasă, pornită la `intro-gata` (sau imediat,
  *                          dacă a fost deja emis): blocul de titlu ([data-hero-titlu]: h1 + subtitlu) pe rânduri din mască,
- *                          linia ([data-hero-divider]) 0 → 100%, rândul de sub semnătură
+ *                          linia ([data-hero-divider]) și linia roșie de sub titlu ([data-hero-accent]) 0 → 100%, rândul de sub semnătură
  *                          ([data-hero-fade]) și wordmark-ul ([data-hero-wordmark]) apar, fotografia
  *                          ([data-hero-foto]) se descoperă de jos în sus (clip-path, 1 s, expo.out), iar
  *                          semnătura se desenează în 3.5 s. Până atunci CSS-ul le ascunde sub
@@ -36,7 +36,9 @@
  *                          (top top → bottom top), scrub. Blocul de jos al hero-ului (40) și
  *                          interiorul fotografiei din hero (8).
  *   [data-fraze]           frazele mari ([data-fraza]) se succed literă cu literă, legat de scroll:
- *                          apar de la stânga, dispar de la dreapta, ultima rămâne (FrazeSticky.astro).
+ *                          fiecare literă apare în nuanța stinsă (--c-slogan-stins-inchis, nu opacitate)
+ *                          și se aprinde în alb, de la stânga; la ieșire se stinge și dispare, de la
+ *                          dreapta; ultima rămâne aprinsă (FrazeSticky.astro, pe rosu-900).
  *   [data-aprinde]         textul „se aprinde” literă cu literă la scroll, culoarea --c-slogan-stins → --c-ink.
  */
 import { gsap } from 'gsap';
@@ -184,6 +186,7 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
   const html = document.documentElement;
   const titlu = hero.querySelector<HTMLElement>('[data-hero-titlu]');
   const linie = hero.querySelector<HTMLElement>('[data-hero-divider]');
+  const accent = hero.querySelector<HTMLElement>('[data-hero-accent]');
   const fade = [...hero.querySelectorAll<HTMLElement>('[data-hero-fade]')];
   const wordmark = hero.querySelector<HTMLElement>('[data-hero-wordmark]');
   const foto = hero.querySelector<HTMLElement>('[data-hero-foto]');
@@ -220,6 +223,8 @@ function intrareHero(hero: HTMLElement, ctx: gsap.Context): () => void {
         });
       }
       if (linie) gsap.fromTo(linie, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'power2.inOut' });
+      // Linia roșie de sub titlu (V3d): după primele rânduri ale titlului.
+      if (accent) gsap.fromTo(accent, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'power2.inOut', delay: 0.35 });
       if (fade.length) gsap.fromTo(fade, { autoAlpha: 0, y: '1em' }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.inOut', delay: 0.2 });
       if (wordmark) gsap.fromTo(wordmark, { autoAlpha: 0, y: '0.3em' }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power2.inOut', delay: 0.3 });
       // Fotografia: mască de jos în sus (V3b).
@@ -256,15 +261,27 @@ function parallaxIesire(el: HTMLElement) {
   gsap.fromTo(el, { yPercent: 0 }, { yPercent: n, ease: 'none', scrollTrigger: { trigger: sectiune, start: 'top top', end: 'bottom top', scrub: true } });
 }
 
+/** Culoarea unui token din tokens.css, citită la rulare (ex. --c-slogan-stins). */
+const culoareToken = (nume: string, rezerva: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(nume).trim() || rezerva;
+
 function fraze(container: HTMLElement): () => void {
   const elemente = [...container.querySelectorAll<HTMLElement>('[data-fraza]')];
   const master = gsap.timeline({ scrollTrigger: { trigger: container, start: 'top 40%', end: 'bottom bottom', scrub: true } });
+  // V3d (pe rosu-900): fiecare literă apare direct în nuanța stinsă (5.2:1), fără stări
+  // intermediare de opacitate, apoi se aprinde în alb; la ieșire, invers.
+  const stins = culoareToken('--c-slogan-stins-inchis', '#dea7a0');
+  const aprins = culoareToken('--c-paper', '#ffffff');
   const curatari = elemente.map((f, i) => {
     const { tinta, aria, revino } = pregatesteTextAccesibil(f);
     const split = SplitText.create(tinta, { type: 'words,chars', aria });
     const t = gsap.timeline();
-    t.from(split.chars, { autoAlpha: 0, stagger: { amount: 0.7, from: 'start' }, duration: 0.7 });
-    if (i < elemente.length - 1) t.to(split.chars, { autoAlpha: 0, stagger: { amount: 0.7, from: 'end' }, duration: 0.7 });
+    t.fromTo(split.chars, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, stagger: { amount: 0.7, from: 'start' } }, 0);
+    t.fromTo(split.chars, { color: stins }, { color: aprins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'start' } }, 0);
+    if (i < elemente.length - 1) {
+      t.to(split.chars, { color: stins, duration: 0.35, ease: 'none', stagger: { amount: 0.7, from: 'end' } }, '>');
+      t.to(split.chars, { autoAlpha: 0, duration: 0.01, stagger: { amount: 0.7, from: 'end' } }, '<0.35');
+    }
     master.add(t, i === 0 ? 0 : '-=0.15');
     return () => {
       split.revert();
@@ -280,8 +297,9 @@ function fraze(container: HTMLElement): () => void {
 
 function aprinde(el: HTMLElement): () => void {
   const { tinta, aria, revino } = pregatesteTextAccesibil(el);
-  // Din griul --c-slogan-stins (5.3:1 pe alb) în culoarea textului; nu din opacitate (V3b).
-  const stins = getComputedStyle(document.documentElement).getPropertyValue('--c-slogan-stins').trim() || '#6b6b6b';
+  // Din griul --c-slogan-stins (6.3:1 pe alb) în culoarea textului; nu din opacitate (V3b).
+  // Pe închis (.pe-inchis), din --c-slogan-stins-inchis (5.2:1 pe rosu-900).
+  const stins = el.closest('.pe-inchis') ? culoareToken('--c-slogan-stins-inchis', '#dea7a0') : culoareToken('--c-slogan-stins', '#62605d');
   const split = SplitText.create(tinta, {
     type: 'words,chars',
     aria,
