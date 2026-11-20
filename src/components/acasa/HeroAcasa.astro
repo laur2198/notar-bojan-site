@@ -226,7 +226,7 @@ const alt = textAlt(imagineAlt);
     width: 100%;
     aspect-ratio: 4 / 3;
     border-radius: 0.25em;
-    background: #ede6e0;
+    background: #f8ebe7;
   }
 
   /* Cadrul e mai înalt decât fereastra fotografiei, ca parallax-ul (yPercent 0 → 8) să nu lase gol. */
@@ -248,14 +248,14 @@ const alt = textAlt(imagineAlt);
     object-fit: cover;
   }
 
-  /* Placeholder cald până la fotografia reală: text --c-ink pe #D9CFC6 în cel mai rău caz (10.8:1). */
+  /* Placeholder cald până la fotografia reală: text --c-ink pe #ECD3CC în cel mai rău caz (11.7:1). */
   .hero__placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 12% var(--space-3) 0;
-    background: linear-gradient(160deg, #ede6e0 0%, #d9cfc6 100%);
+    background: linear-gradient(160deg, #f8ebe7 0%, #ecd3cc 100%);
     color: var(--c-ink);
     font-size: var(--fs-sm);
     font-weight: 600;
@@ -319,7 +319,7 @@ const alt = textAlt(imagineAlt);
   /* Distanța linie → „Birou Individual Notarial”: 1.1em din rândul de sus, ca în prototip. */
   .hero :global(.hero__wordmark) {
     --wordmark-sus-sus: 1.1em;
-    color: var(--c-brand-900);
+    color: var(--c-ink);
   }
 
   /*

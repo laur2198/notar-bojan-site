@@ -18,7 +18,8 @@ import Buton from '../components/Buton.astro';
 import Semnatura from '../components/Semnatura.astro';
 import Shutter from '../components/Shutter.astro';
 import WordmarkGigant from '../components/WordmarkGigant.astro';
-import { formateazaRaport, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
+import { amesteca, contrastCuGranulatie, formateazaRaport, GRANULATIE, PRAG_AA, raportContrast, treceAA, type Uz } from '../lib/contrast';
+import { compusMaxim, INTENSITATI, type Intensitate } from '../lib/fundal-viu';
 import { estePreview, getBirou } from '../lib/continut';
 import { culoare, culori, marimePx, numarToken } from '../lib/tokens';
 import { url } from '../lib/url';
@@ -28,32 +29,30 @@ export const getStaticPaths = (() => (estePreview ? [{ params: { stil: 'stil' } 
 const birou = await getBirou();
 
 const MARK_FUNDAL = '#FFF1B8'; // mark.todo din global.css
-/** Opacitatea granulației: zgomot negru, alfa maxim .06 (tokens.css, --granulatie). */
-const GRANULATIE = 0.06;
 
-/** Amestec sRGB, ca `color-mix(in srgb, a, b p%)` din CSS. */
-const amesteca = (a: string, b: string, p: number) =>
-  '#' +
-  [1, 3, 5]
-    .map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - p) + parseInt(b.slice(i, i + 2), 16) * p))
-    .map((v) => v.toString(16).padStart(2, '0'))
-    .join('')
-    .toUpperCase();
-
-/** O culoare sub pixelul cel mai închis al granulației (negru la opacitatea maximă). */
-const subGranulatie = (h: string) => amesteca(h, '#000000', GRANULATIE);
-
+/*
+ * Pseudo-tokenuri pentru fundaluri compuse:
+ *   hero-subtitlu            alb 90% peste rosu-900 (subtitlul din hero-ul paginilor interioare);
+ *   viu-{intensitate}-{fond} punctul cel mai saturat al fundalului viu (cele 3 pete suprapuse în
+ *                            centru) peste --c-paper sau --c-paper-2 (src/lib/fundal-viu.ts).
+ */
 const hex = (token: string) => {
   if (token === 'mark') return MARK_FUNDAL;
-  // Alb 90% peste fundalul închis (subtitlul din hero).
-  if (token === 'hero-subtitlu') return amesteca(culoare('c-brand-900'), culoare('c-paper'), 0.9);
+  if (token === 'hero-subtitlu') return amesteca(culoare('c-rosu-900'), culoare('c-paper'), 0.9);
+  const viu = token.match(/^viu-(puternic|discret)-(c-paper(?:-2)?)$/);
+  if (viu) return compusMaxim(viu[1] as Intensitate, culoare(viu[2]!));
   const tokenCuloare = culori[token];
   if (!tokenCuloare) throw new Error(`Tokenul --${token} lipsește din tokens.css.`);
   return tokenCuloare.hex;
 };
 
-const numeCuloare = (token: string) =>
-  token === 'mark' ? 'mark.todo' : token === 'hero-subtitlu' ? 'paper 90% pe brand-900' : `--${token}`;
+const numeCuloare = (token: string) => {
+  if (token === 'mark') return 'mark.todo';
+  if (token === 'hero-subtitlu') return 'paper 90% pe rosu-900';
+  const viu = token.match(/^viu-(puternic|discret)-(c-paper(?:-2)?)$/);
+  if (viu) return `fundal viu ${viu[1]} (maxim) pe --${viu[2]}`;
+  return `--${token}`;
+};
 
 interface Pereche {
   fata: string;
@@ -63,30 +62,40 @@ interface Pereche {
   nota?: string;
 }
 
+const perechiViu: Pereche[] = INTENSITATI.flatMap((i) =>
+  ['c-paper', 'c-paper-2'].flatMap((fond) => [
+    { fata: 'c-ink', fundal: `viu-${i}-${fond}`, uz: 'text' as Uz, folosire: `Text principal peste fundalul viu ${i}, în punctul cel mai saturat` },
+    { fata: 'c-muted', fundal: `viu-${i}-${fond}`, uz: 'text' as Uz, folosire: `Text secundar peste fundalul viu ${i}` },
+    { fata: 'c-rosu', fundal: `viu-${i}-${fond}`, uz: 'text' as Uz, folosire: `Cifrele 01–0N, iconițele și focusul peste fundalul viu ${i}` },
+  ]),
+);
+
 const perechi: Pereche[] = [
-  { fata: 'c-ink', fundal: 'c-paper', uz: 'text', folosire: 'Text principal și titluri; linkuri' },
-  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'text', folosire: 'Text pe secțiunile alternante (frazele mari, întrebările, banda de titlu)' },
+  { fata: 'c-ink', fundal: 'c-paper', uz: 'text', folosire: 'Text principal și titluri; linkuri; wordmark-ul, navbar-ul, butonul contur' },
+  { fata: 'c-ink', fundal: 'c-paper-2', uz: 'text', folosire: 'Text pe secțiunile alternante' },
+  { fata: 'c-ink', fundal: 'c-rosu-50', uz: 'text', folosire: 'Butonul contur la hover' },
   { fata: 'c-muted', fundal: 'c-paper', uz: 'text', folosire: 'Text secundar, lead-uri, rezumate; „Închis” (cerc gol, nu culoare)' },
   { fata: 'c-muted', fundal: 'c-paper-2', uz: 'text', folosire: 'Text secundar pe secțiunile alternante' },
   { fata: 'c-slogan-stins', fundal: 'c-paper', uz: 'text', folosire: 'Sloganul din „Cum lucrăm” înainte să „se aprindă” (trece în --c-ink)' },
-  { fata: 'c-brand', fundal: 'c-paper', uz: 'text', folosire: 'Textul butonului contur; wordmark-ul și semnătura (brand)' },
-  { fata: 'c-brand', fundal: 'c-paper-2', uz: 'text', folosire: 'Butonul contur pe secțiunile alternante' },
-  { fata: 'c-brand', fundal: 'c-brand-50', uz: 'text', folosire: 'Butonul contur la hover' },
-  { fata: 'c-paper', fundal: 'c-brand', uz: 'text', folosire: 'Textul butonului plin; bula cursorului' },
-  { fata: 'c-paper', fundal: 'c-brand-900', uz: 'text', folosire: 'Butonul plin la hover; text pe subsol, meniul compact, CTA-ul final' },
-  { fata: 'c-brand-900', fundal: 'c-paper', uz: 'text', folosire: 'Butonul alb de pe închis (navbar în tema închisă); wordmark-ul din hero' },
-  { fata: 'c-brand-900', fundal: 'c-brand-50', uz: 'text', folosire: 'Butonul alb de pe închis, la hover' },
-  { fata: 'c-brand-300', fundal: 'c-brand-900', uz: 'text', folosire: 'Text secundar pe închis: titlurile și rândul legal din subsol, butonul inactiv' },
-  { fata: 'hero-subtitlu', fundal: 'c-brand-900', uz: 'text', folosire: 'Subtitlul din hero-ul paginilor interioare' },
-  { fata: 'c-accent', fundal: 'c-paper', uz: 'text', folosire: 'Accent: numerele 01–0N de la servicii (mono, text mic)' },
-  { fata: 'c-accent', fundal: 'c-paper-2', uz: 'ui', folosire: 'Accent: iconița +/− din întrebări' },
+  { fata: 'c-paper', fundal: 'c-rosu', uz: 'text', folosire: 'Textul butonului plin; bula cursorului' },
+  { fata: 'c-paper', fundal: 'c-rosu-hover', uz: 'text', folosire: 'Butonul plin la hover; butonul contur pe închis, la hover' },
+  { fata: 'c-rosu', fundal: 'c-paper', uz: 'text', folosire: 'Cifrele 01–0N de la servicii (mono, text mic)' },
+  { fata: 'c-rosu', fundal: 'c-paper-2', uz: 'text', folosire: 'Roșul pe secțiunile alternante' },
+  { fata: 'c-rosu', fundal: 'c-rosu-50', uz: 'text', folosire: 'Roșul pe fundalurile mici rosu-50' },
+  { fata: 'c-paper', fundal: 'c-rosu-900', uz: 'text', folosire: 'Text pe închis: subsolul, meniul compact, frazele mari, CTA-ul final' },
+  { fata: 'c-rosu-900', fundal: 'c-paper', uz: 'text', folosire: 'Butonul alb de pe închis (navbar în tema închisă, CTA-ul final)' },
+  { fata: 'c-rosu-900', fundal: 'c-rosu-50', uz: 'text', folosire: 'Butonul alb de pe închis, la hover' },
+  { fata: 'c-rosu-300', fundal: 'c-rosu-900', uz: 'text', folosire: 'Text secundar pe închis: titlurile și rândul legal din subsol, butonul inactiv' },
+  { fata: 'c-slogan-stins-inchis', fundal: 'c-rosu-900', uz: 'text', folosire: 'Frazele mari înainte să „se aprindă” (trec în alb)' },
+  { fata: 'hero-subtitlu', fundal: 'c-rosu-900', uz: 'text', folosire: 'Subtitlul din hero-ul paginilor interioare' },
   { fata: 'c-ink', fundal: 'mark', uz: 'text', folosire: 'Marcaj «DE COMPLETAT» (doar în preview)' },
-  { fata: 'c-brand', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, conturul butonului contur, iconița WhatsApp' },
-  { fata: 'c-brand', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus pe secțiunile alternante' },
-  { fata: 'c-paper', fundal: 'c-brand-900', uz: 'ui', folosire: 'Contur de focus pe închis; conturul butonului contur pe închis' },
-  { fata: 'c-accent', fundal: 'c-paper', uz: 'ui', folosire: 'Accent: săgețile serviciilor, punctul pasului activ, linia .sub la hover' },
+  ...perechiViu,
+  { fata: 'c-rosu', fundal: 'c-paper', uz: 'ui', folosire: 'Contur de focus, linia de sub h1, dividerele, săgețile, iconița WhatsApp, linia .sub la hover' },
+  { fata: 'c-rosu', fundal: 'c-paper-2', uz: 'ui', folosire: 'Contur de focus și iconița +/− pe secțiunile alternante' },
+  { fata: 'c-ink', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul butonului contur, al telefonului și al butonului „Meniu”' },
+  { fata: 'c-paper', fundal: 'c-rosu-900', uz: 'ui', folosire: 'Contur de focus pe închis; conturul butonului contur pe închis' },
   { fata: 'c-muted', fundal: 'c-paper', uz: 'ui', folosire: 'Conturul punctat al butonului inactiv și al marcajului' },
-  { fata: 'c-brand-300', fundal: 'c-brand-900', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
+  { fata: 'c-rosu-300', fundal: 'c-rosu-900', uz: 'ui', folosire: 'Conturul butonului inactiv pe închis' },
   {
     fata: 'c-line',
     fundal: 'c-paper',
@@ -95,18 +104,25 @@ const perechi: Pereche[] = [
     nota: 'Doar decorativ: nu delimitează câmpuri de formular sau butoane.',
   },
   {
-    fata: 'c-line-dark',
-    fundal: 'c-brand-900',
+    fata: 'c-linie-inchis',
+    fundal: 'c-rosu-900',
     uz: 'decorativ',
     folosire: 'Borduri și separatoare pe închis',
     nota: 'Doar decorativ.',
   },
   {
-    fata: 'c-brand-300',
-    fundal: 'c-paper',
+    fata: 'c-rosu',
+    fundal: 'c-rosu-900',
     uz: 'decorativ',
-    folosire: 'Cifrele mari din „Cum lucrăm” (aria-hidden)',
-    nota: 'Doar decorativ: pasul e anunțat în text.',
+    folosire: 'Linia de 3 px de pe marginea de sus a subsolului',
+    nota: 'Doar decorativ. Roșul nu stă pe roșu ca text sau element de interfață (pică AA).',
+  },
+  {
+    fata: 'c-rosu-300',
+    fundal: 'c-rosu-900',
+    uz: 'decorativ',
+    folosire: 'Grila de puncte din frazele mari (opacitate mică)',
+    nota: 'Doar decorativ (aria-hidden).',
   },
 ];
 
@@ -125,7 +141,7 @@ const randuri = perechi.map((p) => {
   const fata = hex(p.fata);
   const fundal = hex(p.fundal);
   const raport = raportContrast(fata, fundal);
-  const cuGranulatie = Math.min(raport, raportContrast(subGranulatie(fata), fundal), raportContrast(fata, subGranulatie(fundal)));
+  const cuGranulatie = contrastCuGranulatie(fata, fundal);
   return { ...p, raport, cuGranulatie, trece: treceAA(cuGranulatie, p.uz) };
 });
 
@@ -190,8 +206,10 @@ const fonturi = [
       <section aria-labelledby="paleta">
         <h2 id="paleta">Paleta</h2>
         <p>
-          Monocromă. Nicio informație nu e purtată doar de culoare: starea „Deschis / Închis” are text și formă
-          (disc plin / cerc gol). Singura culoare din afara paletei e galbenul marcajului «DE COMPLETAT», doar în preview.
+          V3d: alb și alb cald, ink pentru text, roșu pentru acțiuni și accente, roșu închis pentru singura suprafață
+          închisă; fără maro. Nicio informație nu e purtată doar de culoare: starea „Deschis / Închis” are text și formă
+          (disc plin / cerc gol), în ink / muted. Singura culoare din afara paletei e galbenul marcajului «DE COMPLETAT»,
+          doar în preview.
         </p>
         <ul class="paleta" role="list">
           {
@@ -372,7 +390,7 @@ const fonturi = [
           </figure>
           <figure class="granulatie-mostra">
             <div class="granulatie-marita granulatie-marita--inchis" data-tema-sectiune="dark" aria-hidden="true"></div>
-            <figcaption>Pe <code>--c-brand-900</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
+            <figcaption>Pe <code>--c-rosu-900</code>, mărit 4× (zgomotul e negru: pe închis abia se vede, ca în prototip)</figcaption>
           </figure>
         </div>
       </section>
@@ -400,7 +418,7 @@ const fonturi = [
       <section aria-labelledby="intro">
         <h2 id="intro">Intro-ul</h2>
         <p>
-          Ecran complet <code>--c-paper</code>, semnătura în <code>--c-brand</code> se desenează în 1,8 s; după o pauză de
+          Ecran complet <code>--c-paper</code>, semnătura în <code>--c-ink</code> se desenează în 1,8 s; după o pauză de
           0,4 s ecranul urcă în 1 s. O dată pe sesiune; orice clic, tastă, rotiță sau atingere îl sare. Nu apare deloc cu
           mișcare redusă sau fără JS. Pe această pagină pornește doar din buton (sau cu <code>#intro</code> în adresă).
         </p>
@@ -585,7 +603,7 @@ const fonturi = [
 
   .demo-inchis {
     padding-block: var(--space-7);
-    background: var(--c-brand-900);
+    background: var(--c-rosu-900);
     color: var(--c-paper);
   }
 
@@ -915,8 +933,8 @@ const fonturi = [
   }
 
   .granulatie-marita--inchis {
-    background-color: var(--c-brand-900);
-    border-color: var(--c-line-dark);
+    background-color: var(--c-rosu-900);
+    border-color: var(--c-linie-inchis);
   }
 
   .granulatie-mostra figcaption {
@@ -938,7 +956,7 @@ const fonturi = [
     border: 1px solid var(--c-line);
     border-radius: var(--radius);
     background: var(--c-paper);
-    color: var(--c-brand);
+    color: var(--c-ink);
   }
 
   .semnatura-panou > :global(.semnatura) {
@@ -946,8 +964,8 @@ const fonturi = [
   }
 
   .semnatura-panou--inchis {
-    background: var(--c-brand-900);
+    background: var(--c-rosu-900);
     color: var(--c-paper);
-    border-color: var(--c-brand-900);
+    border-color: var(--c-rosu-900);
   }
 </style>

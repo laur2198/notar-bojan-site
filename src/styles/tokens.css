@@ -6,29 +6,31 @@
  */
 :root {
   /*
-   * Culori: paleta caldă (varianta luminoasă aprobată după feedbackul clientei, V3b). Alb și gri
-   * cald pentru suprafețe, maro închis pentru elementele de brand, roșu bordo doar ca accent
-   * punctual. Contrastele sunt calculate și verificate în /stil/ (src/lib/contrast.ts).
+   * Culori (V3d, după feedbackul clientei: „roșul să fie o culoare vizibilă, site-ul mai colorat”):
+   * alb și alb cald pentru suprafețe, ink pentru text, ROȘU pentru acțiuni și accente, roșu închis
+   * pentru singura suprafață închisă. Maro nu mai apare în interfață. Contrastele de mai jos sunt
+   * fără granulație; cazul cel mai defavorabil (granulația de 6%) e verificat în
+   * src/lib/tokens.test.ts și în /stil/ (src/lib/contrast.ts), care eșuează sub AA.
    */
   --c-paper:      #FFFFFF;  /* fundal deschis (pagina, header, secțiuni) */
-  --c-paper-2:    #F5F5F4;  /* fundal deschis alternant (frazele mari, întrebări, banda de titlu) */
-  --c-ink:        #1F1E1D;  /* textul pe deschis, cald (16.6:1 pe alb, 15.2:1 pe paper-2) */
+  --c-paper-2:    #FBF8F6;  /* alb cald, secțiunile alternante (ink 15.7:1, muted 6.3:1, roșu 6.2:1) */
+  --c-ink:        #1F1E1D;  /* textul pe deschis; wordmark-ul, navbar-ul, butonul contur (16.6:1 pe alb) */
   --c-ink-2:      #34322F;  /* hover pe elementele ink */
-  --c-muted:      #5E5C59;  /* text secundar pe deschis (6.6:1 pe alb, 6.1:1 pe paper-2) */
+  --c-muted:      #5E5C59;  /* text secundar pe deschis (6.7:1 pe alb, 6.3:1 pe paper-2) */
   --c-line:       #E2E1DF;  /* borduri, separatoare pe deschis (doar decorativ) */
 
-  /* Brand: maro închis (butoane, semnătură, wordmark, subsol). */
-  --c-brand:      #4A2E1E;  /* butonul plin, conturul butonului secundar, focusul pe deschis (12.4:1 pe alb) */
-  --c-brand-900:  #2A1A10;  /* hover pe brand; suprafețele închise: subsolul, meniul compact, CTA-ul final */
-  --c-brand-300:  #C9AE94;  /* text secundar pe brand-900 (7.9:1); cifrele mari decorative */
-  --c-brand-50:   #EFE7E0;  /* hover pe butonul contur (brand pe el: 10.1:1) și pe butonul alb de pe închis */
-  --c-line-dark:  #4A3527;  /* borduri, separatoare pe brand-900 (doar decorativ) */
-
-  /* Accent: roșu bordo, DOAR accente mici (numere, săgeți, iconițe, linia .sub). Niciodată suprafețe mari, butoane sau paragrafe. */
-  --c-accent:     #9B1C1C;  /* 8.1:1 pe alb, 7.5:1 pe paper-2 */
+  /* Roșul: culoarea de acțiune. Niciodată pe paragrafe și niciodată pe alt roșu (rosu pe rosu-900: 1.6:1). */
+  --c-rosu:       #B42318;  /* butonul plin (alb pe el 6.6:1), cifrele, liniile, iconițele, .sub la hover, focusul pe deschis (6.6:1 pe alb) */
+  --c-rosu-hover: #8F1D14;  /* hover pe butonul plin (alb pe el 8.9:1) */
+  --c-rosu-50:    #FBEDEA;  /* hover pe butonul contur, fundaluri mici (roșu pe el 5.8:1, ink 14.6:1) */
+  --c-rosu-900:   #7A1414;  /* SINGURA suprafață închisă: subsolul, meniul compact, frazele mari, CTA-ul final (alb pe el 10.8:1) */
+  --c-rosu-300:   #E8C9C4;  /* text secundar pe rosu-900 (7.0:1); cifrele decorative pe închis */
+  --c-linie-inchis: #9A2A22; /* borduri, separatoare pe rosu-900 (doar decorativ) */
 
   /* Sloganul care „se aprinde” pornește din acest gri (5.3:1 pe alb), nu din opacitate. */
   --c-slogan-stins: #6B6B6B;
+  /* Aceeași stare stinsă pe rosu-900 (frazele mari se aprind spre alb): 5.2:1 pe rosu-900. */
+  --c-slogan-stins-inchis: #DEA7A0;
 
   /*
    * Granulație statică (fără animație, la nicio setare; WCAG 2.2.2): zgomot feTurbulence din
@@ -37,6 +39,26 @@
    * 6%; contrastul în cazul cel mai defavorabil e în /stil/. Data URI: CSP-ul permite img-src data:.
    */
   --granulatie: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+
+  /*
+   * Fundalul viu (FundalViu.astro): 3 pete pe instanță, câte una din fiecare culoare, fiecare un
+   * radial-gradient de la culoarea de mai jos, la opacitatea intensității, până la transparent la
+   * 70% din rază. Cazul cel mai defavorabil pentru textul de deasupra: toate trei suprapuse în
+   * centrul lor (orice poziție, scalare sau deplasare), pe --c-paper-2, plus granulația de 6%.
+   * Acolo: --c-muted, --c-ink și --c-rosu ≥ 4.5:1 (src/lib/tokens.test.ts, /stil/).
+   *   puternic (hero):            compus maxim #F8E5DA pe paper, #F5E0D3 pe paper-2
+   *   discret (secțiuni cu text): compus maxim #FAEEE8 pe paper, #F7E8E0 pe paper-2
+   * Contrastele exacte, cu și fără granulație, sunt în tabelul din /stil/.
+   */
+  --viu-culoare-rosu:     #B42318;
+  --viu-culoare-piersica: #F2A38F;
+  --viu-culoare-auriu:    #E9B872;
+  --viu-puternic-rosu:     0.04;
+  --viu-puternic-piersica: 0.11;
+  --viu-puternic-auriu:    0.13;
+  --viu-discret-rosu:      0.025;
+  --viu-discret-piersica:  0.07;
+  --viu-discret-auriu:     0.08;
 
   /* Tipografie: fonturi self-hosted (fonturi.css) */
   --font-sans:    'Geist Variable', system-ui, sans-serif;                         /* text, butoane, h3–h4 */

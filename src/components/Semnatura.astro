@@ -13,7 +13,7 @@
  * pagină (intro + hero). Pe Acasă e scrisă în HTML o singură dată (hero); intro-ul o clonează la
  * pornire și redenumește id-urile (IntroSemnatura.astro, src/scripts/intro-semnatura.ts).
  *
- * Culoarea: currentColor, din `ton`: pe deschis maroul de brand (--c-brand, CLAUDE.md §5),
+ * Culoarea: currentColor, din `ton`: pe deschis ink (--c-ink, CLAUDE.md §5),
  * pe închis alb (--c-paper).
  *
  * Animația (src/scripts/desen-semnatura.ts): un progres global P 0 → 1, fiecare .rev în intervalul
@@ -59,7 +59,7 @@ const r = randeazaSemnatura(svgSemnatura, id);
 <style>
   .semnatura {
     display: block;
-    color: var(--c-brand);
+    color: var(--c-ink);
   }
 
   .semnatura--inchis {

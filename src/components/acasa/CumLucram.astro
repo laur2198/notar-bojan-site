@@ -2,9 +2,9 @@
 /**
  * „Cum lucrăm” pe Acasă (prototip, `.pasi`): secțiune deschisă (V3b). Stânga o imagine care se
  * schimbă după pasul activ (fotografia pasului din CMS sau, fără ea, placeholder cald cu cifra mare
- * bej, decorativă; doar cadrul activ e în arborele de accesibilitate), dreapta pașii din CMS:
+ * roșie, decorativă; doar cadrul activ e în arborele de accesibilitate), dreapta pașii din CMS:
  * titluri mari, cele inactive la opacitate .6 (text mare: ≥ 3.5:1 pe alb), cel activ 1 și cu un
- * punct roșu de accent. Activarea la
+ * punct roșu (--c-rosu). Activarea la
  * hover (pointer fin), focus și clic: butoane cu aria-expanded care arată descrierea pasului activ.
  * Fără JS și la mișcare redusă: toți pașii și toate descrierile vizibile (descrierile inactive se
  * ascund doar sub html.miscare); acolo focusul și clicul schimbă doar imaginea, aria-expanded rămâne true.
@@ -155,8 +155,8 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     display: grid;
     place-items: center;
     background:
-      radial-gradient(120% 90% at 75% 20%, #f5f5f4 0%, rgb(245 245 244 / 0) 60%),
-      linear-gradient(160deg, #ede6e0 0%, #e6ddd5 100%);
+      radial-gradient(120% 90% at 75% 20%, #fbf8f6 0%, rgb(251 248 246 / 0) 60%),
+      linear-gradient(160deg, #f8ebe7 0%, #f1dcd6 100%);
     opacity: 0;
     transition: opacity 0.2s ease;
   }
@@ -173,9 +173,9 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     object-fit: cover;
   }
 
-  /* Cifra mare: decorativă (aria-hidden), bej. */
+  /* Cifra mare: decorativă (aria-hidden), roșie (5.0:1 pe placeholder-ul cel mai închis). */
   .pasi__cadru span {
-    color: var(--c-brand-300);
+    color: var(--c-rosu);
     font-family: var(--font-display);
     font-size: 8em;
     letter-spacing: -0.05em;
@@ -223,8 +223,8 @@ const paragrafe = slogan.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
     width: 0.2em;
     height: 0.2em;
     border-radius: 50%;
-    /* Accentul roșu: doar punctul pasului activ. */
-    background: var(--c-accent);
+    /* Roșul: punctul pasului activ. */
+    background: var(--c-rosu);
     opacity: 0;
     /* Intră din stânga: spre dreapta ar ieși din ecran pe titlurile pe toată lățimea. */
     transform: translateX(-0.5em);

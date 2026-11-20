@@ -1,8 +1,9 @@
 ---
 /**
- * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5; V3b): fundal --c-brand-900 (temă închisă),
- * titlurile și rândul legal în --c-brand-300, linkurile în alb. Intră „de sub
- * conținut”: interiorul urcă (yPercent -25 → 0) și un strat #120A05 se estompează (0.35 → 0), cu
+ * Subsolul din prototip (`.footer-wrap`; CLAUDE.md §5; V3d): fundal --c-rosu-900 (temă închisă),
+ * cu o linie de 3 px --c-rosu pe marginea de sus; titlurile și rândul legal în --c-rosu-300,
+ * linkurile în alb. Intră „de sub
+ * conținut”: interiorul urcă (yPercent -25 → 0) și un strat #3D0A0A se estompează (0.35 → 0), cu
  * scrub, pe intervalul clamp(top bottom) → clamp(top top). Mișcarea o face src/scripts/miscare.ts
  * ([data-footer]), doar cu mișcare permisă; altfel subsolul e static. Când s-a oprit, textul e fix.
  *
@@ -171,7 +172,9 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol {
     position: relative;
     overflow: hidden;
-    background: var(--c-brand-900);
+    /* Linia de sus: roșul, decorativă (desparte subsolul de CTA-ul final, tot rosu-900). */
+    border-top: 3px solid var(--c-rosu);
+    background: var(--c-rosu-900);
     color: var(--c-paper);
   }
 
@@ -206,8 +209,8 @@ const { strada, codPostal, oras, judet } = birou.adresa;
 
   .subsol__titlu {
     margin-bottom: calc(var(--space-1) / 2);
-    /* Bej pe maro închis: 7.9:1. */
-    color: var(--c-brand-300);
+    /* rosu-300 pe rosu-900: 7.0:1. */
+    color: var(--c-rosu-300);
     font-family: var(--font-sans);
     font-size: var(--fs-base);
     font-weight: 400;
@@ -252,7 +255,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
     justify-content: space-between;
     gap: 0 var(--space-4);
     padding-bottom: 0.3em;
-    color: var(--c-brand-300);
+    color: var(--c-rosu-300);
   }
 
   .subsol__legal p {
@@ -260,13 +263,13 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   }
 
   .subsol__legal .subsol__link {
-    color: var(--c-brand-300);
+    color: var(--c-rosu-300);
     font-weight: 400;
   }
 
   .subsol__linie {
     height: 1px;
-    background: var(--c-brand-300);
+    background: var(--c-rosu-300);
   }
 
   /* Wordmark-ul gigant: spațiu dedesubt, ca descendentul lui „ț” să nu fie tăiat. */
@@ -279,7 +282,7 @@ const { strada, codPostal, oras, judet } = birou.adresa;
   .subsol__strat {
     position: absolute;
     inset: 0;
-    background: #120a05;
+    background: #3d0a0a;
     opacity: 0;
     pointer-events: none;
   }

@@ -18,7 +18,7 @@
  *   [data-parallax="N"]    deplasare legată de scroll, yPercent N → −N pe durata vizibilității
  *                          (N negativ inversează sensul). Doar decorativ: fotografii, forme.
  *   [data-footer]          subsolul „intră de sub conținut” (Footer.astro): interiorul
- *                          ([data-footer-interior]) yPercent -25 → 0 și stratul #120A05
+ *                          ([data-footer-interior]) yPercent -25 → 0 și stratul #3D0A0A
  *                          ([data-footer-strat]) opacitate 0.35 → 0, scrub, clamp(top bottom) →
  *                          clamp(top top). La capăt, textul e static.
  *   [data-shutter]         benzi ink (doar demo pe /stil/, V3b) care acoperă secțiunea la ieșire (Shutter.astro): scaleY 0 → 1
